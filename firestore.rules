@@ -1,0 +1,37 @@
+rules_version = '2';
+// Carreau Competition Desk — who can read and change what.
+//  - Anyone can read competitions and results (spectators need no account).
+//  - Any signed-in Google user can create a competition; only its owner can change setup, entries and draws.
+//  - Scorers listed by the owner (kept private) can enter scores and move games between courts.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function tourn(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)).data; }
+    function owns(tid) { return signedIn() && tourn(tid).ownerUid == request.auth.uid; }
+    function accessPath(tid) { return /databases/$(database)/documents/tournaments/$(tid)/private/access; }
+    function scores(tid) {
+      return signedIn() && request.auth.token.email_verified == true
+        && exists(accessPath(tid)) && myEmail() in get(accessPath(tid)).data.scorers;
+    }
+
+    match /tournaments/{tid} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn() && resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
+      match /private/{docId} {
+        allow read: if owns(tid) || (signedIn() && docId == "access" && myEmail() in resource.data.scorers);
+        allow write: if owns(tid) && docId == "access";
+      }
+
+      match /matches/{mid} {
+        allow read: if true;
+        allow create, update: if owns(tid) || scores(tid);
+        allow delete: if owns(tid);
+      }
+    }
+  }
+}

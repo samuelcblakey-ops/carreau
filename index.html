@@ -1,0 +1,1453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Run petanque competitions live: draws, courts and scores for everyone.">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+</style>
+<title>Carreau Competition Desk</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: compact app bar + tab strip, one working column; courts and brackets as grids that wrap or scroll in place. */
+:root{
+  --bg:#eceeea; --surface:#ffffff; --surface-2:#f5f6f3; --ink:#1a2320; --muted:#5d6a64; --line:#d3d9d5;
+  --accent:#1d6a54; --accent-ink:#ffffff; --accent-soft:#dcebe5;
+  --jack:#d48d0b; --jack-soft:#fbefd6; --danger:#b3261e; --danger-soft:#f8e0de; --wire:#b9c3be;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111614; --surface:#1a211e; --surface-2:#202825; --ink:#e5ebe8; --muted:#97a49e; --line:#2d3833;
+  --accent:#5fc19d; --accent-ink:#0b1511; --accent-soft:#1f3a30;
+  --jack:#f0b443; --jack-soft:#3a2f17; --danger:#ef7a70; --danger-soft:#3d1f1d; --wire:#3e4b45; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111614; --surface:#1a211e; --surface-2:#202825; --ink:#e5ebe8; --muted:#97a49e; --line:#2d3833;
+  --accent:#5fc19d; --accent-ink:#0b1511; --accent-soft:#1f3a30;
+  --jack:#f0b443; --jack-soft:#3a2f17; --danger:#ef7a70; --danger-soft:#3d1f1d; --wire:#3e4b45; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.app{background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;margin-right:auto}
+.brand svg{flex:none}
+.brand small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.tsel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.tsel select{max-width:260px}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav.tabs button{background:none;border:0;padding:10px 14px;font-family:var(--display);font-size:17px;font-weight:600;letter-spacing:.03em;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-current="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+main{padding-block:20px 60px}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;margin:0;text-wrap:balance}
+h2{font-size:26px}
+h3{font-size:19px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--danger);border-color:var(--danger-soft)}
+.btn.ghost{background:none;border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:13px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+label.f>span{text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+input[type=text],input[type=number],input[type=date],select,textarea{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0;width:100%;color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+.seg{display:inline-flex;align-self:flex-start;max-width:100%;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface-2);padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:disabled{cursor:not-allowed;opacity:.6}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.pill.playing{background:var(--jack-soft);color:var(--jack)}
+.pill.done{background:var(--accent-soft);color:var(--accent)}
+.pill.ready{background:var(--surface-2);color:var(--ink);border:1px dashed var(--line)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.notice{padding:10px 14px;border-radius:8px;background:var(--jack-soft);color:var(--ink);font-size:14px}
+.notice.example{background:var(--accent-soft)}
+/* matches */
+.mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
+.match{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:6px;text-align:left;width:100%;cursor:pointer;min-width:0}
+.match:hover{border-color:var(--muted)}
+.match.ro{cursor:default}
+.match.playing{border-color:var(--jack);box-shadow:inset 3px 0 0 var(--jack)}
+.match .meta{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.side{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.side .nm{min-width:0;overflow-wrap:anywhere;font-weight:500}
+.side.win .nm{font-weight:700}
+.side .sc{font-family:var(--display);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.side.win .sc{color:var(--accent)}
+.side.lose .sc{color:var(--muted)}
+.court-tag{font-family:var(--display);font-weight:700;font-size:14px;color:var(--ink);letter-spacing:.03em}
+.tbd{color:var(--muted);font-style:italic}
+/* tables */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+td.n,th.n{text-align:right}
+td.wrap{white-space:normal;min-width:160px}
+tr.q td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.rank{font-family:var(--display);font-weight:700;font-size:17px}
+/* courts */
+.courts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:12px}
+.court{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px;min-height:150px}
+.court .cn{font-family:var(--display);font-size:28px;font-weight:700;line-height:1;display:flex;justify-content:space-between;align-items:center}
+.court.free{background:var(--surface-2);border-style:dashed}
+.court.off{opacity:.5}
+/* bracket */
+/* bracket: every round column is the same height and each match sits in an equal share of it,
+   so a match always lines up halfway between the two games that feed it; wires are drawn with borders */
+.bk-scroll{overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.bk{--gap:40px;display:grid;grid-auto-columns:minmax(200px,230px);grid-template-rows:auto 1fr;column-gap:var(--gap);width:max-content;min-width:100%}
+.bk h4{font-family:var(--display);font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 6px;grid-row:1}
+.bk-col{grid-row:2;display:flex;flex-direction:column}
+.bk-pair{flex:1;display:flex;flex-direction:column;position:relative}
+.bk-slot{flex:1;display:flex;align-items:center;position:relative;padding-block:5px}
+.bk-slot>*{width:100%}
+.bk-col.out .bk-slot::after{content:"";position:absolute;right:calc(var(--gap) / -2);width:calc(var(--gap) / 2);top:50%;border-top:2px solid var(--wire)}
+.bk-col.out .bk-pair::after{content:"";position:absolute;right:calc(var(--gap) / -2);top:25%;bottom:25%;border-right:2px solid var(--wire)}
+.bk-col.in .bk-slot::before{content:"";position:absolute;left:calc(var(--gap) / -2);width:calc(var(--gap) / 2);top:50%;border-top:2px solid var(--wire)}
+.bk-col.out .bk-slot.done::after{border-color:var(--accent)}
+.bkm{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;text-align:left;padding:0;cursor:pointer;font-size:14px}
+.bkm.ro{cursor:default}
+button.bkm:hover{border-color:var(--muted)}
+.bkm.playing{border-color:var(--jack);box-shadow:inset 3px 0 0 var(--jack)}
+.bkm.bye{opacity:.6;background:var(--surface-2);border-style:dashed}
+.bkm-row{display:flex;align-items:center;gap:8px;padding:6px 10px;min-height:34px}
+.bkm-row+.bkm-row{border-top:1px solid var(--line)}
+.bkm-row .sd{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:1.6ch;text-align:right}
+.bkm-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bkm-row .sc{font-family:var(--display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.bkm-row.win .nm{font-weight:700}.bkm-row.win .sc{color:var(--accent)}
+.bkm-row.lose .nm,.bkm-row.lose .sc{color:var(--muted)}
+.bkm-row .tbd{font-size:13px}
+.bkm-foot{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;background:var(--surface-2);color:var(--muted);border-top:1px solid var(--line)}
+.bkm.playing .bkm-foot{background:var(--jack-soft);color:var(--jack)}
+.bk-champ{border:2px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.bk-champ b{font-family:var(--display);font-size:22px;line-height:1.1;overflow-wrap:anywhere}
+.bk-champ.tbc{border-style:dashed;border-color:var(--wire);background:none}
+.bk-third{display:flex;justify-content:flex-end}
+.bk-third>div{width:230px;max-width:100%}
+.bk-third h4{font-family:var(--display);font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0}
+/* pools */
+.pools{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px}
+/* entries */
+.elist{display:flex;flex-direction:column}
+.erow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.erow .num{font-family:var(--display);font-weight:700;color:var(--muted);width:2.5ch;text-align:right;font-variant-numeric:tabular-nums}
+.erow .who{flex:1;min-width:0}
+.erow .who b{display:block}
+.erow.out{opacity:.5}
+.erow.here .num{color:var(--accent)}
+.btn.checked{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.reg-count{font-family:var(--display);font-size:22px}.reg-count b{font-size:30px}
+.meter{height:8px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.meter span{display:block;height:100%;background:var(--accent);transition:width .2s}
+input[type=search]{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0;width:100%;color:var(--ink)}
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(10,14,12,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border-radius:14px;max-width:520px;width:100%;max-height:calc(100% - 20px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--line)}
+.scorer{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.scorer .who{min-width:0}
+.scorer .who b{display:block;font-size:17px;overflow-wrap:anywhere}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:22px;font-weight:700;cursor:pointer}
+.stepper input{width:64px;text-align:center;font-family:var(--display);font-size:30px;font-weight:700;padding:4px}
+.err{color:var(--danger);font-size:14px;font-weight:600}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px)}
+.empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
+/* display mode */
+.disp{display:flex;flex-direction:column;gap:20px}
+.disp .court .cn{font-size:40px}
+.disp .court .side .nm{font-size:20px}
+.disp .court .side .sc{font-size:34px}
+.disp h2{font-size:38px}
+@media (max-width:560px){h2{font-size:22px}.stepper button{width:40px;height:40px}}
+@media (prefers-reduced-motion:no-preference){.match,.btn{transition:border-color .12s}}
+</style>
+</head>
+<body>
+
+
+<header class="app">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">
+        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="10" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 11.5c3.5 1.5 7.5 1.5 11 0M4.5 16.5c3.5-1.5 7.5-1.5 11 0" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="21" cy="6" r="3" fill="var(--jack)"/></svg>
+        Carreau <small>Competition desk</small>
+      </div>
+      <div class="tsel" id="tsel"></div>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+  </div>
+</header>
+<main class="wrap" id="main"><div class="empty">Loading competitions…</div></main>
+<div id="modal"></div>
+<div id="toast" hidden class="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, connectFirestoreEmulator, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, connectAuthEmulator, signInWithCredential, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { firebaseConfig } from "./firebase-config.js";
+(() => {
+"use strict";
+/* ---------------- utilities ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const clone = o => JSON.parse(JSON.stringify(o));
+const SIZE = { singles: 1, doubles: 2, triples: 3 };
+const FORMAT_LABEL = { singles: "Singles (tête-à-tête)", doubles: "Doubles", triples: "Triples" };
+const SYSTEM_LABEL = { swiss: "Swiss rounds", pools: "Pools → knockout", knockout: "Knockout", roundrobin: "Round robin", snake: "Snake", melee: "Mêlée rounds" };
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+
+/* ---------------- storage: shared db, or local fallback ---------------- */
+function localStore() {
+  const KEY = "carreau-local-v1";
+  let data; try { data = JSON.parse(lsGet(KEY) || "null"); } catch { data = null; }
+  data = data || { t: {}, m: {} };
+  const subsT = new Set(), subsM = new Map();
+  const persist = () => lsSet(KEY, JSON.stringify(data));
+  const emitT = () => setTimeout(() => subsT.forEach(cb => cb(Object.values(data.t).map(clone))));
+  const emitM = tid => setTimeout(() => (subsM.get(tid) || new Set()).forEach(cb => cb(Object.values(data.m[tid] || {}).map(clone))));
+  return {
+    mode: "local",
+    watchTournaments(cb) { subsT.add(cb); emitT(); return () => subsT.delete(cb); },
+    watchMatches(tid, cb) { if (!subsM.has(tid)) subsM.set(tid, new Set()); subsM.get(tid).add(cb); emitM(tid); return () => subsM.get(tid).delete(cb); },
+    async setTournament(t) { data.t[t.id] = clone(t); persist(); emitT(); },
+    async deleteTournament(tid) { delete data.t[tid]; delete data.m[tid]; persist(); emitT(); },
+    async setMatch(tid, m) { (data.m[tid] ||= {})[m.id] = clone(m); persist(); emitM(tid); },
+    async updateMatch(tid, id, patch) { const m = data.m[tid]?.[id]; if (!m) throw { code: "invalid_argument" }; Object.assign(m, clone(patch)); persist(); emitM(tid); },
+    async deleteMatch(tid, id) { delete data.m[tid]?.[id]; persist(); emitM(tid); },
+    async listMatchIds(tid) { return Object.keys(data.m[tid] || {}); }
+  };
+}
+function dbStore(db) {
+  return {
+    mode: "db",
+    watchTournaments(cb, onErr) { return db.collection("tournaments").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
+    watchMatches(tid, cb, onErr) { return db.collection(`tournaments/${tid}/matches`).limit(1000).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
+    setTournament(t) { return db.doc(`tournaments/${t.id}`).set(clone(t)); },
+    async deleteTournament(tid) {
+      const s = await db.collection(`tournaments/${tid}/matches`).limit(1000).get();
+      for (const d of s.docs) await db.doc(`tournaments/${tid}/matches/${d.id}`).delete();
+      await db.doc(`tournaments/${tid}`).delete();
+    },
+    setMatch(tid, m) { return db.doc(`tournaments/${tid}/matches/${m.id}`).set(clone(m)); },
+    updateMatch(tid, id, patch) { return db.doc(`tournaments/${tid}/matches/${id}`).update(clone(patch)); },
+    deleteMatch(tid, id) { return db.doc(`tournaments/${tid}/matches/${id}`).delete(); }
+  };
+}
+
+/* ---------------- state ---------------- */
+const S = {
+  store: localStore(), tournaments: {}, tid: lsGet("carreau-tid"), matches: {}, unsubM: null,
+  tab: lsGet("carreau-tab") || "draw", canWrite: true, modal: null, downloads: null, loaded: false, pendingRender: false
+};
+const T = () => S.tournaments[S.tid];
+// who can do what: replaced by the web build (owner / scorer / viewer)
+S.permFn = () => ({ edit: S.canWrite, score: S.canWrite });
+S.canCreate = () => S.canWrite;
+const canEdit = () => !!T() && S.permFn(T()).edit;
+const canScore = () => !!T() && S.permFn(T()).score;
+const MS = () => Object.values(S.matches);
+
+/* ---------------- domain helpers ---------------- */
+const isMelee = t => t.entry === "melee";
+const entities = t => isMelee(t) ? t.players : t.teams;
+// who goes into the draw: entered, not withdrawn, and checked in when check-in is switched on
+const activeIds = t => entities(t).filter(e => e.active !== false && (!t.checkin || e.checkedIn)).map(e => e.id);
+// before anyone has checked in, plan around everyone entered
+const plannedCount = t => activeIds(t).length || enteredIds(t).length;
+const enteredIds = t => entities(t).filter(e => e.active !== false).map(e => e.id);
+function entName(t, id) {
+  if (isMelee(t)) return t.players.find(p => p.id === id)?.name || "Unknown player";
+  const tm = t.teams.find(x => x.id === id);
+  if (!tm) return "Unknown team";
+  return tm.name || tm.players.filter(Boolean).join(" / ") || "Unnamed team";
+}
+function teamPlayers(t, id) { const tm = t.teams.find(x => x.id === id); return tm ? tm.players.filter(Boolean).join(", ") : ""; }
+function sideName(t, side) { if (!side) return null; return side.map(id => entName(t, id)).join(isMelee(t) ? " · " : " / "); }
+function mStatus(m) { if (m.done) return "done"; if (!m.a || !m.b) return "pending"; if (m.court) return "playing"; return "ready"; }
+const ents = m => [...(m.a || []), ...(m.b || [])];
+const winnerSide = m => (m.done && m.b ? (m.sa > m.sb ? m.a : m.b) : m.done ? m.a : null);
+const loserSide = m => (m.done && m.b ? (m.sa > m.sb ? m.b : m.a) : null);
+const courtName = (t, cid) => t.courts.find(c => c.id === cid)?.name ?? "?";
+const byOrder = (x, y) => (x.round || 0) - (y.round || 0) || (x.seq || 0) - (y.seq || 0) || (x.order || 0) - (y.order || 0);
+let seqBase = 0; const nextSeq = () => Date.now() * 100 + (seqBase++ % 100);
+
+function computeStats(t, ms, ids) {
+  const st = {};
+  ids.forEach(id => st[id] = { id, p: 0, w: 0, l: 0, pf: 0, pa: 0, byes: 0, opps: [], beat: [] });
+  for (const m of ms) {
+    if (!m.done || !m.a) continue;
+    if (!m.b) { m.a.forEach(id => { const s = st[id]; if (!s) return; s.p++; s.w++; s.pf += m.sa; s.pa += m.sb; s.byes++; }); continue; }
+    const aw = m.sa > m.sb;
+    m.a.forEach(id => { const s = st[id]; if (!s) return; s.p++; aw ? s.w++ : s.l++; s.pf += m.sa; s.pa += m.sb; s.opps.push(...m.b); });
+    m.b.forEach(id => { const s = st[id]; if (!s) return; s.p++; aw ? s.l++ : s.w++; s.pf += m.sb; s.pa += m.sa; s.opps.push(...m.a); });
+  }
+  for (const m of ms) { if (!m.done || !m.a || !m.b) continue; const [W, L] = m.sa > m.sb ? [m.a, m.b] : [m.b, m.a]; W.forEach(x => st[x] && L.forEach(y => st[x].beat.push(y))); }
+  Object.values(st).forEach(s => { s.diff = s.pf - s.pa; s.buch = s.opps.reduce((a, o) => a + (st[o]?.w || 0), 0); });
+  Object.values(st).forEach(s => { s.fbuch = s.opps.reduce((a, o) => a + (st[o]?.buch || 0), 0); s.lot = lotNo(t, s.id); });
+  return st;
+}
+// a fixed "drawn lot" per entry: the same every time the page loads, different for every competition
+function lotNo(t, id) { let h = 2166136261; for (const c of (t.id || "") + ":" + id) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) % 100000; }
+// Swiss: wins, Buchholz, fine Buchholz, points difference, points for, lot.
+// Round robin / pools: wins, points difference, points for, then head-to-head for a two-way tie, then lot.
+function rankStats(t, st, useBuch) {
+  const arr = Object.values(st);
+  if (useBuch) return arr.sort((a, b) => b.w - a.w || b.buch - a.buch || b.fbuch - a.fbuch || b.diff - a.diff || b.pf - a.pf || a.lot - b.lot);
+  arr.sort((a, b) => b.w - a.w || b.diff - a.diff || b.pf - a.pf || a.lot - b.lot);
+  for (let i = 0; i < arr.length - 1; i++) {
+    const a = arr[i], b = arr[i + 1], c = arr[i + 2], z = arr[i - 1];
+    const same = (x, y) => x && y && x.w === y.w && x.diff === y.diff && x.pf === y.pf;
+    if (same(a, b) && !same(b, c) && !same(z, a)) {
+      const ab = a.beat.filter(x => x === b.id).length, ba = b.beat.filter(x => x === a.id).length;
+      if (ba > ab) { arr[i] = b; arr[i + 1] = a; }
+    }
+  }
+  return arr;
+}
+
+/* ---------- court allocation ---------- */
+function planCourts(t, ms) {
+  const active = t.courts.filter(c => c.active !== false);
+  const live = ms.filter(m => !m.done && m.court);
+  const busyCourts = new Set(live.map(m => m.court));
+  const busyEnt = new Set(live.flatMap(ents));
+  let free = active.filter(c => !busyCourts.has(c.id));
+  if (t.randomCourts) free = shuffle(free);
+  const ready = ms.filter(m => !m.done && !m.court && m.a && m.b).sort(byOrder);
+  const out = [];
+  for (const m of ready) {
+    if (!free.length) break;
+    const me = ents(m);
+    if (me.some(e => busyEnt.has(e))) continue;
+    const earlier = ms.some(o => o !== m && !o.done && o.group === m.group && (o.round || 0) < (m.round || 0) && ents(o).some(e => me.includes(e)));
+    if (earlier) continue;
+    const c = free.shift();
+    m.court = c.id; out.push({ id: m.id, court: c.id });
+    me.forEach(e => busyEnt.add(e));
+  }
+  return out;
+}
+
+/* ---------- swiss pairing ---------- */
+function swissPairs(order, played) {
+  let steps = 0;
+  const solve = rem => {
+    if (!rem.length) return [];
+    if (++steps > 40000) return null;
+    const a = rem[0];
+    for (let j = 1; j < rem.length; j++) {
+      const b = rem[j];
+      if (played.has(a + "|" + b)) continue;
+      const rest = solve(rem.filter((_, k) => k !== 0 && k !== j));
+      if (rest) return [[a, b], ...rest];
+    }
+    return null;
+  };
+  const res = solve(order);
+  if (res) return { pairs: res, rematches: 0 };
+  const pairs = []; let rematches = 0;
+  for (let i = 0; i < order.length; i += 2) { pairs.push([order[i], order[i + 1]]); if (played.has(order[i] + "|" + order[i + 1])) rematches++; }
+  return { pairs, rematches };
+}
+function pickBye(order, st) {
+  for (let i = order.length - 1; i >= 0; i--) if (!st[order[i]]?.byes) return order[i];
+  return order[order.length - 1];
+}
+function playedSet(ms, stage) {
+  const s = new Set();
+  ms.filter(m => m.stage === stage && m.a && m.b).forEach(m => m.a.forEach(x => m.b.forEach(y => { s.add(x + "|" + y); s.add(y + "|" + x); })));
+  return s;
+}
+function mkMatch(o) { return Object.assign({ a: null, b: null, sa: null, sb: null, done: false, court: null, bye: false, seq: nextSeq(), order: 0, round: 1 }, o); }
+function mkBye(t, o) { return mkMatch(Object.assign({ b: null, done: true, bye: true, sa: t.byeScore[0], sb: t.byeScore[1] }, o)); }
+
+function drawSwissRound(t, ms) {
+  const n = t.draws.filter(d => d.kind === "round").length + 1;
+  const ids = activeIds(t);
+  const sm = ms.filter(m => m.stage === "swiss");
+  const st = computeStats(t, sm, ids);
+  let order = n === 1 ? shuffle(ids) : rankStats(t, st, true).map(s => s.id);
+  const out = []; const gid = "R" + n;
+  if (order.length % 2) { const bye = pickBye(order, st); order = order.filter(x => x !== bye); out.push(mkBye(t, { id: `${gid}-bye`, stage: "swiss", group: gid, round: n, order: 999, a: [bye] })); }
+  const { pairs, rematches } = swissPairs(order, playedSet(sm, "swiss"));
+  pairs.forEach(([a, b], i) => out.push(mkMatch({ id: `${gid}-m${i + 1}`, stage: "swiss", group: gid, round: n, order: i, a: [a], b: [b] })));
+  return { matches: out, draw: { id: gid, kind: "round", label: `Round ${n}`, round: n }, note: rematches ? `${rematches} rematch(es) were unavoidable this round.` : "" };
+}
+
+function meleeSizes(n, pref) {
+  if (pref === 1) return n % 2 ? null : Array(n).fill(1);
+  if (pref === 3) { for (let t3 = Math.floor(n / 3); t3 >= 0; t3--) { const r = n - 3 * t3; if (r % 2 === 0 && (t3 + r / 2) % 2 === 0) return [...Array(t3).fill(3), ...Array(r / 2).fill(2)]; } }
+  if (pref === 2) { for (let d = Math.floor(n / 2); d >= 0; d--) { const r = n - 2 * d; if (r % 3 === 0 && (d + r / 3) % 2 === 0) return [...Array(d).fill(2), ...Array(r / 3).fill(3)]; } }
+  return null;
+}
+function drawMeleeRound(t, ms) {
+  const n = t.draws.filter(d => d.kind === "round").length + 1;
+  const gid = "R" + n; const pref = SIZE[t.format];
+  const mm = ms.filter(m => m.stage === "melee");
+  const st = computeStats(t, mm, activeIds(t));
+  let players = activeIds(t); const byes = []; let sizes = meleeSizes(players.length, pref);
+  const byeOrder = shuffle(players).sort((a, b) => (st[a]?.byes || 0) - (st[b]?.byes || 0));
+  while (!sizes && players.length > 1) { const b = byeOrder.shift(); byes.push(b); players = players.filter(p => p !== b); sizes = meleeSizes(players.length, pref); }
+  if (!sizes) return { error: "Not enough players to make a round." };
+  const partner = new Map(), opp = new Map(); const key = (x, y) => x < y ? x + "|" + y : y + "|" + x;
+  mm.forEach(m => { [m.a, m.b].forEach(s => s && s.forEach(x => s.forEach(y => x < y && partner.set(key(x, y), (partner.get(key(x, y)) || 0) + 1)))); if (m.a && m.b) m.a.forEach(x => m.b.forEach(y => opp.set(key(x, y), (opp.get(key(x, y)) || 0) + 1))); });
+  let best = null;
+  for (let attempt = 0; attempt < 300; attempt++) {
+    const sh = shuffle(players); const teams = []; let k = 0;
+    sizes.forEach(sz => { teams.push(sh.slice(k, k + sz)); k += sz; });
+    const big = teams.filter(x => x.length === Math.max(...sizes)), small = teams.filter(x => x.length !== Math.max(...sizes));
+    const ordered = [...big, ...small];
+    let cost = 0; const pairs = [];
+    for (let i = 0; i < ordered.length; i += 2) {
+      const A = ordered[i], B = ordered[i + 1]; pairs.push([A, B]);
+      [A, B].forEach(s => s.forEach(x => s.forEach(y => { if (x < y) cost += 10 * (partner.get(key(x, y)) || 0); })));
+      A.forEach(x => B.forEach(y => cost += opp.get(key(x, y)) || 0));
+    }
+    if (!best || cost < best.cost) best = { cost, pairs };
+    if (cost === 0) break;
+  }
+  const out = best.pairs.map(([A, B], i) => mkMatch({ id: `${gid}-m${i + 1}`, stage: "melee", group: gid, round: n, order: i, a: A, b: B }));
+  byes.forEach((p, i) => out.push(mkBye(t, { id: `${gid}-bye${i + 1}`, stage: "melee", group: gid, round: n, order: 900 + i, a: [p] })));
+  return { matches: out, draw: { id: gid, kind: "round", label: `Round ${n}`, round: n }, note: byes.length ? `${byes.length} player(s) have a bye to make the teams fit.` : "" };
+}
+
+function circle(ids) {
+  const arr = [...ids]; if (arr.length % 2) arr.push(null);
+  const n = arr.length, rounds = [];
+  for (let r = 0; r < n - 1; r++) {
+    const pairs = [];
+    for (let i = 0; i < n / 2; i++) { const a = arr[i], b = arr[n - 1 - i]; if (a && b) pairs.push(r % 2 ? [b, a] : [a, b]); }
+    rounds.push(pairs);
+    arr.splice(1, 0, arr.pop());
+  }
+  return rounds;
+}
+function genRoundRobin(t) {
+  const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t));
+  const out = [];
+  circle(ids).forEach((pairs, r) => pairs.forEach(([a, b], i) => out.push(mkMatch({ id: `RR-r${r + 1}-m${i + 1}`, stage: "rr", group: "RR", round: r + 1, order: i, a: [a], b: [b] }))));
+  return { matches: out, draw: { id: "RR", kind: "schedule", label: "Round robin schedule" } };
+}
+
+// Snake: teams stand in two lines; each round the second line moves along one place, so team 2 plays
+// whoever team 1 just played, team 3 whoever team 2 just played, and so on. Fixed in advance, no repeat games.
+function snakeMaxRounds(n) { return Math.max(1, Math.ceil(n / 2)); }
+function genSnake(t) {
+  const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t));
+  const line = [...ids]; if (line.length % 2) line.push(null);
+  const h = line.length / 2, top = line.slice(0, h), bottom = line.slice(h);
+  const R = Math.min(t.snakeRounds || 5, snakeMaxRounds(ids.length));
+  const out = [];
+  for (let r = 0; r < R; r++) {
+    let k = 0;
+    for (let i = 0; i < h; i++) {
+      const a = top[i], b = bottom[(((i - r) % h) + h) % h]; // team i now meets whoever team i-1 played last round
+      if (a && b) out.push(mkMatch({ id: `SN-r${r + 1}-m${++k}`, stage: "snake", group: "SN", round: r + 1, order: i, a: [a], b: [b] }));
+      else if (a || b) out.push(mkBye(t, { id: `SN-r${r + 1}-bye`, stage: "snake", group: "SN", round: r + 1, order: 999, a: [a || b] }));
+    }
+  }
+  return { matches: out, draw: { id: "SN", kind: "schedule", label: "Snake rounds" }, note: R < (t.snakeRounds || 5) ? `Only ${R} rounds are possible without repeat games for ${ids.length} teams.` : "" };
+}
+const poolLetter = i => { let s = ""; i++; while (i > 0) { const r = (i - 1) % 26; s = String.fromCharCode(65 + r) + s; i = Math.floor((i - 1) / 26); } return s; };
+function drawPools(t) {
+  const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t));
+  const n = ids.length, size = t.poolSize || 4;
+  const k = Math.max(1, Math.round(n / size));
+  const pools = Array.from({ length: k }, (_, i) => ({ id: "P" + poolLetter(i), name: "Pool " + poolLetter(i), members: [] }));
+  if (t.seeding === "entry") ids.forEach((id, i) => { const row = Math.floor(i / k), col = i % k; pools[row % 2 ? k - 1 - col : col].members.push(id); });
+  else ids.forEach((id, i) => pools[i % k].members.push(id));
+  const out = [];
+  pools.forEach(p => {
+    p.french = t.poolStyle === "french" && p.members.length === 4;
+    if (p.french) {
+      const [a, b, c, d] = p.members;
+      out.push(mkMatch({ id: `${p.id}-g1a`, stage: "pool", group: "pools", pool: p.id, round: 1, order: 0, a: [a], b: [b] }));
+      out.push(mkMatch({ id: `${p.id}-g1b`, stage: "pool", group: "pools", pool: p.id, round: 1, order: 1, a: [c], b: [d] }));
+    } else {
+      circle(p.members).forEach((pairs, r) => pairs.forEach(([a, b], i) => out.push(mkMatch({ id: `${p.id}-r${r + 1}-m${i + 1}`, stage: "pool", group: "pools", pool: p.id, round: r + 1, order: i, a: [a], b: [b] }))));
+    }
+  });
+  return { matches: out, pools, draw: { id: "pools", kind: "pools", label: "Pools" } };
+}
+function frenchProgress(p, ms) {
+  const g = id => ms.find(m => m.id === `${p.id}-${id}`); const out = [];
+  const a = g("g1a"), b = g("g1b");
+  if (a?.done && b?.done) {
+    if (!g("g2w")) out.push(mkMatch({ id: `${p.id}-g2w`, stage: "pool", group: "pools", pool: p.id, round: 2, order: 0, a: winnerSide(a), b: winnerSide(b), label: "Winners' game" }));
+    if (!g("g2l")) out.push(mkMatch({ id: `${p.id}-g2l`, stage: "pool", group: "pools", pool: p.id, round: 2, order: 1, a: loserSide(a), b: loserSide(b), label: "Losers' game" }));
+  }
+  const w = g("g2w"), l = g("g2l");
+  if (w?.done && l?.done && !g("g3")) out.push(mkMatch({ id: `${p.id}-g3`, stage: "pool", group: "pools", pool: p.id, round: 3, order: 0, a: loserSide(w), b: winnerSide(l), label: "Barrage" }));
+  return out;
+}
+function poolRanking(t, p, ms) {
+  const pm = ms.filter(m => m.pool === p.id);
+  const complete = pm.length > 0 && pm.every(m => m.done) && (!p.french || pm.some(m => m.id.endsWith("g3")));
+  if (p.french) {
+    const g = id => pm.find(m => m.id === `${p.id}-${id}`);
+    const rows = []; const w = g("g2w"), l = g("g2l"), b = g("g3");
+    const st = computeStats(t, pm, p.members);
+    const place = [w?.done ? winnerSide(w)[0] : null, b?.done ? winnerSide(b)[0] : null, b?.done ? loserSide(b)[0] : null, l?.done ? loserSide(l)[0] : null];
+    const placed = new Set(place.filter(Boolean));
+    place.forEach(id => id && rows.push(st[id]));
+    p.members.filter(id => !placed.has(id)).forEach(id => rows.push(Object.assign({ unplaced: true }, st[id])));
+    return { rows, complete };
+  }
+  const st = computeStats(t, pm, p.members);
+  return { rows: rankStats(t, st, false), complete };
+}
+
+function seedOrder(size) { let o = [1]; while (o.length < size) { const m = o.length * 2 + 1; o = o.flatMap(s => [s, m - s]); } return o; }
+function roundLabel(R, r) { const left = R - r; return left === 0 ? "Final" : left === 1 ? "Semi-finals" : left === 2 ? "Quarter-finals" : `Last ${2 ** (left + 1)}`; }
+function createBracket(t, bid, name, entrants, opts = {}) {
+  if (opts.random) entrants = shuffle(entrants);
+  const n = entrants.length; let size = 2; while (size < n) size *= 2;
+  const R = Math.log2(size); const order = seedOrder(size); const out = {};
+  for (let r = 1; r <= R; r++) {
+    const cnt = size / 2 ** r;
+    for (let i = 0; i < cnt; i++) {
+      out[`${bid}-r${r}-m${i + 1}`] = mkMatch({ id: `${bid}-r${r}-m${i + 1}`, stage: "ko", group: bid, bracket: bid, round: r, order: i,
+        next: r < R ? { id: `${bid}-r${r + 1}-m${Math.floor(i / 2) + 1}`, side: i % 2 ? "b" : "a" } : null });
+    }
+  }
+  const slots = [];
+  for (let i = 0; i < size / 2; i++) { const sa = order[2 * i], sb = order[2 * i + 1]; slots.push([sa <= n ? entrants[sa - 1] : null, sb <= n ? entrants[sb - 1] : null]); }
+  // keep teams from the same pool apart in the first round where possible
+  if (opts.groupOf) {
+    const g = opts.groupOf, clash = s => s[0] && s[1] && g(s[0]) === g(s[1]);
+    slots.forEach((si, i) => {
+      if (!clash(si)) return;
+      for (let d = 1; d < slots.length; d++) {
+        const j = (i + d) % slots.length, sj = slots[j];
+        if (!sj[1] || !sj[0]) continue;
+        if (g(si[0]) !== g(sj[1]) && g(sj[0]) !== g(si[1])) { [si[1], sj[1]] = [sj[1], si[1]]; break; }
+      }
+    });
+  }
+  if (opts.third && R >= 2 && n >= 4) {
+    out[`${bid}-3p`] = mkMatch({ id: `${bid}-3p`, stage: "ko", group: bid, bracket: bid, round: R, order: 1, third: true });
+    out[`${bid}-r${R - 1}-m1`].lnext = { id: `${bid}-3p`, side: "a" };
+    out[`${bid}-r${R - 1}-m2`].lnext = { id: `${bid}-3p`, side: "b" };
+  }
+  for (let i = 0; i < size / 2; i++) {
+    const m = out[`${bid}-r1-m${i + 1}`];
+    m.a = slots[i][0] ? [slots[i][0]] : null; m.b = slots[i][1] ? [slots[i][1]] : null;
+    if (!m.a && m.b) { m.a = m.b; m.b = null; }
+    if (m.a && !m.b) { Object.assign(m, { done: true, bye: true, sa: t.byeScore[0], sb: t.byeScore[1] }); out[m.next.id][m.next.side] = m.a; }
+  }
+  return { matches: Object.values(out), bracket: { id: bid, name, size, rounds: R, entrants: n, third: !!out[`${bid}-3p`], seeds: opts.random ? null : entrants }, draw: { id: bid, kind: "bracket", label: name } };
+}
+
+/* ---------- afternoon knockout plan ---------- */
+const PLAN_SYSTEMS = ["swiss", "roundrobin", "pools", "snake"];
+const rankStage = t => t.system === "roundrobin" ? "rr" : t.system === "snake" ? "snake" : "swiss";
+function defaultPlan(t) {
+  if (t.system === "pools") {
+    const q = t.qualify || 2; const br = [{ id: "A", name: "A knockout (Championnat)", from: 1, to: q, third: false }];
+    if (t.bBracket !== false) br.push({ id: "B", name: "B knockout (Consolante)", from: q + 1, to: t.poolSize || 4, third: false });
+    return { seeding: "seeded", brackets: br };
+  }
+  const n = plannedCount(t); let top = 2; while (top * 2 <= Math.min(8, n)) top *= 2;
+  return { seeding: "seeded", brackets: [{ id: "A", name: "Main knockout", from: 1, to: top, third: false }] };
+}
+const getPlan = t => t.koPlan || defaultPlan(t);
+function planPresets(t) {
+  // presets work before entries are in; ranges are clamped to the field when drawn
+  if (t.system === "pools") {
+    const ps = t.poolSize || 4;
+    return [
+      ["1st & 2nd → A, rest → B", [["A knockout (Championnat)", 1, 2], ["B knockout (Consolante)", 3, ps]]],
+      ["1st → A, 2nd → B, rest → C", [["A knockout", 1, 1], ["B knockout", 2, 2], ["C knockout", 3, ps]]],
+      ["1st & 2nd → A only", [["A knockout (Championnat)", 1, 2]]],
+      ["Everyone → one knockout", [["Main knockout", 1, ps]]]
+    ];
+  }
+  const out = [["Final (top 2)", [["Final", 1, 2]]], ["Semi-finals (top 4)", [["Semi-finals", 1, 4]]], ["Quarter-finals (top 8)", [["Main knockout", 1, 8]]], ["Top 8 + Plate (9–16)", [["Main knockout", 1, 8], ["Plate", 9, 16]]], ["Top 16", [["Main knockout", 1, 16]]], ["Top 16 + Plate (17–32)", [["Main knockout", 1, 16], ["Plate", 17, 32]]]];
+  return out;
+}
+function koEntrants(t, ms, br) {
+  if (t.system === "pools") {
+    const rks = t.pools.map(p => ({ p, rows: poolRanking(t, p, ms).rows })); const list = [];
+    const maxPlace = Math.max(0, ...rks.map(r => r.rows.length));
+    for (let place = br.from; place <= Math.min(br.to, maxPlace); place++) {
+      const row = rks.map(r => r.rows[place - 1] && { id: r.rows[place - 1].id, pool: r.p.id, s: r.rows[place - 1] }).filter(Boolean);
+      row.sort((a, b) => b.s.w - a.s.w || b.s.diff - a.s.diff || b.s.pf - a.s.pf);
+      list.push(...row);
+    }
+    return list;
+  }
+  const ranked = overallTable(t, rankStage(t)).filter(s => activeIds(t).includes(s.id));
+  return ranked.slice(br.from - 1, br.to).map(s => ({ id: s.id }));
+}
+function bracketShape(n) {
+  if (n < 2) return "not enough teams";
+  let size = 2; while (size < n) size *= 2;
+  const R = Math.log2(size); const byes = size - n;
+  return `${n} teams · starts at ${roundLabel(R, 1).toLowerCase()}${byes ? ` · ${byes} bye${byes > 1 ? "s" : ""} for the top seed${byes > 1 ? "s" : ""}` : ""}`;
+}
+function morningDone(t, ms) {
+  if (t.system === "pools") return (t.pools || []).length > 0 && t.pools.every(p => poolRanking(t, p, ms).complete);
+  if (t.system === "roundrobin" || t.system === "snake") { const g = t.system === "snake" ? "SN" : "RR"; const rr = ms.filter(m => m.group === g); return rr.length > 0 && rr.every(m => m.done); }
+  if (t.system === "swiss") { const sm = ms.filter(m => m.stage === "swiss"); return sm.length > 0 && sm.every(m => m.done); }
+  return false;
+}
+function renderPlanEditor(t, { locked, compact } = {}) {
+  const plan = getPlan(t); const unit = t.system === "pools" ? "Pool places" : "Ranks";
+  const ms = MS(); const done = morningDone(t, ms);
+  const n = plannedCount(t);
+  const count = br => {
+    if (done) return koEntrants(t, ms, br).length;
+    if (t.system !== "pools") return Math.max(0, Math.min(br.to, n) - br.from + 1);
+    if ((t.pools || []).length) return t.pools.reduce((a, p) => a + Math.max(0, Math.min(br.to, p.members.length) - br.from + 1), 0);
+    const size = t.poolSize || 4; return Math.max(0, Math.min(br.to, size) - br.from + 1) * Math.max(1, Math.round(n / size));
+  };
+  const main = plan.brackets.find(b => !b.silver);
+  const silver = plan.brackets.find(b => b.silver);
+  const dis = locked || !canEdit() ? "disabled" : "";
+  return `<div class="stack" style="gap:12px">
+    ${!locked && canEdit() ? `<div class="stack" style="gap:6px"><div class="eyebrow">Quick set-ups</div><div class="row" style="gap:6px">${planPresets(t).map(([l], i) => `<button class="btn sm" data-act="plan-preset" data-i="${i}">${esc(l)}</button>`).join("")}</div></div>` : ""}
+    <div class="stack" style="gap:6px"><div class="eyebrow">Draw for the knockouts</div>${seg("plan-seeding", plan.seeding, [["seeded", t.system === "pools" ? "Seeded (pool winners kept apart)" : "Seeded by standings (1 v 8, 2 v 7…)"], ["random", "Random draw (tirage au sort)"]], locked || !canEdit())}</div>
+    <div class="tw"><table class="plan"><thead><tr><th>Knockout</th><th>${unit}</th><th>3rd-place game</th><th></th></tr></thead><tbody>
+    ${plan.brackets.map((b, i) => `<tr>
+      <td class="wrap"><input type="text" id="pl-name-${i}" data-plan="name" data-i="${i}" value="${esc(b.name)}" ${dis} aria-label="Knockout name"><div class="small muted" style="margin-top:4px">${bracketShape(count(b))}</div></td>
+      <td>${b.silver ? `<span class="muted">${t.system === "pools" ? "Every place" : "Everyone"} from ${b.from} down</span>` : `<div class="row" style="flex-wrap:nowrap;gap:6px"><input type="number" min="1" id="pl-from-${i}" data-plan="from" data-i="${i}" value="${b.from}" style="width:64px" ${dis} aria-label="From"><span>to</span><input type="number" min="1" id="pl-to-${i}" data-plan="to" data-i="${i}" value="${b.to}" style="width:64px" ${dis} aria-label="To"></div>`}</td>
+      <td><input type="checkbox" data-plan="third" data-i="${i}" ${b.third ? "checked" : ""} ${dis} aria-label="Third-place play-off"></td>
+      <td>${!locked && canEdit() && plan.brackets.length > 1 ? `<button class="btn sm ghost" data-act="plan-del" data-i="${i}" aria-label="Remove knockout">✕</button>` : ""}</td>
+    </tr>`).join("")}
+    </tbody></table></div>
+    <div class="spread">
+      <label class="chk"><input type="checkbox" id="pl-silver" data-plansilver ${silver ? "checked" : ""} ${dis}> <span><b>Silver competition</b>: everyone who doesn't make ${main ? `the ${esc(main.name)}` : "a knockout"} plays their own knockout</span></label>
+      ${!locked && canEdit() && plan.brackets.length < 6 ? `<button class="btn sm" data-act="plan-add">+ Add another knockout</button>` : ""}
+    </div>
+    ${compact ? "" : `<p class="small muted">${t.system === "pools" ? "Pick which finishing places in each pool go into each knockout, e.g. 1st–2nd into the A, 3rd–4th into the B." : "Pick which overall ranks go into each knockout. Numbers that aren't a power of two get byes for the top seeds, so top 6 gives seeds 1 and 2 a bye into the semi-finals."}</p>`}
+  </div>`;
+}
+async function startKnockouts() {
+  const t = T(); const ms = MS(); const plan = getPlan(t); const made = [];
+  for (const br of plan.brackets) {
+    const ents = koEntrants(T(), ms, br);
+    if (ents.length < 2) continue;
+    const bid = br.id;
+    if ((T().brackets || []).some(b => b.id === bid)) continue;
+    const poolOf = Object.fromEntries(ents.map(e => [e.id, e.pool]));
+    const res = createBracket(T(), bid, br.name, ents.map(e => e.id), { random: plan.seeding === "random", third: br.third, groupOf: t.system === "pools" && plan.seeding !== "random" ? id => poolOf[id] : null });
+    await addDraw(res); made.push(br.name);
+  }
+  toast(made.length ? `Drawn: ${made.join(", ")}.` : "No knockout has at least 2 teams. Check the ranges.");
+}
+// the Silver competition always takes everyone below the last other knockout
+function normalisePlan(pl) {
+  const sil = pl.brackets.filter(b => b.silver), rest = pl.brackets.filter(b => !b.silver);
+  rest.forEach(b => { b.from = Math.max(1, b.from | 0); b.to = Math.max(b.from, b.to | 0); });
+  pl.brackets = rest;
+  if (sil.length) { const s = sil[0]; s.from = rest.length ? Math.max(...rest.map(b => b.to)) + 1 : 1; s.to = 9999; pl.brackets.push(s); }
+  return pl;
+}
+async function savePlan(fn) {
+  const t = clone(T()); t.koPlan = clone(getPlan(t)); fn(t.koPlan);
+  normalisePlan(t.koPlan);
+  await guard(() => saveT(t));
+}
+
+/* ---------------- writes ---------------- */
+function handleWriteError(e) {
+  console.error(e);
+  if ((e?.code === "invalid_argument" && S.store.mode === "db") || e?.code === "permission-denied") { S.canWrite = false; S.denied = true; toast("You can follow this competition but not change it."); render(); return; }
+  if (e?.code === "quota_exceeded") { toast("Storage is full. Delete an old competition to free space."); return; }
+  toast("That change didn't save. Check your connection and try again.");
+}
+async function guard(fn) { try { return await fn(); } catch (e) { handleWriteError(e); } }
+async function saveT(t) { t.updated = Date.now(); S.tournaments[t.id] = t; render(); await S.store.setTournament(t); }
+async function writeMatches(list) { list.forEach(m => S.matches[m.id] = m); for (let i = 0; i < list.length; i += 20) await Promise.all(list.slice(i, i + 20).map(m => S.store.setMatch(S.tid, m))); }
+async function assignCourts() {
+  const t = T(); const ms = MS().map(clone);
+  const plan = planCourts(t, ms);
+  for (const p of plan) { S.matches[p.id] && (S.matches[p.id].court = p.court); await S.store.updateMatch(S.tid, p.id, { court: p.court }); }
+  return plan.length;
+}
+async function addDraw(res) {
+  if (res.error) { toast(res.error); return; }
+  const t = clone(T());
+  const all = [...MS().map(clone), ...res.matches];
+  planCourts(t, all);
+  t.draws.push(Object.assign({ created: Date.now() }, res.draw));
+  if (res.pools) t.pools = res.pools;
+  if (res.bracket) t.brackets = [...(t.brackets || []), res.bracket];
+  await saveT(t);
+  await writeMatches(res.matches);
+  toast(res.note || `${res.draw.label} drawn.`);
+}
+async function undoDraw(did) {
+  const t = clone(T());
+  const ms = MS().filter(m => m.group === did);
+  if (ms.some(m => m.done && !m.bye)) { toast("Results are already in for this draw, so it can't be undone."); return; }
+  for (const m of ms) await S.store.deleteMatch(S.tid, m.id);
+  t.draws = t.draws.filter(d => d.id !== did);
+  if (did === "pools") t.pools = [];
+  t.brackets = (t.brackets || []).filter(b => b.id !== did);
+  await saveT(t);
+  await assignCourts();
+  toast("Draw removed.");
+}
+async function recordResult(id, sa, sb, done) {
+  const t = T(); const m = clone(S.matches[id]);
+  const wasDone = m.done; const oldWin = wasDone ? winnerSide(m) : null;
+  m.sa = sa; m.sb = sb; m.done = done;
+  if (done) m.finishedAt = Date.now();
+  const newWin = done ? winnerSide(m) : null;
+  const oldLose = wasDone ? loserSide(S.matches[id]) : null, newLose = done ? loserSide(m) : null;
+  const links = [[m.next, oldWin, newWin], [m.lnext, oldLose, newLose]].filter(l => l[0]);
+  for (const [lk, o, nw] of links) {
+    if (wasDone && JSON.stringify(o) !== JSON.stringify(nw) && S.matches[lk.id]?.done) { toast("A later game in the bracket already used this result. Reopen that game first."); return false; }
+  }
+  if (m.pool && wasDone && JSON.stringify(oldWin) !== JSON.stringify(newWin)) {
+    const p = (t.pools || []).find(p => p.id === m.pool);
+    const later = p?.french && MS().some(o => o.pool === m.pool && o.round > m.round);
+    if (later) { toast("Later pool games already use this result. Undo isn't possible once the pool has moved on."); return false; }
+  }
+  const patch = { sa, sb, done, finishedAt: m.finishedAt || null };
+  if (done) { patch.courtUsed = m.court || m.courtUsed || null; patch.court = null; }
+  else if (wasDone) patch.court = null;
+  S.matches[id] = Object.assign(S.matches[id], patch);
+  await S.store.updateMatch(S.tid, id, patch);
+  // knockout: move winner on
+  for (const [lk, , nw] of links) {
+    const nx = S.matches[lk.id];
+    if (nx && JSON.stringify(nx[lk.side] ?? null) !== JSON.stringify(nw)) {
+      const np = { [lk.side]: nw };
+      if (!nw && nx.court && !nx.done) np.court = null;
+      Object.assign(nx, np);
+      await S.store.updateMatch(S.tid, nx.id, np);
+    }
+  }
+  // french pools: create next games
+  if (m.pool) {
+    const p = (t.pools || []).find(p => p.id === m.pool);
+    if (p?.french) { const created = frenchProgress(p, MS()); if (created.length) { created.forEach(c => S.matches[c.id] = c); await writeMatches(created); } }
+  }
+  // the finished game's court is now free: fill courts
+  await assignCourts();
+  return true;
+}
+
+/* ---------------- toast & modal ---------------- */
+let toastTimer;
+function toast(msg) { const el = $("#toast"); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 3200); }
+
+function openMatch(id) {
+  const m = S.matches[id]; if (!m || !m.a || !m.b) return;
+  S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: false, err: "" };
+  renderModal();
+}
+function renderModal() {
+  const el = $("#modal"); const t = T();
+  if (!S.modal || !t) { el.innerHTML = ""; return; }
+  const m = S.matches[S.modal.id]; if (!m) { S.modal = null; el.innerHTML = ""; return; }
+  const ro = !canScore();
+  const who = side => side.map(id => isMelee(t) ? esc(entName(t, id)) : `<b>${esc(entName(t, id))}</b><span class="small muted">${esc(teamPlayers(t, id))}</span>`).join(isMelee(t) ? "<br>" : "");
+  const stp = k => `<div class="stepper">${ro ? "" : `<button type="button" data-act="dec" data-k="${k}" aria-label="Minus one">−</button>`}<input id="sc-${k}" type="number" min="0" max="${t.target}" inputmode="numeric" value="${S.modal[k]}" ${ro ? "readonly" : ""} aria-label="Score">${ro ? "" : `<button type="button" data-act="inc" data-k="${k}" aria-label="Plus one">+</button>`}</div>`;
+  const courts = t.courts.filter(c => c.active !== false);
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Match score">
+    <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>${m.court ? "Piste " + esc(courtName(t, m.court)) : m.done ? "Result" : "Waiting for a piste"}</h3></div>
+      <button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    <div class="scorer"><div class="who">${who(m.a)}</div>${stp("sa")}</div>
+    <div class="scorer"><div class="who">${who(m.b)}</div>${stp("sb")}</div>
+    ${ro ? "" : `<label class="chk"><input type="checkbox" id="early" ${S.modal.early ? "checked" : ""}> Game ended on time limit (winner below ${t.target})</label>
+    ${!m.done ? `<label class="f"><span>Piste</span><select id="mcourt"><option value="">No piste yet</option>${courts.map(c => `<option value="${c.id}" ${m.court === c.id ? "selected" : ""}>Piste ${esc(c.name)}${MS().some(o => o.court === c.id && !o.done && o.id !== m.id) ? " (in use)" : ""}</option>`).join("")}</select></label>` : ""}
+    ${S.modal.err ? `<div class="err">${esc(S.modal.err)}</div>` : ""}
+    <div class="row">
+      <button class="btn primary" data-act="save-final">${m.done ? "Update result" : "Save result"}</button>
+      ${!m.done ? `<button class="btn" data-act="save-live">Save live score</button>` : `<button class="btn" data-act="reopen">Reopen match</button>`}
+    </div>`}
+  </div></div>`;
+}
+function matchContext(t, m) {
+  if (m.stage === "ko") { const b = (t.brackets || []).find(b => b.id === m.bracket); return `${b?.name || "Knockout"} · ${m.third ? "Third-place game" : roundLabel(b?.rounds || 1, m.round)}`; }
+  if (m.stage === "pool") { const p = (t.pools || []).find(p => p.id === m.pool); return `${p?.name || "Pool"} · ${m.label || "Game " + m.round}`; }
+  if (m.stage === "rr") return `Round robin · Round ${m.round}`;
+  if (m.stage === "snake") return `Snake · Round ${m.round}`;
+  return `Round ${m.round}`;
+}
+function readModalScores() {
+  const a = parseInt($("#sc-sa")?.value, 10), b = parseInt($("#sc-sb")?.value, 10);
+  S.modal.sa = isNaN(a) ? 0 : a; S.modal.sb = isNaN(b) ? 0 : b; S.modal.early = !!$("#early")?.checked;
+}
+async function modalAction(act, k) {
+  const t = T(); const md = S.modal; if (!md) return;
+  if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
+  readModalScores();
+  if (act === "inc") { md[k] = Math.min(t.target, md[k] + 1); renderModal(); return; }
+  if (act === "dec") { md[k] = Math.max(0, md[k] - 1); renderModal(); return; }
+  const m = S.matches[md.id];
+  if (act === "save-final") {
+    const { sa, sb } = md;
+    if (sa === sb) { md.err = "Scores can't be level. Petanque games always have a winner."; renderModal(); return; }
+    if (Math.max(sa, sb) > t.target) { md.err = `Scores can't go above ${t.target}.`; renderModal(); return; }
+    if (!md.early && Math.max(sa, sb) !== t.target) { md.err = `The winner needs ${t.target} points, or tick the time-limit box.`; renderModal(); return; }
+    const ok = await guard(() => recordResult(md.id, sa, sb, true));
+    if (ok) { S.modal = null; renderModal(); toast("Result saved."); }
+    return;
+  }
+  if (act === "save-live") {
+    const c = $("#mcourt")?.value || null;
+    await guard(async () => {
+      const patch = { sa: md.sa, sb: md.sb };
+      if (c !== (m.court || null)) patch.court = c;
+      Object.assign(S.matches[md.id], patch);
+      await S.store.updateMatch(S.tid, md.id, patch);
+    });
+    S.modal = null; renderModal(); toast("Live score saved."); return;
+  }
+  if (act === "reopen") {
+    const ok = await guard(() => recordResult(md.id, m.sa, m.sb, false));
+    if (ok) { S.modal = null; renderModal(); toast("Match reopened."); }
+  }
+}
+
+/* ---------------- rendering ---------------- */
+const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["display", "Big screen"]];
+function render() {
+  const ae = document.activeElement;
+  if (ae && $("#main").contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName) && ae.type !== "checkbox") { S.pendingRender = true; return; }
+  S.pendingRender = false;
+  renderHeader();
+  const t = T(); const main = $("#main");
+  if (!S.loaded) return;
+  if (!t) { main.innerHTML = renderWelcome(); return; }
+  const fn = { setup: renderSetup, entries: renderEntries, draw: renderDraw, courts: renderCourts, standings: renderStandings, display: renderDisplay }[S.tab] || renderDraw;
+  main.innerHTML = (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
+}
+function renderHeader() {
+  const list = Object.values(S.tournaments).sort((a, b) => (b.created || 0) - (a.created || 0));
+  $("#tsel").innerHTML = `${list.length ? `<select id="tpick" aria-label="Competition">${list.map(t => `<option value="${t.id}" ${t.id === S.tid ? "selected" : ""}>${esc(t.name)}</option>`).join("")}</select>` : ""}
+    ${S.canCreate() ? `<button class="btn sm" data-act="new-t">+ New competition</button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
+    ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
+  const t = T();
+  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || !["setup"].includes(k)).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}">${l}</button>`).join("") : "";
+}
+function renderWelcome() {
+  return `<div class="panel stack" style="max-width:640px">
+    <h2>No competitions yet</h2>
+    <p class="muted">Set up a competition, add teams or players, then draw rounds, pools or a knockout. Pistes are allocated as games finish and scores go live for everyone with the link.</p>
+    ${S.canCreate() ? `<div><button class="btn primary" data-act="new-t">Create a competition</button></div>` : S.welcomeExtra ? S.welcomeExtra() : `<p class="muted">The organiser hasn't created a competition yet.</p>`}
+  </div>`;
+}
+function newTournament() {
+  const id = "t" + uid();
+  return { id, name: "New competition", date: new Date().toISOString().slice(0, 10), venue: "", entry: "teams", format: "triples", system: "swiss",
+    checkin: true, target: 13, byeScore: [13, 7], swissRounds: 5, poolSize: 4, poolStyle: "french", qualify: 2, bBracket: true, consolante: false, seeding: "random", randomCourts: false,
+    courts: Array.from({ length: 8 }, (_, i) => ({ id: "c" + (i + 1), name: String(i + 1), active: true })),
+    teams: [], players: [], draws: [], pools: [], brackets: [], created: Date.now() };
+}
+
+/* setup */
+function seg(name, cur, opts, locked) { return `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-set="${name}" data-val="${v}" aria-pressed="${String(cur) === String(v)}" ${locked ? "disabled" : ""}>${l}</button>`).join("")}</div>`; }
+function renderSetup(t) {
+  const locked = t.draws.length > 0;
+  const sys = isMelee(t) ? "melee" : t.system;
+  return `<div class="stack">
+  <div class="spread"><h2>Setup</h2>${locked ? `<span class="pill">Format locked after the first draw</span>` : ""}</div>
+  ${S.setupExtra ? S.setupExtra(t) : ""}
+  <div class="panel stack">
+    <div class="fields">
+      <label class="f"><span>Competition name</span><input type="text" id="f-name" data-field="name" value="${esc(t.name)}"></label>
+      <label class="f"><span>Date</span><input type="date" id="f-date" data-field="date" value="${esc(t.date)}"></label>
+      <label class="f"><span>Venue</span><input type="text" id="f-venue" data-field="venue" value="${esc(t.venue)}" placeholder="Club or boulodrome"></label>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="panel stack">
+      <h3>Entries</h3>
+      <div class="stack" style="gap:8px"><div class="eyebrow">Entry type</div>${seg("entry", t.entry, [["teams", "Fixed teams"], ["melee", "Mêlée (random teams)"]], locked)}</div>
+      <div class="stack" style="gap:8px"><div class="eyebrow">Format</div>${seg("format", t.format, [["singles", "Singles"], ["doubles", "Doubles"], ["triples", "Triples"]], locked)}</div>
+      ${isMelee(t) ? `<p class="small muted">Players enter individually. Each round draws new random teams, mixing doubles and triples when numbers don't divide evenly, and avoids repeat partners where it can. Players are ranked individually.</p>` : ""}
+      <div class="fields">
+        <label class="f"><span>Points to win</span><input type="number" min="1" max="21" id="f-target" data-field="target" data-num value="${t.target}"></label>
+        <label class="f"><span>Bye counts as</span><div class="row" style="flex-wrap:nowrap"><input type="number" min="0" id="f-bye0" data-field="byeScore.0" data-num value="${t.byeScore[0]}"><span>–</span><input type="number" min="0" id="f-bye1" data-field="byeScore.1" data-num value="${t.byeScore[1]}"></div></label>
+      </div>
+    </div>
+    <div class="panel stack">
+      <h3>Competition system</h3>
+      ${isMelee(t) ? `<p class="muted">Mêlée competitions play a set number of rounds.</p>` :
+      seg("system", t.system, [["swiss", "Swiss"], ["snake", "Snake"], ["pools", "Pools → KO"], ["knockout", "Knockout"], ["roundrobin", "Round robin"]], locked)}
+      ${sys === "snake" ? `<label class="f"><span>Rounds</span><input type="number" min="1" max="15" id="f-snrounds" data-field="snakeRounds" data-num value="${t.snakeRounds || 5}" ${locked ? "disabled" : ""}></label>
+        <p class="small muted">Teams stand in two lines. Each round one line moves along a place, so team 2 plays whoever team 1 just played, team 3 whoever team 2 just played, and so on. All rounds are drawn at once and nobody meets the same team twice${activeIds(t).length ? ` (${activeIds(t).length} teams allow up to ${snakeMaxRounds(activeIds(t).length)} rounds)` : ""}. With an odd number of teams, one team sits out each round and scores a bye. Ranked like Swiss: wins, Buchholz, fine Buchholz, points difference.</p>` : ""}
+      ${sys === "swiss" || sys === "melee" ? `<label class="f"><span>Planned rounds</span><input type="number" min="1" max="15" id="f-rounds" data-field="swissRounds" data-num value="${t.swissRounds}"></label>
+        <p class="small muted">${sys === "swiss" ? "Round 1 is random. After that, teams on the same number of wins play each other and rematches are avoided. Ties are split by Buchholz (opponents' wins), then points difference." : "Rounds are drawn one at a time once the previous round is finished."}</p>` : ""}
+      ${sys === "pools" ? `<div class="fields">
+          <label class="f"><span>Pool size</span><input type="number" min="3" max="8" id="f-psize" data-field="poolSize" data-num value="${t.poolSize}" ${locked ? "disabled" : ""}></label>
+        </div>
+        <div class="stack" style="gap:8px"><div class="eyebrow">Pool games</div>${seg("poolStyle", t.poolStyle, [["french", "French poule (2 wins qualify)"], ["rr", "Round robin"]], locked)}</div>
+        <p class="small muted">French poules need 4 teams: game 1 is drawn, then winners play winners and losers play losers, and a barrage decides second place. Pools of other sizes play round robin.</p>` : ""}
+      ${sys === "knockout" ? `<label class="chk"><input type="checkbox" data-check="consolante" ${t.consolante ? "checked" : ""}> First-round losers play a consolante</label><label class="chk"><input type="checkbox" data-check="koThird" ${t.koThird ? "checked" : ""} ${locked ? "disabled" : ""}> Third-place play-off</label>` : ""}
+      ${sys !== "melee" ? `<div class="stack" style="gap:8px"><div class="eyebrow">Seeding</div>${seg("seeding", t.seeding, [["random", "Random draw"], ["entry", "Entry order is seeding"]], locked)}</div>` : ""}
+    </div>
+  </div>
+  ${PLAN_SYSTEMS.includes(sys) ? `<div class="panel stack">
+    <div><h3>Afternoon knockouts</h3><p class="small muted">What happens after the ${sys === "pools" ? "pools" : sys === "swiss" ? "Swiss rounds" : sys === "snake" ? "snake rounds" : "round robin"}. You can change this any time before the knockouts are drawn.</p></div>
+    ${renderPlanEditor(t, { locked: (t.brackets || []).length > 0 })}
+  </div>` : ""}
+  <div class="panel stack">
+    <div class="spread"><h3>Pistes</h3><label class="f" style="flex-direction:row;align-items:center;gap:8px"><span>Number of pistes</span><input type="number" min="1" max="200" id="f-courts" data-courts value="${t.courts.length}" style="width:90px"></label></div>
+    <p class="small muted">Rename a piste to match the markings on your terrain, or switch it off if it's unusable. Free pistes are given to waiting games as soon as a result comes in.</p>
+    <div class="courts" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr))">
+      ${t.courts.map((c, i) => `<div class="row" style="flex-wrap:nowrap;gap:6px"><input type="text" id="cn-${c.id}" data-court-name="${i}" value="${esc(c.name)}" aria-label="Piste name" style="width:70px"><label class="chk small"><input type="checkbox" data-court-on="${i}" ${c.active !== false ? "checked" : ""}> In use</label></div>`).join("")}
+    </div>
+    <label class="chk"><input type="checkbox" data-check="randomCourts" ${t.randomCourts ? "checked" : ""}> Allocate pistes at random (otherwise lowest free piste first)</label>
+  </div>
+  <div class="panel spread">
+    <div><h3>Delete competition</h3><p class="small muted">Removes the competition, its entries and every result.</p></div>
+    ${S.confirmDelete ? `<div class="row"><span class="err">Delete “${esc(t.name)}” for everyone?</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
+  </div>
+  </div>`;
+}
+
+/* entries */
+function renderEntries(t) {
+  const melee = isMelee(t); const size = SIZE[t.format]; const noun = melee ? "players" : "teams";
+  const list = entities(t);
+  const entered = list.filter(e => e.active !== false);
+  const here = entered.filter(e => e.checkedIn);
+  const drawn = t.draws.length > 0;
+  const rolling = ["swiss", "melee"].includes(melee ? "melee" : t.system); // later rounds pick up late arrivals
+  const pct = entered.length ? Math.round(100 * here.length / entered.length) : 0;
+  const q = (S.regFilter || "").toLowerCase();
+  const match = e => !q || [entName(t, e.id), ...(e.players || []), e.club || "", e.name || ""].join(" ").toLowerCase().includes(q);
+  return `<div class="stack">
+    <div class="spread"><h2>Registration</h2><span class="muted small">${FORMAT_LABEL[t.format]} · ${melee ? "Mêlée" : SYSTEM_LABEL[t.system]}</span></div>
+    <div class="panel stack">
+      ${t.checkin ? `<div class="spread"><div><div class="eyebrow">Checked in on the day</div><div class="reg-count"><b>${here.length}</b> of ${entered.length} ${noun}</div></div>
+        ${canEdit() && !drawn ? `<div class="row"><button class="btn sm" data-act="checkin-all">Check in everyone</button>${here.length ? `<button class="btn sm ghost" data-act="checkin-clear">Clear check-ins</button>` : ""}</div>` : ""}</div>
+        <div class="meter" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
+        <p class="small muted">Only checked-in ${noun} go into the draw, so the format and the number of games are worked out from who has actually turned up. ${entered.length - here.length ? `<b>${entered.length - here.length} not checked in yet.</b>` : ""}</p>`
+      : `<div class="spread"><div><div class="eyebrow">Entries</div><div class="reg-count"><b>${entered.length}</b> ${noun}</div></div></div><p class="small muted">Check-in is off, so every entered ${melee ? "player" : "team"} goes into the draw.</p>`}
+      ${canEdit() ? `<label class="chk"><input type="checkbox" data-check="checkin" ${t.checkin ? "checked" : ""}> Teams must check in on the day before they're included in the draw</label>` : ""}
+    </div>
+    ${drawn ? `<div class="notice">${rolling && t.checkin ? `The draw has started. Anyone checked in now joins from the next round.` : rolling ? `The draw has started. New entries join from the next round.` : `The draw has been made, so new entries and check-ins won't be included. Withdrawn ${noun} stay in the draw already made.`}</div>` : ""}
+    ${canEdit() ? `<div class="grid2">
+      <form class="panel stack" id="add-form">
+        <h3>Add ${melee ? "a player" : "a team"}</h3>
+        ${melee ? `<label class="f"><span>Player name</span><input type="text" id="np-name" required></label>` :
+        `<label class="f"><span>Team name (optional)</span><input type="text" id="nt-name" placeholder="Defaults to the players' names"></label>
+         <div class="fields">${Array.from({ length: size }, (_, i) => `<label class="f"><span>Player ${i + 1}</span><input type="text" id="nt-p${i}"></label>`).join("")}</div>
+         <label class="f"><span>Club</span><input type="text" id="nt-club"></label>`}
+        ${t.checkin ? `<label class="chk"><input type="checkbox" id="add-here"> Here now (check in straight away)</label>` : ""}
+        <div><button class="btn primary" type="submit">Add</button></div>
+      </form>
+      <form class="panel stack" id="bulk-form">
+        <h3>Paste a list</h3>
+        <p class="small muted">${melee ? "One player per line." : `One team per line. Use <code>Team name: Player, Player</code> or just the players' names separated by commas.`}</p>
+        <textarea id="bulk" placeholder="${melee ? "Marie Dubois&#10;Tom Hart" : "Les Pointeurs: Marie Dubois, Tom Hart, Ana Silva&#10;Jo Bell, Raj Patel, Lee Chen"}"></textarea>
+        <div><button class="btn" type="submit">Add all</button></div>
+      </form>
+    </div>` : ""}
+    <div class="panel stack" style="gap:8px">
+      <div class="spread"><h3>${melee ? "Players" : "Teams"}</h3>${list.length > 6 ? `<input type="search" id="reg-search" placeholder="Find a ${melee ? "player" : "team or player"}" value="${esc(S.regFilter || "")}" style="max-width:260px" aria-label="Search entries">` : ""}</div>
+      ${list.length ? `<div class="elist">${list.map((e, i) => `<div class="erow ${e.active === false ? "out" : ""} ${t.checkin && e.checkedIn && e.active !== false ? "here" : ""}" data-row="${e.id}" ${match(e) ? "" : "hidden"} data-text="${esc([entName(t, e.id), ...(e.players || []), e.club || ""].join(" ").toLowerCase())}">
+        <span class="num">${i + 1}</span>
+        <div class="who">${melee ? `<b>${esc(e.name)}</b>` : `<b>${esc(entName(t, e.id))}</b><span class="small muted">${esc((e.players || []).filter(Boolean).join(", "))}${e.club ? " · " + esc(e.club) : ""}</span>`}</div>
+        ${e.active === false ? `<span class="pill">Withdrawn</span>` : t.checkin ? (canEdit() ? `<button class="btn sm ${e.checkedIn ? "checked" : ""}" data-act="checkin" data-id="${e.id}" aria-pressed="${!!e.checkedIn}">${e.checkedIn ? "✓ Checked in" : "Check in"}</button>` : e.checkedIn ? `<span class="pill done">Checked in</span>` : `<span class="pill">Not here yet</span>`) : ""}
+        ${canEdit() ? `<div class="row">
+          ${t.seeding === "entry" && !drawn ? `<button class="btn sm ghost" data-act="up" data-id="${e.id}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button>` : ""}
+          <button class="btn sm ghost" data-act="toggle-e" data-id="${e.id}">${e.active === false ? "Reinstate" : "Withdraw"}</button>
+          ${!usedInDraw(e.id) ? `<button class="btn sm ghost danger" data-act="del-e" data-id="${e.id}" aria-label="Remove">Remove</button>` : ""}
+        </div>` : ""}
+      </div>`).join("")}</div>` : `<div class="empty">No ${noun} yet. Add them above or paste a list.</div>`}
+    </div>
+  </div>`;
+}
+const usedInDraw = id => MS().some(m => ents(m).includes(id));
+
+/* match card */
+function matchCard(t, m, opts = {}) {
+  const st = mStatus(m); const ro = !canScore() || st === "pending";
+  const side = (s, sc, win) => `<div class="side ${m.done && m.b ? (win ? "win" : "lose") : ""}"><span class="nm">${s ? esc(sideName(t, s)) : `<span class="tbd">${m.stage === "ko" ? "Winner to come" : "To be decided"}</span>`}</span><span class="sc">${m.done || (sc !== null && sc !== undefined && st === "playing") ? (sc ?? "") : ""}</span></div>`;
+  if (m.bye) return `<div class="match ro"><div class="meta"><span>${opts.ctx ? esc(matchContext(t, m)) : ""}</span><span class="pill">Bye</span></div>${side(m.a, m.sa, true)}<div class="small muted">Bye scored ${m.sa}–${m.sb}</div></div>`;
+  const aw = m.done && m.sa > m.sb;
+  const label = st === "playing" ? `<span class="court-tag">Piste ${esc(courtName(t, m.court))}</span>` : st === "done" ? (m.courtUsed ? `<span>Piste ${esc(courtName(t, m.courtUsed))}</span>` : "<span></span>") : st === "ready" ? `<span>Waiting for piste</span>` : `<span></span>`;
+  const pill = { playing: `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: `<span class="pill done">Final</span>`, ready: `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
+  return `<${ro ? "div" : "button"} class="match ${st} ${ro ? "ro" : ""}" ${ro ? "" : `data-match="${m.id}" type="button"`}>
+    <div class="meta">${opts.ctx ? `<span>${esc(matchContext(t, m))}</span>` : label}${pill}</div>
+    ${side(m.a, m.sa, aw)}${side(m.b, m.sb, m.done && !aw)}
+    ${opts.ctx && st === "playing" ? `<div class="meta">${label}</div>` : ""}
+  </${ro ? "div" : "button"}>`;
+}
+
+/* draw */
+function renderDraw(t) {
+  const ms = MS(); const n = activeIds(t).length;
+  const sys = isMelee(t) ? "melee" : t.system;
+  const wr = canEdit();
+  const minNeeded = sys === "melee" ? SIZE[t.format] * 2 : 2;
+  if (!t.draws.length) {
+    return `<div class="stack"><h2>Draw & results</h2><div class="panel stack">
+      <p>${n} ${isMelee(t) ? "players" : "teams"} ${t.checkin ? "checked in" : "entered"} · ${SYSTEM_LABEL[sys]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
+      ${t.checkin && enteredIds(t).length > n ? `<div class="notice">${enteredIds(t).length - n} entered ${isMelee(t) ? "player" : "team"}${enteredIds(t).length - n === 1 ? " hasn't" : "s haven't"} checked in and won't be in the draw. <button class="btn sm ghost" data-tab="entries">Go to Registration</button></div>` : ""}
+      ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} ${isMelee(t) ? "players" : "teams"} on Registration before drawing.</p>` :
+      wr ? `<div><button class="btn primary" data-act="first-draw">${{ swiss: "Draw round 1", melee: "Draw round 1", roundrobin: "Generate round robin schedule", snake: "Draw snake rounds", pools: "Draw pools", knockout: "Draw knockout bracket" }[sys]}</button></div>` : `<p class="muted">Waiting for the organiser to make the draw.</p>`}
+    </div></div>`;
+  }
+  let html = `<div class="stack"><div class="spread"><h2>Draw & results</h2><div class="row">${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}${wr && S.downloads ? `<button class="btn sm" data-act="export">Export results (CSV)</button>` : ""}</div></div>`;
+  // rounds (swiss / melee)
+  const rounds = t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round);
+  if (rounds.length) {
+    const last = rounds[0]; const lastMs = ms.filter(m => m.group === last.id);
+    const lastDone = lastMs.every(m => m.done);
+    const finalsExist = (t.brackets || []).length > 0;
+    html += `<div class="panel spread"><div><div class="eyebrow">${SYSTEM_LABEL[sys]}</div><b>Round ${last.round} of ${t.swissRounds} planned</b>${lastDone && last.round >= t.swissRounds && sys === "swiss" ? ` · <span style="color:var(--accent);font-weight:600">Morning complete</span>` : ""} · ${lastMs.filter(m => m.done).length}/${lastMs.length} games finished</div>
+      ${wr && !finalsExist ? `<div class="row">${lastDone ? `<button class="btn primary" data-act="next-round">Draw round ${last.round + 1}</button>` : ""}
+        ${!lastMs.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${last.id}">Undo round ${last.round}</button>` : ""}</div>` : ""}</div>`;
+  }
+  // afternoon knockout planner
+  if (PLAN_SYSTEMS.includes(sys) && !(t.brackets || []).length && wr) {
+    const ready = morningDone(t, ms);
+    html += `<div class="panel stack" ${ready ? `style="border-color:var(--accent)"` : ""}>
+      <div class="spread"><div><div class="eyebrow">Afternoon</div><h3>Knockouts</h3></div>
+        ${ready ? `<button class="btn primary" data-act="start-kos">Draw the knockouts</button>` : `<span class="pill">${sys === "swiss" ? "Draw once the last round is finished" : "Draw once every game is finished"}</span>`}</div>
+      ${ready && sys === "swiss" && rounds.length && rounds[0].round < t.swissRounds ? `<div class="notice">Only ${rounds[0].round} of ${t.swissRounds} planned rounds have been played. You can still draw the knockouts now, or play another round first.</div>` : ""}
+      ${renderPlanEditor(t, { compact: true })}
+    </div>`;
+  }
+  // brackets first if present (most recent stage)
+  (t.brackets || []).forEach(b => html += renderBracket(t, b, ms));
+  if (rounds.length) rounds.forEach(d => { const rm = ms.filter(m => m.group === d.id).sort(byOrder); html += `<section class="stack" style="gap:10px"><h3>${esc(d.label)}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; });
+  // round robin and snake (whole schedule drawn at once)
+  for (const [gid, label] of [["RR", "Round robin"], ["SN", "Snake"]]) if (t.draws.some(d => d.id === gid)) {
+    const rr = ms.filter(m => m.group === gid); const maxR = Math.max(...rr.map(m => m.round));
+    html += `<div class="panel spread"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds</div>
+      ${wr ? `<div class="row">${!rr.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${gid}">Undo schedule</button>` : ""}</div>` : ""}</div>`;
+    for (let r = 1; r <= maxR; r++) { const rm = rr.filter(m => m.round === r).sort(byOrder); html += `<section class="stack" style="gap:10px"><h3>Round ${r}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; }
+  }
+  // pools
+  if ((t.pools || []).length) {
+    const ranks = t.pools.map(p => poolRanking(t, p, ms));
+    const allDone = ranks.every(r => r.complete);
+    const koStarted = (t.brackets || []).some(b => b.id === "A");
+    html += `<div class="panel spread"><div><div class="eyebrow">Pools</div><b>${ranks.filter(r => r.complete).length}/${t.pools.length} pools complete</b></div>
+      ${wr && !koStarted ? `<div class="row">${!ms.some(m => m.pool && m.done) ? `<button class="btn danger sm" data-act="undo" data-id="pools">Undo pools</button>` : ""}</div>` : ""}</div>
+      <div class="pools">${t.pools.map((p, i) => poolCard(t, p, ms, ranks[i])).join("")}</div>`;
+  }
+  // knockout consolante control
+  if (t.system === "knockout" && t.consolante && !isMelee(t) && wr) {
+    const a = (t.brackets || []).find(b => b.id === "A"); const hasB = (t.brackets || []).some(b => b.id === "B");
+    if (a && !hasB) {
+      const r1 = ms.filter(m => m.bracket === "A" && m.round === 1 && !m.bye);
+      const ready = r1.length && r1.every(m => m.done);
+      html += `<div class="panel spread"><div><b>Consolante</b><div class="small muted">${ready ? `${r1.length} first-round losers are ready to play.` : "Available once every first-round game is finished."}</div></div><button class="btn" data-act="start-cons" ${ready ? "" : "disabled"}>Draw consolante</button></div>`;
+    }
+  }
+  return html + `</div>`;
+}
+function poolCard(t, p, ms, rk) {
+  const pm = ms.filter(m => m.pool === p.id).sort(byOrder);
+  return `<div class="panel stack" style="gap:10px">
+    <div class="spread"><h3>${esc(p.name)}</h3>${rk.complete ? `<span class="pill done">Complete</span>` : `<span class="pill">${pm.filter(m => m.done).length}/${p.french ? 5 : pm.length} games</span>`}</div>
+    <div class="tw"><table><thead><tr><th>#</th><th>${isMelee(t) ? "Player" : "Team"}</th><th class="n">W</th><th class="n">+/-</th></tr></thead><tbody>
+      ${rk.rows.map((s, i) => `<tr class="${!s.unplaced && i < getPlan(t).brackets[0].to && i >= getPlan(t).brackets[0].from - 1 && rk.complete ? "q" : ""}"><td>${s.unplaced ? "–" : i + 1}</td><td class="wrap">${esc(entName(t, s.id))}</td><td class="n">${s.w}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
+    </tbody></table></div>
+    <div class="stack" style="gap:8px">${pm.map(m => matchCard(t, m)).join("")}</div>
+  </div>`;
+}
+const SHORT = (R, r) => { const left = R - r; return left === 0 ? "Final" : left === 1 ? "SF" : left === 2 ? "QF" : `R${2 ** (left + 1)}`; };
+function bkCard(t, b, m) {
+  const seedOf = id => b.seeds ? b.seeds.indexOf(id) + 1 : 0;
+  const st = mStatus(m); const ro = !canScore() || st === "pending" || m.bye;
+  const aw = m.done && m.b && m.sa > m.sb;
+  const feeder = side => { // the earlier game this slot is waiting on
+    if (m.third) return `Loser of SF ${side === "a" ? 1 : 2}`;
+    if (m.round === 1) return "Bye";
+    return `Winner of ${SHORT(b.rounds, m.round - 1)} ${m.order * 2 + (side === "a" ? 1 : 2)}`;
+  };
+  const row = (side, sc, cls) => {
+    const ids = m[side];
+    const sd = ids && m.round === 1 && !m.third && ids.length === 1 ? seedOf(ids[0]) : 0;
+    const showSc = !m.bye && (st === "done" || st === "playing") && sc !== null && sc !== undefined;
+    return `<div class="bkm-row ${cls}"><span class="sd">${sd || ""}</span><span class="nm">${ids ? esc(sideName(t, ids)) : `<span class="tbd muted">${feeder(side)}</span>`}</span><span class="sc">${showSc ? sc : ""}</span></div>`;
+  };
+  const foot = m.bye ? "Bye" : st === "playing" ? `Piste ${esc(courtName(t, m.court))} · playing` : st === "ready" ? "Waiting for a piste" : "";
+  const tag = ro ? "div" : "button";
+  return `<${tag} class="bkm ${st} ${m.bye ? "bye" : ""} ${ro ? "ro" : ""}" ${ro ? "" : `type="button" data-match="${m.id}"`} aria-label="${esc(matchContext(t, m))}">
+    ${row("a", m.sa, m.done && m.b ? (aw ? "win" : "lose") : m.bye ? "win" : "")}
+    ${m.bye ? "" : row("b", m.sb, m.done && m.b ? (aw ? "lose" : "win") : "")}
+    ${foot ? `<div class="bkm-foot">${foot}</div>` : ""}
+  </${tag}>`;
+}
+function bracketGrid(t, b, ms) {
+  const bm = ms.filter(m => m.bracket === b.id);
+  const final = bm.find(m => m.round === b.rounds && !m.third);
+  const champ = final?.done ? sideName(t, winnerSide(final)) : null;
+  let heads = "", cols = "";
+  const slot = m => `<div class="bk-slot ${m.done ? "done" : ""}">${bkCard(t, b, m)}</div>`;
+  for (let r = 1; r <= b.rounds; r++) {
+    const rm = bm.filter(m => m.round === r && !m.third).sort((x, y) => x.order - y.order);
+    heads += `<h4 style="grid-column:${r}">${roundLabel(b.rounds, r)}</h4>`;
+    let body = "";
+    if (r < b.rounds) { for (let i = 0; i < rm.length; i += 2) body += `<div class="bk-pair">${slot(rm[i])}${rm[i + 1] ? slot(rm[i + 1]) : ""}</div>`; }
+    else body = rm.map(slot).join("");
+    cols += `<div class="bk-col ${r > 1 ? "in" : ""} out" style="grid-column:${r}">${body}</div>`;
+  }
+  heads += `<h4 style="grid-column:${b.rounds + 1}">Winner</h4>`;
+  cols += `<div class="bk-col in" style="grid-column:${b.rounds + 1}"><div class="bk-slot"><div class="bk-champ ${champ ? "" : "tbc"}"><span class="eyebrow">${champ ? "Champion" : "To be decided"}</span><b>${champ ? esc(champ) : "—"}</b></div></div></div>`;
+  const tp = bm.find(m => m.third);
+  return `<div class="bk-scroll"><div class="bk">${heads}${cols}</div></div>
+    ${tp ? `<div class="bk-third"><div class="stack" style="gap:6px"><h4>Third place</h4>${bkCard(t, b, tp)}</div></div>` : ""}`;
+}
+function renderBracket(t, b, ms) {
+  const bm = ms.filter(m => m.bracket === b.id);
+  const final = bm.find(m => m.round === b.rounds && !m.third);
+  const champ = final?.done ? sideName(t, winnerSide(final)) : null;
+  const canUndo = canEdit() && !bm.some(m => m.done && !m.bye);
+  return `<section class="panel stack" style="gap:12px"><div class="spread"><h3>${esc(b.name)} <span class="muted small">${b.entrants} ${isMelee(t) ? "players" : "teams"}${b.seeds ? " · seeded" : b.seeds === null ? " · random draw" : ""}</span></h3>
+    <div class="row">${champ ? `<span class="pill done">Winner: ${esc(champ)}</span>` : ""}${canUndo ? `<button class="btn danger sm" data-act="undo" data-id="${b.id}">Undo bracket</button>` : ""}</div></div>
+    ${bracketGrid(t, b, ms)}</section>`;
+}
+
+/* courts */
+function renderCourts(t) {
+  const ms = MS();
+  const live = ms.filter(m => !m.done && m.court);
+  const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder);
+  return `<div class="stack">
+    <div class="spread"><h2>Pistes</h2><div class="row"><span class="muted small">${live.length} playing · ${waiting.length} waiting</span>${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}</div></div>
+    <div class="courts">${t.courts.map(c => {
+      const m = live.find(x => x.court === c.id);
+      if (c.active === false) return `<div class="court off"><div class="cn">${esc(c.name)}<span class="pill">Not in use</span></div></div>`;
+      if (!m) return `<div class="court free"><div class="cn">${esc(c.name)}<span class="pill">Free</span></div><span class="muted small">No game on this piste.</span></div>`;
+      return `<div class="court"><div class="cn">${esc(c.name)}<span class="pill playing"><span class="dot"></span>Playing</span></div>${matchCard(t, m, { ctx: true })}</div>`;
+    }).join("")}</div>
+    <section class="stack" style="gap:10px"><h3>Waiting for a piste</h3>
+      ${waiting.length ? `<div class="mlist">${waiting.map(m => matchCard(t, m, { ctx: true })).join("")}</div>` : `<div class="empty">No games waiting.</div>`}
+    </section>
+  </div>`;
+}
+
+/* standings */
+function overallTable(t, stage) {
+  const ms = MS().filter(m => m.stage === stage);
+  const ids = entities(t).map(e => e.id).filter(id => ms.some(m => ents(m).includes(id)) || activeIds(t).includes(id));
+  const st = computeStats(t, ms, ids); const useB = stage === "swiss" || stage === "snake";
+  return rankStats(t, st, useB);
+}
+function standingsTable(t, rows, opts = {}) {
+  const useB = opts.buch;
+  return `<div class="tw"><table><thead><tr><th>#</th><th>${isMelee(t) ? "Player" : "Team"}</th><th class="n">Pld</th><th class="n">W</th><th class="n">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n">For</th><th class="n">Agst</th><th class="n">+/-</th></tr></thead><tbody>
+    ${rows.map((s, i) => `<tr><td class="rank">${i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${!isMelee(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n">${s.fbuch}</td>` : ""}<td class="n">${s.pf}</td><td class="n">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+function renderStandings(t) {
+  const sys = isMelee(t) ? "melee" : t.system;
+  let html = `<div class="stack"><h2>Standings</h2>`;
+  const ms = MS();
+  (t.brackets || []).forEach(b => {
+    const f = ms.find(m => m.bracket === b.id && m.round === b.rounds && !m.third);
+    const tp = ms.find(m => m.bracket === b.id && m.third);
+    const semis = ms.filter(m => m.bracket === b.id && m.round === b.rounds - 1 && m.done && m.b);
+    html += `<div class="panel stack" style="gap:6px"><h3>${esc(b.name)}</h3>${f?.done ? `<div><span class="eyebrow">Winner</span> <b>${esc(sideName(t, winnerSide(f)))}</b></div><div><span class="eyebrow">Runner-up</span> ${esc(sideName(t, loserSide(f)) || "")}</div>${tp?.done ? `<div><span class="eyebrow">Third</span> ${esc(sideName(t, winnerSide(tp)))}</div><div><span class="eyebrow">Fourth</span> ${esc(sideName(t, loserSide(tp)) || "")}</div>` : semis.length ? `<div><span class="eyebrow">Semi-finalists</span> ${semis.map(m => esc(sideName(t, loserSide(m)))).join(", ")}</div>` : ""}` : `<span class="muted">In progress. See Draw & results for the bracket.</span>`}</div>`;
+  });
+  if (sys === "swiss" || sys === "melee" || sys === "snake") {
+    if (!ms.some(m => m.stage === sys)) html += `<div class="empty">Standings appear once round 1 is drawn.</div>`;
+    else html += `<div class="panel">${standingsTable(t, overallTable(t, sys), { buch: sys !== "melee" })}</div><p class="small muted">${sys !== "melee" ? "Ranked by wins, then Buchholz (opponents' total wins), then fine Buchholz (their opponents' Buchholz), then points difference, then points scored. Anything still level is split by a lot drawn for each entry when it was added." : "Ranked by wins, then points difference, then points scored. Anything still level is split by a lot drawn for each entry when it was added."} Byes count as a ${t.byeScore[0]}–${t.byeScore[1]} win.</p>`;
+  } else if (sys === "roundrobin") {
+    if (!ms.length) html += `<div class="empty">Standings appear once the schedule is generated.</div>`;
+    else html += `<div class="panel">${standingsTable(t, overallTable(t, "rr"))}</div><p class="small muted">Ranked by wins, then points difference, then points scored. Two teams still level are split by their game against each other, then by a lot drawn for each entry when it was added.</p>`;
+  } else if (sys === "pools") {
+    if (!(t.pools || []).length) html += `<div class="empty">Pool tables appear once pools are drawn.</div>`;
+    else html += `<div class="pools">${t.pools.map(p => { const rk = poolRanking(t, p, ms); return `<div class="panel stack" style="gap:8px"><h3>${esc(p.name)}</h3>${standingsTable(t, rk.rows)}</div>`; }).join("")}</div>`;
+  } else if (!(t.brackets || []).length) html += `<div class="empty">Results appear once the bracket is drawn.</div>`;
+  return html + `</div>`;
+}
+
+/* big screen */
+function renderDisplay(t) {
+  const ms = MS(); const live = ms.filter(m => !m.done && m.court);
+  const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder).slice(0, 8);
+  const sys = isMelee(t) ? "melee" : t.system;
+  let table = "";
+  if ((sys === "swiss" || sys === "melee" || sys === "snake") && ms.some(m => m.stage === sys)) table = standingsTable(t, overallTable(t, sys).slice(0, 12), { buch: sys !== "melee" });
+  else if (sys === "roundrobin" && ms.length) table = standingsTable(t, overallTable(t, "rr").slice(0, 12));
+  const curRound = t.draws.filter(d => d.kind === "round").length;
+  return `<div class="disp">
+    <div class="spread"><div><div class="eyebrow">${esc(t.venue || "")}${t.venue ? " · " : ""}${esc(t.date || "")}</div><h2>${esc(t.name)}</h2></div>
+      <div class="row">${(t.brackets || []).length ? `<span class="pill playing" style="font-size:15px;padding:4px 12px">Knockouts</span>` : curRound ? `<span class="pill playing" style="font-size:15px;padding:4px 12px">Round ${curRound}</span>` : ""}<button class="btn sm" data-act="fullscreen">Full screen</button></div></div>
+    <div class="courts">${t.courts.filter(c => c.active !== false).map(c => { const m = live.find(x => x.court === c.id);
+      return m ? `<div class="court"><div class="cn">${esc(c.name)}<span class="small muted" style="font-family:var(--body);font-size:12px;font-weight:600">${esc(matchContext(t, m))}</span></div>${["a", "b"].map(k => `<div class="side"><span class="nm">${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? 0}</span></div>`).join("")}</div>`
+        : `<div class="court free"><div class="cn">${esc(c.name)}</div><span class="muted">Free</span></div>`; }).join("")}</div>
+    ${waiting.length ? `<section class="stack" style="gap:8px"><h3>Next up</h3><div class="mlist">${waiting.map(m => `<div class="match ro"><div class="meta"><span>${esc(matchContext(t, m))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.a))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.b))}</span></div></div>`).join("")}</div></section>` : ""}
+    ${(t.brackets || []).map(b => `<section class="panel stack" style="gap:8px"><h3>${esc(b.name)}</h3>${bracketGrid(t, b, ms)}</section>`).join("")}
+    ${table && !(t.brackets || []).length ? `<section class="panel stack" style="gap:8px"><h3>Standings</h3>${table}</section>` : ""}
+  </div>`;
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener("click", async e => {
+  const tab = e.target.closest("[data-tab]");
+  if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); render(); return; }
+  const mc = e.target.closest("[data-match]");
+  if (mc) { openMatch(mc.dataset.match); return; }
+  const setb = e.target.closest("[data-set]");
+  if (setb && canEdit() && setb.dataset.set === "plan-seeding") { const v = setb.dataset.val; await savePlan(pl => pl.seeding = v); return; }
+  if (setb && canEdit()) { const t = clone(T()); t[setb.dataset.set] = setb.dataset.val; if (setb.dataset.set === "entry" && t.entry === "melee") t.system = "swiss"; await guard(() => saveT(t)); return; }
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  const act = a.dataset.act;
+  if (a.closest("#modal")) { if (act === "close-bg" && e.target !== a) return; modalAction(act, a.dataset.k); return; }
+  const t = T();
+  switch (act) {
+    case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
+    case "del-t": S.confirmDelete = true; render(); break;
+    case "del-t-no": S.confirmDelete = false; render(); break;
+    case "del-t-yes": { S.confirmDelete = false; const id = t.id; delete S.tournaments[id]; S.tid = Object.keys(S.tournaments)[0] || null; S.matches = {}; watchMatches(); render(); await guard(() => S.store.deleteTournament(id)); S.onSelect?.(); toast("Competition deleted."); break; }
+    case "first-draw": {
+      const sys = isMelee(t) ? "melee" : t.system;
+      if (sys === "swiss") await guard(() => addDraw(drawSwissRound(t, MS())));
+      else if (sys === "melee") await guard(() => addDraw(drawMeleeRound(t, MS())));
+      else if (sys === "roundrobin") await guard(() => addDraw(genRoundRobin(t)));
+      else if (sys === "snake") await guard(() => addDraw(genSnake(t)));
+      else if (sys === "pools") await guard(() => addDraw(drawPools(t)));
+      else if (sys === "knockout") { const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t)); await guard(() => addDraw(createBracket(t, "A", "Main knockout", ids, { third: t.koThird }))); }
+      break;
+    }
+    case "next-round": await guard(() => addDraw(isMelee(t) ? drawMeleeRound(t, MS()) : drawSwissRound(t, MS()))); break;
+    case "undo": await guard(() => undoDraw(a.dataset.id)); break;
+    case "assign": { const n = await guard(assignCourts); toast(n ? `${n} game(s) sent to pistes.` : "No free piste or no game ready."); render(); break; }
+    case "start-kos": await guard(startKnockouts); break;
+    case "plan-preset": { const pr = planPresets(t)[+a.dataset.i]; if (pr) await savePlan(pl => { const sil = pl.brackets.find(b => b.silver); pl.brackets = pr[1].map(([name, from, to], i) => ({ id: "ABCDEF"[i], name, from, to, third: !!pl.brackets[i]?.third })); if (sil) pl.brackets.push(sil); }); break; }
+    case "plan-add": await savePlan(pl => { const others = pl.brackets.filter(b => !b.silver); const last = others[others.length - 1] || { from: 0, to: 0 }; const id = "ABCDEF".split("").find(x => !pl.brackets.some(b => b.id === x)); const span = last.to - last.from + 1; pl.brackets.push({ id, name: `${id} knockout`, from: last.to + 1, to: last.to + span, third: false }); }); break;
+    case "plan-del": await savePlan(pl => pl.brackets.splice(+a.dataset.i, 1)); break;
+    case "start-cons": {
+      const losers = MS().filter(m => m.bracket === "A" && m.round === 1 && !m.bye && m.done).sort(byOrder).map(m => loserSide(m)[0]);
+      await guard(() => addDraw(createBracket(t, "B", "Consolante", losers, { third: t.koThird }))); break;
+    }
+    case "checkin": { const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); e2.checkedIn = !e2.checkedIn; e2.checkedInAt = e2.checkedIn ? Date.now() : null; await guard(() => saveT(nt)); break; }
+    case "checkin-all": { const nt = clone(t); entities(nt).forEach(x => { if (x.active !== false && !x.checkedIn) { x.checkedIn = true; x.checkedInAt = Date.now(); } }); await guard(() => saveT(nt)); toast("Everyone is checked in."); break; }
+    case "checkin-clear": { if (!S.confirmClear) { S.confirmClear = true; toast("Tap Clear check-ins again to confirm."); setTimeout(() => S.confirmClear = false, 4000); break; } S.confirmClear = false; const nt = clone(t); entities(nt).forEach(x => { x.checkedIn = false; x.checkedInAt = null; }); await guard(() => saveT(nt)); toast("Check-ins cleared."); break; }
+    case "toggle-e": { const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); e2.active = e2.active === false; await guard(() => saveT(nt)); break; }
+    case "del-e": { const nt = clone(t); if (isMelee(nt)) nt.players = nt.players.filter(x => x.id !== a.dataset.id); else nt.teams = nt.teams.filter(x => x.id !== a.dataset.id); await guard(() => saveT(nt)); break; }
+    case "up": { const nt = clone(t); const arr = entities(nt); const i = arr.findIndex(x => x.id === a.dataset.id); if (i > 0) [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; await guard(() => saveT(nt)); break; }
+    case "fullscreen": { try { await document.documentElement.requestFullscreen(); } catch { toast("Full screen isn't available here."); } break; }
+    case "export": exportCsv(); break;
+    default: if (S.extraAction) await S.extraAction(act, a);
+  }
+});
+document.addEventListener("change", async e => {
+  const el = e.target;
+  if (el.id === "tpick") { S.tid = el.value; lsSet("carreau-tid", S.tid); S.matches = {}; S.onSelect?.(); watchMatches(); render(); return; }
+  if (!canEdit() || !T()) return;
+  if (el.closest("#modal")) return;
+  if (S.extraChange && await S.extraChange(el)) return;
+  if (el.dataset.plansilver !== undefined) { const on = el.checked; await savePlan(pl => { pl.brackets = pl.brackets.filter(b => !b.silver); if (on) pl.brackets.push({ id: "S", name: "Silver", silver: true, from: 1, to: 9999, third: false }); }); return; }
+  if (el.dataset.plan) { const i = +el.dataset.i, f = el.dataset.plan; const v = f === "third" ? el.checked : f === "name" ? (el.value.trim() || "Knockout") : parseInt(el.value, 10); if (f !== "name" && f !== "third" && isNaN(v)) return; await savePlan(pl => pl.brackets[i][f] = v); return; }
+  const t = clone(T());
+  if (el.dataset.field) {
+    let v = el.value; if (el.dataset.num !== undefined) { v = parseInt(v, 10); if (isNaN(v)) return; }
+    const [k, idx] = el.dataset.field.split(".");
+    if (idx !== undefined) t[k][+idx] = v; else t[k] = v;
+  } else if (el.dataset.check) t[el.dataset.check] = el.checked;
+  else if (el.dataset.courts !== undefined) {
+    const n = Math.max(1, Math.min(200, parseInt(el.value, 10) || 1));
+    while (t.courts.length < n) { const i = t.courts.length + 1; let id = "c" + i; while (t.courts.some(c => c.id === id)) id = "c" + uid(); t.courts.push({ id, name: String(i), active: true }); }
+    const inUse = new Set(MS().filter(m => !m.done && m.court).map(m => m.court));
+    while (t.courts.length > n && !inUse.has(t.courts[t.courts.length - 1].id)) t.courts.pop();
+    if (t.courts.length > n) toast("Some pistes have games on them, so they weren't removed.");
+  } else if (el.dataset.courtName !== undefined) t.courts[+el.dataset.courtName].name = el.value.trim() || String(+el.dataset.courtName + 1);
+  else if (el.dataset.courtOn !== undefined) t.courts[+el.dataset.courtOn].active = el.checked;
+  else if (el.dataset.list !== undefined) t[el.dataset.list] = el.value.split(/[\s,;]+/).map(x => x.trim().toLowerCase()).filter(x => x.includes("@"));
+  else return;
+  await guard(() => saveT(t));
+  if (el.dataset.courtOn !== undefined || el.dataset.courts !== undefined) await guard(assignCourts);
+});
+document.addEventListener("input", e => {
+  if (e.target.id !== "reg-search") return;
+  S.regFilter = e.target.value; const q = S.regFilter.toLowerCase();
+  document.querySelectorAll("[data-row]").forEach(r => r.hidden = !!q && !r.dataset.text.includes(q));
+});
+document.addEventListener("focusout", () => setTimeout(() => { if (S.pendingRender) render(); }, 0));
+document.addEventListener("submit", async e => {
+  e.preventDefault(); const t = clone(T()); if (!t) return;
+  if (e.target.id === "add-form") {
+    const hereNow = !!$("#add-here")?.checked; const ci = hereNow ? { checkedIn: true, checkedInAt: Date.now() } : {};
+    if (isMelee(t)) { const nm = $("#np-name").value.trim(); if (!nm) return; t.players.push(Object.assign({ id: "p" + uid(), name: nm, active: true }, ci)); }
+    else {
+      const ps = Array.from({ length: SIZE[t.format] }, (_, i) => $("#nt-p" + i).value.trim());
+      const name = $("#nt-name").value.trim(); if (!name && !ps.some(Boolean)) { toast("Enter a team name or at least one player."); return; }
+      t.teams.push(Object.assign({ id: "e" + uid(), name, players: ps, club: $("#nt-club").value.trim(), active: true }, ci));
+    }
+    e.target.reset(); if ($("#add-here")) $("#add-here").checked = hereNow; document.activeElement?.blur();
+    await guard(() => saveT(t)); e.target.querySelector("input")?.focus?.();
+  }
+  if (e.target.id === "bulk-form") {
+    const lines = $("#bulk").value.split(/\n/).map(s => s.trim()).filter(Boolean); if (!lines.length) return;
+    lines.forEach(l => {
+      if (isMelee(t)) t.players.push({ id: "p" + uid(), name: l, active: true });
+      else { let name = "", rest = l; const ci = l.indexOf(":"); if (ci > -1) { name = l.slice(0, ci).trim(); rest = l.slice(ci + 1); }
+        const ps = rest.split(/[,;\/]/).map(s => s.trim()).filter(Boolean); t.teams.push({ id: "e" + uid(), name, players: ps, club: "", active: true }); }
+    });
+    $("#bulk").value = ""; document.activeElement?.blur();
+    await guard(() => saveT(t)); toast(`${lines.length} added.`);
+  }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && S.modal) { S.modal = null; renderModal(); } });
+
+async function exportCsv() {
+  const t = T(); const rows = [["Stage", "Round", "Piste", isMelee(t) ? "Side A" : "Team A", "Score A", "Score B", isMelee(t) ? "Side B" : "Team B", "Status"]];
+  MS().sort(byOrder).forEach(m => rows.push([matchContext(t, m), m.round, m.courtUsed || m.court ? courtName(t, m.courtUsed || m.court) : "", sideName(t, m.a) || "", m.sa ?? "", m.sb ?? "", m.bye ? "BYE" : sideName(t, m.b) || "", mStatus(m)]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  try { await S.downloads.save({ filename: `${t.name.replace(/[^\w\- ]+/g, "").trim() || "results"}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
+}
+
+/* ---------------- boot ---------------- */
+function watchMatches() {
+  S.unsubM?.(); S.unsubM = null;
+  if (!S.tid) return;
+  const tid = S.tid;
+  S.unsubM = S.store.watchMatches(tid, list => { if (S.tid !== tid) return; S.matches = {}; list.forEach(m => S.matches[m.id] = m); render(); }, err => console.error(err));
+}
+function startWatching() {
+  S.store.watchTournaments(list => {
+    S.tournaments = {}; list.forEach(t => S.tournaments[t.id] = t);
+    S.loaded = true;
+    if (!S.tid || !S.tournaments[S.tid]) { const first = list.sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
+    if (T() && !canEdit() && (S.tab === "setup" || S.tab === "entries")) S.tab = "courts";
+    render();
+  }, err => console.error(err));
+  watchMatches();
+}
+/* ---------------- web build: Firebase storage + Google sign-in ---------------- */
+const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
+const AUTH = { user: null, ready: false };
+const ACCESS = {}; // tid -> { scorers: [] } when this user may read it (owner or scorer)
+let FB = null, unsubT = null, unsubAccess = null;
+
+function fbStore() {
+  const { db } = FB;
+  let unsubs = [];
+  return {
+    mode: "firebase",
+    watchTournaments(cb, onErr) {
+      unsubs.forEach(u => u()); unsubs = [];
+      const parts = {}; const expected = new Set();
+      const emit = () => {
+        if ([...expected].some(k => !(k in parts))) return; // wait until every query has answered once
+        const m = {}; Object.values(parts).forEach(list => list.forEach(t => m[t.id] = t)); cb(Object.values(m));
+      };
+      const sub = (key, q) => { expected.add(key); unsubs.push(onSnapshot(q, s => { parts[key] = s.docs.map(d => d.data()); emit(); }, e => { console.error(e); parts[key] = []; emit(); onErr?.(e); })); };
+      const tc = collection(db, "tournaments");
+      sub("listed", query(tc, where("listed", "==", true), limit(100)));
+      if (AUTH.user) sub("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), limit(200)));
+      if (S.tid) { expected.add("sel"); unsubs.push(onSnapshot(doc(db, "tournaments", S.tid), d => { parts.sel = d.exists() ? [d.data()] : []; emit(); }, () => { parts.sel = []; emit(); })); }
+      return () => { unsubs.forEach(u => u()); unsubs = []; };
+    },
+    watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data())), onErr); },
+    setTournament(t) { return setDoc(doc(db, "tournaments", t.id), clone(t)); },
+    async deleteTournament(tid) {
+      const s = await getDocs(collection(db, "tournaments", tid, "matches"));
+      for (const d of s.docs) await deleteDoc(d.ref);
+      try { await deleteDoc(doc(db, "tournaments", tid, "private", "access")); } catch {}
+      await deleteDoc(doc(db, "tournaments", tid));
+    },
+    setMatch(tid, m) { return setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m)); },
+    updateMatch(tid, id, patch) { return updateDoc(doc(db, "tournaments", tid, "matches", id), clone(patch)); },
+    deleteMatch(tid, id) { return deleteDoc(doc(db, "tournaments", tid, "matches", id)); }
+  };
+}
+
+const myEmail = () => (AUTH.user?.email || "").toLowerCase();
+S.permFn = t => {
+  const u = AUTH.user; if (!u || !t) return { edit: false, score: false };
+  const owner = t.ownerUid === u.uid;
+  const scorer = (ACCESS[t.id]?.scorers || []).includes(myEmail());
+  return { edit: owner, score: owner || scorer };
+};
+S.canCreate = () => !!AUTH.user;
+S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.listed = false; };
+S.headerExtra = () => !CONFIGURED ? "" : AUTH.user
+  ? `<span class="small muted" title="Signed in">${esc(AUTH.user.email || "Signed in")}</span><button class="btn sm ghost" data-act="sign-out">Sign out</button>`
+  : `<button class="btn sm" data-act="sign-in">Organiser sign in</button>`;
+S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link the organiser sent you. Running one? Sign in with Google to create your own.</p>${CONFIGURED ? `<div><button class="btn primary" data-act="sign-in">Sign in with Google</button></div>` : ""}`;
+const shareUrl = t => `${location.origin}${location.pathname}#${t.id}`;
+S.setupExtra = t => !CONFIGURED ? "" : `<div class="panel stack">
+  <h3>Sharing</h3>
+  <div class="stack" style="gap:6px"><div class="eyebrow">Link for players and spectators</div>
+    <div class="row" style="flex-wrap:nowrap"><input type="text" id="share-url" readonly value="${esc(shareUrl(t))}" aria-label="Share link"><button class="btn" data-act="copy-link">Copy</button></div>
+    <p class="small muted">Anyone with the link can follow the draw, pistes and results live. No account needed.</p></div>
+  <label class="chk"><input type="checkbox" data-check="listed" ${t.listed ? "checked" : ""}> Show this competition on the site's public list</label>
+  <label class="f"><span>Scorers (Google email addresses)</span><textarea id="f-scorers" data-scorers style="min-height:70px" placeholder="umpire@gmail.com, captain@club.org">${esc((ACCESS[t.id]?.scorers || []).join(", "))}</textarea></label>
+  <p class="small muted">Scorers sign in with Google, open the competition link and can enter scores and move games between pistes. Only you can change the setup, entries and draws. Their addresses stay private.</p>
+</div>`;
+S.extraChange = async el => {
+  if (el.dataset.scorers === undefined) return false;
+  const list = el.value.split(/[\s,;]+/).map(x => x.trim().toLowerCase()).filter(x => x.includes("@"));
+  try { await setDoc(doc(FB.db, "tournaments", S.tid, "private", "access"), { scorers: list }); ACCESS[S.tid] = { scorers: list }; toast(`${list.length} scorer${list.length === 1 ? "" : "s"} saved.`); }
+  catch (e) { console.error(e); toast("Scorers weren't saved. Check you're signed in as the organiser."); }
+  return true;
+};
+S.extraAction = async act => {
+  if (act === "sign-in") { try { await signInWithPopup(FB.auth, new GoogleAuthProvider()); } catch (e) { if (e?.code !== "auth/popup-closed-by-user") toast("Sign-in didn't complete. Allow pop-ups for this site and try again."); } }
+  if (act === "sign-out") { await signOut(FB.auth); }
+  if (act === "copy-link") { const el = document.getElementById("share-url"); try { await navigator.clipboard.writeText(el.value); toast("Link copied."); } catch { el.select(); } }
+};
+S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
+
+function watchAccess() {
+  unsubAccess?.(); unsubAccess = null;
+  if (!FB || !AUTH.user || !S.tid) return;
+  const tid = S.tid;
+  unsubAccess = onSnapshot(doc(FB.db, "tournaments", tid, "private", "access"),
+    d => { ACCESS[tid] = d.exists() ? d.data() : { scorers: [] }; render(); },
+    () => { ACCESS[tid] = { scorers: [] }; render(); }); // not owner or scorer: viewer
+}
+function restart() {
+  if (!FB) return;
+  startWatching(); watchAccess();
+}
+S.onSelect = () => { if (S.tid) history.replaceState(null, "", "#" + S.tid); else history.replaceState(null, "", location.pathname); restart(); };
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (h && h !== S.tid) { S.tid = h; S.matches = {}; restart(); } });
+
+function boot() {
+  const h = location.hash.slice(1); if (h) S.tid = h;
+  if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
+  const app = initializeApp(firebaseConfig);
+  FB = { db: getFirestore(app), auth: getAuth(app) };
+  if (window.__CARREAU_EMULATOR) { // local testing only
+    connectFirestoreEmulator(FB.db, "127.0.0.1", 8080); connectAuthEmulator(FB.auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    window.__testSignIn = (email, sub) => signInWithCredential(FB.auth, GoogleAuthProvider.credential(JSON.stringify({ sub: sub || email, email, email_verified: true })));
+    window.__testSignOut = () => signOut(FB.auth);
+  }
+  S.store = fbStore();
+  onAuthStateChanged(FB.auth, u => { AUTH.user = u; AUTH.ready = true; S.denied = false; restart(); render(); });
+}
+render();
+boot();
+
+// expose internals for testing in local mode only
+if (!window.claude || window.__testHook) window.__carreau = { S, genSnake, render, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, recordResult, addDraw, MS, T };
+})();
+</script>
+
+</body>
+</html>
