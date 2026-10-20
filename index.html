@@ -206,7 +206,7 @@ input[type=search]{background:var(--surface-2);border:1px solid var(--line);bord
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, connectFirestoreEmulator, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, connectAuthEmulator, signInWithCredential, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, connectAuthEmulator, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { firebaseConfig } from "./firebase-config.js";
 (() => {
 "use strict";
@@ -921,10 +921,10 @@ function renderSetup(t) {
     </div>
     <label class="chk"><input type="checkbox" data-check="randomCourts" ${t.randomCourts ? "checked" : ""}> Allocate pistes at random (otherwise lowest free piste first)</label>
   </div>
-  <div class="panel spread">
+  ${S.canDelete && !S.canDelete(t) ? "" : `<div class="panel spread">
     <div><h3>Delete competition</h3><p class="small muted">Removes the competition, its entries and every result.</p></div>
     ${S.confirmDelete ? `<div class="row"><span class="err">Delete “${esc(t.name)}” for everyone?</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
-  </div>
+  </div>`}
   </div>`;
 }
 
@@ -1215,7 +1215,7 @@ document.addEventListener("click", async e => {
   if (setb && canEdit()) { const t = clone(T()); t[setb.dataset.set] = setb.dataset.val; if (setb.dataset.set === "entry" && t.entry === "melee") t.system = "swiss"; await guard(() => saveT(t)); return; }
   const a = e.target.closest("[data-act]"); if (!a) return;
   const act = a.dataset.act;
-  if (a.closest("#modal")) { if (act === "close-bg" && e.target !== a) return; modalAction(act, a.dataset.k); return; }
+  if (a.closest("#modal") && S.modal) { if (act === "close-bg" && e.target !== a) return; modalAction(act, a.dataset.k); return; }
   const t = T();
   switch (act) {
     case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
@@ -1333,15 +1333,26 @@ function startWatching() {
     S.loaded = true;
     if (!S.tid || !S.tournaments[S.tid]) { const first = list.sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
     if (T() && !canEdit() && (S.tab === "setup" || S.tab === "entries")) S.tab = "courts";
+    S.onTournaments?.();
     render();
   }, err => console.error(err));
   watchMatches();
 }
-/* ---------------- web build: Firebase storage + Google sign-in ---------------- */
+/* ---------------- web build: Firebase storage, no-login access with share codes ---------------- */
+// Beta access model: every device signs in anonymously (no account, nothing to type).
+// The device that creates a competition owns it. Owners hand out two private codes:
+//   organiser code -> full control, scorer code -> scores and pistes only.
+// Helpers open a link containing the code (or type it in) and their device is remembered as a member.
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
-const ACCESS = {}; // tid -> { scorers: [] } when this user may read it (owner or scorer)
-let FB = null, unsubT = null, unsubAccess = null;
+const ROLE = {};   // tid -> "edit" | "score" (membership of this device)
+const CODES = {};  // tid -> { edit, score } (only readable by organisers)
+let FB = null, unsubRole = null, unsubCodes = null;
+const JOINED_KEY = "carreau-joined";
+const joined = () => { try { return JSON.parse(lsGet(JOINED_KEY) || "[]"); } catch { return []; } };
+const remember = tid => { const j = joined(); if (!j.includes(tid)) { j.push(tid); lsSet(JOINED_KEY, JSON.stringify(j.slice(-50))); } };
+const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const newCode = () => { const a = new Uint32Array(8); crypto.getRandomValues(a); return [...a].map(x => ALPHA[x % ALPHA.length]).join(""); };
 
 function fbStore() {
   const { db } = FB;
@@ -1352,22 +1363,31 @@ function fbStore() {
       unsubs.forEach(u => u()); unsubs = [];
       const parts = {}; const expected = new Set();
       const emit = () => {
-        if ([...expected].some(k => !(k in parts))) return; // wait until every query has answered once
+        if ([...expected].some(k => !(k in parts))) return; // wait until every source has answered once
         const m = {}; Object.values(parts).forEach(list => list.forEach(t => m[t.id] = t)); cb(Object.values(m));
       };
-      const sub = (key, q) => { expected.add(key); unsubs.push(onSnapshot(q, s => { parts[key] = s.docs.map(d => d.data()); emit(); }, e => { console.error(e); parts[key] = []; emit(); onErr?.(e); })); };
+      const subQ = (key, q) => { expected.add(key); unsubs.push(onSnapshot(q, s => { parts[key] = s.docs.map(d => d.data()); emit(); }, e => { console.error(e); parts[key] = []; emit(); onErr?.(e); })); };
+      const subD = (key, tid) => { expected.add(key); unsubs.push(onSnapshot(doc(db, "tournaments", tid), d => { parts[key] = d.exists() ? [d.data()] : []; emit(); }, () => { parts[key] = []; emit(); })); };
       const tc = collection(db, "tournaments");
-      sub("listed", query(tc, where("listed", "==", true), limit(100)));
-      if (AUTH.user) sub("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), limit(200)));
-      if (S.tid) { expected.add("sel"); unsubs.push(onSnapshot(doc(db, "tournaments", S.tid), d => { parts.sel = d.exists() ? [d.data()] : []; emit(); }, () => { parts.sel = []; emit(); })); }
+      subQ("listed", query(tc, where("listed", "==", true), limit(100)));
+      if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), limit(200)));
+      new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
     watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data())), onErr); },
-    setTournament(t) { return setDoc(doc(db, "tournaments", t.id), clone(t)); },
+    async setTournament(t) {
+      const isNew = !!t._new; const body = clone(t); delete body._new;
+      await setDoc(doc(db, "tournaments", t.id), body);
+      if (isNew) { // first save of a new competition: create its private codes
+        delete t._new; if (S.tournaments[t.id]) delete S.tournaments[t.id]._new;
+        const codes = { edit: newCode(), score: newCode() };
+        await setDoc(doc(db, "tournaments", t.id, "private", "codes"), codes); CODES[t.id] = codes; render();
+      }
+    },
     async deleteTournament(tid) {
       const s = await getDocs(collection(db, "tournaments", tid, "matches"));
       for (const d of s.docs) await deleteDoc(d.ref);
-      try { await deleteDoc(doc(db, "tournaments", tid, "private", "access")); } catch {}
+      try { await deleteDoc(doc(db, "tournaments", tid, "private", "codes")); } catch {}
       await deleteDoc(doc(db, "tournaments", tid));
     },
     setMatch(tid, m) { return setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m)); },
@@ -1376,70 +1396,118 @@ function fbStore() {
   };
 }
 
-const myEmail = () => (AUTH.user?.email || "").toLowerCase();
+const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);
 S.permFn = t => {
-  const u = AUTH.user; if (!u || !t) return { edit: false, score: false };
-  const owner = t.ownerUid === u.uid;
-  const scorer = (ACCESS[t.id]?.scorers || []).includes(myEmail());
-  return { edit: owner, score: owner || scorer };
+  if (!AUTH.user || !t) return { edit: false, score: false };
+  const r = isOwner(t) ? "edit" : ROLE[t.id];
+  return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
-S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.listed = false; };
-S.headerExtra = () => !CONFIGURED ? "" : AUTH.user
-  ? `<span class="small muted" title="Signed in">${esc(AUTH.user.email || "Signed in")}</span><button class="btn sm ghost" data-act="sign-out">Sign out</button>`
-  : `<button class="btn sm" data-act="sign-in">Organiser sign in</button>`;
-S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link the organiser sent you. Running one? Sign in with Google to create your own.</p>${CONFIGURED ? `<div><button class="btn primary" data-act="sign-in">Sign in with Google</button></div>` : ""}`;
-const shareUrl = t => `${location.origin}${location.pathname}#${t.id}`;
-S.setupExtra = t => !CONFIGURED ? "" : `<div class="panel stack">
-  <h3>Sharing</h3>
-  <div class="stack" style="gap:6px"><div class="eyebrow">Link for players and spectators</div>
-    <div class="row" style="flex-wrap:nowrap"><input type="text" id="share-url" readonly value="${esc(shareUrl(t))}" aria-label="Share link"><button class="btn" data-act="copy-link">Copy</button></div>
-    <p class="small muted">Anyone with the link can follow the draw, pistes and results live. No account needed.</p></div>
-  <label class="chk"><input type="checkbox" data-check="listed" ${t.listed ? "checked" : ""}> Show this competition on the site's public list</label>
-  <label class="f"><span>Scorers (Google email addresses)</span><textarea id="f-scorers" data-scorers style="min-height:70px" placeholder="umpire@gmail.com, captain@club.org">${esc((ACCESS[t.id]?.scorers || []).join(", "))}</textarea></label>
-  <p class="small muted">Scorers sign in with Google, open the competition link and can enter scores and move games between pistes. Only you can change the setup, entries and draws. Their addresses stay private.</p>
-</div>`;
-S.extraChange = async el => {
-  if (el.dataset.scorers === undefined) return false;
-  const list = el.value.split(/[\s,;]+/).map(x => x.trim().toLowerCase()).filter(x => x.includes("@"));
-  try { await setDoc(doc(FB.db, "tournaments", S.tid, "private", "access"), { scorers: list }); ACCESS[S.tid] = { scorers: list }; toast(`${list.length} scorer${list.length === 1 ? "" : "s"} saved.`); }
-  catch (e) { console.error(e); toast("Scorers weren't saved. Check you're signed in as the organiser."); }
-  return true;
-};
-S.extraAction = async act => {
-  if (act === "sign-in") { try { await signInWithPopup(FB.auth, new GoogleAuthProvider()); } catch (e) { if (e?.code !== "auth/popup-closed-by-user") toast("Sign-in didn't complete. Allow pop-ups for this site and try again."); } }
-  if (act === "sign-out") { await signOut(FB.auth); }
-  if (act === "copy-link") { const el = document.getElementById("share-url"); try { await navigator.clipboard.writeText(el.value); toast("Link copied."); } catch { el.select(); } }
-};
-S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
+S.canDelete = t => isOwner(t);
+S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.listed = false; nt._new = true; remember(nt.id); };
 
-function watchAccess() {
-  unsubAccess?.(); unsubAccess = null;
+const base = () => `${location.origin}${location.pathname}`;
+const links = t => ({ watch: `${base()}#${t.id}`, edit: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].edit}` : "", score: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].score}` : "" });
+S.headerExtra = () => {
+  const t = T(); if (!CONFIGURED || !t) return "";
+  const p = S.permFn(t);
+  if (isOwner(t)) return `<span class="pill done">Organiser</span>`;
+  if (p.edit) return `<span class="pill done">Organiser</span>`;
+  if (p.score) return `<span class="pill done">Scorer</span>`;
+  return `<button class="btn sm" data-act="enter-code">Enter a code</button>`;
+};
+S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link the organiser sent you.</p>`;
+const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px"><div class="eyebrow">${label}</div>
+  <div class="row" style="flex-wrap:nowrap"><input type="text" id="${id}" readonly value="${esc(value)}" aria-label="${label}"><button class="btn" data-act="copy" data-target="${id}">Copy</button></div>
+  <p class="small muted">${note}</p></div>`;
+S.setupExtra = t => {
+  if (!CONFIGURED) return "";
+  const l = links(t);
+  return `<div class="panel stack">
+    <h3>Sharing</h3>
+    ${copyRow("share-watch", "Link for players and spectators", l.watch, "Anyone with this link can follow the draw, pistes and results live. They can't change anything.")}
+    ${l.edit ? `${copyRow("share-score", "Scorer link", l.score, `Scorers open this once on their phone and can then enter scores and move games between pistes. Scorer code: <b>${esc(CODES[t.id].score)}</b>`)}
+    ${copyRow("share-edit", "Organiser link", l.edit, `Gives full control, including registration, setup and draws. Keep it to your organising team, and keep a copy for yourself in case you change device. Organiser code: <b>${esc(CODES[t.id].edit)}</b>`)}` : `<p class="small muted">Loading the private codes…</p>`}
+    <label class="chk"><input type="checkbox" data-check="listed" ${t.listed ? "checked" : ""}> Show this competition on the site's front page</label>
+  </div>`;
+};
+S.extraAction = async (act, a) => {
+  if (act === "copy") { const el = document.getElementById(a.dataset.target); try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } }
+  if (act === "enter-code") openCodeBox();
+  if (act === "code-close") closeCodeBox();
+  if (act === "code-submit") { const v = document.getElementById("code-input").value; if (await joinWithCode(S.tid, v)) closeCodeBox(); }
+};
+function openCodeBox() {
+  document.getElementById("modal").innerHTML = `<div class="scrim"><div class="modal" role="dialog" aria-modal="true" aria-label="Enter a code">
+    <div class="spread"><h3>Enter a code</h3><button type="button" class="btn ghost" data-act="code-close" aria-label="Close">✕</button></div>
+    <p class="muted">Organisers and scorers get a code from the person running the competition.</p>
+    <input type="text" id="code-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. K7RM2QXP" style="font-size:22px;letter-spacing:.12em;text-transform:uppercase">
+    <div><button class="btn primary" type="button" data-act="code-submit">Join</button></div>
+  </div></div>`;
+  document.getElementById("code-input").focus();
+}
+function closeCodeBox() { document.getElementById("modal").innerHTML = ""; }
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "code-input") { e.preventDefault(); document.querySelector('[data-act="code-submit"]')?.click(); } });
+
+async function joinWithCode(tid, raw) {
+  const code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (!code || !tid || !AUTH.user) return false;
+  const ref = doc(FB.db, "tournaments", tid, "members", AUTH.user.uid);
+  for (const role of ["edit", "score"]) {
+    try {
+      await setDoc(ref, { role, code, joinedAt: Date.now() });
+      ROLE[tid] = role; remember(tid); restart(); render();
+      toast(role === "edit" ? "You're now an organiser for this competition." : "You can now enter scores for this competition.");
+      return true;
+    } catch (e) { /* not this role: try the next */ }
+  }
+  toast("That code didn't work. Check it with the organiser.");
+  return false;
+}
+
+function watchRole() {
+  unsubRole?.(); unsubRole = null; unsubCodes?.(); unsubCodes = null;
   if (!FB || !AUTH.user || !S.tid) return;
   const tid = S.tid;
-  unsubAccess = onSnapshot(doc(FB.db, "tournaments", tid, "private", "access"),
-    d => { ACCESS[tid] = d.exists() ? d.data() : { scorers: [] }; render(); },
-    () => { ACCESS[tid] = { scorers: [] }; render(); }); // not owner or scorer: viewer
+  unsubRole = onSnapshot(doc(FB.db, "tournaments", tid, "members", AUTH.user.uid),
+    d => { ROLE[tid] = d.exists() ? d.data().role : undefined; if (d.exists()) remember(tid); render(); watchCodes(tid); },
+    () => { ROLE[tid] = undefined; render(); watchCodes(tid); });
 }
-function restart() {
-  if (!FB) return;
-  startWatching(); watchAccess();
+function watchCodes(tid) {
+  if (unsubCodes || tid !== S.tid) return;
+  const t = S.tournaments[tid];
+  if (!(isOwner(t) || ROLE[tid] === "edit")) return;
+  unsubCodes = onSnapshot(doc(FB.db, "tournaments", tid, "private", "codes"), d => { if (d.exists()) { CODES[tid] = d.data(); render(); } }, () => {});
 }
-S.onSelect = () => { if (S.tid) history.replaceState(null, "", "#" + S.tid); else history.replaceState(null, "", location.pathname); restart(); };
-window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (h && h !== S.tid) { S.tid = h; S.matches = {}; restart(); } });
+function restart() { if (!FB) return; startWatching(); watchRole(); }
+S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
+S.onTournaments = () => { if (S.tid) watchCodes(S.tid); };
+
+// links look like #<competition id> or #<competition id>.<code>
+function readHash() { const [tid, code] = location.hash.slice(1).split("."); return { tid: tid || null, code: code || null }; }
+async function handleHash() {
+  const { tid, code } = readHash(); if (!tid) return;
+  if (tid !== S.tid) { S.tid = tid; S.matches = {}; restart(); }
+  if (code && AUTH.user) { history.replaceState(null, "", "#" + tid); await joinWithCode(tid, code); }
+}
+window.addEventListener("hashchange", handleHash);
+
+S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
 
 function boot() {
-  const h = location.hash.slice(1); if (h) S.tid = h;
+  const h = readHash(); if (h.tid) S.tid = h.tid;
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
   FB = { db: getFirestore(app), auth: getAuth(app) };
   if (window.__CARREAU_EMULATOR) { // local testing only
     connectFirestoreEmulator(FB.db, "127.0.0.1", 8080); connectAuthEmulator(FB.auth, "http://127.0.0.1:9099", { disableWarnings: true });
-    window.__testSignIn = (email, sub) => signInWithCredential(FB.auth, GoogleAuthProvider.credential(JSON.stringify({ sub: sub || email, email, email_verified: true })));
-    window.__testSignOut = () => signOut(FB.auth);
   }
   S.store = fbStore();
-  onAuthStateChanged(FB.auth, u => { AUTH.user = u; AUTH.ready = true; S.denied = false; restart(); render(); });
+  onAuthStateChanged(FB.auth, async u => {
+    if (!u) { try { await signInAnonymously(FB.auth); } catch (e) { console.error(e); toast("Couldn't connect. Check your internet connection and reload."); } return; }
+    AUTH.user = u; AUTH.ready = true; restart(); render();
+    await handleHash();
+  });
 }
 render();
 boot();

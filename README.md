@@ -1,6 +1,6 @@
 # Carreau Competition Desk
 
-Run petanque competitions live: Swiss, snake, pools, knockout, round robin and mêlée, with piste allocation and score entry. Spectators follow along on their phones with no account; organisers sign in with Google.
+Run petanque competitions live: Swiss, snake, pools, knockout, round robin and mêlée, with piste allocation and score entry. Nobody needs an account during the beta: spectators follow along on their phones, and organisers and scorers join with private codes.
 
 ## Files
 
@@ -17,7 +17,7 @@ Run petanque competitions live: Swiss, snake, pools, knockout, round robin and m
 1. Go to <https://console.firebase.google.com> and click **Create a project**. Name it something like `carreau-petanque`. Google Analytics isn't needed.
 2. In the left menu open **Build → Firestore Database → Create database**. Pick a location near you (e.g. `europe-west2` for London), start in **production mode**.
 3. Open the **Rules** tab of Firestore, replace everything with the contents of `firestore.rules`, and click **Publish**.
-4. Open **Build → Authentication → Get started**, choose **Google** as a sign-in provider, switch it on, pick your support email, and **Save**.
+4. Open **Build → Authentication → Get started**, choose **Anonymous** as a sign-in provider, switch it on and **Save**. (Google is also switched on, ready for organiser logins after the beta.)
 
 ### 2. Connect the app to it
 1. Click the gear icon → **Project settings**. Under **Your apps**, click the **</>** (web) icon, give it a nickname, and register it (no hosting needed).
@@ -33,9 +33,12 @@ Run petanque competitions live: Swiss, snake, pools, knockout, round robin and m
 In Firebase, **Authentication → Settings → Authorized domains → Add domain** and add `YOUR-USERNAME.github.io`.
 
 ## Using it
-- **Organisers:** sign in with Google, create a competition, and share its link from **Setup → Sharing**.
-- **Scorers:** add their Google email addresses under **Setup → Sharing**. They sign in, open the link and can enter scores and move games between pistes. Their addresses are never shown publicly.
-- **Spectators:** just open the link. Tick *Show on the public list* if you want the competition to appear on the site's home page.
+- **Organisers:** open the site and create a competition. The device you create it on is the organiser. In **Setup → Sharing** you'll find three links:
+  - *Players and spectators*: follow the draw, pistes and results live, read-only.
+  - *Scorer link*: opened once on a phone, lets that phone enter scores and move games between pistes.
+  - *Organiser link*: full control for your organising team. Keep a copy for yourself in case you change device.
+- **Codes:** each link has a code in it. Helpers can also tap **Enter a code** at the top of the page and type it in.
+- Tick *Show on the site's front page* if you want a competition to appear for everyone who opens the site.
 
 ## Own domain (optional)
 Buy a domain, add it under **Settings → Pages → Custom domain** in GitHub, follow GitHub's DNS instructions, then add the domain to Firebase's **Authorized domains** too.
