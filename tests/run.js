@@ -15,6 +15,12 @@ const SUITES = {
       /final standings: Standings Final WINNER/,
       /archived visible locally: true/, /restored: true/, /^errs \[\]$/m,
     ],
+    'app-shoot-live.js': [
+      /next up shown: true/, /live opens by default: true first prompt: Shooter \d Shot 1 of 20 A1 · Lone boule 6 m/,
+      /after undo, still shot 20: true/, /progress saved per shot: true/, /first done: true total 96/,
+      /advanced to next: true msg: Saved Shooter \d: 96 pts\. Next up: Shooter \d\./, /modal closed after last: true/,
+      /duel alternates: true/, /duel done: true \d+-\d+/, /winner: true/, /template copy: true shooters 3 draws 0 matches 0 name My run-through · Live shoot template false/, /errs \[\]/,
+    ],
     'app-score-keypad.js': [/pad buttons 14/, /after sa pick, pad on sb: true/, /pad closed true values 13-8/, /reopen sb pad true/, /saved true 13-8/, /errs \[\]/],
   },
   web: {
@@ -34,6 +40,7 @@ const SUITES = {
       /visitor cannot read nicknames: true/, /show theirs: true/, /confirm shown: true/,
       /bulk delete toast: 2 competitions deleted\./, /A comps gone, B kept: true/, /A list after delete: 0/, /errs \[\]/,
     ],
+    'web-shooting.js': [/final sides true done true/, /third sides true done true/, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
       /admin page \(signed in\):.*Open testingOn/, /B tabs \(testing off\): Draw & results\|Standings\|Big screen/,

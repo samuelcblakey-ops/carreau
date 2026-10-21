@@ -172,6 +172,15 @@ input[type=search]{background:var(--surface-2);border:1px solid var(--line);bord
 .err{color:var(--danger);font-size:14px;font-weight:600}
 .modal.wide{max-width:680px}
 table.shots td,table.shots th{padding:5px 6px}
+.live-shot{text-align:center;padding:10px 0 4px}.live-shot .who{font-family:var(--display);font-size:22px;font-weight:700}
+.live-shot .what{font-size:15px;margin-top:2px}.live-shot .dist{font-family:var(--display);font-size:40px;font-weight:700;line-height:1.1}
+.shotpad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+.shotpad button{height:64px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font-family:var(--display);font-size:28px;font-weight:700;cursor:pointer}
+.shotpad button small{display:block;font-family:var(--body,inherit);font-size:11px;font-weight:500;color:var(--muted)}
+.shotpad button:active{background:var(--accent);color:var(--accent-ink)}
+.shotstrip{display:grid;grid-template-columns:repeat(20,1fr);gap:2px}.shotstrip span{text-align:center;font-size:12px;padding:3px 0;border-radius:4px;background:var(--surface-2);color:var(--muted);font-variant-numeric:tabular-nums}
+.shotstrip span.v{color:var(--ink);font-weight:700}.shotstrip span.cur{outline:2px solid var(--accent)}
+@media (max-width:560px){.shotstrip{grid-template-columns:repeat(10,1fr)}}
 select.shot{width:58px;padding:5px 6px;text-align:center}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px)}
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
@@ -380,7 +389,7 @@ const FR_TEXT = {
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
-  "Copied.": "Copié.", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
+  "Copied.": "Copié.", "Live scorer": "Pointage en direct", "Grid view": "Vue grille", "Undo last shot": "Annuler le dernier tir", "Finish scorecard": "Terminer la feuille", "Now shooting": "Au tir", "All 20 shots in": "Les 20 tirs sont faits", "Check the strip below, then finish the scorecard.": "Vérifiez la ligne ci-dessous, puis terminez la feuille.", "Miss": "Raté", "point": "point", "points": "points", "Try it yourself": "Essayez vous-même", "Score now": "Pointer", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
   "Visitors only see the competitions they created on their own device, plus the examples. Examples are view-only for visitors.": "Les visiteurs ne voient que les concours créés sur leur propre appareil, plus les exemples. Les exemples sont en lecture seule pour les visiteurs.",
   "Precision shooting": "Tir de précision", "Shooting scorecard": "Feuille de tir", "Atelier": "Atelier", "Lone boule": "Boule seule", "Boule behind the jack": "Boule derrière le but", "Boule between two boules": "Boule entre deux boules", "Boule behind an obstacle": "Boule derrière un obstacle", "The jack": "Le but",
   "Each shot scores 0, 1, 3 or 5. Maximum 100.": "Chaque tir vaut 0, 1, 3 ou 5 points. Maximum 100.", "{n} pts · {n}/20 shots": "{1} pts · {2}/20 tirs", "{n} pts": "{1} pts",
@@ -1061,6 +1070,20 @@ const SHOT_VALUES = [0, 1, 3, 5];
 const shotTotal = sh => ATELIERS.reduce((t, [k]) => t + (sh?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0), 0);
 const shotCount = sh => ATELIERS.reduce((t, [k]) => t + (sh?.[k] || []).filter(v => v != null && v !== "").length, 0);
 const shotComplete = sh => shotCount(sh) === ATELIERS.length * DISTANCES.length;
+// live scorer: shots are taken in order A1 6→9 m, A2 6→9 m … A5; in a duel the two shooters alternate shot by shot
+const SHOT_SEQ = ATELIERS.flatMap(([k], ai) => DISTANCES.map((d, di) => ({ k, ai, di, d })));
+const fullShots = sh => Object.fromEntries(ATELIERS.map(([k]) => [k, DISTANCES.map((d, di) => sh?.[k]?.[di] ?? null)]));
+function liveSlots(duel) { return SHOT_SEQ.flatMap((x, i) => duel ? [{ ...x, i, side: "a" }, { ...x, i, side: "b" }] : [{ ...x, i, side: "a" }]); }
+function liveNext(md, duel) { return liveSlots(duel).find(s => (s.side === "a" ? md.shotsA : md.shotsB)[s.k][s.di] == null) || null; }
+function liveLast(md, duel) { return [...liveSlots(duel)].reverse().find(s => (s.side === "a" ? md.shotsA : md.shotsB)[s.k][s.di] != null) || null; }
+// one at a time on a single piste: the next unfinished scorecard in running order
+function nextShooter(t, after) {
+  const phase = S.matches[after]?.phase; const list = MS().filter(m => m.stage === "shoot" && m.phase === phase && !m.done && m.id !== after).sort((x, y) => x.order - y.order);
+  return list[0] || null;
+}
+function shotStrip(sh, cur) {
+  return `<div class="shotstrip">${SHOT_SEQ.map((x, i) => { const v = sh[x.k][x.di]; return `<span class="${v != null ? "v" : ""} ${cur === i ? "cur" : ""}" title="${ATELIERS[x.ai][1]} ${x.d} m">${v ?? "·"}</span>`; }).join("")}</div>`;
+}
 const shootPhase = (t, ph) => MS().filter(m => m.stage === "shoot" && m.phase === ph);
 function shootRanking(t, ph) {
   const order = id => entities(t).findIndex(e => e.id === id);
@@ -1097,6 +1120,32 @@ function readShots(prefix) {
   ATELIERS.forEach(([k]) => { out[k] = DISTANCES.map((d, di) => { const el = document.getElementById(`${prefix}-${k}-${di}`); return el && el.value !== "" ? +el.value : null; }); });
   return out;
 }
+function renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, level }) {
+  const md = S.modal; const nx = liveNext(md, duel); const cur = nx ? SHOT_SEQ.findIndex(x => x.k === nx.k && x.di === nx.di) : -1;
+  const name = side => esc(sideName(t, side === "a" ? m.a : m.b));
+  const card = (side, sh, tot) => `<div class="stack" style="gap:4px"><div class="spread"><b>${name(side)}</b><span class="pill ${shotComplete(sh) ? "done" : ""}">${tot} pts · ${shotCount(sh)}/20</span></div>${shotStrip(sh, nx && nx.side === side ? cur : -1)}</div>`;
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Live shooting scorer">
+    <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>Live scorer</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    ${md.saved ? `<div class="notice small">${esc(md.saved)}</div>` : ""}
+    ${nx ? `<div class="live-shot">
+        ${duel ? `<div class="small muted">Now shooting</div>` : ""}<div class="who">${name(nx.side)}</div>
+        <div class="small muted">Shot ${nx.i + 1} of 20</div>
+        <div class="what">${ATELIERS[nx.ai][0]} · ${ATELIERS[nx.ai][1]}</div>
+        <div class="dist">${nx.d} m</div></div>
+      <div class="shotpad">${SHOT_VALUES.map(v => `<button type="button" data-act="shot-pick" data-v="${v}">${v}<small>${v === 0 ? "Miss" : "point" + (v === 1 ? "" : "s")}</small></button>`).join("")}</div>`
+    : `<div class="live-shot"><div class="who">All 20 shots in</div><div class="small muted">Check the strip below, then finish the scorecard.</div></div>`}
+    ${card("a", shA, tA)}${duel ? card("b", shB, tB) : ""}
+    ${level ? `<div class="notice stack" style="gap:6px"><b>Scores are level.</b><span>Choose the winner (for example after a shoot-off):</span>
+      <label class="chk"><input type="radio" name="sw" value="a" ${md.win === "a" ? "checked" : ""}> ${name("a")}</label>
+      <label class="chk"><input type="radio" name="sw" value="b" ${md.win === "b" ? "checked" : ""}> ${name("b")}</label></div>` : ""}
+    ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
+    ${md.blocked ? overrideBox(md.blocked) : ""}
+    <div class="row">${!nx ? `<button class="btn primary" data-act="shoot-save" data-final="1">Finish scorecard</button>` : ""}
+      ${liveLast(md, duel) ? `<button class="btn" data-act="shot-undo">Undo last shot</button>` : ""}
+      <button class="btn ghost" data-act="shoot-mode">Grid view</button></div>
+  </div></div>`;
+  localize(el);
+}
 function renderShootModal(t, m, el) {
   const ro = !canScore(); const duel = !!m.b;
   const md = S.modal;
@@ -1104,6 +1153,7 @@ function renderShootModal(t, m, el) {
   const shA = md.shotsA ?? (duel ? m.shotsA : m.shots) ?? {}, shB = md.shotsB ?? m.shotsB ?? {};
   const tA = shotTotal(shA), tB = shotTotal(shB);
   const level = duel && shotComplete(shA) && shotComplete(shB) && tA === tB;
+  if (md.live && !ro) { renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, level }); return; }
   el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Shooting scorecard">
     <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>Shooting scorecard</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
     <p class="small muted">Each shot scores 0, 1, 3 or 5. Maximum 100.</p>
@@ -1114,14 +1164,14 @@ function renderShootModal(t, m, el) {
       <label class="chk"><input type="radio" name="sw" value="b" ${md.win === "b" || (!md.win && m.win === "b") ? "checked" : ""}> ${esc(sideName(t, m.b))}</label></div>` : ""}
     ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
     ${md.blocked ? overrideBox(md.blocked) : ""}
-    ${ro ? "" : `<div class="row"><button class="btn primary" data-act="shoot-save" data-final="1">${m.done ? "Update scorecard" : "Save scorecard"}</button>${!m.done ? `<button class="btn" data-act="shoot-save">Save progress</button>` : ""}</div>`}
+    ${ro ? "" : `<div class="row"><button class="btn primary" data-act="shoot-save" data-final="1">${m.done ? "Update scorecard" : "Save scorecard"}</button>${!m.done ? `<button class="btn" data-act="shoot-save">Save progress</button><button class="btn ghost" data-act="shoot-mode">Live scorer</button>` : ""}</div>`}
   </div></div>`;
   el.querySelectorAll("select.shot").forEach(s => s.addEventListener("change", () => { const p = s.id.slice(0, 2); const sh = readShots(p); const card = s.closest(".stack"); const tot = card.querySelector(".shot-total"); if (tot) tot.textContent = shotTotal(sh); }));
   localize(el);
 }
 async function saveShooting(final) {
   const t = T(); const md = S.modal; const m = S.matches[md.id]; const duel = !!m.b;
-  const shA = readShots("sa"), shB = duel ? readShots("sb") : null;
+  const shA = md.live ? fullShots(md.shotsA) : readShots("sa"), shB = duel ? (md.live ? fullShots(md.shotsB) : readShots("sb")) : null;
   md.shotsA = shA; if (duel) md.shotsB = shB;
   const win = document.querySelector('input[name="sw"]:checked')?.value || null;
   if (!final) {
@@ -1134,6 +1184,8 @@ async function saveShooting(final) {
     const patch = { shots: shA, sa: shotTotal(shA), sb: 0, done: true, finishedAt: Date.now() };
     if (m.done && m.sa !== patch.sa) patch.corrected = { at: Date.now(), from: [m.sa, 0] };
     Object.assign(S.matches[md.id], patch); await S.store.updateMatch(S.tid, md.id, patch);
+    const nxt = md.live ? nextShooter(t, md.id) : null;
+    if (nxt) { openMatch(nxt.id); S.modal.saved = `Saved ${sideName(t, m.a)}: ${patch.sa} pts. Next up: ${sideName(t, nxt.a)}.`; renderModal(); return; }
     S.modal = null; renderModal(); toast("Scorecard saved."); return;
   }
   const tA = shotTotal(shA), tB = shotTotal(shB);
@@ -1152,7 +1204,9 @@ function renderShooting(t) {
   }
   const table = (ph, title, cut) => {
     const rows = shootRanking(t, ph); const doneN = rows.filter(r => r.done).length;
+    const up = rows.filter(r => !r.done).sort((x, y) => x.m.order - y.m.order)[0];
     return `<section class="panel stack" style="gap:8px"><div class="spread"><h3>${title}</h3><span class="pill ${doneN === rows.length ? "done" : ""}">${doneN}/${rows.length} scorecards</span></div>
+      ${up ? `<div class="spread notice"><span>Next up on the piste: <b>${esc(entName(t, up.id))}</b> <span class="small muted">(shooter ${up.m.order + 1} of ${rows.length})</span></span>${canScore() ? `<button class="btn primary sm" data-shoot="${up.m.id}">${shotCount(up.shots) ? "Continue" : "Score now"}</button>` : ""}</div>` : ""}
       <div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th></th></tr></thead><tbody>
       ${rows.map((r, i) => `<tr class="${cut && r.done && i < cut ? "q" : ""}"><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${r.m.corrected ? ` <span class="pill">Corrected</span>` : ""}</td>
         ${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
@@ -1205,6 +1259,7 @@ function toast(msg) { const el = $("#toast"); el.textContent = tr(msg); el.hidde
 function openMatch(id) {
   const m = S.matches[id]; if (!m || !m.a || (!m.b && m.stage !== "shoot")) return;
   S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: false, err: "", pad: !m.done && canScore() ? "sa" : null };
+  if (m.stage === "shoot" || m.shoot) { const duel = !!m.b; S.modal.live = !m.done && canScore(); S.modal.shotsA = fullShots(duel ? m.shotsA : m.shots); if (duel) S.modal.shotsB = fullShots(m.shotsB); }
   renderModal();
 }
 function renderModal() {
@@ -1249,6 +1304,16 @@ async function modalAction(act, k, a) {
   const t = T(); const md = S.modal; if (!md) return;
   if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
+  if (act === "shoot-mode") { const m = S.matches[md.id]; const duel = !!m.b;
+    if (!md.live) { md.shotsA = fullShots(readShots("sa")); if (duel) md.shotsB = fullShots(readShots("sb")); } md.live = !md.live; md.err = ""; renderModal(); return; }
+  if (act === "shot-pick" || act === "shot-undo") {
+    const m = S.matches[md.id]; const duel = !!m.b; const s = act === "shot-pick" ? liveNext(md, duel) : liveLast(md, duel); if (!s) return;
+    const sh = s.side === "a" ? md.shotsA : md.shotsB; sh[s.k][s.di] = act === "shot-pick" ? +a.dataset.v : null; md.saved = ""; md.err = ""; renderModal();
+    // save progress after every shot so nothing is lost if the phone locks
+    const patch = duel ? { shotsA: fullShots(md.shotsA), shotsB: fullShots(md.shotsB), sa: shotTotal(md.shotsA), sb: shotTotal(md.shotsB) } : { shots: fullShots(md.shotsA), sa: shotTotal(md.shotsA) };
+    Object.assign(S.matches[md.id], patch); try { await S.store.updateMatch(S.tid, md.id, patch); } catch (e) { console.error(e); toast("That shot didn't save. Check your connection; it'll be saved with the next one."); }
+    return;
+  }
   if (act === "override") {
     if (md.pending?.shoot) { md.override = true; md.blocked = null; renderModal(); await saveShooting(true); return; }
     const pd = md.pending || {};
@@ -1303,7 +1368,7 @@ function render() {
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
   const fn = { setup: renderSetup, entries: renderEntries, draw: renderDraw, courts: renderCourts, standings: renderStandings, display: renderDisplay }[S.tab] || renderDraw;
-  main.innerHTML = (t.archived ? `<div class="notice" style="margin-bottom:16px">Archived. Only the site admin can see this competition.${S.canSeeArchived() ? ` <button class="btn sm" data-act="restore">Restore</button>` : ""}</div>` : "") + (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
+  main.innerHTML = (t.archived ? `<div class="notice" style="margin-bottom:16px">Archived. Only the site admin can see this competition.${S.canSeeArchived() ? ` <button class="btn sm" data-act="restore">Restore</button>` : ""}</div>` : "") + (t.template ? `<div class="notice spread" style="margin-bottom:16px"><span><b>Run-through template.</b> Get your own copy with these settings and shooters, then run it start to finish with the live scorer.</span>${S.canCreate() ? `<button class="btn primary sm" data-act="use-template">Try it yourself</button>` : ""}</div>` : "") + (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
   localize($("header.app")); localize(main);
   fitBrackets(); restore();
 }
@@ -1729,6 +1794,15 @@ document.addEventListener("click", async e => {
   const t = T();
   switch (act) {
     case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
+    case "use-template": {
+      const src = clone(t); const nt = newTournament();
+      const keep = ["entry", "format", "system", "checkin", "target", "byeScore", "swissRounds", "poolSize", "poolStyle", "qualify", "bBracket", "consolante", "seeding", "randomCourts", "courts", "teams", "players", "shootFormat", "shootFinal", "koThird", "koPlan", "venue"];
+      keep.forEach(k => { if (src[k] !== undefined) nt[k] = clone(src[k]); });
+      nt.name = "My run-through · " + (src.name || "").replace(/^TEST \d+ · /, ""); nt.koPlan && (nt.koPlan = clone(src.koPlan));
+      (nt.players || []).forEach(p => p.active = true); (nt.teams || []).forEach(x => x.active = true);
+      if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "draw"; S.matches = {};
+      await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); render(); toast("Your own copy is ready. Start the qualifying round when you're set."); break;
+    }
     case "del-t": if (S.canDelete && !S.canDelete(t)) break; S.confirmDelete = true; render(); break;
     case "del-t-no": S.confirmDelete = false; render(); break;
     case "del-t-yes": { if (S.canDelete && !S.canDelete(t)) break;  S.confirmDelete = false; const id = t.id; delete S.tournaments[id]; S.tid = Object.keys(S.tournaments)[0] || null; S.matches = {}; watchMatches(); render(); await guard(() => S.store.deleteTournament(id)); S.onSelect?.(); toast("Competition deleted."); break; }

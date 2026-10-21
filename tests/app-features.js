@@ -46,7 +46,7 @@ const { chromium } = require('playwright');
     const fill = (prefix, base) => { document.querySelectorAll(`select[id^="${prefix}-"]`).forEach((s,i)=>{ s.value = String([0,1,3,5][(i+base)%4]); }); };
     for (const m of C.MS().filter(m=>m.stage==='shoot')) {
       document.querySelector('[data-tab="draw"]').click(); await w(30);
-      document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(40);
+      document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(40); document.querySelector('[data-act=\"shoot-mode\"]')?.click(); await w(60);
       fill('sa', m.order); document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(60);
     }
     log.push('qual ranking: '+C.shootRanking(C.T(),'Q').map(r=>r.total).join(','));
@@ -54,7 +54,7 @@ const { chromium } = require('playwright');
     document.querySelector('[data-act="shoot-next"]').click(); await w(150);
     log.push('KO entrants '+C.T().brackets[0].entrants+' duels '+C.MS().filter(m=>m.shoot).length);
     let g=0; while(g++<20){ const live=C.MS().filter(m=>m.shoot&&!m.done&&m.a&&m.b); if(!live.length) break; const m=live[0];
-      document.querySelector('[data-tab="draw"]').click(); await w(30); document.querySelector(`[data-match="${m.id}"]`).click(); await w(40);
+      document.querySelector('[data-tab="draw"]').click(); await w(30); document.querySelector(`[data-match="${m.id}"]`).click(); await w(40); document.querySelector('[data-act=\"shoot-mode\"]')?.click(); await w(60);
       fill('sa', 1); fill('sb', g===1 ? 1 : 2); document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(80);
       if (document.querySelector('input[name="sw"]')) { log.push('tie prompt shown'); document.querySelector('input[name="sw"][value="b"]').checked=true; document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(80); }
     }
@@ -64,9 +64,9 @@ const { chromium } = require('playwright');
     // 5. Shooting final format
     await mk({entry:'shooting', system:'knockout', shootFormat:'final', shootFinal:4, name:'Shoot final'}, 6, true);
     document.querySelector('[data-act="first-draw"]').click(); await w(100);
-    for (const m of C.MS().filter(m=>m.stage==='shoot')) { document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(30); fill('sa', m.order); document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(50); }
+    for (const m of C.MS().filter(m=>m.stage==='shoot')) { document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(30); document.querySelector('[data-act=\"shoot-mode\"]')?.click(); await w(60); fill('sa', m.order); document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(50); }
     document.querySelector('[data-act="shoot-next"]').click(); await w(120);
-    for (const m of C.MS().filter(m=>m.phase==='F')) { document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(30); fill('sa', m.order+2); document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(50); }
+    for (const m of C.MS().filter(m=>m.phase==='F')) { document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(30); document.querySelector('[data-act=\"shoot-mode\"]')?.click(); await w(60); fill('sa', m.order+2); document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(50); }
     document.querySelector('[data-tab="standings"]').click(); await w(50); log.push('final standings: '+document.querySelector('main').innerText.replace(/\s+/g,' ').slice(0,160));
     // 6. Archive (local: owner/admin sees)
     document.querySelector('[data-tab="setup"]').click(); await w(40);
