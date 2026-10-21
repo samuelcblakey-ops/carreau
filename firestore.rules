@@ -8,6 +8,8 @@ rules_version = '2';
 //    open testing on or off (config/site). While open testing is on, anyone can run any competition.
 //  - Organisers can archive a finished competition; after that only the admin can see or restore it.
 //  - Only the admin can delete a competition; organisers archive instead.
+//  - Team score entry (off unless config/site.teamScoring): a team link makes a device a 'team' member; it can only
+//    propose a score for its own game, or confirm/dispute the other team's. An organiser's screen publishes results.
 //  - Visitors only list their own competitions plus the examples (listed); examples are view-only.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -27,6 +29,23 @@ service cloud.firestore {
     function canScore(tid) { return canEdit(tid) || role(tid) == 'score'; }
     // archived competitions are hidden from everyone except the admin
     function notArchived(tid) { return get(tdoc(tid)).data.get('archived', false) != true; }
+    // team score entry (site switch config/site.teamScoring, and the competition's scoreMode)
+    function myTeam(tid) { return signedIn() && exists(mdoc(tid)) && get(mdoc(tid)).data.role == 'team' ? get(mdoc(tid)).data.teamId : ''; }
+    function teamScoringOn(tid) { return exists(cfg()) && get(cfg()).data.get('teamScoring', false) == true
+                                   && get(tdoc(tid)).data.get('scoreMode', 'organiser') in ['teams', 'teams-auto']; }
+    // a team may only touch the proposal on its own unfinished game: propose a score, or confirm/dispute the other team's
+    function teamUpdate(tid) {
+      let me = myTeam(tid);
+      let p = request.resource.data.proposal;
+      let old = resource.data.get('proposal', null);
+      return me != '' && teamScoringOn(tid) && notArchived(tid) && resource.data.get('done', false) != true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['proposal'])
+        && (me in resource.data.get('a', []) || me in resource.data.get('b', []))
+        && ((p.status == 'pending' && p.by == me && p.keys().hasOnly(['sa', 'sb', 'by', 'at', 'status'])
+             && (old == null || old.by == me || old.status in ['disputed', 'applied', 'auto']))
+         || (old != null && old.status == 'pending' && old.by != me && p.sa == old.sa && p.sb == old.sb && p.by == old.by
+             && p.status in ['confirmed', 'disputed'] && p.confirmedBy == me));
+    }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
 
     // config/site is public (open testing switch); config/creators holds the admin's private nicknames for creators
@@ -45,22 +64,25 @@ service cloud.firestore {
       allow delete: if isAdmin();
 
       match /private/{docId} {
-        allow read: if docId == 'codes' && canEdit(tid);
-        allow write: if docId == 'codes' && (owns(tid) || isAdmin());
+        allow read: if (docId == 'codes' || docId == 'teamcodes') && canEdit(tid);
+        allow write: if (docId == 'codes' && (owns(tid) || isAdmin())) || (docId == 'teamcodes' && canEdit(tid));
       }
 
       match /members/{uid} {
         allow read: if signedIn() && (request.auth.uid == uid || canEdit(tid));
         allow create, update: if signedIn() && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['role', 'code', 'joinedAt'])
+          && request.resource.data.keys().hasOnly(['role', 'code', 'joinedAt', 'teamId'])
           && ((request.resource.data.role == 'edit' && request.resource.data.code == codes(tid).edit)
-           || (request.resource.data.role == 'score' && request.resource.data.code == codes(tid).score));
+           || (request.resource.data.role == 'score' && request.resource.data.code == codes(tid).score)
+           || (request.resource.data.role == 'team' && request.resource.data.code is string && request.resource.data.code.size() > 0
+               && request.resource.data.code == get(/databases/$(database)/documents/tournaments/$(tid)/private/teamcodes).data.get(request.resource.data.teamId, '#')));
         allow delete: if signedIn() && (request.auth.uid == uid || owns(tid) || isAdmin());
       }
 
       match /matches/{mid} {
         allow read: if notArchived(tid) || isAdmin();
-        allow create, update: if (canScore(tid) && notArchived(tid)) || isAdmin();
+        allow create: if (canScore(tid) && notArchived(tid)) || isAdmin();
+        allow update: if (canScore(tid) && notArchived(tid)) || isAdmin() || teamUpdate(tid);
         allow delete: if (canEdit(tid) && notArchived(tid)) || isAdmin();
       }
     }

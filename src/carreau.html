@@ -423,7 +423,7 @@ const FR_TEXT = {
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
-  "Copied.": "Copié.", "Mêlée style": "Type de mêlée", "New teams every round": "Nouvelles équipes à chaque partie", "All rounds drawn in advance": "Toutes les parties tirées d'avance", "Teams drawn once": "Équipes tirées une fois", "Draw the teams": "Tirer les équipes", "Redraw teams": "Refaire le tirage des équipes", "Back to players": "Revenir aux joueurs", "Print the draw": "Imprimer le tirage", "Undo the draw": "Annuler le tirage", "Get the app.": "Installez l'appli.", "Add Carreau to your home screen for one-tap access, full screen.": "Ajoutez Carreau à votre écran d'accueil : un seul geste, en plein écran.", "Add to home screen": "Ajouter à l'écran d'accueil", "Not now": "Plus tard", "Add Carreau to your home screen": "Ajouter Carreau à l'écran d'accueil", "Opens full screen, one tap away": "S'ouvre en plein écran, en un geste", "Draw": "Tirage", "Table": "Classement", "Screen": "Écran", "Your competitions": "Vos concours", "Examples": "Exemples", "Choose a competition": "Choisir un concours", "No competitions match.": "Aucun concours ne correspond.", "Not started": "Pas commencé", "Tap a shot, then tap its score. Each shot scores 0, 1, 3 or 5.": "Touchez un tir, puis son score. Chaque tir vaut 0, 1, 3 ou 5.", "Clear this shot": "Effacer ce tir", "Live scorer": "Pointage en direct", "Grid view": "Vue grille", "Undo last shot": "Annuler le dernier tir", "Finish scorecard": "Terminer la feuille", "Now shooting": "Au tir", "All 20 shots in": "Les 20 tirs sont faits", "Check the strip below, then finish the scorecard.": "Vérifiez la ligne ci-dessous, puis terminez la feuille.", "Miss": "Raté", "point": "point", "points": "points", "Try it yourself": "Essayez vous-même", "Score now": "Pointer", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
+  "Copied.": "Copié.", "My team": "Mon équipe", "Enter score": "Saisir le score", "Confirm": "Confirmer", "Dispute": "Contester", "Disputed": "Contesté", "To check": "À vérifier", "Score entry": "Saisie des scores", "Organisers only": "Organisateurs seulement", "Teams enter, other team confirms": "Les équipes saisissent, l'adversaire confirme", "Teams enter, auto-confirm": "Les équipes saisissent, confirmation auto", "Send to the other team": "Envoyer à l'adversaire", "Awaiting other team": "En attente de l'adversaire", "Scores sent in by teams": "Scores envoyés par les équipes", "Mêlée style": "Type de mêlée", "New teams every round": "Nouvelles équipes à chaque partie", "All rounds drawn in advance": "Toutes les parties tirées d'avance", "Teams drawn once": "Équipes tirées une fois", "Draw the teams": "Tirer les équipes", "Redraw teams": "Refaire le tirage des équipes", "Back to players": "Revenir aux joueurs", "Print the draw": "Imprimer le tirage", "Undo the draw": "Annuler le tirage", "Get the app.": "Installez l'appli.", "Add Carreau to your home screen for one-tap access, full screen.": "Ajoutez Carreau à votre écran d'accueil : un seul geste, en plein écran.", "Add to home screen": "Ajouter à l'écran d'accueil", "Not now": "Plus tard", "Add Carreau to your home screen": "Ajouter Carreau à l'écran d'accueil", "Opens full screen, one tap away": "S'ouvre en plein écran, en un geste", "Draw": "Tirage", "Table": "Classement", "Screen": "Écran", "Your competitions": "Vos concours", "Examples": "Exemples", "Choose a competition": "Choisir un concours", "No competitions match.": "Aucun concours ne correspond.", "Not started": "Pas commencé", "Tap a shot, then tap its score. Each shot scores 0, 1, 3 or 5.": "Touchez un tir, puis son score. Chaque tir vaut 0, 1, 3 ou 5.", "Clear this shot": "Effacer ce tir", "Live scorer": "Pointage en direct", "Grid view": "Vue grille", "Undo last shot": "Annuler le dernier tir", "Finish scorecard": "Terminer la feuille", "Now shooting": "Au tir", "All 20 shots in": "Les 20 tirs sont faits", "Check the strip below, then finish the scorecard.": "Vérifiez la ligne ci-dessous, puis terminez la feuille.", "Miss": "Raté", "point": "point", "points": "points", "Try it yourself": "Essayez vous-même", "Score now": "Pointer", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
   "Visitors only see the competitions they created on their own device, plus the examples. Examples are view-only for visitors.": "Les visiteurs ne voient que les concours créés sur leur propre appareil, plus les exemples. Les exemples sont en lecture seule pour les visiteurs.",
   "Precision shooting": "Tir de précision", "Shooting scorecard": "Feuille de tir", "Atelier": "Atelier", "Lone boule": "Boule seule", "Boule behind the jack": "Boule derrière le but", "Boule between two boules": "Boule entre deux boules", "Boule behind an obstacle": "Boule derrière un obstacle", "The jack": "Le but",
   "Each shot scores 0, 1, 3 or 5. Maximum 100.": "Chaque tir vaut 0, 1, 3 ou 5 points. Maximum 100.", "{n} pts · {n}/20 shots": "{1} pts · {2}/20 tirs", "{n} pts": "{1} pts",
@@ -590,6 +590,58 @@ function entName(t, id) {
   return tm.name || tm.players.filter(Boolean).join(" / ") || "Unnamed team";
 }
 function teamPlayers(t, id) { const tm = t.teams.find(x => x.id === id); return tm ? tm.players.filter(Boolean).join(", ") : ""; }
+/* ---------- team score entry (off unless the site switch is on) ---------- */
+// t.scoreMode: "organiser" (default), "teams" (a team enters, the other team confirms), "teams-auto" (confirms itself after a few minutes)
+const teamScoring = t => !!(S.teamScoringOn && S.teamScoringOn()) && !isIndiv(t) && (t.scoreMode === "teams" || t.scoreMode === "teams-auto");
+const myTeam = t => (S.myTeam && t && S.myTeam(t)) || null;
+const inMatch = (m, id) => !!id && ((m.a || []).includes(id) || (m.b || []).includes(id));
+const autoMinutes = t => Math.max(0.01, +t.autoConfirmMin || 10);
+// organiser's screen publishes confirmed scores (and unanswered ones once the wait is over in auto mode)
+async function applyProposals() {
+  const t = T(); if (!t || !teamScoring(t) || !canEdit() || myTeam(t) || S.applying) return;
+  const due = MS().filter(m => !m.done && m.a && m.b && m.proposal && (m.proposal.status === "confirmed" ||
+    (t.scoreMode === "teams-auto" && m.proposal.status === "pending" && Date.now() - (m.proposal.at || 0) > autoMinutes(t) * 60000)));
+  if (!due.length) return;
+  S.applying = true;
+  try { for (const m of due) { const p = m.proposal; const r = await recordResult(m.id, p.sa, p.sb, true);
+      if (r === true) { const np = { ...p, status: p.status === "confirmed" ? "applied" : "auto", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(S.tid, m.id, { proposal: np }); } }
+    await assignCourts(); } catch (e) { console.error(e); } finally { S.applying = false; }
+  render();
+}
+setInterval(() => { try { applyProposals(); } catch {} }, 30000);
+function teamPanel(t) {
+  const me = myTeam(t); if (!me || !teamScoring(t)) return "";
+  const mine = MS().filter(m => inMatch(m, me) && !m.bye).sort(byOrder);
+  const cur = mine.find(m => !m.done && m.a && m.b);
+  const p = cur?.proposal; const opp = cur ? sideName(t, (cur.a || []).includes(me) ? cur.b : cur.a) : "";
+  const iAmA = cur && (cur.a || []).includes(me);
+  const sc = p ? (iAmA ? `${p.sa}–${p.sb}` : `${p.sb}–${p.sa}`) : "";
+  let body;
+  if (!cur) body = `<p class="muted">No game for you right now. Your next game appears here as soon as it's drawn.</p>`;
+  else {
+    const where = `<div class="small muted">${esc(matchContext(t, cur))}${cur.court ? ` · Piste ${esc(courtName(t, cur.court))}` : " · waiting for a piste"}</div>`;
+    const head = `<div><b>v ${esc(opp)}</b>${where}</div>`;
+    if (!p || p.status === "applied" || p.status === "auto") body = `<div class="spread">${head}<button class="btn primary" data-act="team-score" data-id="${cur.id}">Enter score</button></div>`;
+    else if (p.status === "pending" && p.by === me) body = `<div class="spread">${head}<span class="pill playing">You sent ${sc}</span></div><p class="small muted">Waiting for ${esc(opp)} to confirm${t.scoreMode === "teams-auto" ? ` (it counts automatically after ${autoMinutes(t)} minutes)` : ""}. <button class="btn sm ghost" data-act="team-score" data-id="${cur.id}">Change</button></p>`;
+    else if (p.status === "pending") body = `<div class="stack" style="gap:8px">${head}<div class="notice"><b>${esc(opp)} entered ${sc}</b> (your score first). Is that right?</div>
+      <div class="row"><button class="btn primary" data-act="team-confirm" data-id="${cur.id}">Confirm</button><button class="btn" data-act="team-dispute" data-id="${cur.id}">Dispute</button></div></div>`;
+    else if (p.status === "confirmed") body = `<div class="spread">${head}<span class="pill done">Confirmed ${sc}</span></div><p class="small muted">The score is going up on the board.</p>`;
+    else body = `<div class="spread">${head}<span class="pill">Disputed</span></div><p class="small muted">The organiser will settle this score. Please see the desk.</p>`;
+  }
+  const done = mine.filter(m => m.done).slice(-3).reverse();
+  return `<div class="panel stack team-panel" style="gap:10px;border-color:var(--accent);margin-bottom:16px"><div><div class="eyebrow">My team</div><h3>${esc(entName(t, me))}</h3></div>${body}
+    ${done.length ? `<div class="small muted">${done.map(m => { const a = (m.a || []).includes(me); const won = winnerSide(m)?.includes(me); return `${won ? "Won" : "Lost"} ${a ? m.sa : m.sb}–${a ? m.sb : m.sa} v ${esc(sideName(t, a ? m.b : m.a) || "bye")}`; }).join(" · ")}</div>` : ""}</div>`;
+}
+function checkPanel(t) {
+  if (!teamScoring(t) || !canEdit() || myTeam(t)) return "";
+  const list = MS().filter(m => !m.done && m.proposal && ["pending", "disputed", "confirmed"].includes(m.proposal.status)).sort(byOrder);
+  if (!list.length) return "";
+  const who = m => esc(sideName(t, m.a)) + " v " + esc(sideName(t, m.b));
+  return `<div class="panel stack check-panel" style="gap:8px;margin-bottom:16px"><div class="spread"><h3>To check <span class="muted small">${list.length}</span></h3><span class="small muted">Scores sent in by teams</span></div>
+    ${list.map(m => { const p = m.proposal; const by = esc(entName(t, p.by)); return `<div class="erow"><div class="who"><b>${who(m)}</b><span class="small muted">${esc(matchContext(t, m))} · ${p.sa}–${p.sb} sent by ${by}</span></div>
+      <span class="pill ${p.status === "disputed" ? "" : "playing"}">${p.status === "disputed" ? "Disputed" : p.status === "confirmed" ? "Confirmed" : "Awaiting other team"}</span>
+      <button class="btn sm primary" data-act="check-accept" data-id="${m.id}">Accept ${p.sa}–${p.sb}</button><button class="btn sm" data-match="${m.id}">Enter score</button></div>`; }).join("")}</div>`;
+}
 function sideName(t, side) { if (!side) return null; return side.map(id => entName(t, id)).join(isIndiv(t) ? " · " : " / "); }
 function mStatus(m) { if (m.done) return "done"; if (!m.a || !m.b) return "pending"; if (m.court) return "playing"; return "ready"; }
 const ents = m => [...(m.a || []), ...(m.b || [])];
@@ -1334,7 +1386,7 @@ function renderModal() {
   if (!S.modal || !t) { el.innerHTML = ""; return; }
   const m = S.matches[S.modal.id]; if (!m) { S.modal = null; el.innerHTML = ""; return; }
   if (m.stage === "shoot" || m.shoot) { renderShootModal(t, m, el); return; }
-  const ro = !canScore();
+  const ro = !canScore() && !S.modal.team;
   const who = side => side.map(id => isIndiv(t) ? esc(entName(t, id)) : `<b>${esc(entName(t, id))}</b><span class="small muted">${esc(teamPlayers(t, id))}</span>`).join(isIndiv(t) ? "<br>" : "");
   const stp = k => `<div class="stepper">${ro ? "" : `<button type="button" data-act="dec" data-k="${k}" aria-label="Minus one">−</button>`}<input id="sc-${k}" type="text" readonly ${ro ? "" : `data-act="pad" data-k="${k}" class="padbox ${S.modal.pad === k ? "on" : ""}"`} value="${S.modal[k]}" aria-label="Score">${ro ? "" : `<button type="button" data-act="inc" data-k="${k}" aria-label="Plus one">+</button>`}</div>`;
   const pad = k => ro || S.modal.pad !== k ? "" : `<div class="pad">${Array.from({ length: t.target + 1 }, (_, n) => `<button type="button" data-act="pick" data-k="${k}" data-n="${n}" class="${n === S.modal[k] ? "on" : ""} ${n === t.target ? "win" : ""}">${n}</button>`).join("")}</div>`;
@@ -1345,13 +1397,13 @@ function renderModal() {
     <div class="scorer"><div class="who">${who(m.a)}</div>${stp("sa")}</div>${pad("sa")}
     <div class="scorer"><div class="who">${who(m.b)}</div>${stp("sb")}</div>${pad("sb")}
     ${ro ? "" : `<label class="chk"><input type="checkbox" id="early" ${S.modal.early ? "checked" : ""}> Game ended on time limit (winner below ${t.target})</label>
-    ${!m.done ? `<label class="f"><span>Piste</span><select id="mcourt"><option value="">No piste yet</option>${courts.map(c => `<option value="${c.id}" ${m.court === c.id ? "selected" : ""}>Piste ${esc(c.name)}${MS().some(o => o.court === c.id && !o.done && o.id !== m.id) ? " (in use)" : ""}</option>`).join("")}</select></label>` : ""}
+    ${!m.done && !S.modal.team ? `<label class="f"><span>Piste</span><select id="mcourt"><option value="">No piste yet</option>${courts.map(c => `<option value="${c.id}" ${m.court === c.id ? "selected" : ""}>Piste ${esc(c.name)}${MS().some(o => o.court === c.id && !o.done && o.id !== m.id) ? " (in use)" : ""}</option>`).join("")}</select></label>` : ""}
     ${S.modal.err ? `<div class="err">${esc(S.modal.err)}</div>` : ""}
     ${m.corrected && !m.corrected.reset ? `<p class="small muted">Corrected (was ${m.corrected.from?.[0] ?? "–"}–${m.corrected.from?.[1] ?? "–"}).</p>` : ""}
     ${m.done && canEdit() && !S.modal.blocked ? `<p class="small muted">To correct a wrong score, change it and press Update result. If the winner changes and a later game has already been played, you'll be asked to confirm an override${overrideAllowed(m) ? "" : " (only possible for the current and previous round)"}.</p>` : ""}
     ${S.modal.blocked ? overrideBox(S.modal.blocked) : `<div class="row">
-      <button class="btn primary" data-act="save-final">${m.done ? "Update result" : "Save result"}</button>
-      ${!m.done ? `<button class="btn" data-act="save-live">Save live score</button>` : `<button class="btn" data-act="reopen">Reopen match</button>`}
+      <button class="btn primary" data-act="save-final">${S.modal.team ? "Send to the other team" : m.done ? "Update result" : "Save result"}</button>
+      ${S.modal.team ? "" : !m.done ? `<button class="btn" data-act="save-live">Save live score</button>` : `<button class="btn" data-act="reopen">Reopen match</button>`}
     </div>`}`}
   </div></div>`;
   localize(el);
@@ -1406,6 +1458,7 @@ async function modalAction(act, k, a) {
     if (sa === sb) { md.err = "Scores can't be level. Petanque games always have a winner."; renderModal(); return; }
     if (Math.max(sa, sb) > t.target) { md.err = `Scores can't go above ${t.target}.`; renderModal(); return; }
     if (!md.early && Math.max(sa, sb) !== t.target) { md.err = `The winner needs ${t.target} points, or tick the time-limit box.`; renderModal(); return; }
+    if (md.team) { const ok = await guard(() => S.teamPropose(t, S.matches[md.id], sa, sb)); if (ok !== false) { S.modal = null; renderModal(); toast("Sent. The other team now confirms it."); render(); } return; }
     const ok = await guard(() => recordResult(md.id, sa, sb, true));
     if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa, sb, done: true }; renderModal(); return; }
     if (ok) { S.modal = null; renderModal(); toast("Result saved."); }
@@ -1519,6 +1572,11 @@ function renderSetup(t) {
   return `<div class="stack">
   <div class="spread"><h2>Setup</h2>${locked ? `<span class="pill">Format locked after the first draw</span>` : ""}</div>
   ${S.setupExtra ? S.setupExtra(t) : ""}
+  ${S.teamScoringOn && S.teamScoringOn() && !isIndiv(t) ? `<div class="panel stack"><h3>Score entry</h3>
+    ${seg("scoreMode", t.scoreMode || "organiser", [["organiser", "Organisers only"], ["teams", "Teams enter, other team confirms"], ["teams-auto", "Teams enter, auto-confirm"]], false)}
+    <p class="small muted">${{ organiser: "Only organisers and scorers enter scores.", teams: "Each team gets its own link (see Team links above). When a game ends, either team enters the score on their phone and the other team confirms it. Disputes come to you on Draw & results. Keep an organiser's screen open: it publishes confirmed scores.", "teams-auto": "As above, but a score the other team hasn't answered counts automatically after the wait below." }[t.scoreMode || "organiser"]}</p>
+    ${t.scoreMode === "teams-auto" ? `<label class="f" style="max-width:220px"><span>Auto-confirm after (minutes)</span><input type="number" min="1" max="60" data-field="autoConfirmMin" data-num value="${t.autoConfirmMin || 10}"></label>` : ""}
+  </div>` : ""}
   <div class="panel stack">
     <div class="fields">
       <label class="f"><span>Competition name</span><input type="text" id="f-name" data-field="name" value="${esc(t.name)}"></label>
@@ -1677,7 +1735,7 @@ function renderDraw(t) {
       wr ? `<div><button class="btn primary" data-act="first-draw">${{ swiss: "Draw round 1", melee: "Draw round 1", roundrobin: "Generate round robin schedule", snake: "Draw snake rounds", pools: "Draw pools", knockout: "Draw knockout bracket" }[sys]}</button></div>` : `<p class="muted">Waiting for the organiser to make the draw.</p>`}
     </div></div>`;
   }
-  let html = `<div class="stack"><div class="spread"><h2>Draw & results</h2><div class="row">${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}${wr && S.downloads ? `<button class="btn sm" data-act="export">Export results (CSV)</button>` : ""}</div></div>`;
+  let html = teamPanel(t) + checkPanel(t) + `<div class="stack"><div class="spread"><h2>Draw & results</h2><div class="row">${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}${wr && S.downloads ? `<button class="btn sm" data-act="export">Export results (CSV)</button>` : ""}</div></div>`;
   // rounds (swiss / melee)
   const rounds = t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round);
   if (rounds.length) {
@@ -1952,6 +2010,11 @@ document.addEventListener("click", async e => {
     }
     case "melee-unteam": { const nt = Object.assign(clone(t), { entry: "melee", teams: [], meleeDrawn: false }); await guard(() => saveT(nt)); render(); break; }
     case "print-draw": window.print(); break;
+    case "team-score": { const m = S.matches[a.dataset.id]; if (!m) break; const p = m.proposal;
+      S.modal = { id: m.id, team: true, sa: p && p.status === "pending" ? p.sa : 0, sb: p && p.status === "pending" ? p.sb : 0, early: false, err: "", pad: "sa" }; renderModal(); break; }
+    case "team-confirm": case "team-dispute": { const m = S.matches[a.dataset.id]; if (!m) break; const ok = await guard(() => S.teamRespond(t, m, act === "team-confirm" ? "confirmed" : "disputed")); if (ok !== false) toast(act === "team-confirm" ? "Confirmed. Thanks!" : "Sent to the organiser to settle."); render(); break; }
+    case "check-accept": { const m = S.matches[a.dataset.id]; if (!m?.proposal) break; const p = m.proposal;
+      const r = await guard(() => recordResult(m.id, p.sa, p.sb, true)); if (r === true) { const np = { ...p, status: "applied", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(S.tid, m.id, { proposal: np }); await guard(assignCourts); toast("Result saved."); } render(); break; }
     case "undo-all": { for (const d of t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round)) await guard(() => undoDraw(d.id)); toast("Draw undone."); render(); break; }
     case "shoot-next": await guard(() => addDraw((t.shootFormat || "ko8") === "final" ? drawShootFinal(t) : drawShootKnockout(t))); break;
     case "archive": S.confirmArchive = true; render(); break;
@@ -2062,7 +2125,7 @@ function watchMatches() {
   S.unsubM?.(); S.unsubM = null;
   if (!S.tid) return;
   const tid = S.tid;
-  S.unsubM = S.store.watchMatches(tid, list => { if (S.tid !== tid) return; S.matches = {}; list.forEach(m => S.matches[m.id] = m); render(); }, err => console.error(err));
+  S.unsubM = S.store.watchMatches(tid, list => { if (S.tid !== tid) return; S.matches = {}; list.forEach(m => S.matches[m.id] = m); render(); applyProposals(); }, err => console.error(err));
 }
 function startWatching() {
   S.store.watchTournaments(list => {
