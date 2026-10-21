@@ -25,6 +25,14 @@ const { chromium } = require('playwright');
   await AD.click('[data-act="team-links-make"]'); await w(1500);
   const links = await AD.evaluate(() => Object.fromEntries([...document.querySelectorAll('#team-links input[id^="tl-"]')].map(i => [i.id.slice(3), i.value])));
   log('team links:', Object.keys(links).length);
+  // per-team QR code: shown on its own, encodes that team's link, hides again
+  const firstTeam = Object.keys(links)[0];
+  await AD.click(`[data-act="team-qr"][data-id="${firstTeam}"]`); await w(1500);
+  const qr = await AD.evaluate(() => { const c = document.querySelector('.qr-card'); return c ? { cards: document.querySelectorAll('.qr-card').length, name: c.querySelector('.qr-name').textContent, svg: c.querySelector('svg')?.outerHTML || '' } : null; });
+  let decoded = '';
+  if (qr && qr.svg) { try { const sharp = require('sharp'); const jsQR = require('jsqr'); const png = await sharp(Buffer.from(qr.svg.replace('<svg ', '<svg width="400" height="400" '))).png().toBuffer(); const { data, info } = await sharp(png).ensureAlpha().raw().toBuffer({ resolveWithObject: true }); decoded = jsQR(new Uint8ClampedArray(data.buffer), info.width, info.height)?.data || ''; } catch (e) { decoded = 'decode unavailable: ' + e.message; } }
+  log('qr shown alone:', qr && qr.cards === 1 && qr.svg.length > 500, '| decodes to team link:', decoded === links[firstTeam] ? true : decoded);
+  await AD.click(`[data-act="team-qr"][data-id="${firstTeam}"]`); await w(300); log('qr hidden again:', await AD.evaluate(() => !document.querySelector('.qr-card')));
   await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="first-draw"]'); await w(2500);
   const games = await A.evaluate(() => window.__carreau.MS().filter(m => m.a && m.b).sort((x, y) => x.order - y.order).map(m => ({ id: m.id, a: m.a[0], b: m.b[0] })));
   const [g1, g2] = games;
