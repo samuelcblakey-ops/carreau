@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
   const b = await chromium.launch(); const errs=[];
   const mk = async (n) => { const c = await b.newContext({viewport:{width:1100,height:900}}); await c.addInitScript(() => { window.__CARREAU_EMULATOR = true; }); const p = await c.newPage(); p.on('pageerror', e => errs.push(n+': '+e.message)); return p; };
   const w = ms => new Promise(r => setTimeout(r, ms)); const log=(...a)=>console.log(...a);
-  const tabs = p => p.$$eval('#tabs button', e => e.map(x=>x.textContent).join('|'));
+  const tabs = p => p.$$eval('#tabs button', e => e.map(x=>x.getAttribute('aria-label')).join('|'));
   const A = await mk('A'); await A.goto(process.env.WEB_URL+''); await w(3000);
   log('footer exists:', !!(await A.$('#site-foot [data-act="admin-in"]')));
   await A.click('[data-act="new-t"]'); await w(2500);

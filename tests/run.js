@@ -23,6 +23,7 @@ const SUITES = {
     ],
     'app-picker.js': [/no select: true/, /open: true groups: Your competitions 6 \/ Examples 2/, /meta: .*Triples · Swiss · 0 teams · Not started/, /search focused: true/,
       /search filters: Bristol Open 7\n/, /picked: Bristol Open 7 closed: true button shows: Bristol Open 7/, /outside click closes: true/, /escape closes: true/, /errs \[\]/],
+    'app-mobile.js': [/phone: \{"overflow":false,"navFixed":true,"navBottom":true,"icons":true,"header":\d{2,3},"inputFont":"16px"\}/, /desktop: \{"overflow":false,"navFixed":false,"navBottom":false,"icons":false/, /errs \[\]/],
     'app-score-keypad.js': [/pad buttons 14/, /after sa pick, pad on sb: true/, /pad closed true values 13-8/, /reopen sb pad true/, /saved true 13-8/, /errs \[\]/],
   },
   web: {
@@ -43,6 +44,8 @@ const SUITES = {
       /bulk delete toast: 2 competitions deleted\./, /A comps gone, B kept: true/, /A list after delete: 0/, /errs \[\]/,
     ],
     'web-shooting.js': [/final sides true done true/, /third sides true done true/, /errs \[\]/],
+    'web-pwa.js': [/manifest: \[true,"standalone",3,true,200,"image\/png",true\]/, /service worker: true/, /no banner before prompt event: true/, /banner after prompt event: true/,
+      /install prompt shown: true \| banner gone: true/, /dismissed stays hidden: true/, /picker offers install: true/, /ios banner: true/, /ios steps: true/, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
       /admin page \(signed in\):.*Open testingOn/, /B tabs \(testing off\): Draw & results\|Standings\|Big screen/,
