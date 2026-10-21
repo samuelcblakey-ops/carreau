@@ -222,6 +222,226 @@ const SYSTEM_LABEL = { swiss: "Swiss rounds", pools: "Pools → knockout", knock
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 
+/* ---------------- French translation ----------------
+   Keys are the English text as it appears on screen. {n} matches a number and {x} any text
+   (a team name, say); in the French, {1}, {2}… refer to those matches in order. */
+const FR_TEXT = {
+  // header, tabs, general
+  "Carreau": "Carreau", "Competition desk": "Bureau du concours", "+ New competition": "+ Nouveau concours", "New competition": "Nouveau concours",
+  "Competition": "Concours", "Sections": "Sections", "This device only": "Cet appareil uniquement", "Saved in this browser only": "Enregistré dans ce navigateur uniquement",
+  "Registration": "Inscriptions", "Setup": "Paramètres", "Draw & results": "Tirage et résultats", "Pistes": "Pistes", "Standings": "Classement", "Big screen": "Grand écran",
+  "Loading competitions…": "Chargement des concours…", "No competitions yet": "Aucun concours pour l'instant",
+  "Set up a competition, add teams or players, then draw rounds, pools or a knockout. Pistes are allocated as games finish and scores go live for everyone with the link.": "Créez un concours, ajoutez des équipes ou des joueurs, puis tirez les parties, les poules ou un tableau. Les pistes sont attribuées au fil des parties et les scores s'affichent en direct pour tous ceux qui ont le lien.",
+  "Create a competition": "Créer un concours", "The organiser hasn't created a competition yet.": "L'organisateur n'a pas encore créé de concours.",
+  "This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.": "Ceci est un concours d'exemple avec des équipes fictives, pour voir comment tout fonctionne. Créez le vôtre depuis le menu ci-dessus, puis supprimez celui-ci dans Paramètres.",
+  "Close": "Fermer", "Delete": "Supprimer", "Delete…": "Supprimer…", "Keep it": "Le garder", "Remove": "Retirer", "Add": "Ajouter", "Copy": "Copier", "Join": "Rejoindre",
+  // formats & systems
+  "Singles": "Tête-à-tête", "Doubles": "Doublettes", "Triples": "Triplettes", "Singles (tête-à-tête)": "Tête-à-tête",
+  "Fixed teams": "Équipes formées", "Mêlée (random teams)": "Mêlée (équipes tirées au sort)", "Mêlée": "Mêlée", "Mêlée rounds": "Parties en mêlée",
+  "Swiss": "Suisse", "Swiss rounds": "Système suisse", "Snake": "Serpent", "Snake rounds": "Parties en serpent", "Pools → KO": "Poules → tableau", "Pools → knockout": "Poules → tableau",
+  "Knockout": "Élimination directe", "Round robin": "Tous contre tous", "Round robin schedule": "Calendrier tous contre tous", "Pools": "Poules",
+  // setup
+  "Competition name": "Nom du concours", "Date": "Date", "Venue": "Lieu", "Club or boulodrome": "Club ou boulodrome",
+  "Format locked after the first draw": "Format verrouillé après le premier tirage", "Entries": "Engagés", "Entry type": "Type d'inscription", "Format": "Format",
+  "Players enter individually. Each round draws new random teams, mixing doubles and triples when numbers don't divide evenly, and avoids repeat partners where it can. Players are ranked individually.": "Les joueurs s'inscrivent individuellement. À chaque partie, de nouvelles équipes sont tirées au sort, en mélangeant doublettes et triplettes si le nombre ne tombe pas juste, en évitant si possible les mêmes partenaires. Le classement est individuel.",
+  "Points to win": "Points pour gagner", "Bye counts as": "L'exempt compte pour", "Competition system": "Système de jeu",
+  "Mêlée competitions play a set number of rounds.": "Les concours en mêlée se jouent sur un nombre de parties fixé.",
+  "Planned rounds": "Parties prévues", "Rounds": "Parties",
+  "Round {n} is random. After that, teams on the same number of wins play each other and rematches are avoided. Ties are split by Buchholz (opponents' wins), then points difference.": "La partie {1} est tirée au sort. Ensuite, les équipes ayant le même nombre de victoires se rencontrent, sans revanche. Les égalités sont départagées au Buchholz (victoires des adversaires), puis au goal-average.",
+  "Rounds are drawn one at a time once the previous round is finished.": "Les parties sont tirées une par une, quand la précédente est terminée.",
+  "Teams stand in two lines. Each round one line moves along a place, so team {n} plays whoever team {n} just played, team {n} whoever team {n} just played, and so on. All rounds are drawn at once and nobody meets the same team twice ({n} teams allow up to {n} rounds). With an odd number of teams, one team sits out each round and scores a bye. Ranked like Swiss: wins, Buchholz, fine Buchholz, points difference.": "Les équipes forment deux lignes. À chaque partie, une ligne avance d'une place : l'équipe {1} joue contre l'adversaire que l'équipe {2} vient d'affronter, l'équipe {3} contre celui de l'équipe {4}, et ainsi de suite. Toutes les parties sont tirées d'un coup et personne ne rencontre deux fois la même équipe ({5} équipes permettent jusqu'à {6} parties). Avec un nombre impair, une équipe est exempte à chaque partie. Classement comme en suisse : victoires, Buchholz, Buchholz fin, goal-average.",
+  "Teams stand in two lines. Each round one line moves along a place, so team {n} plays whoever team {n} just played, team {n} whoever team {n} just played, and so on. All rounds are drawn at once and nobody meets the same team twice. With an odd number of teams, one team sits out each round and scores a bye. Ranked like Swiss: wins, Buchholz, fine Buchholz, points difference.": "Les équipes forment deux lignes. À chaque partie, une ligne avance d'une place : l'équipe {1} joue contre l'adversaire que l'équipe {2} vient d'affronter, l'équipe {3} contre celui de l'équipe {4}, et ainsi de suite. Toutes les parties sont tirées d'un coup et personne ne rencontre deux fois la même équipe. Avec un nombre impair, une équipe est exempte à chaque partie. Classement comme en suisse : victoires, Buchholz, Buchholz fin, goal-average.",
+  "Pool size": "Taille des poules", "Pool games": "Parties de poule", "French poule ({n} wins qualify)": "Poule à la française ({1} victoires qualifient)",
+  "French poules need {n} teams: game {n} is drawn, then winners play winners and losers play losers, and a barrage decides second place. Pools of other sizes play round robin.": "Les poules à la française se jouent à {1} équipes : la partie {2} est tirée au sort, puis gagnants contre gagnants et perdants contre perdants, et un barrage désigne le deuxième. Les poules d'autres tailles se jouent en tous contre tous.",
+  "First-round losers play a consolante": "Les perdants du premier tour jouent une consolante", "Third-place play-off": "Petite finale",
+  "Seeding": "Têtes de série", "Random draw": "Tirage au sort", "Entry order is seeding": "L'ordre d'inscription fait les têtes de série",
+  "Afternoon knockouts": "Tableaux de l'après-midi", "Afternoon": "Après-midi", "Knockouts": "Tableaux",
+  "What happens after the Swiss rounds. You can change this any time before the knockouts are drawn.": "Ce qui suit les parties en système suisse. Modifiable jusqu'au tirage des tableaux.",
+  "What happens after the pools. You can change this any time before the knockouts are drawn.": "Ce qui suit les poules. Modifiable jusqu'au tirage des tableaux.",
+  "What happens after the round robin. You can change this any time before the knockouts are drawn.": "Ce qui suit le tous contre tous. Modifiable jusqu'au tirage des tableaux.",
+  "What happens after the snake rounds. You can change this any time before the knockouts are drawn.": "Ce qui suit les parties en serpent. Modifiable jusqu'au tirage des tableaux.",
+  "Quick set-ups": "Formules rapides", "Draw for the knockouts": "Tirage des tableaux",
+  "Seeded by standings ({n} v {n}, {n} v {n}…)": "Selon le classement ({1} contre {2}, {3} contre {4}…)", "Seeded (pool winners kept apart)": "Têtes de série (premiers de poule séparés)",
+  "Random draw (tirage au sort)": "Tirage au sort intégral", "Knockout name": "Nom du tableau", "Ranks": "Places", "Pool places": "Places en poule", "3rd-place game": "Petite finale",
+  "From": "De", "To": "À", "to": "à", "Remove knockout": "Retirer le tableau", "+ Add another knockout": "+ Ajouter un tableau",
+  "Every place from {n} down": "Toutes les places à partir de la {1}e", "Everyone from {n} down": "Tous à partir du {1}e",
+  "Silver competition": "Concours Silver", "everyone who doesn't make the {x} plays their own knockout": "tous ceux qui ne sont pas qualifiés pour le {1} jouent leur propre tableau",
+  "starts at final": "commence en finale", "starts at semi-finals": "commence en demi-finales", "starts at quarter-finals": "commence en quarts de finale", "starts at last {n}": "commence au tour des {1}",
+  "Pick which finishing places in each pool go into each knockout, e.g. {n}st–{n}nd into the A, {n}rd–{n}th into the B.": "Choisissez quelles places de chaque poule vont dans chaque tableau, par exemple 1er–2e dans le A, 3e–4e dans le B.",
+  "Pick which overall ranks go into each knockout. Numbers that aren't a power of two get byes for the top seeds, so top {n} gives seeds {n} and {n} a bye into the semi-finals.": "Choisissez quelles places du classement vont dans chaque tableau. Si le nombre n'est pas une puissance de deux, les meilleures têtes de série sont exemptes : avec les {1} premiers, les têtes de série {2} et {3} vont directement en demi-finale.",
+  "not enough teams": "pas assez d'équipes",
+  "{n} teams · starts at final": "{1} équipes · commence en finale", "{n} teams · starts at semi-finals": "{1} équipes · commence en demi-finales", "{n} teams · starts at quarter-finals": "{1} équipes · commence en quarts de finale",
+  "{n} teams · starts at last {n}": "{1} équipes · commence au tour des {2}", "{n} byes for the top seeds": "{1} exempts pour les meilleures têtes de série", "{n} bye for the top seed": "{1} exempt pour la meilleure tête de série",
+  "Final (top {n})": "Finale ({1} premiers)", "Semi-finals (top {n})": "Demi-finales ({1} premiers)", "Quarter-finals (top {n})": "Quarts de finale ({1} premiers)",
+  "Top {n} + Plate ({n}–{n})": "{1} premiers + complémentaire ({2}–{3})", "Top {n}": "{1} premiers", "Everyone → one knockout": "Tout le monde → un seul tableau",
+  "{n}st & {n}nd → A, rest → B": "1er et 2e → A, les autres → B", "{n}st → A, {n}nd → B, rest → C": "1er → A, 2e → B, les autres → C", "{n}st & {n}nd → A only": "1er et 2e → A seulement",
+  "Pistes": "Pistes", "Number of pistes": "Nombre de pistes", "Piste name": "Nom de la piste", "In use": "Utilisée",
+  "Rename a piste to match the markings on your terrain, or switch it off if it's unusable. Free pistes are given to waiting games as soon as a result comes in.": "Renommez une piste selon le marquage de votre terrain, ou désactivez-la si elle est inutilisable. Les pistes libres sont attribuées aux parties en attente dès qu'un résultat arrive.",
+  "Allocate pistes at random (otherwise lowest free piste first)": "Attribuer les pistes au hasard (sinon la première piste libre)",
+  "Delete competition": "Supprimer le concours", "Removes the competition, its entries and every result.": "Supprime le concours, ses inscriptions et tous les résultats.",
+  "Delete “{x}” for everyone": "Supprimer « {1} » pour tout le monde",
+  // registration
+  "Checked in on the day": "Pointés le jour même", "of {n} teams": "sur {1} équipes", "of {n} players": "sur {1} joueurs",
+  "Check in everyone": "Pointer tout le monde", "Clear check-ins": "Effacer le pointage",
+  "Only checked-in teams go into the draw, so the format and the number of games are worked out from who has actually turned up.": "Seules les équipes pointées entrent dans le tirage : le format et le nombre de parties dépendent de qui est vraiment présent.",
+  "Only checked-in players go into the draw, so the format and the number of games are worked out from who has actually turned up.": "Seuls les joueurs pointés entrent dans le tirage : le format et le nombre de parties dépendent de qui est vraiment présent.",
+  "{n} not checked in yet.": "{1} pas encore pointé(s).",
+  "Check-in is off, so every entered team goes into the draw.": "Le pointage est désactivé : toutes les équipes inscrites entrent dans le tirage.",
+  "Check-in is off, so every entered player goes into the draw.": "Le pointage est désactivé : tous les joueurs inscrits entrent dans le tirage.",
+  "Teams must check in on the day before they're included in the draw": "Les équipes doivent pointer le jour même pour entrer dans le tirage",
+  "The draw has started. Anyone checked in now joins from the next round.": "Le tirage a commencé. Ceux qui pointent maintenant entrent à la partie suivante.",
+  "The draw has started. New entries join from the next round.": "Le tirage a commencé. Les nouvelles inscriptions entrent à la partie suivante.",
+  "The draw has been made, so new entries and check-ins won't be included. Withdrawn teams stay in the draw already made.": "Le tirage est fait : les nouvelles inscriptions et pointages ne seront pas pris en compte. Les équipes forfaits restent dans le tirage déjà fait.",
+  "Add a team": "Ajouter une équipe", "Add a player": "Ajouter un joueur", "Team name (optional)": "Nom de l'équipe (facultatif)", "Defaults to the players' names": "Par défaut, le nom des joueurs",
+  "Player {n}": "Joueur {1}", "Club": "Club", "Player name": "Nom du joueur", "Here now (check in straight away)": "Présent (pointer tout de suite)",
+  "Paste a list": "Coller une liste", "One player per line.": "Un joueur par ligne.", "One team per line. Use": "Une équipe par ligne. Écrivez",
+  "Team name: Player, Player": "Nom de l'équipe : Joueur, Joueur", "or just the players' names separated by commas.": "ou simplement les noms des joueurs séparés par des virgules.",
+  "Add all": "Tout ajouter", "Teams": "Équipes", "Players": "Joueurs", "Team": "Équipe", "Player": "Joueur",
+  "Find a team or player": "Chercher une équipe ou un joueur", "Find a player": "Chercher un joueur", "Search entries": "Rechercher",
+  "Check in": "Pointer", "✓ Checked in": "✓ Pointée", "Checked in": "Pointée", "Not here yet": "Pas encore là", "Withdraw": "Forfait", "Withdrawn": "Forfait", "Reinstate": "Réintégrer", "Move up": "Monter",
+  "No teams yet. Add them above or paste a list.": "Aucune équipe pour l'instant. Ajoutez-les ci-dessus ou collez une liste.",
+  "No players yet. Add them above or paste a list.": "Aucun joueur pour l'instant. Ajoutez-les ci-dessus ou collez une liste.",
+  "Unknown team": "Équipe inconnue", "Unknown player": "Joueur inconnu", "Unnamed team": "Équipe sans nom",
+  // draw
+  "Draw round {n}": "Tirer la partie {1}", "Generate round robin schedule": "Générer le calendrier", "Draw snake rounds": "Tirer les parties en serpent", "Draw pools": "Tirer les poules", "Draw knockout bracket": "Tirer le tableau",
+  "Waiting for the organiser to make the draw.": "En attente du tirage par l'organisateur.",
+  "Check in at least {n} teams on Registration before drawing.": "Pointez au moins {1} équipes dans Inscriptions avant le tirage.",
+  "Check in at least {n} players on Registration before drawing.": "Pointez au moins {1} joueurs dans Inscriptions avant le tirage.",
+  "Add at least {n} teams on Registration before drawing.": "Ajoutez au moins {1} équipes dans Inscriptions avant le tirage.",
+  "Add at least {n} players on Registration before drawing.": "Ajoutez au moins {1} joueurs dans Inscriptions avant le tirage.",
+  "{n} entered team hasn't checked in and won't be in the draw.": "{1} équipe inscrite n'a pas pointé et ne sera pas dans le tirage.",
+  "{n} entered teams haven't checked in and won't be in the draw.": "{1} équipes inscrites n'ont pas pointé et ne seront pas dans le tirage.",
+  "{n} entered player hasn't checked in and won't be in the draw.": "{1} joueur inscrit n'a pas pointé et ne sera pas dans le tirage.",
+  "{n} entered players haven't checked in and won't be in the draw.": "{1} joueurs inscrits n'ont pas pointé et ne seront pas dans le tirage.",
+  "Go to Registration": "Aller aux inscriptions",
+  "{n} teams checked in": "{1} équipes pointées", "{n} teams entered": "{1} équipes inscrites", "{n} players checked in": "{1} joueurs pointés", "{n} players entered": "{1} joueurs inscrits", "{n} pistes": "{1} pistes",
+  "Fill free pistes": "Remplir les pistes libres", "Export results (CSV)": "Exporter les résultats (CSV)",
+  "Round {n} of {n} planned": "Partie {1} sur {2} prévues", "Morning complete": "Matinée terminée", "{n}/{n} games finished": "{1}/{2} parties terminées", "{n} rounds": "{1} parties",
+  "Undo round {n}": "Annuler la partie {1}", "Undo schedule": "Annuler le calendrier", "Undo pools": "Annuler les poules", "Undo bracket": "Annuler le tableau",
+  "Round {n}": "Partie {1}", "Draw the knockouts": "Tirer les tableaux",
+  "Draw once the last round is finished": "Tirage quand la dernière partie est terminée", "Draw once every game is finished": "Tirage quand toutes les parties sont terminées",
+  "Only {n} of {n} planned rounds have been played. You can still draw the knockouts now, or play another round first.": "Seules {1} des {2} parties prévues ont été jouées. Vous pouvez tirer les tableaux maintenant ou jouer une partie de plus.",
+  "{n}/{n} pools complete": "{1}/{2} poules terminées", "Complete": "Terminée", "{n}/{n} games": "{1}/{2} parties",
+  "Consolante": "Consolante", "Draw consolante": "Tirer la consolante", "{n} first-round losers are ready to play.": "{1} perdants du premier tour sont prêts à jouer.",
+  "Available once every first-round game is finished.": "Disponible quand toutes les parties du premier tour sont terminées.",
+  "Waiting for piste": "En attente de piste", "Waiting for a piste": "En attente d'une piste", "Winner to come": "Vainqueur à venir", "To be decided": "À déterminer",
+  "Playing": "En jeu", "Finished": "Terminée", "Ready": "Prête", "Pending": "En attente", "Bye": "Exempt", "Bye scored {n}–{n}": "Exempt compté {1}–{2}",
+  "Seeded": "Têtes de série", "seeded": "têtes de série", "random draw": "tirage au sort", "{n} teams": "{1} équipes", "{n} players": "{1} joueurs", "teams": "équipes", "players": "joueurs",
+  "Champion": "Champion", "Winner": "Vainqueur", "Winner: {x}": "Vainqueur : {1}", "Third place": "Petite finale",
+  "Winner of QF {n}": "Vainqueur QF {1}", "Winner of SF {n}": "Vainqueur DF {1}", "Winner of R{n} {n}": "Vainqueur T{1} {2}", "Loser of SF {n}": "Perdant DF {1}",
+  "Final": "Finale", "Semi-finals": "Demi-finales", "Quarter-finals": "Quarts de finale", "Third-place game": "Petite finale",
+  "Main knockout": "Tableau principal", "Silver": "Silver", "Plate": "Complémentaire", "Semis": "Demi-finales",
+  "A knockout (Championnat)": "Tableau A (Championnat)", "B knockout (Consolante)": "Tableau B (Consolante)", "A knockout": "Tableau A", "B knockout": "Tableau B", "C knockout": "Tableau C",
+  "Winners' game": "Partie des gagnants", "Losers' game": "Partie des perdants", "Barrage": "Barrage", "Game {n}": "Partie {1}",
+  "Pool {x}": "Poule {1}",
+  // score form
+  "Match score": "Score de la partie", "Score": "Score", "Minus one": "Moins un", "Plus one": "Plus un", "Result": "Résultat", "Piste": "Piste", "Piste {n}": "Piste {1}",
+  "Piste {x}": "Piste {1}", "Piste {x} (in use)": "Piste {1} (occupée)", "Piste {x} · playing": "Piste {1} · en jeu", "No piste yet": "Pas encore de piste",
+  "Game ended on time limit (winner below {n})": "Partie arrêtée au temps (vainqueur sous {1})",
+  "Save result": "Enregistrer le résultat", "Update result": "Modifier le résultat", "Save live score": "Enregistrer le score en cours", "Reopen match": "Rouvrir la partie",
+  "Scores can't be level. Petanque games always have a winner.": "Les scores ne peuvent pas être à égalité : une partie de pétanque a toujours un vainqueur.",
+  "Scores can't go above {n}.": "Les scores ne peuvent pas dépasser {1}.", "The winner needs {n} points, or tick the time-limit box.": "Le vainqueur doit avoir {1} points, ou cochez la case de limite de temps.",
+  // pistes
+  "{n} playing · {n} waiting": "{1} en jeu · {2} en attente", "Free": "Libre", "No game on this piste.": "Aucune partie sur cette piste.", "Not in use": "Hors service",
+  "No games waiting.": "Aucune partie en attente.",
+  // standings
+  "Pld": "J", "W": "G", "L": "P", "Buch": "Buch", "Fine": "Fin", "For": "Pour", "Agst": "Contre",
+  "Buchholz: opponents' total wins": "Buchholz : total des victoires des adversaires", "Fine Buchholz: opponents' total Buchholz": "Buchholz fin : total des Buchholz des adversaires",
+  "Runner-up": "Finaliste", "Semi-finalists": "Demi-finalistes", "Third": "Troisième", "Fourth": "Quatrième",
+  "In progress. See Draw & results for the bracket.": "En cours. Voir le tableau dans Tirage et résultats.",
+  "Standings appear once round {n} is drawn.": "Le classement s'affiche dès le tirage de la partie {1}.",
+  "Standings appear once the schedule is generated.": "Le classement s'affiche dès que le calendrier est généré.",
+  "Pool tables appear once pools are drawn.": "Les classements de poule s'affichent dès le tirage des poules.",
+  "Results appear once the bracket is drawn.": "Les résultats s'affichent dès le tirage du tableau.",
+  "Ranked by wins, then Buchholz (opponents' total wins), then fine Buchholz (their opponents' Buchholz), then points difference, then points scored. Anything still level is split by a lot drawn for each entry when it was added. Byes count as a {n}–{n} win.": "Classement aux victoires, puis au Buchholz (victoires des adversaires), puis au Buchholz fin (Buchholz des adversaires), puis au goal-average, puis aux points marqués. Les égalités restantes sont départagées par un tirage au sort fait à l'inscription. Un exempt compte comme une victoire {1}–{2}.",
+  "Ranked by wins, then points difference, then points scored. Anything still level is split by a lot drawn for each entry when it was added. Byes count as a {n}–{n} win.": "Classement aux victoires, puis au goal-average, puis aux points marqués. Les égalités restantes sont départagées par un tirage au sort fait à l'inscription. Un exempt compte comme une victoire {1}–{2}.",
+  "Ranked by wins, then points difference, then points scored. Two teams still level are split by their game against each other, then by a lot drawn for each entry when it was added.": "Classement aux victoires, puis au goal-average, puis aux points marqués. Deux équipes encore à égalité sont départagées par leur confrontation directe, puis par un tirage au sort fait à l'inscription.",
+  // big screen
+  "Full screen": "Plein écran", "Next up": "Prochaines parties",
+  // toasts and messages
+  "Result saved.": "Résultat enregistré.", "Live score saved.": "Score en cours enregistré.", "Match reopened.": "Partie rouverte.", "Draw removed.": "Tirage annulé.",
+  "{x} drawn.": "{1} : tirage fait.", "Pools drawn.": "Poules tirées.", "Round {n} drawn.": "Partie {1} tirée.", "Drawn: {x}.": "Tirage fait : {1}.",
+  "Competition deleted.": "Concours supprimé.", "Everyone is checked in.": "Tout le monde est pointé.", "Check-ins cleared.": "Pointage effacé.",
+  "Tap Clear check-ins again to confirm.": "Appuyez de nouveau sur Effacer le pointage pour confirmer.", "{n} added.": "{1} ajouté(s).",
+  "Enter a team name or at least one player.": "Indiquez un nom d'équipe ou au moins un joueur.",
+  "Results are already in for this draw, so it can't be undone.": "Des résultats sont déjà saisis pour ce tirage : il ne peut plus être annulé.",
+  "A later game in the bracket already used this result. Reopen that game first.": "Une partie suivante du tableau utilise déjà ce résultat. Rouvrez d'abord cette partie.",
+  "Later pool games already use this result. Undo isn't possible once the pool has moved on.": "Les parties suivantes de la poule utilisent déjà ce résultat. Impossible d'annuler une fois la poule avancée.",
+  "Some pistes have games on them, so they weren't removed.": "Certaines pistes ont des parties en cours, elles n'ont pas été retirées.",
+  "{n} game(s) sent to pistes.": "{1} partie(s) envoyée(s) sur les pistes.", "No free piste or no game ready.": "Aucune piste libre ou aucune partie prête.",
+  "No knockout has at least 2 teams. Check the ranges.": "Aucun tableau n'a au moins 2 équipes. Vérifiez les places.",
+  "Full screen isn't available here.": "Le plein écran n'est pas disponible ici.", "The file wasn't saved.": "Le fichier n'a pas été enregistré.",
+  "You can follow this competition but not change it.": "Vous pouvez suivre ce concours mais pas le modifier.",
+  "That change didn't save. Check your connection and try again.": "La modification n'a pas été enregistrée. Vérifiez votre connexion et réessayez.",
+  "Storage is full. Delete an old competition to free space.": "Le stockage est plein. Supprimez un ancien concours pour libérer de la place.",
+  "Not enough players to make a round.": "Pas assez de joueurs pour former une partie.",
+  "{n} rematch(es) were unavoidable this round.": "{1} revanche(s) inévitable(s) à cette partie.",
+  "{n} player(s) have a bye to make the teams fit.": "{1} joueur(s) exempt(s) pour équilibrer les équipes.",
+  "Only {n} rounds are possible without repeat games for {n} teams.": "Seules {1} parties sont possibles sans revanche pour {2} équipes.",
+  // web version
+  "Organiser": "Organisateur", "Scorer": "Marqueur", "Enter a code": "Saisir un code", "Sharing": "Partage",
+  "Following a competition? Open the link the organiser sent you.": "Vous suivez un concours ? Ouvrez le lien envoyé par l'organisateur.",
+  "Link for players and spectators": "Lien pour les joueurs et les spectateurs",
+  "Anyone with this link can follow the draw and results live. They can't change anything.": "Toute personne ayant ce lien peut suivre le tirage et les résultats en direct, sans rien pouvoir modifier.", "Organiser code": "Code organisateur", "Organisers get a code from the person running the competition.": "Les organisateurs reçoivent un code de la personne qui gère le concours.",
+  "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
+  "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
+  "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
+  "Copied.": "Copié.", "That code didn't work. Check it with the organiser.": "Ce code ne fonctionne pas. Vérifiez-le auprès de l'organisateur.",
+  "You're now an organiser for this competition.": "Vous êtes maintenant organisateur de ce concours.", "You can now enter scores for this competition.": "Vous pouvez maintenant saisir les scores de ce concours.",
+  "Couldn't connect. Check your internet connection and reload.": "Connexion impossible. Vérifiez votre connexion internet et rechargez la page.",
+  "Firebase isn't set up yet, so this is saving on this device only.": "Firebase n'est pas encore configuré : les données sont enregistrées sur cet appareil uniquement."
+};
+// Rounds with their own French names
+const FR_LAST = n => n === 16 ? "Huitièmes de finale" : n === 32 ? "Seizièmes de finale" : n === 64 ? "Trente-deuxièmes de finale" : `Tour des ${n}`;
+const FR_FN = [
+  [/^Last (\d+)$/, m => FR_LAST(+m[1])]
+];
+Object.assign(FR_TEXT, {
+  "Scorers open this once on their phone and can then enter scores and move games between pistes. Scorer code": "Les marqueurs l'ouvrent une fois sur leur téléphone, puis peuvent saisir les scores et déplacer les parties entre les pistes. Code marqueur",
+  "Gives full control, including registration, setup, draws and scores. Keep it to your organising team, and keep a copy for yourself in case you change device. Organiser code": "Donne le contrôle total : inscriptions, paramètres, tirages et scores. Réservez-le à votre équipe d'organisation et gardez-en une copie au cas où vous changeriez d'appareil. Code organisateur"
+});
+
+/* translation engine: applied to the rendered page, so the app logic stays in English */
+const I18N = { lang: lsGet("carreau-lang") === "fr" ? "fr" : "en", exact: null, re: [] };
+function frCompile() {
+  if (I18N.exact) return; I18N.exact = {};
+  for (const [k, v] of Object.entries(FR_TEXT)) {
+    if (/\{[nx]\}/.test(k)) {
+      const src = k.replace(/[.*+?^$()|[\]\\]/g, "\\$&").replace(/\{n\}/g, "([+\\-−]?\\d+)").replace(/\{x\}/g, "(.+?)");
+      I18N.re.push([new RegExp("^" + src + "$"), v, k.replace(/\{[nx]\}/g, "").length]);
+    } else I18N.exact[k] = v;
+  }
+  I18N.re.sort((a, b) => b[2] - a[2]); // most specific pattern first
+}
+function trCore(t, depth = 0) {
+  frCompile();
+  if (I18N.exact[t] !== undefined) return I18N.exact[t];
+  for (const [re, fn] of FR_FN) { const m = t.match(re); if (m) return fn(m); }
+  for (const [re, v] of I18N.re) {
+    const m = t.match(re);
+    if (m) { const caps = m.slice(1).map(c => /^[+\-−]?\d+$/.test(c) ? c : (trCore(c, depth + 1) ?? c)); return v.replace(/\{(\d+)\}/g, (_, d) => caps[+d - 1] ?? ""); }
+  }
+  if (depth < 3) for (const sep of [" · ", ", ", " / "]) if (t.includes(sep)) {
+    const parts = t.split(sep); const out = parts.map(p => trCore(p.trim(), depth + 1));
+    if (out.some(o => o != null)) return out.map((o, i) => o ?? parts[i]).join(sep);
+  }
+  return null;
+}
+function tr(s) {
+  if (I18N.lang !== "fr" || !s) return s;
+  const m = String(s).match(/^([\s·:]*)([\s\S]*?)([\s·:?]*)$/); const core = m[2];
+  if (!core || !/[A-Za-z]/.test(core)) return s;
+  const r = trCore(core.replace(/\s+/g, " ")); return r == null ? s : m[1] + r + m[3];
+}
+function localize(root) {
+  if (I18N.lang !== "fr" || !root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement && n.parentElement.closest("textarea, script, style, select#tpick, [data-notr]") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const nodes = []; let n; while ((n = w.nextNode())) nodes.push(n);
+  nodes.forEach(n => { const v = tr(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; });
+  root.querySelectorAll("[placeholder], [aria-label], [title]").forEach(el => ["placeholder", "aria-label", "title"].forEach(a => { if (el.hasAttribute(a)) { const v = tr(el.getAttribute(a)); if (v !== el.getAttribute(a)) el.setAttribute(a, v); } }));
+}
+document.documentElement.lang = I18N.lang;
+
 /* ---------------- storage: shared db, or local fallback ---------------- */
 function localStore() {
   const KEY = "carreau-local-v1";
@@ -758,7 +978,7 @@ async function recordResult(id, sa, sb, done) {
 
 /* ---------------- toast & modal ---------------- */
 let toastTimer;
-function toast(msg) { const el = $("#toast"); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 3200); }
+function toast(msg) { const el = $("#toast"); el.textContent = tr(msg); el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 3200); }
 
 function openMatch(id) {
   const m = S.matches[id]; if (!m || !m.a || !m.b) return;
@@ -786,6 +1006,7 @@ function renderModal() {
       ${!m.done ? `<button class="btn" data-act="save-live">Save live score</button>` : `<button class="btn" data-act="reopen">Reopen match</button>`}
     </div>`}
   </div></div>`;
+  localize(el);
 }
 function matchContext(t, m) {
   if (m.stage === "ko") { const b = (t.brackets || []).find(b => b.id === m.bracket); return `${b?.name || "Knockout"} · ${m.third ? "Third-place game" : roundLabel(b?.rounds || 1, m.round)}`; }
@@ -838,18 +1059,21 @@ function render() {
   S.pendingRender = false;
   renderHeader();
   const t = T(); const main = $("#main");
-  if (!S.loaded) return;
-  if (!t) { main.innerHTML = renderWelcome(); return; }
+  if (!S.loaded) { localize($("header.app")); return; }
+  if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
   const fn = { setup: renderSetup, entries: renderEntries, draw: renderDraw, courts: renderCourts, standings: renderStandings, display: renderDisplay }[S.tab] || renderDraw;
   main.innerHTML = (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
+  localize($("header.app")); localize(main);
 }
 function renderHeader() {
   const list = Object.values(S.tournaments).sort((a, b) => (b.created || 0) - (a.created || 0));
   $("#tsel").innerHTML = `${list.length ? `<select id="tpick" aria-label="Competition">${list.map(t => `<option value="${t.id}" ${t.id === S.tid ? "selected" : ""}>${esc(t.name)}</option>`).join("")}</select>` : ""}
+    <div class="seg" role="group" aria-label="Language" data-notr><button type="button" data-lang="en" aria-pressed="${I18N.lang === "en"}">EN</button><button type="button" data-lang="fr" aria-pressed="${I18N.lang === "fr"}">FR</button></div>
     ${S.canCreate() ? `<button class="btn sm" data-act="new-t">+ New competition</button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
   const t = T();
-  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || !["setup"].includes(k)).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}">${l}</button>`).join("") : "";
+  if (t && !canScore() && S.tab !== "draw") S.tab = "draw"; // players and spectators see the draw and results only
+  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || (canScore() ? k !== "setup" : k === "draw")).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}">${l}</button>`).join("") : "";
 }
 function renderWelcome() {
   return `<div class="panel stack" style="max-width:640px">
@@ -991,7 +1215,7 @@ function matchCard(t, m, opts = {}) {
   if (m.bye) return `<div class="match ro"><div class="meta"><span>${opts.ctx ? esc(matchContext(t, m)) : ""}</span><span class="pill">Bye</span></div>${side(m.a, m.sa, true)}<div class="small muted">Bye scored ${m.sa}–${m.sb}</div></div>`;
   const aw = m.done && m.sa > m.sb;
   const label = st === "playing" ? `<span class="court-tag">Piste ${esc(courtName(t, m.court))}</span>` : st === "done" ? (m.courtUsed ? `<span>Piste ${esc(courtName(t, m.courtUsed))}</span>` : "<span></span>") : st === "ready" ? `<span>Waiting for piste</span>` : `<span></span>`;
-  const pill = { playing: `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: `<span class="pill done">Final</span>`, ready: `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
+  const pill = { playing: `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: `<span class="pill done">Finished</span>`, ready: `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
   return `<${ro ? "div" : "button"} class="match ${st} ${ro ? "ro" : ""}" ${ro ? "" : `data-match="${m.id}" type="button"`}>
     <div class="meta">${opts.ctx ? `<span>${esc(matchContext(t, m))}</span>` : label}${pill}</div>
     ${side(m.a, m.sa, aw)}${side(m.b, m.sb, m.done && !aw)}
@@ -1039,7 +1263,7 @@ function renderDraw(t) {
   if (rounds.length) rounds.forEach(d => { const rm = ms.filter(m => m.group === d.id).sort(byOrder); html += `<section class="stack" style="gap:10px"><h3>${esc(d.label)}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; });
   // round robin and snake (whole schedule drawn at once)
   for (const [gid, label] of [["RR", "Round robin"], ["SN", "Snake"]]) if (t.draws.some(d => d.id === gid)) {
-    const rr = ms.filter(m => m.group === gid); const maxR = Math.max(...rr.map(m => m.round));
+    const rr = ms.filter(m => m.group === gid); if (!rr.length) continue; const maxR = Math.max(...rr.map(m => m.round));
     html += `<div class="panel spread"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds</div>
       ${wr ? `<div class="row">${!rr.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${gid}">Undo schedule</button>` : ""}</div>` : ""}</div>`;
     for (let r = 1; r <= maxR; r++) { const rm = rr.filter(m => m.round === r).sort(byOrder); html += `<section class="stack" style="gap:10px"><h3>Round ${r}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; }
@@ -1206,6 +1430,8 @@ function renderDisplay(t) {
 
 /* ---------------- events ---------------- */
 document.addEventListener("click", async e => {
+  const lg = e.target.closest("[data-lang]");
+  if (lg) { I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
   const tab = e.target.closest("[data-tab]");
   if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); render(); return; }
   const mc = e.target.closest("[data-match]");
@@ -1332,7 +1558,7 @@ function startWatching() {
     S.tournaments = {}; list.forEach(t => S.tournaments[t.id] = t);
     S.loaded = true;
     if (!S.tid || !S.tournaments[S.tid]) { const first = list.sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
-    if (T() && !canEdit() && (S.tab === "setup" || S.tab === "entries")) S.tab = "courts";
+    if (T() && !canEdit() && (S.tab === "setup" || S.tab === "entries")) S.tab = canScore() ? "courts" : "draw";
     S.onTournaments?.();
     render();
   }, err => console.error(err));
@@ -1414,7 +1640,7 @@ S.headerExtra = () => {
   if (isOwner(t)) return `<span class="pill done">Organiser</span>`;
   if (p.edit) return `<span class="pill done">Organiser</span>`;
   if (p.score) return `<span class="pill done">Scorer</span>`;
-  return `<button class="btn sm" data-act="enter-code">Enter a code</button>`;
+  return `<button class="btn sm ghost" data-act="enter-code">Organiser code</button>`;
 };
 S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link the organiser sent you.</p>`;
 const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px"><div class="eyebrow">${label}</div>
@@ -1425,9 +1651,8 @@ S.setupExtra = t => {
   const l = links(t);
   return `<div class="panel stack">
     <h3>Sharing</h3>
-    ${copyRow("share-watch", "Link for players and spectators", l.watch, "Anyone with this link can follow the draw, pistes and results live. They can't change anything.")}
-    ${l.edit ? `${copyRow("share-score", "Scorer link", l.score, `Scorers open this once on their phone and can then enter scores and move games between pistes. Scorer code: <b>${esc(CODES[t.id].score)}</b>`)}
-    ${copyRow("share-edit", "Organiser link", l.edit, `Gives full control, including registration, setup and draws. Keep it to your organising team, and keep a copy for yourself in case you change device. Organiser code: <b>${esc(CODES[t.id].edit)}</b>`)}` : `<p class="small muted">Loading the private codes…</p>`}
+    ${copyRow("share-watch", "Link for players and spectators", l.watch, "Anyone with this link can follow the draw and results live. They can't change anything.")}
+    ${l.edit ? `${copyRow("share-edit", "Organiser link", l.edit, `Gives full control, including registration, setup, draws and scores. Keep it to your organising team, and keep a copy for yourself in case you change device. Organiser code: <b>${esc(CODES[t.id].edit)}</b>`)}` : `<p class="small muted">Loading the private codes…</p>`}
     <label class="chk"><input type="checkbox" data-check="listed" ${t.listed ? "checked" : ""}> Show this competition on the site's front page</label>
   </div>`;
 };
@@ -1440,10 +1665,11 @@ S.extraAction = async (act, a) => {
 function openCodeBox() {
   document.getElementById("modal").innerHTML = `<div class="scrim"><div class="modal" role="dialog" aria-modal="true" aria-label="Enter a code">
     <div class="spread"><h3>Enter a code</h3><button type="button" class="btn ghost" data-act="code-close" aria-label="Close">✕</button></div>
-    <p class="muted">Organisers and scorers get a code from the person running the competition.</p>
+    <p class="muted">Organisers get a code from the person running the competition.</p>
     <input type="text" id="code-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. K7RM2QXP" style="font-size:22px;letter-spacing:.12em;text-transform:uppercase">
     <div><button class="btn primary" type="button" data-act="code-submit">Join</button></div>
   </div></div>`;
+  localize(document.getElementById("modal"));
   document.getElementById("code-input").focus();
 }
 function closeCodeBox() { document.getElementById("modal").innerHTML = ""; }

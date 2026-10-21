@@ -33,11 +33,10 @@ Run petanque competitions live: Swiss, snake, pools, knockout, round robin and m
 In Firebase, **Authentication → Settings → Authorized domains → Add domain** and add `YOUR-USERNAME.github.io`.
 
 ## Using it
-- **Organisers:** open the site and create a competition. The device you create it on is the organiser. In **Setup → Sharing** you'll find three links:
-  - *Players and spectators*: follow the draw, pistes and results live, read-only.
-  - *Scorer link*: opened once on a phone, lets that phone enter scores and move games between pistes.
-  - *Organiser link*: full control for your organising team. Keep a copy for yourself in case you change device.
-- **Codes:** each link has a code in it. Helpers can also tap **Enter a code** at the top of the page and type it in.
+- **Organisers:** open the site and create a competition. The device you create it on is the organiser. **Setup → Sharing** has two links:
+  - *Players and spectators*: shows the draw and results live, read-only.
+  - *Organiser link*: full control, including entering scores, for your organising team. Keep a copy for yourself in case you change device.
+- Helpers can also tap **Organiser code** at the top of the page and type the code in.
 - Tick *Show on the site's front page* if you want a competition to appear for everyone who opens the site.
 
 ## Own domain (optional)
