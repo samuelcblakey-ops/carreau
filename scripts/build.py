@@ -30,6 +30,14 @@ html = f"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Run petanque competitions live: draws, courts and scores for everyone.">
+<meta name="theme-color" content="#1d6a54">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Carreau">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 {reset}
 {head_part.replace('<meta name="claude:viewport-fit-sides" content="cover">', '')}
 </head>
@@ -43,6 +51,10 @@ os.makedirs(out, exist_ok=True)
 open(os.path.join(out, "index.html"), "w").write(html)
 import shutil
 for f in os.listdir(os.path.join(root, "public")):
-    shutil.copy(os.path.join(root, "public", f), out)
+    if os.path.isfile(os.path.join(root, "public", f)): shutil.copy(os.path.join(root, "public", f), out)
 open(os.path.join(out, ".nojekyll"), "w").write("")
+# stamp the service worker with this build so phones pick up new versions
+import hashlib
+sw = os.path.join(out, "sw.js"); ver = hashlib.md5(html.encode()).hexdigest()[:10]
+txt = open(sw).read(); open(sw, "w").write(txt.replace("__VERSION__", ver))
 print("built dist/index.html", len(html))

@@ -120,6 +120,9 @@ S.setupExtra = t => {
 };
 S.extraAction = async (act, a) => {
   if (act.startsWith("adm-") && await adminAction(act, a)) return;
+  if (act === "install-app") { await installApp(); return; }
+  if (act === "install-dismiss") { try { localStorage.setItem("carreau-install-dismissed", "1"); } catch {} render(); toast("You can add it later from the competition menu."); return; }
+  if (act === "install-close") { INSTALL.help = false; try { localStorage.setItem("carreau-install-dismissed", "1"); } catch {} render(); return; }
   if (act === "copy") { const el = document.getElementById(a.dataset.target); try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } }
   if (act === "enter-code") openCodeBox();
   if (act === "admin-exit") { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); S.overlayView = null; render(); return; }
@@ -330,6 +333,36 @@ async function handleHash() {
 window.addEventListener("hashchange", handleHash);
 
 S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
+
+// ---------- install to home screen ----------
+const INSTALL = { prompt: null, help: false };
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const canInstall = () => !isStandalone() && (!!INSTALL.prompt || isIOS());
+const installDismissed = () => { try { return localStorage.getItem("carreau-install-dismissed") === "1"; } catch { return false; } };
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL.prompt = e; render(); });
+window.addEventListener("appinstalled", () => { INSTALL.prompt = null; render(); toast("Carreau is on your home screen."); });
+function installHelp() {
+  return `<div class="stack" style="gap:6px"><b>Add Carreau to your home screen</b>
+    <ol class="small" style="margin:0;padding-left:20px"><li>In Safari, tap the <b>Share</b> button (the square with an arrow, at the bottom or top of the screen).</li>
+    <li>Scroll down and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. Carreau then opens full screen like an app.</li></ol>
+    <span class="small muted">Using Chrome on iPhone? Tap the Share button in the address bar, then Add to Home Screen.</span></div>`;
+}
+S.topBanner = () => {
+  if (!canInstall() || (installDismissed() && !INSTALL.help)) return "";
+  if (INSTALL.help) return `<div class="notice stack install-banner" style="margin-bottom:16px;gap:10px">${installHelp()}<div><button class="btn sm" data-act="install-close">Done</button></div></div>`;
+  if (!matchMedia("(max-width: 900px), (pointer: coarse)").matches) return "";
+  return `<div class="notice spread install-banner" style="margin-bottom:16px"><span><b>Get the app.</b> Add Carreau to your home screen for one-tap access, full screen.</span>
+    <span class="row"><button class="btn primary sm" data-act="install-app">Add to home screen</button><button class="btn sm ghost" data-act="install-dismiss">Not now</button></span></div>`;
+};
+S.pickerFooter = () => canInstall() ? `<button type="button" class="pick-row" data-act="install-app"><span class="pr-main"><b>Add Carreau to your home screen</b><span class="small muted">Opens full screen, one tap away</span></span></button>` : "";
+async function installApp() {
+  if (INSTALL.prompt) { const p = INSTALL.prompt; INSTALL.prompt = null; try { await p.prompt(); const c = await p.userChoice; if (c?.outcome !== "accepted") INSTALL.prompt = null; } catch (e) { console.error(e); } render(); return; }
+  INSTALL.help = true; S.picker = false; render(); scrollTo({ top: 0, behavior: "smooth" });
+}
+if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__CARREAU_TEST_SW)) {
+  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.warn("Service worker not registered", e)));
+}
 
 function boot() {
   const h = readHash(); if (h.tid && h.tid !== "admin") S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView;
