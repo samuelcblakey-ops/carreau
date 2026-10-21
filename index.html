@@ -382,7 +382,7 @@ const FR_TEXT = {
   "Organiser": "Organisateur", "Scorer": "Marqueur", "Enter a code": "Saisir un code", "Sharing": "Partage",
   "Following a competition? Open the link the organiser sent you.": "Vous suivez un concours ? Ouvrez le lien envoyé par l'organisateur.",
   "Link for players and spectators": "Lien pour les joueurs et les spectateurs",
-  "Anyone with this link can follow the draw and results live. They can't change anything.": "Toute personne ayant ce lien peut suivre le tirage et les résultats en direct, sans rien pouvoir modifier.", "Organiser code": "Code organisateur", "Organisers get a code from the person running the competition.": "Les organisateurs reçoivent un code de la personne qui gère le concours.",
+  "Anyone with this link can follow the draw, results, standings and big screen live. They can't change anything.": "Toute personne ayant ce lien peut suivre le tirage, les résultats, le classement et le grand écran en direct, sans rien pouvoir modifier.", "Organiser code": "Code organisateur", "Organisers get a code from the person running the competition.": "Les organisateurs reçoivent un code de la personne qui gère le concours.",
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
@@ -1073,8 +1073,9 @@ function renderHeader() {
     ${S.canCreate() ? `<button class="btn sm" data-act="new-t">+ New competition</button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
   const t = T();
-  if (t && !canScore() && S.tab !== "draw") S.tab = "draw"; // players and spectators see the draw and results only
-  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || (canScore() ? k !== "setup" : k === "draw")).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}">${l}</button>`).join("") : "";
+  const SPECTATOR_TABS = ["draw", "standings", "display"]; // players and spectators: draw & results, standings, big screen
+  if (t && !canScore() && !SPECTATOR_TABS.includes(S.tab)) S.tab = "draw";
+  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}">${l}</button>`).join("") : "";
 }
 function renderWelcome() {
   return `<div class="panel stack" style="max-width:640px">
@@ -1656,7 +1657,7 @@ S.setupExtra = t => {
   const l = links(t);
   return `<div class="panel stack">
     <h3>Sharing</h3>
-    ${copyRow("share-watch", "Link for players and spectators", l.watch, "Anyone with this link can follow the draw and results live. They can't change anything.")}
+    ${copyRow("share-watch", "Link for players and spectators", l.watch, "Anyone with this link can follow the draw, results, standings and big screen live. They can't change anything.")}
     ${l.edit ? `${copyRow("share-edit", "Organiser link", l.edit, `Gives full control, including registration, setup, draws and scores. Keep it to your organising team, and keep a copy for yourself in case you change device. Organiser code: <b>${esc(CODES[t.id].edit)}</b>`)}` : `<p class="small muted">Loading the private codes…</p>`}
     <label class="chk"><input type="checkbox" data-check="listed" ${t.listed ? "checked" : ""}> Show this competition on the site's front page</label>
   </div>`;
