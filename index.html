@@ -206,7 +206,7 @@ input[type=search]{background:var(--surface-2);border:1px solid var(--line);bord
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, connectFirestoreEmulator, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, connectAuthEmulator, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, connectAuthEmulator, onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithCredential, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { firebaseConfig } from "./firebase-config.js";
 (() => {
 "use strict";
@@ -386,7 +386,8 @@ const FR_TEXT = {
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
-  "Copied.": "Copié.", "That code didn't work. Check it with the organiser.": "Ce code ne fonctionne pas. Vérifiez-le auprès de l'organisateur.",
+  "Copied.": "Copié.", "Admin": "Admin", "Admin sign in": "Connexion admin", "Sign out": "Se déconnecter", "Signed out.": "Déconnecté.", "Signed in as admin.": "Connecté en tant qu'admin.", "Admin: {x}": "Admin : {1}",
+  "That Google account isn't an admin for this site.": "Ce compte Google n'est pas administrateur de ce site.", "Sign-in didn't complete. Allow pop-ups for this site and try again.": "La connexion n'a pas abouti. Autorisez les fenêtres pop-up pour ce site et réessayez.", "That code didn't work. Check it with the organiser.": "Ce code ne fonctionne pas. Vérifiez-le auprès de l'organisateur.",
   "You're now an organiser for this competition.": "Vous êtes maintenant organisateur de ce concours.", "You can now enter scores for this competition.": "Vous pouvez maintenant saisir les scores de ce concours.",
   "Couldn't connect. Check your internet connection and reload.": "Connexion impossible. Vérifiez votre connexion internet et rechargez la page.",
   "Firebase isn't set up yet, so this is saving on this device only.": "Firebase n'est pas encore configuré : les données sont enregistrées sur cet appareil uniquement."
@@ -1569,6 +1570,8 @@ function startWatching() {
 // The device that creates a competition owns it. Owners hand out two private codes:
 //   organiser code -> full control, scorer code -> scores and pistes only.
 // Helpers open a link containing the code (or type it in) and their device is remembered as a member.
+const ADMIN_EMAILS = ["samuelcblakey@gmail.com"]; // site admins (enforced in firestore.rules too)
+const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.includes((AUTH.user.email || "").toLowerCase()));
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
 const ROLE = {};   // tid -> "edit" | "score" (membership of this device)
@@ -1597,6 +1600,7 @@ function fbStore() {
       const tc = collection(db, "tournaments");
       subQ("listed", query(tc, where("listed", "==", true), limit(100)));
       if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), limit(200)));
+      if (isAdmin()) subQ("all", query(tc, limit(300)));
       new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
@@ -1625,11 +1629,11 @@ function fbStore() {
 const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);
 S.permFn = t => {
   if (!AUTH.user || !t) return { edit: false, score: false };
-  const r = isOwner(t) ? "edit" : ROLE[t.id];
+  const r = isOwner(t) || isAdmin() ? "edit" : ROLE[t.id];
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
-S.canDelete = t => isOwner(t);
+S.canDelete = t => isOwner(t) || isAdmin();
 S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.listed = false; nt._new = true; remember(nt.id); };
 
 const base = () => `${location.origin}${location.pathname}`;
@@ -1637,6 +1641,7 @@ const links = t => ({ watch: `${base()}#${t.id}`, edit: CODES[t.id] ? `${base()}
 S.headerExtra = () => {
   const t = T(); if (!CONFIGURED || !t) return "";
   const p = S.permFn(t);
+  if (isAdmin()) return `<span class="pill done">Admin</span>`;
   if (isOwner(t)) return `<span class="pill done">Organiser</span>`;
   if (p.edit) return `<span class="pill done">Organiser</span>`;
   if (p.score) return `<span class="pill done">Scorer</span>`;
@@ -1659,6 +1664,9 @@ S.setupExtra = t => {
 S.extraAction = async (act, a) => {
   if (act === "copy") { const el = document.getElementById(a.dataset.target); try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } }
   if (act === "enter-code") openCodeBox();
+  if (act === "admin-in") { try { await signInWithPopup(FB.auth, new GoogleAuthProvider()); } catch (e) { if (e?.code !== "auth/popup-closed-by-user" && e?.code !== "auth/cancelled-popup-request") toast("Sign-in didn't complete. Allow pop-ups for this site and try again."); return; }
+    if (!isAdmin()) { toast("That Google account isn't an admin for this site."); await signOut(FB.auth); } else toast("Signed in as admin."); }
+  if (act === "admin-out") { await signOut(FB.auth); toast("Signed out."); }
   if (act === "code-close") closeCodeBox();
   if (act === "code-submit") { const v = document.getElementById("code-input").value; if (await joinWithCode(S.tid, v)) closeCodeBox(); }
 };
@@ -1702,10 +1710,18 @@ function watchRole() {
 function watchCodes(tid) {
   if (unsubCodes || tid !== S.tid) return;
   const t = S.tournaments[tid];
-  if (!(isOwner(t) || ROLE[tid] === "edit")) return;
+  if (!(isOwner(t) || isAdmin() || ROLE[tid] === "edit")) return;
   unsubCodes = onSnapshot(doc(FB.db, "tournaments", tid, "private", "codes"), d => { if (d.exists()) { CODES[tid] = d.data(); render(); } }, () => {});
 }
-function restart() { if (!FB) return; startWatching(); watchRole(); }
+function restart() { if (!FB) return; startWatching(); watchRole(); renderFooter(); }
+function renderFooter() {
+  let f = document.getElementById("site-foot");
+  if (!f) { document.body.insertAdjacentHTML("beforeend", `<footer id="site-foot" class="wrap" style="padding-block:8px 28px;display:flex;justify-content:flex-end;gap:8px;align-items:center" class="small"></footer>`); f = document.getElementById("site-foot"); }
+  f.innerHTML = isAdmin()
+    ? `<span class="small muted">Admin: ${esc(AUTH.user.email)}</span><button class="btn sm ghost" data-act="admin-out">Sign out</button>`
+    : `<button class="btn sm ghost" data-act="admin-in">Admin sign in</button>`;
+  localize(f);
+}
 S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
 S.onTournaments = () => { if (S.tid) watchCodes(S.tid); };
 
@@ -1727,6 +1743,7 @@ function boot() {
   FB = { db: getFirestore(app), auth: getAuth(app) };
   if (window.__CARREAU_EMULATOR) { // local testing only
     connectFirestoreEmulator(FB.db, "127.0.0.1", 8080); connectAuthEmulator(FB.auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    window.__testGoogle = (email) => signInWithCredential(FB.auth, GoogleAuthProvider.credential(JSON.stringify({ sub: email, email, email_verified: true })));
   }
   S.store = fbStore();
   onAuthStateChanged(FB.auth, async u => {

@@ -4,6 +4,7 @@ rules_version = '2';
 //  - Every device signs in anonymously; the device that creates a competition owns it.
 //  - The owner keeps two private codes. A device that presents the organiser code becomes an
 //    organiser (full control); one that presents the scorer code can enter scores and move games.
+//  - Site admins (Google sign-in, listed below) can change or delete any competition.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
@@ -11,7 +12,9 @@ service cloud.firestore {
     function mdoc(tid) { return /databases/$(database)/documents/tournaments/$(tid)/members/$(request.auth.uid); }
     function owns(tid) { return signedIn() && get(tdoc(tid)).data.ownerUid == request.auth.uid; }
     function role(tid) { return signedIn() && exists(mdoc(tid)) ? get(mdoc(tid)).data.role : ''; }
-    function canEdit(tid) { return owns(tid) || role(tid) == 'edit'; }
+    function isAdmin() { return signedIn() && request.auth.token.email_verified == true
+                           && request.auth.token.email in ['samuelcblakey@gmail.com']; }
+    function canEdit(tid) { return isAdmin() || owns(tid) || role(tid) == 'edit'; }
     function canScore(tid) { return canEdit(tid) || role(tid) == 'score'; }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
 
@@ -19,11 +22,11 @@ service cloud.firestore {
       allow read: if true;
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
       allow update: if canEdit(tid) && request.resource.data.ownerUid == resource.data.ownerUid;
-      allow delete: if owns(tid);
+      allow delete: if owns(tid) || isAdmin();
 
       match /private/{docId} {
         allow read: if docId == 'codes' && canEdit(tid);
-        allow write: if docId == 'codes' && owns(tid);
+        allow write: if docId == 'codes' && (owns(tid) || isAdmin());
       }
 
       match /members/{uid} {
@@ -32,7 +35,7 @@ service cloud.firestore {
           && request.resource.data.keys().hasOnly(['role', 'code', 'joinedAt'])
           && ((request.resource.data.role == 'edit' && request.resource.data.code == codes(tid).edit)
            || (request.resource.data.role == 'score' && request.resource.data.code == codes(tid).score));
-        allow delete: if signedIn() && (request.auth.uid == uid || owns(tid));
+        allow delete: if signedIn() && (request.auth.uid == uid || owns(tid) || isAdmin());
       }
 
       match /matches/{mid} {
