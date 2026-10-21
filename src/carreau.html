@@ -144,6 +144,7 @@ button.bkm:hover{border-color:var(--muted)}
 .pools{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px}
 /* entries */
 .elist{display:flex;flex-direction:column}
+[hidden]{display:none!important}
 .erow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .erow .num{font-family:var(--display);font-weight:700;color:var(--muted);width:2.5ch;text-align:right;font-variant-numeric:tabular-nums}
 .erow .who{flex:1;min-width:0}
@@ -1307,7 +1308,7 @@ function render() {
   fitBrackets(); restore();
 }
 function renderHeader() {
-  const list = Object.values(S.tournaments).sort((a, b) => (b.created || 0) - (a.created || 0));
+  const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   $("#tsel").innerHTML = `${list.length ? `<select id="tpick" aria-label="Competition">${list.map(t => `<option value="${t.id}" ${t.id === S.tid ? "selected" : ""}>${esc(t.name)}${t.archived ? " (archived)" : ""}</option>`).join("")}</select>` : ""}
     <div class="seg" role="group" aria-label="Language" data-notr><button type="button" data-lang="en" aria-pressed="${I18N.lang === "en"}">EN</button><button type="button" data-lang="fr" aria-pressed="${I18N.lang === "fr"}">FR</button></div>
     ${S.canCreate() ? `<button class="btn sm" data-act="new-t">+ New competition</button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
@@ -1771,6 +1772,7 @@ document.addEventListener("click", async e => {
 });
 document.addEventListener("change", async e => {
   const el = e.target;
+  if (S.overlayView && S.overlayChange && await S.overlayChange(el)) return;
   if (el.id === "tpick") { S.tid = el.value; lsSet("carreau-tid", S.tid); S.matches = {}; S.onSelect?.(); watchMatches(); render(); return; }
   if (!canEdit() || !T()) return;
   if (el.closest("#modal")) return;
@@ -1797,6 +1799,7 @@ document.addEventListener("change", async e => {
   if (el.dataset.courtOn !== undefined || el.dataset.courts !== undefined) await guard(assignCourts);
 });
 document.addEventListener("input", e => {
+  if (S.overlayView && S.overlayInput && S.overlayInput(e.target)) return;
   if (e.target.id !== "reg-search") return;
   S.regFilter = e.target.value; const q = S.regFilter.toLowerCase();
   document.querySelectorAll("[data-row]").forEach(r => r.hidden = !!q && !r.dataset.text.includes(q));

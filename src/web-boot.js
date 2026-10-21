@@ -43,7 +43,7 @@ function fbStore() {
     },
     watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data())), onErr); },
     async setTournament(t) {
-      const isNew = !!t._new; const body = clone(t); delete body._new;
+      const isNew = !!t._new; const body = clone(t); delete body._new; body.updated = Date.now();
       await setDoc(doc(db, "tournaments", t.id), body);
       if (isNew) { // first save of a new competition: create its private codes
         delete t._new; if (S.tournaments[t.id]) delete S.tournaments[t.id]._new;
@@ -73,7 +73,16 @@ S.permFn = t => {
 S.canCreate = () => !!AUTH.user;
 S.canDelete = t => isOwner(t) || isAdmin();
 S.canSeeArchived = () => isAdmin();
-S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.listed = false; nt._new = true; remember(nt.id); };
+S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.device = deviceLabel(); nt.listed = false; nt._new = true; remember(nt.id); };
+// a rough "what kind of device" label so the admin can tell creators apart (no personal data)
+function deviceLabel() {
+  const u = navigator.userAgent || "";
+  const dev = /iPad/.test(u) ? "iPad" : /iPhone/.test(u) ? "iPhone" : /Android/.test(u) ? (/Mobile/.test(u) ? "Android phone" : "Android tablet") : /Macintosh/.test(u) ? (navigator.maxTouchPoints > 1 ? "iPad" : "Mac") : /Windows/.test(u) ? "Windows PC" : /CrOS/.test(u) ? "Chromebook" : /Linux/.test(u) ? "Linux PC" : "Device";
+  const br = /Edg\//.test(u) ? "Edge" : /OPR\//.test(u) ? "Opera" : /Firefox\//.test(u) ? "Firefox" : /CriOS|Chrome\//.test(u) ? "Chrome" : /Safari\//.test(u) ? "Safari" : "";
+  return br ? `${dev} · ${br}` : dev;
+}
+// the admin's own competition menu only shows their competitions and the examples; everything else lives in #admin
+S.menuFilter = t => !isAdmin() || t.listed || isOwner(t);
 
 const base = () => `${location.origin}${location.pathname}`;
 const links = t => ({ watch: `${base()}#${t.id}`, edit: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].edit}` : "", score: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].score}` : "" });
@@ -108,6 +117,7 @@ S.setupExtra = t => {
   </div>`;
 };
 S.extraAction = async (act, a) => {
+  if (act.startsWith("adm-") && await adminAction(act, a)) return;
   if (act === "copy") { const el = document.getElementById(a.dataset.target); try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } }
   if (act === "enter-code") openCodeBox();
   if (act === "admin-exit") { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); S.overlayView = null; render(); return; }
@@ -175,9 +185,42 @@ function watchCodes(tid) {
 }
 function restart() { if (!FB) return; startWatching(); watchRole(); renderFooter(); }
 function renderFooter() { /* admin lives at #admin (the back end); nothing shown to guests */ }
+const ADM = { filter: "all", q: "", creator: null, sel: new Set(), confirm: null, busy: "", names: {}, naming: null };
+let unsubNames = null;
+function watchNames() {
+  if (unsubNames || !isAdmin()) return;
+  unsubNames = onSnapshot(doc(FB.db, "config", "creators"), d => { ADM.names = d.exists() ? d.data() : {}; if (S.overlayView) render(); }, () => {});
+}
+const entriesOf = t => (t.entry === "melee" || t.entry === "shooting" ? (t.players || []) : (t.teams || [])).length;
+function statusOf(t) {
+  if (t.archived) return "Archived";
+  if ((t.brackets || []).length) return "Knockout";
+  if ((t.pools || []).length) return "Pools";
+  if ((t.draws || []).length) return `Round ${(t.draws || []).length}`;
+  return entriesOf(t) ? "Registration" : "Empty";
+}
+const when = ms => { if (!ms) return "–"; const d = new Date(ms); return d.toLocaleDateString(undefined, { day: "numeric", month: "short" }) + " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }); };
+function creators(all) {
+  const by = {};
+  all.forEach(t => { const k = t.ownerUid || "unknown"; (by[k] = by[k] || { uid: k, list: [], first: Infinity, last: 0, device: "" }).list.push(t);
+    const c = by[k]; c.first = Math.min(c.first, t.created || 0); c.last = Math.max(c.last, t.created || 0); if (t.device) c.device = t.device; });
+  const list = Object.values(by).sort((x, y) => x.first - y.first);
+  let n = 0; list.forEach(c => { c.label = ADM.names[c.uid] || (c.uid === AUTH.user?.uid ? "You (admin)" : c.uid === "unknown" ? "Unknown" : `Visitor ${++n}`); });
+  return list;
+}
 function adminView() {
-  const all = Object.values(S.tournaments).sort((x, y) => (!!y.listed - !!x.listed) || (y.created || 0) - (x.created || 0));
-  return `<div class="stack" style="max-width:720px">
+  if (isAdmin()) watchNames();
+  const all = Object.values(S.tournaments);
+  const cs = creators(all); const cOf = Object.fromEntries(cs.map(c => [c.uid, c]));
+  const counts = { all: all.length, examples: all.filter(t => t.listed).length, visitors: all.filter(t => !t.listed).length, empty: all.filter(t => !t.listed && !entriesOf(t)).length, archived: all.filter(t => t.archived).length };
+  const q = ADM.q.trim().toLowerCase();
+  const shown = all.filter(t => (ADM.filter === "all" || (ADM.filter === "examples" && t.listed) || (ADM.filter === "visitors" && !t.listed) || (ADM.filter === "empty" && !t.listed && !entriesOf(t)) || (ADM.filter === "archived" && t.archived))
+    && (!ADM.creator || (t.ownerUid || "unknown") === ADM.creator) && (!q || (t.name || "").toLowerCase().includes(q)))
+    .sort((x, y) => (!!y.listed - !!x.listed) || (y.created || 0) - (x.created || 0));
+  [...ADM.sel].forEach(id => { if (!S.tournaments[id]) ADM.sel.delete(id); });
+  const nSel = ADM.sel.size; const allShownSel = shown.length && shown.every(t => ADM.sel.has(t.id));
+  const chip = (k, label) => `<button type="button" class="btn sm ${ADM.filter === k ? "primary" : ""}" data-act="adm-filter" data-k="${k}">${label} <span class="small">${counts[k]}</span></button>`;
+  return `<div class="stack" style="max-width:900px">
     <div class="spread"><h2>Admin back end</h2><button class="btn sm" data-act="admin-exit">Back to competitions</button></div>
     ${!isAdmin() ? `<div class="panel stack"><p>Sign in with the admin Google account to change site settings.</p><div><button class="btn primary" data-act="admin-in">Sign in with Google</button></div></div>` : `
     <div class="panel spread"><span class="muted">Signed in as ${esc(AUTH.user.email)}</span><button class="btn sm ghost" data-act="admin-out">Sign out</button></div>
@@ -186,15 +229,75 @@ function adminView() {
       <p class="muted">${SITE.openTesting ? "Everyone can run every competition (beta testing). Spectator and organiser links are switched off." : "Off: spectators see the draw, results, standings and big screen; organisers use their organiser link or code."}</p>
       <div><button class="btn ${SITE.openTesting ? "" : "primary"}" data-act="open-testing" data-on="${SITE.openTesting ? "0" : "1"}">${SITE.openTesting ? "Turn open testing off" : "Turn open testing on"}</button></div>
     </div>
-    <div class="panel stack" style="gap:6px"><h3>Competitions <span class="muted small">${all.length}</span></h3>
-      <p class="small muted">Visitors only see the competitions they created on their own device, plus the examples. Examples are view-only for visitors.</p>
-      ${all.map(t => `<div class="erow"><div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(t.date || "")}</span></div>${t.archived ? `<span class="pill">Archived</span><button class="btn sm" data-act="admin-restore" data-id="${t.id}">Restore</button>` : ""}
+    <div class="panel stack" style="gap:6px" id="adm-creators">
+      <h3>Who's creating <span class="muted small">${cs.length}</span></h3>
+      <p class="small muted">Visitors don't sign in, so each device is one creator. Give them a nickname once you know who they are. Nicknames are only visible to you.</p>
+      ${cs.map(c => `<div class="erow"><div class="who"><b>${esc(c.label)}</b><span class="small muted">${esc(c.device || "Device not recorded")} · ${c.list.length} competition${c.list.length === 1 ? "" : "s"} · last ${when(c.last)}</span></div>
+        ${ADM.naming === c.uid ? `<input id="adm-name" data-uid="${esc(c.uid)}" value="${esc(ADM.names[c.uid] || "")}" placeholder="Nickname" style="max-width:180px"><button class="btn sm primary" data-act="adm-name-save" data-uid="${esc(c.uid)}">Save</button>`
+          : c.uid !== "unknown" ? `<button class="btn sm ghost" data-act="adm-name" data-uid="${esc(c.uid)}">${ADM.names[c.uid] ? "Rename" : "Nickname"}</button>` : ""}
+        <button class="btn sm ${ADM.creator === c.uid ? "primary" : ""}" data-act="adm-creator" data-uid="${esc(c.uid)}">${ADM.creator === c.uid ? "Showing ✓" : "Show theirs"}</button></div>`).join("")}
+    </div>
+    <div class="panel stack" style="gap:8px" id="adm-comps">
+      <h3>Competitions</h3>
+      <p class="small muted">Visitors only see the competitions they created on their own device, plus the examples (view-only). Your own competition menu shows just yours and the examples; everything else is managed here.</p>
+      <div class="row" style="flex-wrap:wrap;gap:6px">${chip("all", "All")}${chip("visitors", "Visitors'")}${chip("empty", "Empty")}${chip("examples", "Examples")}${chip("archived", "Archived")}</div>
+      <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center">
+        <input id="adm-q" type="search" placeholder="Search by name" value="${esc(ADM.q)}" style="max-width:220px">
+        ${ADM.creator ? `<span class="pill">Creator: ${esc(cOf[ADM.creator]?.label || "?")} <button class="btn sm ghost" data-act="adm-creator" data-uid="${esc(ADM.creator)}" aria-label="Clear creator filter">✕</button></span>` : ""}
+        <span class="muted small" id="adm-count">${shown.length} shown</span>
+      </div>
+      <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center">
+        <label class="chk"><input type="checkbox" data-act="adm-sel-all" ${allShownSel ? "checked" : ""}> Select all shown</label>
+        ${nSel ? `<span class="small"><b>${nSel}</b> selected</span>
+          ${ADM.confirm === "bulk-del" ? `<span class="err">Delete ${nSel} competition${nSel === 1 ? "" : "s"} and all their results for good?</span><button class="btn sm danger" data-act="adm-bulk-del-yes">Yes, delete</button><button class="btn sm" data-act="adm-bulk-cancel">Cancel</button>`
+            : `<button class="btn sm danger" data-act="adm-bulk-del">Delete selected</button><button class="btn sm" data-act="adm-bulk-arch">Archive selected</button><button class="btn sm ghost" data-act="adm-sel-none">Clear</button>`}` : ""}
+        ${ADM.busy ? `<span class="small muted">${esc(ADM.busy)}</span>` : ""}
+      </div>
+      <div>${shown.map(t => { const c = cOf[t.ownerUid || "unknown"]; return `<div class="erow" data-name="${esc((t.name || "").toLowerCase())}">
+        <input type="checkbox" data-act="adm-sel" data-id="${t.id}" ${ADM.sel.has(t.id) ? "checked" : ""} aria-label="Select ${esc(t.name)}">
+        <div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(c?.label || "Unknown")} · created ${when(t.created)}${t.updated ? ` · changed ${when(t.updated)}` : ""} · ${entriesOf(t)} ${t.entry === "melee" || t.entry === "shooting" ? "players" : "teams"}</span></div>
+        <span class="pill ${statusOf(t) === "Empty" ? "" : "playing"}">${statusOf(t)}</span>
+        ${t.listed ? `<span class="pill">Example</span>` : ""}
+        ${t.archived ? `<button class="btn sm" data-act="admin-restore" data-id="${t.id}">Restore</button>` : ""}
         <button class="btn sm ${t.listed ? "primary" : ""}" data-act="admin-example" data-id="${t.id}" title="Examples are shown to every visitor, view only">${t.listed ? "Example ✓" : "Make example"}</button>
         <a class="btn sm" href="#${t.id}" data-act="admin-exit">Open</a>
-        ${S.adminConfirm === t.id ? `<button class="btn sm danger" data-act="admin-del-yes" data-id="${t.id}">Confirm delete</button>` : `<button class="btn sm danger" data-act="admin-del" data-id="${t.id}">Delete</button>`}</div>`).join("")}
+        ${S.adminConfirm === t.id ? `<button class="btn sm danger" data-act="admin-del-yes" data-id="${t.id}">Confirm delete</button>` : `<button class="btn sm danger" data-act="admin-del" data-id="${t.id}">Delete</button>`}</div>`; }).join("") || `<p class="muted">Nothing matches.</p>`}</div>
     </div>`}
   </div>`;
 }
+async function adminAction(act, a) {
+  if (act === "adm-filter") { ADM.filter = a.dataset.k; ADM.sel.clear(); ADM.confirm = null; render(); return true; }
+  if (act === "adm-creator") { ADM.creator = ADM.creator === a.dataset.uid ? null : a.dataset.uid; ADM.sel.clear(); ADM.confirm = null; render(); return true; }
+  if (act === "adm-sel") { a.checked ? ADM.sel.add(a.dataset.id) : ADM.sel.delete(a.dataset.id); ADM.confirm = null; render(); return true; }
+  if (act === "adm-sel-all") { const ids = [...document.querySelectorAll('#adm-comps .erow:not([hidden]) [data-act="adm-sel"]')].map(x => x.dataset.id); a.checked ? ids.forEach(i => ADM.sel.add(i)) : ids.forEach(i => ADM.sel.delete(i)); ADM.confirm = null; render(); return true; }
+  if (act === "adm-sel-none") { ADM.sel.clear(); ADM.confirm = null; render(); return true; }
+  if (act === "adm-bulk-del") { ADM.confirm = "bulk-del"; render(); return true; }
+  if (act === "adm-bulk-cancel") { ADM.confirm = null; render(); return true; }
+  if (act === "adm-bulk-del-yes" || act === "adm-bulk-arch") {
+    const ids = [...ADM.sel]; ADM.confirm = null; let ok = 0, failed = 0; const del = act === "adm-bulk-del-yes";
+    for (const id of ids) {
+      ADM.busy = `${del ? "Deleting" : "Archiving"} ${ok + failed + 1} of ${ids.length}…`; render();
+      try { if (del) { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; } else await updateDoc(doc(FB.db, "tournaments", id), { archived: true }); ok++; ADM.sel.delete(id); }
+      catch (e) { console.error(e); failed++; }
+    }
+    ADM.busy = ""; render(); toast(failed ? `${ok} done, ${failed} didn't save. Check your connection and try again.` : `${ok} competition${ok === 1 ? "" : "s"} ${del ? "deleted" : "archived"}.`); return true;
+  }
+  if (act === "adm-name") { ADM.naming = a.dataset.uid; render(); setTimeout(() => document.getElementById("adm-name")?.focus(), 0); return true; }
+  if (act === "adm-name-save") {
+    const uid = a.dataset.uid, v = (document.getElementById("adm-name")?.value || "").trim().slice(0, 40); ADM.naming = null;
+    try { await setDoc(doc(FB.db, "config", "creators"), { [uid]: v || deleteField() }, { merge: true }); ADM.names = { ...ADM.names }; if (v) ADM.names[uid] = v; else delete ADM.names[uid]; } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); }
+    render(); return true;
+  }
+  return false;
+}
+S.overlayInput = el => {
+  if (el.id !== "adm-q") return false;
+  ADM.q = el.value; const q = ADM.q.trim().toLowerCase(); let n = 0;
+  document.querySelectorAll("#adm-comps [data-name]").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
+  const c = document.getElementById("adm-count"); if (c) c.textContent = `${n} shown`;
+  return true;
+};
+S.overlayChange = async el => el.id === "adm-name" || el.id === "adm-q";
 let unsubSite = null;
 async function backfillArchived() {
   if (!isAdmin() || S.backfilled) return; S.backfilled = true;
