@@ -1,0 +1,21 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch(); const p = await b.newPage({viewport:{width:420,height:860}});
+  const errs=[]; p.on('pageerror', e=>errs.push(e.message));
+  await p.goto(process.env.APP_URL); await p.evaluate(()=>localStorage.clear()); await p.reload(); await p.waitForTimeout(300);
+  const out = await p.evaluate(async () => { const C=window.__carreau,S=C.S,w=ms=>new Promise(r=>setTimeout(r,ms));
+    document.querySelector('[data-act="new-t"]').click(); await w(60); const t=JSON.parse(JSON.stringify(C.T())); t.checkin=false;
+    for(let i=0;i<4;i++) t.teams.push({id:'e'+i,name:'Team '+i,players:['a'],active:true}); await S.store.setTournament(t); S.tournaments[t.id]=t; await w(30);
+    document.querySelector('[data-tab="draw"]').click(); await w(40); document.querySelector('[data-act="first-draw"]').click(); await w(150);
+    const m=C.MS().find(m=>m.a&&m.b); document.querySelector(`[data-match="${m.id}"]`).click(); await w(50);
+    const r=['pad buttons '+document.querySelectorAll('.pad button').length];
+    document.querySelector('[data-act="pick"][data-k="sa"][data-n="13"]').click(); await w(40);
+    r.push('after sa pick, pad on sb: '+!!document.querySelector('[data-act="pick"][data-k="sb"]'));
+    document.querySelector('[data-act="pick"][data-k="sb"][data-n="8"]').click(); await w(40);
+    r.push('pad closed '+!document.querySelector('.pad')+' values '+document.querySelector('#sc-sa').value+'-'+document.querySelector('#sc-sb').value);
+    document.querySelector('#sc-sb').click(); await w(40); r.push('reopen sb pad '+!!document.querySelector('.pad'));
+    window.__mid=m.id; return r; });
+  console.log(out.join('\n')); await p.screenshot({path:process.env.OUT+'/pad.png'});
+  await p.evaluate(()=>document.querySelector('[data-act="save-final"]').click()); await p.waitForTimeout(200);
+  console.log('saved', await p.evaluate(()=>{const m=window.__carreau.S.matches[window.__mid]; return m.done+' '+m.sa+'-'+m.sb;}), 'errs', errs);
+  await b.close(); })();

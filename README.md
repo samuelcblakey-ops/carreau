@@ -1,46 +1,38 @@
 # Carreau Competition Desk
 
-Run petanque competitions live: Swiss, snake, pools, knockout, round robin and mêlée, with piste allocation and score entry. Nobody needs an account during the beta: spectators follow along on their phones, and organisers and scorers join with private codes.
+Petanque competition tool: Swiss, snake, pools, knockout, round robin, mêlée and precision shooting, with piste allocation, live scores and standings. Live at <https://samuelcblakey-ops.github.io/carreau/>.
 
-## Files
+## Layout
 
-| File | What it is |
+| Path | What it is |
 |---|---|
-| `index.html` | The whole app |
-| `firebase-config.js` | Your Firebase project's settings (you paste these in) |
-| `firestore.rules` | Who can read and change what (you paste these into Firebase) |
-| `.nojekyll` | Tells GitHub Pages to serve the files as they are |
+| `src/carreau.html` | The app. Also runs on its own as the Claude artifact version. |
+| `src/web-boot.js` | Website-only layer: Firebase storage, anonymous sign-in, admin back end (`#admin`). |
+| `public/` | Static files copied into the site as-is (`firebase-config.js`, safe to publish). |
+| `firestore.rules` | Who can read and change what. Deployed automatically. |
+| `scripts/build.py` | Builds `dist/` (the website) from `src/` + `public/`. |
+| `tests/` | Browser tests. `app-*` need nothing; `web-*` run against the Firebase emulators. |
+| `tools/seedtests.js` | Builds the 48-team example competitions (paste into the browser console on the site). |
 
-## One-time setup (about 15 minutes)
+## How changes ship
 
-### 1. Create the Firebase project
-1. Go to <https://console.firebase.google.com> and click **Create a project**. Name it something like `carreau-petanque`. Google Analytics isn't needed.
-2. In the left menu open **Build → Firestore Database → Create database**. Pick a location near you (e.g. `europe-west2` for London), start in **production mode**.
-3. Open the **Rules** tab of Firestore, replace everything with the contents of `firestore.rules`, and click **Publish**.
-4. Open **Build → Authentication → Get started**, choose **Anonymous** as a sign-in provider, switch it on and **Save**. (Google is also switched on, ready for organiser logins after the beta.)
+1. **Make one small, self-contained change per branch.** For example "score keypad" or "archive button", not both. Small changes are easy to review and test, and easy to undo.
+2. Commit on a branch, push, and open a pull request (GitHub Desktop: *Branch → New branch*, then *Create Pull Request*).
+3. **CI runs automatically** on the pull request: it builds the site and runs every test. A red ✗ means don't merge.
+4. **Merge to `main` = release.** Once the tests pass on `main`, GitHub Actions deploys the website to GitHub Pages and the security rules to Firebase. Nothing is uploaded by hand.
+5. To roll back, revert the commit (GitHub Desktop: *History → right-click → Revert*). That ships the previous version through the same pipeline.
 
-### 2. Connect the app to it
-1. Click the gear icon → **Project settings**. Under **Your apps**, click the **</>** (web) icon, give it a nickname, and register it (no hosting needed).
-2. Copy the values from the `firebaseConfig` block it shows into `firebase-config.js`, replacing the `PASTE_…` placeholders.
+## Run it locally
 
-### 3. Put it on GitHub Pages
-1. Create a new public repository on GitHub, e.g. `carreau`.
-2. Upload all four files to it (**Add file → Upload files**, including `.nojekyll`).
-3. In the repo go to **Settings → Pages**, set **Source** to *Deploy from a branch*, branch `main`, folder `/ (root)`, and **Save**.
-4. After a minute the site is live at `https://YOUR-USERNAME.github.io/carreau/`.
+```bash
+npm ci
+npx playwright install chromium
+npm test            # build + app tests + web tests (needs Java for the emulators)
+npm run test:app    # quick: app tests only, no Java needed
+```
 
-### 4. Allow sign-in from your site
-In Firebase, **Authentication → Settings → Authorized domains → Add domain** and add `YOUR-USERNAME.github.io`.
+## One-time settings (already done unless noted)
 
-## Using it
-- **Organisers:** open the site and create a competition. The device you create it on is the organiser. **Setup → Sharing** has two links:
-  - *Players and spectators*: shows the draw and results live, read-only.
-  - *Organiser link*: full control, including entering scores, for your organising team. Keep a copy for yourself in case you change device.
-- Helpers can also tap **Organiser code** at the top of the page and type the code in.
-- Tick *Show on the site's front page* if you want a competition to appear for everyone who opens the site.
-
-## Own domain (optional)
-Buy a domain, add it under **Settings → Pages → Custom domain** in GitHub, follow GitHub's DNS instructions, then add the domain to Firebase's **Authorized domains** too.
-
-## Costs
-Firebase's free Spark plan allows 50,000 reads and 20,000 writes a day, which comfortably covers a busy club competition day. Nothing is charged unless you upgrade the plan yourself.
+- **Settings → Pages → Source: GitHub Actions**, so Pages serves what the pipeline builds.
+- **Settings → Secrets and variables → Actions → `FIREBASE_SERVICE_ACCOUNT`**: the JSON key of a Firebase service account with the *Firebase Rules Admin* role. Without it, the pipeline skips the rules deploy and warns.
+- **Settings → Branches → protect `main`**: require the `test` check to pass before merging.

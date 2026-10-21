@@ -1,0 +1,36 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch(); const errs=[];
+  const mk = async (n) => { const c = await b.newContext({viewport:{width:1100,height:900}}); await c.addInitScript(() => { window.__CARREAU_EMULATOR = true; }); const p = await c.newPage(); p.on('pageerror', e => errs.push(n+': '+e.message)); return p; };
+  const w = ms => new Promise(r => setTimeout(r, ms)); const log=(...a)=>console.log(...a);
+  const tabs = p => p.$$eval('#tabs button', e => e.map(x=>x.textContent).join('|'));
+  const A = await mk('A'); await A.goto(process.env.WEB_URL+''); await w(3000);
+  log('footer exists:', !!(await A.$('#site-foot [data-act="admin-in"]')));
+  await A.click('[data-act="new-t"]'); await w(2500);
+  const tid = await A.evaluate(()=>location.hash.slice(1));
+  await A.fill('#bulk', 'One\nTwo\nThree\nFour'); await A.click('#bulk-form button[type=submit]'); await w(1200);
+  await A.click('[data-tab="setup"]'); await w(1500);
+  log('A sharing (test mode):', (await A.textContent('.panel')).replace(/\s+/g,' ').slice(0,160));
+  const B = await mk('B'); await B.goto(process.env.WEB_URL+''); await w(3500);
+  log('B sees A comp in menu:', await B.evaluate(t=>!!window.__carreau.S.tournaments[t], tid));
+  await B.goto(process.env.WEB_URL+'#'+tid); await w(2500);
+  log('B tabs (open testing):', await tabs(B), '| header:', (await B.textContent('#tsel')).replace(/\s+/g,' ').trim());
+  log('B rename:', await B.evaluate(async()=>{const S=window.__carreau.S; const t=JSON.parse(JSON.stringify(S.tournaments[S.tid])); t.name='Edited by guest'; try{await S.store.setTournament(t); return 'ok'}catch(e){return 'blocked '+e.code}}));
+  log('B delete:', await B.evaluate(async()=>{const S=window.__carreau.S; try{await S.store.deleteTournament(S.tid); return 'DELETED'}catch(e){return 'blocked '+e.code}}));
+  log('B toggle setting:', await B.evaluate(async()=>{ document.querySelector; return 'n/a'}));
+  // admin page
+  const AD = await mk('admin'); await AD.goto(process.env.WEB_URL+'#admin'); await w(3000);
+  log('admin page (guest):', (await AD.textContent('main')).replace(/\s+/g,' ').slice(0,120));
+  await AD.evaluate(()=>window.__testGoogle('samuelcblakey@gmail.com')); await w(3000);
+  log('admin page (signed in):', (await AD.textContent('main')).replace(/\s+/g,' ').slice(0,260));
+  await AD.click('[data-act="open-testing"]'); await w(2500);
+  log('after toggle:', (await AD.textContent('main')).replace(/\s+/g,' ').slice(60,140));
+  await w(1500);
+  log('B tabs (testing off):', await tabs(B), '| header:', (await B.textContent('#tsel')).replace(/\s+/g,' ').trim());
+  log('B rename (off):', await B.evaluate(async()=>{const S=window.__carreau.S; const t=JSON.parse(JSON.stringify(S.tournaments[S.tid])); t.name='x'; try{await S.store.setTournament(t); return 'WROTE'}catch(e){return 'blocked '+e.code}}));
+  await A.click('[data-tab="setup"]'); await w(1500);
+  log('A sharing (off):', (await A.textContent('.panel')).replace(/\s+/g,' ').slice(0,120));
+  await AD.click('[data-act="open-testing"]'); await w(2500);
+  log('B tabs (back on):', await tabs(B));
+  log('errs', errs); await b.close();
+})();
