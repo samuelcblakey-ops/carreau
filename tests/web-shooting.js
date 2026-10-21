@@ -8,7 +8,8 @@ const { chromium } = require('playwright');
     document.querySelector('[data-act="new-t"]').click(); await w(2500);
     const t = JSON.parse(JSON.stringify(C.T())); Object.assign(t, { name: 'Shoot web', entry: 'shooting', system: 'knockout', shootFormat: 'ko8', koThird: true, checkin: false });
     t.players = Array.from({ length: 10 }, (_, i) => ({ id: 'p' + i, name: 'Shooter ' + i, active: true })); await S.store.setTournament(t); await w(1500);
-    const fill = (pre, base) => document.querySelectorAll(`select[id^="${pre}-"]`).forEach((s, i) => { s.value = String([0, 1, 3, 5][(i + base) % 4]); });
+    const fill = (pre, base) => { const side = pre === 'sa' ? 'a' : 'b'; const n = document.querySelectorAll(`[data-act="shot-cell"][data-side="${side}"]`).length;
+      for (let i = 0; i < n; i++) { document.querySelectorAll(`[data-act="shot-cell"][data-side="${side}"]`)[i].click(); document.querySelector(`[data-act="cell-pick"][data-v="${[0, 1, 3, 5][(i + base) % 4]}"]`).click(); } };
     document.querySelector('[data-tab="draw"]').click(); await w(300); document.querySelector('[data-act="first-draw"]').click(); await w(2500);
     for (const m of C.MS().filter(m => m.stage === 'shoot')) { document.querySelector('[data-tab="draw"]').click(); await w(150); document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(200); document.querySelector('[data-act=\"shoot-mode\"]')?.click(); await w(60); fill('sa', +m.a[0].slice(1)); document.querySelector('[data-act="shoot-save"][data-final="1"]').click(); await w(700); }
     document.querySelector('[data-tab="draw"]').click(); await w(300); document.querySelector('[data-act="shoot-next"]').click(); await w(2500);
