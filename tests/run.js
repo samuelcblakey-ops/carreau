@@ -24,6 +24,7 @@ const SUITES = {
       /B direct link to A comp opens: true/, /toast Competition deleted\./, /errs \[\]/,
     ],
     'web-archive.js': [
+      /owner sees Delete button: false \| owner sees Archive button: true/, /owner delete via rules: blocked/, /matches kept after blocked delete: true/,
       /B sees before archive: true/, /A sees archived: false/, /B sees archived comp: false \| B can read its matches: 0/,
       /admin list shows archived: true \| sees comp: true/, /B sees after restore: true/, /errs \[\]/,
     ],

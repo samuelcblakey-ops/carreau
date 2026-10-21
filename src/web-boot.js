@@ -52,6 +52,7 @@ function fbStore() {
       }
     },
     async deleteTournament(tid) {
+      if (!isAdmin()) throw Object.assign(new Error("Only the admin can delete competitions."), { code: "permission-denied" }); // never half-delete
       const s = await getDocs(collection(db, "tournaments", tid, "matches"));
       for (const d of s.docs) await deleteDoc(d.ref);
       try { await deleteDoc(doc(db, "tournaments", tid, "private", "codes")); } catch {}
@@ -71,7 +72,8 @@ S.permFn = t => {
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
-S.canDelete = t => isOwner(t) || isAdmin();
+// organisers archive; only the admin can delete a competition (also enforced in firestore.rules)
+S.canDelete = () => isAdmin();
 S.canSeeArchived = () => isAdmin();
 S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.device = deviceLabel(); nt.listed = false; nt._new = true; remember(nt.id); };
 // a rough "what kind of device" label so the admin can tell creators apart (no personal data)

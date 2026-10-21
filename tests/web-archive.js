@@ -12,6 +12,12 @@ const { chromium } = require('playwright');
   await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="first-draw"]'); await w(1500);
   const B = await mk('B'); await B.goto(process.env.WEB_URL+'#'+tid); await w(3500);
   log('B sees before archive:', await sees(B, tid), 'matches', await B.evaluate(()=>window.__carreau.MS().length));
+  await A.click('[data-tab="setup"]'); await w(800);
+  log('owner sees Delete button:', await A.evaluate(() => !!document.querySelector('[data-act="del-t"]')), '| owner sees Archive button:', await A.evaluate(() => !!document.querySelector('[data-act="archive"]')));
+  const mBefore = await A.evaluate(() => window.__carreau.MS().length);
+  log('owner delete via rules:', await A.evaluate(async () => { const S = window.__carreau.S; try { await S.store.deleteTournament(S.tid); return 'DELETED'; } catch (e) { return 'blocked ' + e.code; } }));
+  await w(1000); log('matches kept after blocked delete:', await A.evaluate(n => window.__carreau.MS().length === n && n > 0, mBefore));
+  await A.click('[data-tab="draw"]'); await w(300);
   // second comp without archived field (legacy)
   await A.click('[data-act="new-t"]'); await w(2500);
   const legacy = await A.evaluate(()=>location.hash.slice(1));
