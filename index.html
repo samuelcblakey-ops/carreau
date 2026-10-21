@@ -174,7 +174,14 @@ input[type=search]{background:var(--surface-2);border:1px solid var(--line);bord
 .stepper{display:flex;align-items:center;gap:6px}
 .stepper button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:22px;font-weight:700;cursor:pointer}
 .stepper input{width:64px;text-align:center;font-family:var(--display);font-size:30px;font-weight:700;padding:4px}
+.stepper input.padbox{cursor:pointer;caret-color:transparent}.stepper input.padbox.on{outline:3px solid var(--accent);outline-offset:1px}
+.pad{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:-2px 0 6px}
+.pad button{height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font-family:var(--display);font-size:20px;font-weight:700;cursor:pointer}
+.pad button.win{border-color:var(--accent)}.pad button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .err{color:var(--danger);font-size:14px;font-weight:600}
+.modal.wide{max-width:680px}
+table.shots td,table.shots th{padding:5px 6px}
+select.shot{width:58px;padding:5px 6px;text-align:center}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px)}
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* display mode */
@@ -389,7 +396,37 @@ const FR_TEXT = {
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
-  "Copied.": "Copié.", "Fit": "Ajuster", "Zoom in": "Zoom avant", "Zoom out": "Zoom arrière", "Open testing": "Test ouvert", "Admin back end": "Administration", "Back to competitions": "Retour aux concours",
+  "Copied.": "Copié.", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
+  "Visitors only see the competitions they created on their own device, plus the examples. Examples are view-only for visitors.": "Les visiteurs ne voient que les concours créés sur leur propre appareil, plus les exemples. Les exemples sont en lecture seule pour les visiteurs.",
+  "Precision shooting": "Tir de précision", "Shooting scorecard": "Feuille de tir", "Atelier": "Atelier", "Lone boule": "Boule seule", "Boule behind the jack": "Boule derrière le but", "Boule between two boules": "Boule entre deux boules", "Boule behind an obstacle": "Boule derrière un obstacle", "The jack": "Le but",
+  "Each shot scores 0, 1, 3 or 5. Maximum 100.": "Chaque tir vaut 0, 1, 3 ou 5 points. Maximum 100.", "{n} pts · {n}/20 shots": "{1} pts · {2}/20 tirs", "{n} pts": "{1} pts",
+  "Scores are level.": "Égalité.", "Choose the winner (for example after a shoot-off):": "Choisissez le vainqueur (par exemple après un barrage) :", "Update scorecard": "Modifier la feuille", "Save scorecard": "Enregistrer la feuille", "Save progress": "Enregistrer en cours", "Scorecard saved.": "Feuille enregistrée.",
+  "Fill in all 20 shots before finishing the scorecard.": "Remplissez les 20 tirs avant de terminer la feuille.", "Scores are level. Choose the winner.": "Égalité. Choisissez le vainqueur.",
+  "Precision shooting · Qualifying → final (top {n})": "Tir de précision · Qualification → finale ({1} premiers)", "Precision shooting · Qualifying → top {n} knockout": "Tir de précision · Qualification → tableau des {1} premiers",
+  "{n} shooters checked in": "{1} tireurs pointés", "{n} shooters entered": "{1} tireurs inscrits", "Check in at least 2 shooters on Registration first.": "Pointez d'abord au moins 2 tireurs dans Inscriptions.", "Add at least 2 shooters on Registration first.": "Ajoutez d'abord au moins 2 tireurs dans Inscriptions.",
+  "Start the qualifying round": "Lancer la qualification", "Waiting for the organiser to start.": "En attente du lancement par l'organisateur.", "{n}/{n} scorecards": "{1}/{2} feuilles", "Shooter": "Tireur",
+  "View": "Voir", "Continue": "Continuer", "Score": "Noter", "Done": "Terminé", "Shooting": "En tir", "Next": "Suite", "Final for the top {n}": "Finale pour les {1} premiers", "Knockout for the top {n}": "Tableau pour les {1} premiers",
+  "Start the final": "Lancer la finale", "Draw the knockout": "Tirer le tableau", "Available once every qualifying scorecard is finished": "Disponible quand toutes les feuilles de qualification sont terminées", "Qualifying round": "Qualification", "Shooting knockout (top {n})": "Tableau de tir ({1} premiers)",
+  "Standings appear once the qualifying round starts.": "Le classement s'affiche dès le début de la qualification.",
+  "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack. Shooters on the same total are listed in entry order.": "Qualification. A1 boule seule, A2 boule derrière le but, A3 boule entre deux boules, A4 boule derrière un obstacle, A5 le but. Les tireurs à égalité sont classés dans l'ordre d'inscription.",
+  "Shooters enter individually. Tir de précision to FIPJP rules: 5 ateliers (lone boule, boule behind the jack, boule between two boules, boule behind an obstacle, the jack), each shot from 6, 7, 8 and 9 m. Every shot scores 0, 1, 3 or 5, so a scorecard is out of 100.": "Les tireurs s'inscrivent individuellement. Tir de précision selon le règlement FIPJP : 5 ateliers (boule seule, boule derrière le but, boule entre deux boules, boule derrière un obstacle, le but), chacun tiré à 6, 7, 8 et 9 m. Chaque tir vaut 0, 1, 3 ou 5 points : une feuille est notée sur 100.",
+  "Qualifying → top 8 knockout": "Qualification → tableau des 8", "Qualifying → top 16 knockout": "Qualification → tableau des 16", "Qualifying → final": "Qualification → finale", "Shooters in the final": "Tireurs en finale",
+  "Everyone shoots a qualifying scorecard. The top shooters then shoot a final scorecard, and the highest final score wins.": "Chacun tire une feuille de qualification. Les meilleurs tirent ensuite une feuille de finale ; le meilleur total en finale l'emporte.",
+  "Everyone shoots a qualifying scorecard. The top {n} go into a knockout (1st v {n}th, and so on). Each knockout game is a duel: both shooters shoot a full scorecard and the higher total goes through.": "Chacun tire une feuille de qualification. Les {1} premiers entrent dans un tableau (1er contre {2}e, etc.). Chaque rencontre est un duel : les deux tireurs tirent une feuille complète et le meilleur total passe.",
+  "Third-place duel": "Petite finale (duel)", "Shooting order": "Ordre de tir", "Entry order": "Ordre d'inscription", "Rounds": "Tours",
+  "Archive competition": "Archiver le concours", "Archived": "Archivé", "Archive…": "Archiver…", "Archive": "Archiver", "Restore": "Restaurer", "Competition restored.": "Concours restauré.",
+  "Only the site admin can see this competition. Restore it to make it visible again.": "Seul l'administrateur du site peut voir ce concours. Restaurez-le pour le rendre de nouveau visible.",
+  "Once the competition has finished, archive it to hide it from everyone except the site admin.": "Une fois le concours terminé, archivez-le pour le masquer à tous sauf à l'administrateur du site.",
+  "Once the competition has finished, archive it to hide it from everyone except the site admin. Some games aren't finished yet.": "Une fois le concours terminé, archivez-le pour le masquer à tous sauf à l'administrateur du site. Certaines parties ne sont pas terminées.",
+  "Archive “{x}”? Only the admin will be able to see it.": "Archiver « {1} » ? Seul l'administrateur pourra le voir.",
+  "Competition archived. Only the admin can see it now.": "Concours archivé. Seul l'administrateur peut le voir.", "Competition archived. Only the site admin can see it now.": "Concours archivé. Seul l'administrateur du site peut le voir.",
+  "Archived. Only the site admin can see this competition.": "Archivé. Seul l'administrateur du site peut voir ce concours.", "{x} (archived)": "{1} (archivé)",
+  "This correction changes who went through.": "Cette correction change qui est qualifié.", "These later games were already played and will be reset so they can be replayed or re-entered:": "Ces parties suivantes ont déjà été jouées et seront réinitialisées pour être rejouées ou ressaisies :",
+  "Override and reset these games": "Forcer et réinitialiser ces parties", "Cancel": "Annuler", "Ask the organiser to make this correction.": "Demandez à l'organisateur de faire cette correction.",
+  "Result corrected and later games reset.": "Résultat corrigé et parties suivantes réinitialisées.", "Corrected": "Corrigé", "Corrected (was {n}–{n}).": "Corrigé (était {1}–{2}).",
+  "To correct a wrong score, change it and press Update result. If the winner changes and a later game has already been played, you'll be asked to confirm an override.": "Pour corriger un score, modifiez-le puis appuyez sur Modifier le résultat. Si le vainqueur change et qu'une partie suivante a déjà été jouée, une confirmation de forçage vous sera demandée.",
+  "To correct a wrong score, change it and press Update result. If the winner changes and a later game has already been played, you'll be asked to confirm an override (only possible for the current and previous round).": "Pour corriger un score, modifiez-le puis appuyez sur Modifier le résultat. Si le vainqueur change et qu'une partie suivante a déjà été jouée, une confirmation de forçage vous sera demandée (possible seulement pour la partie en cours et la précédente).",
+  "Only the current and previous round can be corrected.": "Seules la partie en cours et la précédente peuvent être corrigées.", "This result has already moved two rounds on, so it can't be corrected here.": "Ce résultat a déjà avancé de deux tours : il ne peut pas être corrigé ici.", "Fit": "Ajuster", "Zoom in": "Zoom avant", "Zoom out": "Zoom arrière", "Open testing": "Test ouvert", "Admin back end": "Administration", "Back to competitions": "Retour aux concours",
   "Open testing is on: everyone who opens a competition can run it, including registration, setup, draws and scores. Spectator and organiser links are switched off while it's on.": "Le test ouvert est activé : toute personne qui ouvre un concours peut le gérer, y compris les inscriptions, les paramètres, les tirages et les scores. Les liens spectateur et organisateur sont désactivés pendant ce mode.",
   "Link to this competition": "Lien vers ce concours", "Anyone with this link can run this competition while open testing is on.": "Toute personne ayant ce lien peut gérer ce concours tant que le test ouvert est activé.",
   "Everyone can run every competition (beta testing). Spectator and organiser links are switched off.": "Tout le monde peut gérer tous les concours (test bêta). Les liens spectateur et organisateur sont désactivés.",
@@ -506,24 +543,28 @@ const MS = () => Object.values(S.matches);
 
 /* ---------------- domain helpers ---------------- */
 const isMelee = t => t.entry === "melee";
-const entities = t => isMelee(t) ? t.players : t.teams;
+const isShoot = t => t.entry === "shooting";
+const isIndiv = t => isMelee(t) || isShoot(t); // entries are individual players
+const sysOf = t => isMelee(t) ? "melee" : isShoot(t) ? "shooting" : t.system;
+const entities = t => isIndiv(t) ? t.players : t.teams;
 // who goes into the draw: entered, not withdrawn, and checked in when check-in is switched on
 const activeIds = t => entities(t).filter(e => e.active !== false && (!t.checkin || e.checkedIn)).map(e => e.id);
 // before anyone has checked in, plan around everyone entered
 const plannedCount = t => activeIds(t).length || enteredIds(t).length;
 const enteredIds = t => entities(t).filter(e => e.active !== false).map(e => e.id);
 function entName(t, id) {
-  if (isMelee(t)) return t.players.find(p => p.id === id)?.name || "Unknown player";
+  if (isIndiv(t)) return t.players.find(p => p.id === id)?.name || "Unknown player";
   const tm = t.teams.find(x => x.id === id);
   if (!tm) return "Unknown team";
   return tm.name || tm.players.filter(Boolean).join(" / ") || "Unnamed team";
 }
 function teamPlayers(t, id) { const tm = t.teams.find(x => x.id === id); return tm ? tm.players.filter(Boolean).join(", ") : ""; }
-function sideName(t, side) { if (!side) return null; return side.map(id => entName(t, id)).join(isMelee(t) ? " · " : " / "); }
+function sideName(t, side) { if (!side) return null; return side.map(id => entName(t, id)).join(isIndiv(t) ? " · " : " / "); }
 function mStatus(m) { if (m.done) return "done"; if (!m.a || !m.b) return "pending"; if (m.court) return "playing"; return "ready"; }
 const ents = m => [...(m.a || []), ...(m.b || [])];
-const winnerSide = m => (m.done && m.b ? (m.sa > m.sb ? m.a : m.b) : m.done ? m.a : null);
-const loserSide = m => (m.done && m.b ? (m.sa > m.sb ? m.b : m.a) : null);
+const aWon = m => m.win ? m.win === "a" : m.sa > m.sb;
+const winnerSide = m => (m.done && m.b ? (aWon(m) ? m.a : m.b) : m.done ? m.a : null);
+const loserSide = m => (m.done && m.b ? (aWon(m) ? m.b : m.a) : null);
 const courtName = (t, cid) => t.courts.find(c => c.id === cid)?.name ?? "?";
 const byOrder = (x, y) => (x.round || 0) - (y.round || 0) || (x.seq || 0) - (y.seq || 0) || (x.order || 0) - (y.order || 0);
 let seqBase = 0; const nextSeq = () => Date.now() * 100 + (seqBase++ % 100);
@@ -946,45 +987,231 @@ async function undoDraw(did) {
   await assignCourts();
   toast("Draw removed.");
 }
-async function recordResult(id, sa, sb, done) {
-  const t = T(); const m = clone(S.matches[id]);
-  const wasDone = m.done; const oldWin = wasDone ? winnerSide(m) : null;
-  m.sa = sa; m.sb = sb; m.done = done;
+// Which earlier rounds can still be corrected with an override: the current round and the one before.
+function overrideAllowed(m) {
+  const key = x => x.bracket || x.pool || x.group || x.stage;
+  const k = key(m); const done = MS().filter(x => key(x) === k && x.done && !x.bye).map(x => x.round || 1);
+  const cur = done.length ? Math.max(...done) : 1;
+  return (m.round || 1) >= cur - 1;
+}
+const sameIds = (x, y) => JSON.stringify(x ?? null) === JSON.stringify(y ?? null);
+// recordResult returns true when saved, or { blocked: [descriptions] } when a correction would change
+// later games that are already finished (call again with { override: true } to reset those games).
+async function recordResult(id, sa, sb, done, opts = {}) {
+  const t = T(); const prev = S.matches[id]; const m = clone(prev);
+  const wasDone = m.done; const oldWin = wasDone ? winnerSide(m) : null, oldLose = wasDone ? loserSide(m) : null;
+  m.sa = sa; m.sb = sb; m.done = done; if (opts.win !== undefined) m.win = opts.win || null;
   if (done) m.finishedAt = Date.now();
-  const newWin = done ? winnerSide(m) : null;
-  const oldLose = wasDone ? loserSide(S.matches[id]) : null, newLose = done ? loserSide(m) : null;
+  const newWin = done ? winnerSide(m) : null, newLose = done ? loserSide(m) : null;
   const links = [[m.next, oldWin, newWin], [m.lnext, oldLose, newLose]].filter(l => l[0]);
+  const resets = []; const blocked = [];
   for (const [lk, o, nw] of links) {
-    if (wasDone && JSON.stringify(o) !== JSON.stringify(nw) && S.matches[lk.id]?.done) { toast("A later game in the bracket already used this result. Reopen that game first."); return false; }
+    const nx = S.matches[lk.id];
+    if (wasDone && !sameIds(o, nw) && nx?.done) {
+      resets.push(nx);
+      // a reset game's own result may already have moved on: only allowed one level deep
+      for (const l2 of [nx.next, nx.lnext].filter(Boolean)) if (S.matches[l2.id]?.done) blocked.push("too-deep");
+    }
   }
-  if (m.pool && wasDone && JSON.stringify(oldWin) !== JSON.stringify(newWin)) {
+  // french poules: later pool games built from this result
+  let poolFix = null;
+  if (m.pool && wasDone && (!sameIds(oldWin, newWin) || !done)) {
     const p = (t.pools || []).find(p => p.id === m.pool);
-    const later = p?.french && MS().some(o => o.pool === m.pool && o.round > m.round);
-    if (later) { toast("Later pool games already use this result. Undo isn't possible once the pool has moved on."); return false; }
+    if (p?.french) { poolFix = p; MS().filter(o => o.pool === m.pool && o.round > m.round && o.done).forEach(o => resets.push(o)); }
   }
+  if (blocked.length) { toast("This result has already moved two rounds on, so it can't be corrected here."); return false; }
+  if (resets.length && !opts.override) return { blocked: resets.map(r => `${matchContext(t, r)}: ${sideName(t, r.a) || "?"} ${r.sa ?? ""}–${r.sb ?? ""} ${sideName(t, r.b) || "?"}`) };
+  if (resets.length && !overrideAllowed(prev)) { toast("Only the current and previous round can be corrected."); return false; }
   const patch = { sa, sb, done, finishedAt: m.finishedAt || null };
+  if (opts.win !== undefined) patch.win = opts.win || null;
+  if (opts.shots) Object.assign(patch, opts.shots);
+  if (wasDone && done && (prev.sa !== sa || prev.sb !== sb || (opts.win !== undefined && (prev.win || null) !== (opts.win || null)))) patch.corrected = { at: Date.now(), from: [prev.sa, prev.sb] };
   if (done) { patch.courtUsed = m.court || m.courtUsed || null; patch.court = null; }
   else if (wasDone) patch.court = null;
   S.matches[id] = Object.assign(S.matches[id], patch);
   await S.store.updateMatch(S.tid, id, patch);
-  // knockout: move winner on
+  // knockout: move the (new) winner and loser on; reset later games that were already played
   for (const [lk, , nw] of links) {
-    const nx = S.matches[lk.id];
-    if (nx && JSON.stringify(nx[lk.side] ?? null) !== JSON.stringify(nw)) {
+    const nx = S.matches[lk.id]; if (!nx) continue;
+    if (!sameIds(nx[lk.side], nw) || (nx.done && resets.includes(nx))) {
       const np = { [lk.side]: nw };
-      if (!nw && nx.court && !nx.done) np.court = null;
+      if (nx.done && opts.override) {
+        Object.assign(np, { sa: null, sb: null, done: false, win: null, court: null, corrected: { at: Date.now(), reset: true } });
+        for (const l2 of [nx.next, nx.lnext].filter(Boolean)) { const n2 = S.matches[l2.id]; if (n2 && !n2.done && n2[l2.side]) { const p2 = { [l2.side]: null }; if (n2.court) p2.court = null; Object.assign(n2, p2); await S.store.updateMatch(S.tid, n2.id, p2); } }
+      } else if (!nw && nx.court && !nx.done) np.court = null;
       Object.assign(nx, np);
       await S.store.updateMatch(S.tid, nx.id, np);
     }
   }
-  // french pools: create next games
+  // french poules: rebuild later games from the corrected results, then create any that are now due
+  if (poolFix) await rebuildFrench(poolFix);
   if (m.pool) {
     const p = (t.pools || []).find(p => p.id === m.pool);
     if (p?.french) { const created = frenchProgress(p, MS()); if (created.length) { created.forEach(c => S.matches[c.id] = c); await writeMatches(created); } }
   }
-  // the finished game's court is now free: fill courts
   await assignCourts();
   return true;
+}
+async function rebuildFrench(p) {
+  const g = id => S.matches[`${p.id}-${id}`];
+  const want = {};
+  const a = g("g1a"), b = g("g1b");
+  if (a?.done && b?.done) { want.g2w = [winnerSide(a), winnerSide(b)]; want.g2l = [loserSide(a), loserSide(b)]; }
+  for (const k of ["g2w", "g2l"]) {
+    const x = g(k); if (!x) continue;
+    const [na, nb] = want[k] || [null, null];
+    if (!sameIds(x.a, na) || !sameIds(x.b, nb)) { const np = { a: na, b: nb, sa: null, sb: null, done: false, court: null, corrected: { at: Date.now(), reset: true } }; Object.assign(x, np); await S.store.updateMatch(S.tid, x.id, np); }
+  }
+  const w = g("g2w"), l = g("g2l"), b3 = g("g3");
+  if (b3) {
+    const na = w?.done && l?.done ? loserSide(w) : null, nb = w?.done && l?.done ? winnerSide(l) : null;
+    if (!sameIds(b3.a, na) || !sameIds(b3.b, nb)) { const np = { a: na, b: nb, sa: null, sb: null, done: false, court: null, corrected: { at: Date.now(), reset: true } }; Object.assign(b3, np); await S.store.updateMatch(S.tid, b3.id, np); }
+  }
+}
+
+/* ---------------- precision shooting (tir de précision, FIPJP) ---------------- */
+// 5 workshops shot from 6, 7, 8 and 9 m; each shot scores 0, 1, 3 or 5; maximum 100.
+const ATELIERS = [["A1", "Lone boule"], ["A2", "Boule behind the jack"], ["A3", "Boule between two boules"], ["A4", "Boule behind an obstacle"], ["A5", "The jack"]];
+const DISTANCES = [6, 7, 8, 9];
+const SHOT_VALUES = [0, 1, 3, 5];
+const shotTotal = sh => ATELIERS.reduce((t, [k]) => t + (sh?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0), 0);
+const shotCount = sh => ATELIERS.reduce((t, [k]) => t + (sh?.[k] || []).filter(v => v != null && v !== "").length, 0);
+const shotComplete = sh => shotCount(sh) === ATELIERS.length * DISTANCES.length;
+const shootPhase = (t, ph) => MS().filter(m => m.stage === "shoot" && m.phase === ph);
+function shootRanking(t, ph) {
+  const order = id => entities(t).findIndex(e => e.id === id);
+  return shootPhase(t, ph).map(m => ({ id: m.a[0], m, total: shotTotal(m.shots), shots: m.shots, done: m.done }))
+    .sort((x, y) => (y.done - x.done) || y.total - x.total || order(x.id) - order(y.id));
+}
+function drawShootQualifying(t) {
+  const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t));
+  const matches = ids.map((id, i) => mkMatch({ id: `Q-${id}`, stage: "shoot", phase: "Q", group: "Q", round: 1, order: i, a: [id], b: null, shots: {} }));
+  return { matches, draw: { id: "Q", kind: "shoot", label: "Qualifying round" } };
+}
+function drawShootFinal(t) {
+  const n = Math.max(2, t.shootFinal || 4);
+  const top = shootRanking(t, "Q").filter(r => r.done).slice(0, n).map(r => r.id);
+  const matches = top.map((id, i) => mkMatch({ id: `F-${id}`, stage: "shoot", phase: "F", group: "F", round: 2, order: i, a: [id], b: null, shots: {} }));
+  return { matches, draw: { id: "F", kind: "shoot", label: "Final" } };
+}
+function drawShootKnockout(t) {
+  const n = t.shootFormat === "ko16" ? 16 : 8;
+  const top = shootRanking(t, "Q").filter(r => r.done).slice(0, n).map(r => r.id);
+  const res = createBracket(t, "A", `Shooting knockout (top ${n})`, top, { third: !!t.koThird });
+  res.matches.forEach(m => m.shoot = true);
+  return res;
+}
+function shotGrid(prefix, sh, ro) {
+  return `<div class="tw"><table class="shots"><thead><tr><th>Atelier</th>${DISTANCES.map(d => `<th class="n">${d} m</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
+    ${ATELIERS.map(([k, label], ai) => `<tr><td class="wrap"><span class="small muted">${ai + 1}.</span> ${label}</td>${DISTANCES.map((d, di) => { const v = sh?.[k]?.[di];
+      return `<td class="n">${ro ? (v ?? "–") : `<select id="${prefix}-${k}-${di}" class="shot" aria-label="${label} ${d} m"><option value="">–</option>${SHOT_VALUES.map(x => `<option value="${x}" ${String(v) === String(x) ? "selected" : ""}>${x}</option>`).join("")}</select>`}</td>`; }).join("")}
+      <td class="n"><b>${(sh?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</b></td></tr>`).join("")}
+    </tbody><tfoot><tr><td><b>Total</b></td><td colspan="4"></td><td class="n"><b class="shot-total">${shotTotal(sh)}</b></td></tr></tfoot></table></div>`;
+}
+function readShots(prefix) {
+  const out = {};
+  ATELIERS.forEach(([k]) => { out[k] = DISTANCES.map((d, di) => { const el = document.getElementById(`${prefix}-${k}-${di}`); return el && el.value !== "" ? +el.value : null; }); });
+  return out;
+}
+function renderShootModal(t, m, el) {
+  const ro = !canScore(); const duel = !!m.b;
+  const md = S.modal;
+  const who = side => `<b>${esc(sideName(t, side))}</b>`;
+  const shA = md.shotsA ?? (duel ? m.shotsA : m.shots) ?? {}, shB = md.shotsB ?? m.shotsB ?? {};
+  const tA = shotTotal(shA), tB = shotTotal(shB);
+  const level = duel && shotComplete(shA) && shotComplete(shB) && tA === tB;
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Shooting scorecard">
+    <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>Shooting scorecard</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    <p class="small muted">Each shot scores 0, 1, 3 or 5. Maximum 100.</p>
+    <div class="stack" style="gap:6px"><div class="spread">${who(m.a)}<span class="pill ${shotComplete(shA) ? "done" : ""}">${tA} pts · ${shotCount(shA)}/20 shots</span></div>${shotGrid("sa", shA, ro)}</div>
+    ${duel ? `<div class="stack" style="gap:6px"><div class="spread">${who(m.b)}<span class="pill ${shotComplete(shB) ? "done" : ""}">${tB} pts · ${shotCount(shB)}/20 shots</span></div>${shotGrid("sb", shB, ro)}</div>` : ""}
+    ${level && !ro ? `<div class="notice stack" style="gap:6px"><b>Scores are level.</b><span>Choose the winner (for example after a shoot-off):</span>
+      <label class="chk"><input type="radio" name="sw" value="a" ${md.win === "a" || (!md.win && m.win === "a") ? "checked" : ""}> ${esc(sideName(t, m.a))}</label>
+      <label class="chk"><input type="radio" name="sw" value="b" ${md.win === "b" || (!md.win && m.win === "b") ? "checked" : ""}> ${esc(sideName(t, m.b))}</label></div>` : ""}
+    ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
+    ${md.blocked ? overrideBox(md.blocked) : ""}
+    ${ro ? "" : `<div class="row"><button class="btn primary" data-act="shoot-save" data-final="1">${m.done ? "Update scorecard" : "Save scorecard"}</button>${!m.done ? `<button class="btn" data-act="shoot-save">Save progress</button>` : ""}</div>`}
+  </div></div>`;
+  el.querySelectorAll("select.shot").forEach(s => s.addEventListener("change", () => { const p = s.id.slice(0, 2); const sh = readShots(p); const card = s.closest(".stack"); const tot = card.querySelector(".shot-total"); if (tot) tot.textContent = shotTotal(sh); }));
+  localize(el);
+}
+async function saveShooting(final) {
+  const t = T(); const md = S.modal; const m = S.matches[md.id]; const duel = !!m.b;
+  const shA = readShots("sa"), shB = duel ? readShots("sb") : null;
+  md.shotsA = shA; if (duel) md.shotsB = shB;
+  const win = document.querySelector('input[name="sw"]:checked')?.value || null;
+  if (!final) {
+    const patch = duel ? { shotsA: shA, shotsB: shB, sa: shotTotal(shA), sb: shotTotal(shB) } : { shots: shA, sa: shotTotal(shA) };
+    Object.assign(S.matches[md.id], patch); await S.store.updateMatch(S.tid, md.id, patch);
+    S.modal = null; renderModal(); toast("Scorecard saved."); return;
+  }
+  if (!shotComplete(shA) || (duel && !shotComplete(shB))) { md.err = "Fill in all 20 shots before finishing the scorecard."; renderModal(); return; }
+  if (!duel) {
+    const patch = { shots: shA, sa: shotTotal(shA), sb: 0, done: true, finishedAt: Date.now() };
+    if (m.done && m.sa !== patch.sa) patch.corrected = { at: Date.now(), from: [m.sa, 0] };
+    Object.assign(S.matches[md.id], patch); await S.store.updateMatch(S.tid, md.id, patch);
+    S.modal = null; renderModal(); toast("Scorecard saved."); return;
+  }
+  const tA = shotTotal(shA), tB = shotTotal(shB);
+  if (tA === tB && !win) { md.err = "Scores are level. Choose the winner."; renderModal(); return; }
+  const res = await guard(() => recordResult(md.id, tA, tB, true, { win: tA === tB ? win : null, shots: { shotsA: shA, shotsB: shB }, override: !!md.override }));
+  if (res && res.blocked) { md.blocked = res.blocked; md.pending = { shoot: true }; renderModal(); return; }
+  if (res) { S.modal = null; renderModal(); toast("Scorecard saved."); }
+}
+function renderShooting(t) {
+  const ms = MS(); const wr = canEdit(); const n = activeIds(t).length;
+  const fmt = t.shootFormat || "ko8";
+  let html = `<div class="stack"><div class="spread"><h2>Draw & results</h2><span class="muted small">Precision shooting · ${fmt === "final" ? `Qualifying → final (top ${t.shootFinal || 4})` : `Qualifying → top ${fmt === "ko16" ? 16 : 8} knockout`}</span></div>`;
+  if (!t.draws.length) {
+    return html + `<div class="panel stack"><p>${n} shooters ${t.checkin ? "checked in" : "entered"}</p>
+      ${n < 2 ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least 2 shooters on Registration first.</p>` : wr ? `<div><button class="btn primary" data-act="first-draw">Start the qualifying round</button></div>` : `<p class="muted">Waiting for the organiser to start.</p>`}</div></div>`;
+  }
+  const table = (ph, title, cut) => {
+    const rows = shootRanking(t, ph); const doneN = rows.filter(r => r.done).length;
+    return `<section class="panel stack" style="gap:8px"><div class="spread"><h3>${title}</h3><span class="pill ${doneN === rows.length ? "done" : ""}">${doneN}/${rows.length} scorecards</span></div>
+      <div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th></th></tr></thead><tbody>
+      ${rows.map((r, i) => `<tr class="${cut && r.done && i < cut ? "q" : ""}"><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${r.m.corrected ? ` <span class="pill">Corrected</span>` : ""}</td>
+        ${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
+        <td class="n"><b>${shotCount(r.shots) ? r.total : "–"}</b></td>
+        <td>${canScore() ? `<button class="btn sm" data-shoot="${r.m.id}">${r.done ? "View" : shotCount(r.shots) ? "Continue" : "Score"}</button>` : r.done ? `<span class="pill done">Done</span>` : shotCount(r.shots) ? `<span class="pill playing">Shooting</span>` : ""}</td></tr>`).join("")}
+      </tbody></table></div></section>`;
+  };
+  const qRows = shootRanking(t, "Q"); const qDone = qRows.length && qRows.every(r => r.done);
+  const hasNext = t.draws.some(d => d.id === "F" || d.id === "A");
+  if (!hasNext && wr) html += `<div class="panel spread" ${qDone ? `style="border-color:var(--accent)"` : ""}><div><div class="eyebrow">Next</div><b>${fmt === "final" ? `Final for the top ${t.shootFinal || 4}` : `Knockout for the top ${fmt === "ko16" ? 16 : 8}`}</b></div>
+    ${qDone ? `<button class="btn primary" data-act="shoot-next">${fmt === "final" ? "Start the final" : "Draw the knockout"}</button>` : `<span class="pill">Available once every qualifying scorecard is finished</span>`}</div>`;
+  if (t.draws.some(d => d.id === "F")) html += table("F", "Final", 1);
+  (t.brackets || []).forEach(b => html += renderBracket(t, b, ms));
+  html += table("Q", "Qualifying round", fmt === "final" ? (t.shootFinal || 4) : fmt === "ko16" ? 16 : 8);
+  return html + `</div>`;
+}
+function shootStandings(t) {
+  const ms = MS(); let html = "";
+  const f = shootRanking(t, "F");
+  if (f.length) html += `<div class="panel stack" style="gap:6px"><h3>Final</h3>${f.every(r => r.done) ? `<div><span class="eyebrow">Winner</span> <b>${esc(entName(t, f[0].id))}</b> · ${f[0].total} pts</div>${f[1] ? `<div><span class="eyebrow">Runner-up</span> ${esc(entName(t, f[1].id))} · ${f[1].total} pts</div>` : ""}${f[2] ? `<div><span class="eyebrow">Third</span> ${esc(entName(t, f[2].id))} · ${f[2].total} pts</div>` : ""}` : `<span class="muted">In progress.</span>`}</div>`;
+  const q = shootRanking(t, "Q");
+  if (!q.length) return html + `<div class="empty">Standings appear once the qualifying round starts.</div>`;
+  return html + `<div class="panel"><div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
+    ${q.map((r, i) => `<tr><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b></td>${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</td>`).join("")}<td class="n"><b>${r.total}</b></td></tr>`).join("")}
+  </tbody></table></div></div><p class="small muted">Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack. Shooters on the same total are listed in entry order.</p>`;
+}
+
+/* ---------------- archive ---------------- */
+S.canSeeArchived = S.canSeeArchived || (() => true);
+async function archiveCompetition(on) {
+  const t = clone(T()); t.archived = !!on; t.archivedAt = on ? Date.now() : null;
+  await guard(() => saveT(t));
+  if (on && !S.canSeeArchived()) {
+    delete S.tournaments[t.id]; S.tid = Object.values(S.tournaments).filter(x => !x.archived).sort((a, b) => (b.created || 0) - (a.created || 0))[0]?.id || null;
+    S.matches = {}; S.onSelect?.(); watchMatches();
+  }
+  render(); toast(on ? (S.canSeeArchived() ? "Competition archived. Only the admin can see it now." : "Competition archived. Only the site admin can see it now.") : "Competition restored.");
+}
+function overrideBox(list) {
+  return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
+    <span>These later games were already played and will be reset so they can be replayed or re-entered:</span>
+    <ul style="margin:0;padding-left:18px">${list.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    ${canEdit() ? `<div class="row"><button class="btn danger" data-act="override">Override and reset these games</button><button class="btn" data-act="close">Cancel</button></div>` : `<span class="small">Ask the organiser to make this correction.</span>`}</div>`;
 }
 
 /* ---------------- toast & modal ---------------- */
@@ -992,30 +1219,34 @@ let toastTimer;
 function toast(msg) { const el = $("#toast"); el.textContent = tr(msg); el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 3200); }
 
 function openMatch(id) {
-  const m = S.matches[id]; if (!m || !m.a || !m.b) return;
-  S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: false, err: "" };
+  const m = S.matches[id]; if (!m || !m.a || (!m.b && m.stage !== "shoot")) return;
+  S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: false, err: "", pad: !m.done && canScore() ? "sa" : null };
   renderModal();
 }
 function renderModal() {
   const el = $("#modal"); const t = T();
   if (!S.modal || !t) { el.innerHTML = ""; return; }
   const m = S.matches[S.modal.id]; if (!m) { S.modal = null; el.innerHTML = ""; return; }
+  if (m.stage === "shoot" || m.shoot) { renderShootModal(t, m, el); return; }
   const ro = !canScore();
-  const who = side => side.map(id => isMelee(t) ? esc(entName(t, id)) : `<b>${esc(entName(t, id))}</b><span class="small muted">${esc(teamPlayers(t, id))}</span>`).join(isMelee(t) ? "<br>" : "");
-  const stp = k => `<div class="stepper">${ro ? "" : `<button type="button" data-act="dec" data-k="${k}" aria-label="Minus one">−</button>`}<input id="sc-${k}" type="number" min="0" max="${t.target}" inputmode="numeric" value="${S.modal[k]}" ${ro ? "readonly" : ""} aria-label="Score">${ro ? "" : `<button type="button" data-act="inc" data-k="${k}" aria-label="Plus one">+</button>`}</div>`;
+  const who = side => side.map(id => isIndiv(t) ? esc(entName(t, id)) : `<b>${esc(entName(t, id))}</b><span class="small muted">${esc(teamPlayers(t, id))}</span>`).join(isIndiv(t) ? "<br>" : "");
+  const stp = k => `<div class="stepper">${ro ? "" : `<button type="button" data-act="dec" data-k="${k}" aria-label="Minus one">−</button>`}<input id="sc-${k}" type="text" readonly ${ro ? "" : `data-act="pad" data-k="${k}" class="padbox ${S.modal.pad === k ? "on" : ""}"`} value="${S.modal[k]}" aria-label="Score">${ro ? "" : `<button type="button" data-act="inc" data-k="${k}" aria-label="Plus one">+</button>`}</div>`;
+  const pad = k => ro || S.modal.pad !== k ? "" : `<div class="pad">${Array.from({ length: t.target + 1 }, (_, n) => `<button type="button" data-act="pick" data-k="${k}" data-n="${n}" class="${n === S.modal[k] ? "on" : ""} ${n === t.target ? "win" : ""}">${n}</button>`).join("")}</div>`;
   const courts = t.courts.filter(c => c.active !== false);
   el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Match score">
     <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>${m.court ? "Piste " + esc(courtName(t, m.court)) : m.done ? "Result" : "Waiting for a piste"}</h3></div>
       <button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
-    <div class="scorer"><div class="who">${who(m.a)}</div>${stp("sa")}</div>
-    <div class="scorer"><div class="who">${who(m.b)}</div>${stp("sb")}</div>
+    <div class="scorer"><div class="who">${who(m.a)}</div>${stp("sa")}</div>${pad("sa")}
+    <div class="scorer"><div class="who">${who(m.b)}</div>${stp("sb")}</div>${pad("sb")}
     ${ro ? "" : `<label class="chk"><input type="checkbox" id="early" ${S.modal.early ? "checked" : ""}> Game ended on time limit (winner below ${t.target})</label>
     ${!m.done ? `<label class="f"><span>Piste</span><select id="mcourt"><option value="">No piste yet</option>${courts.map(c => `<option value="${c.id}" ${m.court === c.id ? "selected" : ""}>Piste ${esc(c.name)}${MS().some(o => o.court === c.id && !o.done && o.id !== m.id) ? " (in use)" : ""}</option>`).join("")}</select></label>` : ""}
     ${S.modal.err ? `<div class="err">${esc(S.modal.err)}</div>` : ""}
-    <div class="row">
+    ${m.corrected && !m.corrected.reset ? `<p class="small muted">Corrected (was ${m.corrected.from?.[0] ?? "–"}–${m.corrected.from?.[1] ?? "–"}).</p>` : ""}
+    ${m.done && canEdit() && !S.modal.blocked ? `<p class="small muted">To correct a wrong score, change it and press Update result. If the winner changes and a later game has already been played, you'll be asked to confirm an override${overrideAllowed(m) ? "" : " (only possible for the current and previous round)"}.</p>` : ""}
+    ${S.modal.blocked ? overrideBox(S.modal.blocked) : `<div class="row">
       <button class="btn primary" data-act="save-final">${m.done ? "Update result" : "Save result"}</button>
       ${!m.done ? `<button class="btn" data-act="save-live">Save live score</button>` : `<button class="btn" data-act="reopen">Reopen match</button>`}
-    </div>`}
+    </div>`}`}
   </div></div>`;
   localize(el);
 }
@@ -1030,10 +1261,20 @@ function readModalScores() {
   const a = parseInt($("#sc-sa")?.value, 10), b = parseInt($("#sc-sb")?.value, 10);
   S.modal.sa = isNaN(a) ? 0 : a; S.modal.sb = isNaN(b) ? 0 : b; S.modal.early = !!$("#early")?.checked;
 }
-async function modalAction(act, k) {
+async function modalAction(act, k, a) {
   const t = T(); const md = S.modal; if (!md) return;
   if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
+  if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
+  if (act === "override") {
+    if (md.pending?.shoot) { md.override = true; md.blocked = null; renderModal(); await saveShooting(true); return; }
+    const pd = md.pending || {};
+    const res = await guard(() => recordResult(md.id, pd.sa, pd.sb, pd.done !== false, { override: true }));
+    if (res === true) { S.modal = null; renderModal(); toast("Result corrected and later games reset."); }
+    return;
+  }
   readModalScores();
+  if (act === "pad") { md.pad = md.pad === k ? null : k; renderModal(); return; }
+  if (act === "pick") { md[k] = +a.dataset.n; md.err = ""; md.pad = k === "sa" && !md.pickedB ? "sb" : null; if (k === "sb") md.pickedB = true; renderModal(); return; }
   if (act === "inc") { md[k] = Math.min(t.target, md[k] + 1); renderModal(); return; }
   if (act === "dec") { md[k] = Math.max(0, md[k] - 1); renderModal(); return; }
   const m = S.matches[md.id];
@@ -1043,6 +1284,7 @@ async function modalAction(act, k) {
     if (Math.max(sa, sb) > t.target) { md.err = `Scores can't go above ${t.target}.`; renderModal(); return; }
     if (!md.early && Math.max(sa, sb) !== t.target) { md.err = `The winner needs ${t.target} points, or tick the time-limit box.`; renderModal(); return; }
     const ok = await guard(() => recordResult(md.id, sa, sb, true));
+    if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa, sb, done: true }; renderModal(); return; }
     if (ok) { S.modal = null; renderModal(); toast("Result saved."); }
     return;
   }
@@ -1058,6 +1300,7 @@ async function modalAction(act, k) {
   }
   if (act === "reopen") {
     const ok = await guard(() => recordResult(md.id, m.sa, m.sb, false));
+    if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa: m.sa, sb: m.sb, done: false }; renderModal(); return; }
     if (ok) { S.modal = null; renderModal(); toast("Match reopened."); }
   }
 }
@@ -1076,13 +1319,13 @@ function render() {
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
   const fn = { setup: renderSetup, entries: renderEntries, draw: renderDraw, courts: renderCourts, standings: renderStandings, display: renderDisplay }[S.tab] || renderDraw;
-  main.innerHTML = (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
+  main.innerHTML = (t.archived ? `<div class="notice" style="margin-bottom:16px">Archived. Only the site admin can see this competition.${S.canSeeArchived() ? ` <button class="btn sm" data-act="restore">Restore</button>` : ""}</div>` : "") + (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
   localize($("header.app")); localize(main);
   fitBrackets(); restore();
 }
 function renderHeader() {
   const list = Object.values(S.tournaments).sort((a, b) => (b.created || 0) - (a.created || 0));
-  $("#tsel").innerHTML = `${list.length ? `<select id="tpick" aria-label="Competition">${list.map(t => `<option value="${t.id}" ${t.id === S.tid ? "selected" : ""}>${esc(t.name)}</option>`).join("")}</select>` : ""}
+  $("#tsel").innerHTML = `${list.length ? `<select id="tpick" aria-label="Competition">${list.map(t => `<option value="${t.id}" ${t.id === S.tid ? "selected" : ""}>${esc(t.name)}${t.archived ? " (archived)" : ""}</option>`).join("")}</select>` : ""}
     <div class="seg" role="group" aria-label="Language" data-notr><button type="button" data-lang="en" aria-pressed="${I18N.lang === "en"}">EN</button><button type="button" data-lang="fr" aria-pressed="${I18N.lang === "fr"}">FR</button></div>
     ${S.canCreate() ? `<button class="btn sm" data-act="new-t">+ New competition</button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
@@ -1103,14 +1346,14 @@ function newTournament() {
   return { id, name: "New competition", date: new Date().toISOString().slice(0, 10), venue: "", entry: "teams", format: "triples", system: "swiss",
     checkin: true, target: 13, byeScore: [13, 7], swissRounds: 5, poolSize: 4, poolStyle: "french", qualify: 2, bBracket: true, consolante: false, seeding: "random", randomCourts: false,
     courts: Array.from({ length: 8 }, (_, i) => ({ id: "c" + (i + 1), name: String(i + 1), active: true })),
-    teams: [], players: [], draws: [], pools: [], brackets: [], created: Date.now() };
+    teams: [], players: [], draws: [], pools: [], brackets: [], archived: false, created: Date.now() };
 }
 
 /* setup */
 function seg(name, cur, opts, locked) { return `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-set="${name}" data-val="${v}" aria-pressed="${String(cur) === String(v)}" ${locked ? "disabled" : ""}>${l}</button>`).join("")}</div>`; }
 function renderSetup(t) {
   const locked = t.draws.length > 0;
-  const sys = isMelee(t) ? "melee" : t.system;
+  const sys = sysOf(t);
   return `<div class="stack">
   <div class="spread"><h2>Setup</h2>${locked ? `<span class="pill">Format locked after the first draw</span>` : ""}</div>
   ${S.setupExtra ? S.setupExtra(t) : ""}
@@ -1124,17 +1367,23 @@ function renderSetup(t) {
   <div class="grid2">
     <div class="panel stack">
       <h3>Entries</h3>
-      <div class="stack" style="gap:8px"><div class="eyebrow">Entry type</div>${seg("entry", t.entry, [["teams", "Fixed teams"], ["melee", "Mêlée (random teams)"]], locked)}</div>
-      <div class="stack" style="gap:8px"><div class="eyebrow">Format</div>${seg("format", t.format, [["singles", "Singles"], ["doubles", "Doubles"], ["triples", "Triples"]], locked)}</div>
+      <div class="stack" style="gap:8px"><div class="eyebrow">Entry type</div>${seg("entry", t.entry, [["teams", "Fixed teams"], ["melee", "Mêlée (random teams)"], ["shooting", "Precision shooting"]], locked)}</div>
+      ${isShoot(t) ? `<p class="small muted">Shooters enter individually. Tir de précision to FIPJP rules: 5 ateliers (lone boule, boule behind the jack, boule between two boules, boule behind an obstacle, the jack), each shot from 6, 7, 8 and 9 m. Every shot scores 0, 1, 3 or 5, so a scorecard is out of 100.</p>` : `<div class="stack" style="gap:8px"><div class="eyebrow">Format</div>${seg("format", t.format, [["singles", "Singles"], ["doubles", "Doubles"], ["triples", "Triples"]], locked)}</div>`}
       ${isMelee(t) ? `<p class="small muted">Players enter individually. Each round draws new random teams, mixing doubles and triples when numbers don't divide evenly, and avoids repeat partners where it can. Players are ranked individually.</p>` : ""}
-      <div class="fields">
+      ${isShoot(t) ? "" : `<div class="fields">
         <label class="f"><span>Points to win</span><input type="number" min="1" max="21" id="f-target" data-field="target" data-num value="${t.target}"></label>
         <label class="f"><span>Bye counts as</span><div class="row" style="flex-wrap:nowrap"><input type="number" min="0" id="f-bye0" data-field="byeScore.0" data-num value="${t.byeScore[0]}"><span>–</span><input type="number" min="0" id="f-bye1" data-field="byeScore.1" data-num value="${t.byeScore[1]}"></div></label>
-      </div>
+      </div>`}
     </div>
     <div class="panel stack">
       <h3>Competition system</h3>
-      ${isMelee(t) ? `<p class="muted">Mêlée competitions play a set number of rounds.</p>` :
+      ${isShoot(t) ? `<div class="stack" style="gap:8px"><div class="eyebrow">Rounds</div>${seg("shootFormat", t.shootFormat || "ko8", [["ko8", "Qualifying → top 8 knockout"], ["ko16", "Qualifying → top 16 knockout"], ["final", "Qualifying → final"]], locked)}</div>
+        ${(t.shootFormat || "ko8") === "final" ? `<label class="f"><span>Shooters in the final</span><input type="number" min="2" max="16" id="f-sfinal" data-field="shootFinal" data-num value="${t.shootFinal || 4}" ${locked ? "disabled" : ""}></label>
+          <p class="small muted">Everyone shoots a qualifying scorecard. The top shooters then shoot a final scorecard, and the highest final score wins.</p>`
+        : `<label class="chk"><input type="checkbox" data-check="koThird" ${t.koThird ? "checked" : ""} ${locked ? "disabled" : ""}> Third-place duel</label>
+          <p class="small muted">Everyone shoots a qualifying scorecard. The top ${(t.shootFormat || "ko8") === "ko16" ? 16 : 8} go into a knockout (1st v ${(t.shootFormat || "ko8") === "ko16" ? 16 : 8}th, and so on). Each knockout game is a duel: both shooters shoot a full scorecard and the higher total goes through.</p>`}
+        <div class="stack" style="gap:8px"><div class="eyebrow">Shooting order</div>${seg("seeding", t.seeding, [["random", "Random draw"], ["entry", "Entry order"]], locked)}</div>`
+      : isMelee(t) ? `<p class="muted">Mêlée competitions play a set number of rounds.</p>` :
       seg("system", t.system, [["swiss", "Swiss"], ["snake", "Snake"], ["pools", "Pools → KO"], ["knockout", "Knockout"], ["roundrobin", "Round robin"]], locked)}
       ${sys === "snake" ? `<label class="f"><span>Rounds</span><input type="number" min="1" max="15" id="f-snrounds" data-field="snakeRounds" data-num value="${t.snakeRounds || 5}" ${locked ? "disabled" : ""}></label>
         <p class="small muted">Teams stand in two lines. Each round one line moves along a place, so team 2 plays whoever team 1 just played, team 3 whoever team 2 just played, and so on. All rounds are drawn at once and nobody meets the same team twice${activeIds(t).length ? ` (${activeIds(t).length} teams allow up to ${snakeMaxRounds(activeIds(t).length)} rounds)` : ""}. With an odd number of teams, one team sits out each round and scores a bye. Ranked like Swiss: wins, Buchholz, fine Buchholz, points difference.</p>` : ""}
@@ -1146,7 +1395,7 @@ function renderSetup(t) {
         <div class="stack" style="gap:8px"><div class="eyebrow">Pool games</div>${seg("poolStyle", t.poolStyle, [["french", "French poule (2 wins qualify)"], ["rr", "Round robin"]], locked)}</div>
         <p class="small muted">French poules need 4 teams: game 1 is drawn, then winners play winners and losers play losers, and a barrage decides second place. Pools of other sizes play round robin.</p>` : ""}
       ${sys === "knockout" ? `<label class="chk"><input type="checkbox" data-check="consolante" ${t.consolante ? "checked" : ""}> First-round losers play a consolante</label><label class="chk"><input type="checkbox" data-check="koThird" ${t.koThird ? "checked" : ""} ${locked ? "disabled" : ""}> Third-place play-off</label>` : ""}
-      ${sys !== "melee" ? `<div class="stack" style="gap:8px"><div class="eyebrow">Seeding</div>${seg("seeding", t.seeding, [["random", "Random draw"], ["entry", "Entry order is seeding"]], locked)}</div>` : ""}
+      ${sys !== "melee" && sys !== "shooting" ? `<div class="stack" style="gap:8px"><div class="eyebrow">Seeding</div>${seg("seeding", t.seeding, [["random", "Random draw"], ["entry", "Entry order is seeding"]], locked)}</div>` : ""}
     </div>
   </div>
   ${PLAN_SYSTEMS.includes(sys) ? `<div class="panel stack">
@@ -1161,6 +1410,10 @@ function renderSetup(t) {
     </div>
     <label class="chk"><input type="checkbox" data-check="randomCourts" ${t.randomCourts ? "checked" : ""}> Allocate pistes at random (otherwise lowest free piste first)</label>
   </div>
+  ${canEdit() ? `<div class="panel spread">
+    <div><h3>${t.archived ? "Archived" : "Archive competition"}</h3><p class="small muted">${t.archived ? "Only the site admin can see this competition. Restore it to make it visible again." : `Once the competition has finished, archive it to hide it from everyone except the site admin.${MS().some(m => !m.done && m.a && (m.b || m.stage === "shoot")) ? " Some games aren't finished yet." : ""}`}</p></div>
+    ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">Archive “${esc(t.name)}”? Only the admin will be able to see it.</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
+  </div>` : ""}
   ${S.canDelete && !S.canDelete(t) ? "" : `<div class="panel spread">
     <div><h3>Delete competition</h3><p class="small muted">Removes the competition, its entries and every result.</p></div>
     ${S.confirmDelete ? `<div class="row"><span class="err">Delete “${esc(t.name)}” for everyone?</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
@@ -1170,7 +1423,7 @@ function renderSetup(t) {
 
 /* entries */
 function renderEntries(t) {
-  const melee = isMelee(t); const size = SIZE[t.format]; const noun = melee ? "players" : "teams";
+  const melee = isIndiv(t); const size = SIZE[t.format]; const noun = melee ? "players" : "teams";
   const list = entities(t);
   const entered = list.filter(e => e.active !== false);
   const here = entered.filter(e => e.checkedIn);
@@ -1229,9 +1482,9 @@ function matchCard(t, m, opts = {}) {
   const st = mStatus(m); const ro = !canScore() || st === "pending";
   const side = (s, sc, win) => `<div class="side ${m.done && m.b ? (win ? "win" : "lose") : ""}"><span class="nm">${s ? esc(sideName(t, s)) : `<span class="tbd">${m.stage === "ko" ? "Winner to come" : "To be decided"}</span>`}</span><span class="sc">${m.done || (sc !== null && sc !== undefined && st === "playing") ? (sc ?? "") : ""}</span></div>`;
   if (m.bye) return `<div class="match ro"><div class="meta"><span>${opts.ctx ? esc(matchContext(t, m)) : ""}</span><span class="pill">Bye</span></div>${side(m.a, m.sa, true)}<div class="small muted">Bye scored ${m.sa}–${m.sb}</div></div>`;
-  const aw = m.done && m.sa > m.sb;
+  const aw = m.done && aWon(m);
   const label = st === "playing" ? `<span class="court-tag">Piste ${esc(courtName(t, m.court))}</span>` : st === "done" ? (m.courtUsed ? `<span>Piste ${esc(courtName(t, m.courtUsed))}</span>` : "<span></span>") : st === "ready" ? `<span>Waiting for piste</span>` : `<span></span>`;
-  const pill = { playing: `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: `<span class="pill done">Finished</span>`, ready: `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
+  const pill = { playing: `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: m.corrected ? `<span class="pill done">Corrected</span>` : `<span class="pill done">Finished</span>`, ready: `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
   return `<${ro ? "div" : "button"} class="match ${st} ${ro ? "ro" : ""}" ${ro ? "" : `data-match="${m.id}" type="button"`}>
     <div class="meta">${opts.ctx ? `<span>${esc(matchContext(t, m))}</span>` : label}${pill}</div>
     ${side(m.a, m.sa, aw)}${side(m.b, m.sb, m.done && !aw)}
@@ -1241,15 +1494,16 @@ function matchCard(t, m, opts = {}) {
 
 /* draw */
 function renderDraw(t) {
+  if (isShoot(t)) return renderShooting(t);
   const ms = MS(); const n = activeIds(t).length;
-  const sys = isMelee(t) ? "melee" : t.system;
+  const sys = sysOf(t);
   const wr = canEdit();
   const minNeeded = sys === "melee" ? SIZE[t.format] * 2 : 2;
   if (!t.draws.length) {
     return `<div class="stack"><h2>Draw & results</h2><div class="panel stack">
-      <p>${n} ${isMelee(t) ? "players" : "teams"} ${t.checkin ? "checked in" : "entered"} · ${SYSTEM_LABEL[sys]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
-      ${t.checkin && enteredIds(t).length > n ? `<div class="notice">${enteredIds(t).length - n} entered ${isMelee(t) ? "player" : "team"}${enteredIds(t).length - n === 1 ? " hasn't" : "s haven't"} checked in and won't be in the draw. <button class="btn sm ghost" data-tab="entries">Go to Registration</button></div>` : ""}
-      ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} ${isMelee(t) ? "players" : "teams"} on Registration before drawing.</p>` :
+      <p>${n} ${isIndiv(t) ? "players" : "teams"} ${t.checkin ? "checked in" : "entered"} · ${SYSTEM_LABEL[sys]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
+      ${t.checkin && enteredIds(t).length > n ? `<div class="notice">${enteredIds(t).length - n} entered ${isIndiv(t) ? "player" : "team"}${enteredIds(t).length - n === 1 ? " hasn't" : "s haven't"} checked in and won't be in the draw. <button class="btn sm ghost" data-tab="entries">Go to Registration</button></div>` : ""}
+      ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} ${isIndiv(t) ? "players" : "teams"} on Registration before drawing.</p>` :
       wr ? `<div><button class="btn primary" data-act="first-draw">${{ swiss: "Draw round 1", melee: "Draw round 1", roundrobin: "Generate round robin schedule", snake: "Draw snake rounds", pools: "Draw pools", knockout: "Draw knockout bracket" }[sys]}</button></div>` : `<p class="muted">Waiting for the organiser to make the draw.</p>`}
     </div></div>`;
   }
@@ -1308,7 +1562,7 @@ function poolCard(t, p, ms, rk) {
   const pm = ms.filter(m => m.pool === p.id).sort(byOrder);
   return `<div class="panel stack" style="gap:10px">
     <div class="spread"><h3>${esc(p.name)}</h3>${rk.complete ? `<span class="pill done">Complete</span>` : `<span class="pill">${pm.filter(m => m.done).length}/${p.french ? 5 : pm.length} games</span>`}</div>
-    <div class="tw"><table><thead><tr><th>#</th><th>${isMelee(t) ? "Player" : "Team"}</th><th class="n">W</th><th class="n">+/-</th></tr></thead><tbody>
+    <div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n">W</th><th class="n">+/-</th></tr></thead><tbody>
       ${rk.rows.map((s, i) => `<tr class="${!s.unplaced && i < getPlan(t).brackets[0].to && i >= getPlan(t).brackets[0].from - 1 && rk.complete ? "q" : ""}"><td>${s.unplaced ? "–" : i + 1}</td><td class="wrap">${esc(entName(t, s.id))}</td><td class="n">${s.w}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
     </tbody></table></div>
     <div class="stack" style="gap:8px">${pm.map(m => matchCard(t, m)).join("")}</div>
@@ -1318,7 +1572,7 @@ const SHORT = (R, r) => { const left = R - r; return left === 0 ? "Final" : left
 function bkCard(t, b, m) {
   const seedOf = id => b.seeds ? b.seeds.indexOf(id) + 1 : 0;
   const st = mStatus(m); const ro = !canScore() || st === "pending" || m.bye;
-  const aw = m.done && m.b && m.sa > m.sb;
+  const aw = m.done && m.b && aWon(m);
   const feeder = side => { // the earlier game this slot is waiting on
     if (m.third) return `Loser of SF ${side === "a" ? 1 : 2}`;
     if (m.round === 1) return "Bye";
@@ -1330,7 +1584,7 @@ function bkCard(t, b, m) {
     const showSc = !m.bye && (st === "done" || st === "playing") && sc !== null && sc !== undefined;
     return `<div class="bkm-row ${cls}"><span class="sd">${sd || ""}</span><span class="nm">${ids ? esc(sideName(t, ids)) : `<span class="tbd muted">${feeder(side)}</span>`}</span><span class="sc">${showSc ? sc : ""}</span></div>`;
   };
-  const foot = m.bye ? "Bye" : st === "playing" ? `Piste ${esc(courtName(t, m.court))} · playing` : st === "ready" ? "Waiting for a piste" : "";
+  const foot = m.corrected && st === "done" ? "Corrected" : m.bye ? "Bye" : st === "playing" ? `Piste ${esc(courtName(t, m.court))} · playing` : st === "ready" ? "Waiting for a piste" : "";
   const tag = ro ? "div" : "button";
   return `<${tag} class="bkm ${st} ${m.bye ? "bye" : ""} ${ro ? "ro" : ""}" ${ro ? "" : `type="button" data-match="${m.id}"`} aria-label="${esc(matchContext(t, m))}">
     ${row("a", m.sa, m.done && m.b ? (aw ? "win" : "lose") : m.bye ? "win" : "")}
@@ -1380,7 +1634,7 @@ function renderBracket(t, b, ms) {
   const final = bm.find(m => m.round === b.rounds && !m.third);
   const champ = final?.done ? sideName(t, winnerSide(final)) : null;
   const canUndo = canEdit() && !bm.some(m => m.done && !m.bye);
-  return `<section class="panel stack" style="gap:12px"><div class="spread"><h3>${esc(b.name)} <span class="muted small">${b.entrants} ${isMelee(t) ? "players" : "teams"}${b.seeds ? " · seeded" : b.seeds === null ? " · random draw" : ""}</span></h3>
+  return `<section class="panel stack" style="gap:12px"><div class="spread"><h3>${esc(b.name)} <span class="muted small">${b.entrants} ${isIndiv(t) ? "players" : "teams"}${b.seeds ? " · seeded" : b.seeds === null ? " · random draw" : ""}</span></h3>
     <div class="row">${champ ? `<span class="pill done">Winner: ${esc(champ)}</span>` : ""}${canUndo ? `<button class="btn danger sm" data-act="undo" data-id="${b.id}">Undo bracket</button>` : ""}</div></div>
     ${bracketGrid(t, b, ms)}</section>`;
 }
@@ -1413,12 +1667,12 @@ function overallTable(t, stage) {
 }
 function standingsTable(t, rows, opts = {}) {
   const useB = opts.buch;
-  return `<div class="tw"><table><thead><tr><th>#</th><th>${isMelee(t) ? "Player" : "Team"}</th><th class="n">Pld</th><th class="n">W</th><th class="n">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n">For</th><th class="n">Agst</th><th class="n">+/-</th></tr></thead><tbody>
-    ${rows.map((s, i) => `<tr><td class="rank">${i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${!isMelee(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n">${s.fbuch}</td>` : ""}<td class="n">${s.pf}</td><td class="n">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
+  return `<div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n">Pld</th><th class="n">W</th><th class="n">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n">For</th><th class="n">Agst</th><th class="n">+/-</th></tr></thead><tbody>
+    ${rows.map((s, i) => `<tr><td class="rank">${i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${!isIndiv(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n">${s.fbuch}</td>` : ""}<td class="n">${s.pf}</td><td class="n">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
   </tbody></table></div>`;
 }
 function renderStandings(t) {
-  const sys = isMelee(t) ? "melee" : t.system;
+  const sys = sysOf(t);
   let html = `<div class="stack"><h2>Standings</h2>`;
   const ms = MS();
   (t.brackets || []).forEach(b => {
@@ -1436,7 +1690,8 @@ function renderStandings(t) {
   } else if (sys === "pools") {
     if (!(t.pools || []).length) html += `<div class="empty">Pool tables appear once pools are drawn.</div>`;
     else html += `<div class="pools">${t.pools.map(p => { const rk = poolRanking(t, p, ms); return `<div class="panel stack" style="gap:8px"><h3>${esc(p.name)}</h3>${standingsTable(t, rk.rows)}</div>`; }).join("")}</div>`;
-  } else if (!(t.brackets || []).length) html += `<div class="empty">Results appear once the bracket is drawn.</div>`;
+  } else if (sys === "shooting") html += shootStandings(t);
+  else if (!(t.brackets || []).length) html += `<div class="empty">Results appear once the bracket is drawn.</div>`;
   return html + `</div>`;
 }
 
@@ -1444,10 +1699,11 @@ function renderStandings(t) {
 function renderDisplay(t) {
   const ms = MS(); const live = ms.filter(m => !m.done && m.court);
   const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder).slice(0, 8);
-  const sys = isMelee(t) ? "melee" : t.system;
+  const sys = sysOf(t);
   let table = "";
   if ((sys === "swiss" || sys === "melee" || sys === "snake") && ms.some(m => m.stage === sys)) table = standingsTable(t, overallTable(t, sys).slice(0, 12), { buch: sys !== "melee" });
   else if (sys === "roundrobin" && ms.length) table = standingsTable(t, overallTable(t, "rr").slice(0, 12));
+  else if (sys === "shooting" && ms.length) table = shootStandings(t);
   const curRound = t.draws.filter(d => d.kind === "round").length;
   return `<div class="disp">
     <div class="spread"><div><div class="eyebrow">${esc(t.venue || "")}${t.venue ? " · " : ""}${esc(t.date || "")}</div><h2>${esc(t.name)}</h2></div>
@@ -1475,14 +1731,17 @@ document.addEventListener("click", async e => {
   if (lg) { I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
   const tab = e.target.closest("[data-tab]");
   if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); render(); return; }
+  const sc = e.target.closest("[data-shoot]");
+  if (sc) { openMatch(sc.dataset.shoot); return; }
   const mc = e.target.closest("[data-match]");
   if (mc) { openMatch(mc.dataset.match); return; }
   const setb = e.target.closest("[data-set]");
   if (setb && canEdit() && setb.dataset.set === "plan-seeding") { const v = setb.dataset.val; await savePlan(pl => pl.seeding = v); return; }
-  if (setb && canEdit()) { const t = clone(T()); t[setb.dataset.set] = setb.dataset.val; if (setb.dataset.set === "entry" && t.entry === "melee") t.system = "swiss"; await guard(() => saveT(t)); return; }
+  if (setb && canEdit()) { const t = clone(T()); t[setb.dataset.set] = setb.dataset.val; if (setb.dataset.set === "entry" && t.entry === "shooting") { t.system = "knockout"; t.shootFormat = t.shootFormat || "ko8"; t.format = "singles"; }
+    if (setb.dataset.set === "entry" && t.entry === "melee") t.system = "swiss"; await guard(() => saveT(t)); return; }
   const a = e.target.closest("[data-act]"); if (!a) return;
   const act = a.dataset.act;
-  if (a.closest("#modal") && S.modal) { if (act === "close-bg" && e.target !== a) return; modalAction(act, a.dataset.k); return; }
+  if (a.closest("#modal") && S.modal) { if (act === "close-bg" && e.target !== a) return; modalAction(act, a.dataset.k, a); return; }
   const t = T();
   switch (act) {
     case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
@@ -1490,8 +1749,9 @@ document.addEventListener("click", async e => {
     case "del-t-no": S.confirmDelete = false; render(); break;
     case "del-t-yes": { S.confirmDelete = false; const id = t.id; delete S.tournaments[id]; S.tid = Object.keys(S.tournaments)[0] || null; S.matches = {}; watchMatches(); render(); await guard(() => S.store.deleteTournament(id)); S.onSelect?.(); toast("Competition deleted."); break; }
     case "first-draw": {
-      const sys = isMelee(t) ? "melee" : t.system;
-      if (sys === "swiss") await guard(() => addDraw(drawSwissRound(t, MS())));
+      const sys = sysOf(t);
+      if (sys === "shooting") await guard(() => addDraw(drawShootQualifying(t)));
+      else if (sys === "swiss") await guard(() => addDraw(drawSwissRound(t, MS())));
       else if (sys === "melee") await guard(() => addDraw(drawMeleeRound(t, MS())));
       else if (sys === "roundrobin") await guard(() => addDraw(genRoundRobin(t)));
       else if (sys === "snake") await guard(() => addDraw(genSnake(t)));
@@ -1499,6 +1759,11 @@ document.addEventListener("click", async e => {
       else if (sys === "knockout") { const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t)); await guard(() => addDraw(createBracket(t, "A", "Main knockout", ids, { third: t.koThird }))); }
       break;
     }
+    case "shoot-next": await guard(() => addDraw((t.shootFormat || "ko8") === "final" ? drawShootFinal(t) : drawShootKnockout(t))); break;
+    case "archive": S.confirmArchive = true; render(); break;
+    case "archive-no": S.confirmArchive = false; render(); break;
+    case "archive-yes": S.confirmArchive = false; await archiveCompetition(true); break;
+    case "restore": await archiveCompetition(false); break;
     case "next-round": await guard(() => addDraw(isMelee(t) ? drawMeleeRound(t, MS()) : drawSwissRound(t, MS()))); break;
     case "undo": await guard(() => undoDraw(a.dataset.id)); break;
     case "assign": { const n = await guard(assignCourts); toast(n ? `${n} game(s) sent to pistes.` : "No free piste or no game ready."); render(); break; }
@@ -1514,7 +1779,7 @@ document.addEventListener("click", async e => {
     case "checkin-all": { const nt = clone(t); entities(nt).forEach(x => { if (x.active !== false && !x.checkedIn) { x.checkedIn = true; x.checkedInAt = Date.now(); } }); await guard(() => saveT(nt)); toast("Everyone is checked in."); break; }
     case "checkin-clear": { if (!S.confirmClear) { S.confirmClear = true; toast("Tap Clear check-ins again to confirm."); setTimeout(() => S.confirmClear = false, 4000); break; } S.confirmClear = false; const nt = clone(t); entities(nt).forEach(x => { x.checkedIn = false; x.checkedInAt = null; }); await guard(() => saveT(nt)); toast("Check-ins cleared."); break; }
     case "toggle-e": { const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); e2.active = e2.active === false; await guard(() => saveT(nt)); break; }
-    case "del-e": { const nt = clone(t); if (isMelee(nt)) nt.players = nt.players.filter(x => x.id !== a.dataset.id); else nt.teams = nt.teams.filter(x => x.id !== a.dataset.id); await guard(() => saveT(nt)); break; }
+    case "del-e": { const nt = clone(t); if (isIndiv(nt)) nt.players = nt.players.filter(x => x.id !== a.dataset.id); else nt.teams = nt.teams.filter(x => x.id !== a.dataset.id); await guard(() => saveT(nt)); break; }
     case "up": { const nt = clone(t); const arr = entities(nt); const i = arr.findIndex(x => x.id === a.dataset.id); if (i > 0) [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; await guard(() => saveT(nt)); break; }
     case "fullscreen": { try { await document.documentElement.requestFullscreen(); } catch { toast("Full screen isn't available here."); } break; }
     case "export": exportCsv(); break;
@@ -1558,7 +1823,7 @@ document.addEventListener("submit", async e => {
   e.preventDefault(); const t = clone(T()); if (!t) return;
   if (e.target.id === "add-form") {
     const hereNow = !!$("#add-here")?.checked; const ci = hereNow ? { checkedIn: true, checkedInAt: Date.now() } : {};
-    if (isMelee(t)) { const nm = $("#np-name").value.trim(); if (!nm) return; t.players.push(Object.assign({ id: "p" + uid(), name: nm, active: true }, ci)); }
+    if (isIndiv(t)) { const nm = $("#np-name").value.trim(); if (!nm) return; t.players.push(Object.assign({ id: "p" + uid(), name: nm, active: true }, ci)); }
     else {
       const ps = Array.from({ length: SIZE[t.format] }, (_, i) => $("#nt-p" + i).value.trim());
       const name = $("#nt-name").value.trim(); if (!name && !ps.some(Boolean)) { toast("Enter a team name or at least one player."); return; }
@@ -1570,7 +1835,7 @@ document.addEventListener("submit", async e => {
   if (e.target.id === "bulk-form") {
     const lines = $("#bulk").value.split(/\n/).map(s => s.trim()).filter(Boolean); if (!lines.length) return;
     lines.forEach(l => {
-      if (isMelee(t)) t.players.push({ id: "p" + uid(), name: l, active: true });
+      if (isIndiv(t)) t.players.push({ id: "p" + uid(), name: l, active: true });
       else { let name = "", rest = l; const ci = l.indexOf(":"); if (ci > -1) { name = l.slice(0, ci).trim(); rest = l.slice(ci + 1); }
         const ps = rest.split(/[,;\/]/).map(s => s.trim()).filter(Boolean); t.teams.push({ id: "e" + uid(), name, players: ps, club: "", active: true }); }
     });
@@ -1581,7 +1846,7 @@ document.addEventListener("submit", async e => {
 document.addEventListener("keydown", e => { if (e.key === "Escape" && S.modal) { S.modal = null; renderModal(); } });
 
 async function exportCsv() {
-  const t = T(); const rows = [["Stage", "Round", "Piste", isMelee(t) ? "Side A" : "Team A", "Score A", "Score B", isMelee(t) ? "Side B" : "Team B", "Status"]];
+  const t = T(); const rows = [["Stage", "Round", "Piste", isIndiv(t) ? "Side A" : "Team A", "Score A", "Score B", isIndiv(t) ? "Side B" : "Team B", "Status"]];
   MS().sort(byOrder).forEach(m => rows.push([matchContext(t, m), m.round, m.courtUsed || m.court ? courtName(t, m.courtUsed || m.court) : "", sideName(t, m.a) || "", m.sa ?? "", m.sb ?? "", m.bye ? "BYE" : sideName(t, m.b) || "", mStatus(m)]));
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
   try { await S.downloads.save({ filename: `${t.name.replace(/[^\w\- ]+/g, "").trim() || "results"}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
@@ -1596,7 +1861,7 @@ function watchMatches() {
 }
 function startWatching() {
   S.store.watchTournaments(list => {
-    S.tournaments = {}; list.forEach(t => S.tournaments[t.id] = t);
+    S.tournaments = {}; list.filter(t => !t.archived || S.canSeeArchived()).forEach(t => S.tournaments[t.id] = t);
     S.loaded = true;
     if (!S.tid || !S.tournaments[S.tid]) { const first = list.sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
     if (T() && !canEdit() && (S.tab === "setup" || S.tab === "entries")) S.tab = canScore() ? "courts" : "draw";
@@ -1639,9 +1904,12 @@ function fbStore() {
       const subQ = (key, q) => { expected.add(key); unsubs.push(onSnapshot(q, s => { parts[key] = s.docs.map(d => d.data()); emit(); }, e => { console.error(e); parts[key] = []; emit(); onErr?.(e); })); };
       const subD = (key, tid) => { expected.add(key); unsubs.push(onSnapshot(doc(db, "tournaments", tid), d => { parts[key] = d.exists() ? [d.data()] : []; emit(); }, () => { parts[key] = []; emit(); })); };
       const tc = collection(db, "tournaments");
-      subQ("listed", query(tc, where("listed", "==", true), limit(100)));
-      if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), limit(200)));
-      if (isAdmin() || SITE.openTesting) subQ("all", query(tc, limit(300)));
+      // archived competitions are only visible to the admin (enforced in firestore.rules)
+      if (isAdmin()) subQ("all", query(tc, limit(300)));
+      else {
+        subQ("listed", query(tc, where("listed", "==", true), where("archived", "==", false), limit(100)));
+        if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), where("archived", "==", false), limit(200)));
+      }
       new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
@@ -1670,11 +1938,13 @@ function fbStore() {
 const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);
 S.permFn = t => {
   if (!AUTH.user || !t) return { edit: false, score: false };
-  const r = isOwner(t) || isAdmin() || SITE.openTesting ? "edit" : ROLE[t.id];
+  // open testing lets guests run competitions they open, except the examples (listed), which stay view-only
+  const r = isOwner(t) || isAdmin() || (SITE.openTesting && !t.listed) ? "edit" : ROLE[t.id];
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
 S.canDelete = t => isOwner(t) || isAdmin();
+S.canSeeArchived = () => isAdmin();
 S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.listed = false; nt._new = true; remember(nt.id); };
 
 const base = () => `${location.origin}${location.pathname}`;
@@ -1683,6 +1953,7 @@ S.headerExtra = () => {
   const t = T(); if (!CONFIGURED || !t) return "";
   const p = S.permFn(t);
   if (isAdmin()) return `<span class="pill done">Admin</span>`;
+  if (SITE.openTesting && t.listed) return `<span class="pill" title="Example competition, view only">Example</span>`;
   if (SITE.openTesting) return `<span class="pill playing" title="Open testing">Test mode</span>`;
   if (isOwner(t)) return `<span class="pill done">Organiser</span>`;
   if (p.edit) return `<span class="pill done">Organiser</span>`;
@@ -1712,6 +1983,13 @@ S.extraAction = async (act, a) => {
   if (act === "copy") { const el = document.getElementById(a.dataset.target); try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } }
   if (act === "enter-code") openCodeBox();
   if (act === "admin-exit") { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); S.overlayView = null; render(); return; }
+  if (act === "admin-example") { const t = S.tournaments[a.dataset.id]; try { await updateDoc(doc(FB.db, "tournaments", a.dataset.id), { listed: !t?.listed }); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); } return; }
+  if (act === "admin-del") { S.adminConfirm = a.dataset.id; render(); return; }
+  if (act === "admin-del-yes") { const id = a.dataset.id; S.adminConfirm = null; try { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; toast("Competition deleted."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); } render(); return; }
+  if (act === "admin-restore") {
+    try { await updateDoc(doc(FB.db, "tournaments", a.dataset.id), { archived: false, archivedAt: null }); toast("Competition restored."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); }
+    return;
+  }
   if (act === "open-testing") {
     const on = a.dataset.on === "1";
     try { await setDoc(doc(FB.db, "config", "site"), { openTesting: on, updated: Date.now() }); toast(on ? "Open testing is on." : "Open testing is off."); }
@@ -1770,7 +2048,7 @@ function watchCodes(tid) {
 function restart() { if (!FB) return; startWatching(); watchRole(); renderFooter(); }
 function renderFooter() { /* admin lives at #admin (the back end); nothing shown to guests */ }
 function adminView() {
-  const all = Object.values(S.tournaments).sort((x, y) => (y.created || 0) - (x.created || 0));
+  const all = Object.values(S.tournaments).sort((x, y) => (!!y.listed - !!x.listed) || (y.created || 0) - (x.created || 0));
   return `<div class="stack" style="max-width:720px">
     <div class="spread"><h2>Admin back end</h2><button class="btn sm" data-act="admin-exit">Back to competitions</button></div>
     ${!isAdmin() ? `<div class="panel stack"><p>Sign in with the admin Google account to change site settings.</p><div><button class="btn primary" data-act="admin-in">Sign in with Google</button></div></div>` : `
@@ -1781,11 +2059,19 @@ function adminView() {
       <div><button class="btn ${SITE.openTesting ? "" : "primary"}" data-act="open-testing" data-on="${SITE.openTesting ? "0" : "1"}">${SITE.openTesting ? "Turn open testing off" : "Turn open testing on"}</button></div>
     </div>
     <div class="panel stack" style="gap:6px"><h3>Competitions <span class="muted small">${all.length}</span></h3>
-      ${all.map(t => `<div class="erow"><div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(t.date || "")}</span></div><a class="btn sm" href="#${t.id}" data-act="admin-exit">Open</a></div>`).join("")}
+      <p class="small muted">Visitors only see the competitions they created on their own device, plus the examples. Examples are view-only for visitors.</p>
+      ${all.map(t => `<div class="erow"><div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(t.date || "")}</span></div>${t.archived ? `<span class="pill">Archived</span><button class="btn sm" data-act="admin-restore" data-id="${t.id}">Restore</button>` : ""}
+        <button class="btn sm ${t.listed ? "primary" : ""}" data-act="admin-example" data-id="${t.id}" title="Examples are shown to every visitor, view only">${t.listed ? "Example ✓" : "Make example"}</button>
+        <a class="btn sm" href="#${t.id}" data-act="admin-exit">Open</a>
+        ${S.adminConfirm === t.id ? `<button class="btn sm danger" data-act="admin-del-yes" data-id="${t.id}">Confirm delete</button>` : `<button class="btn sm danger" data-act="admin-del" data-id="${t.id}">Delete</button>`}</div>`).join("")}
     </div>`}
   </div>`;
 }
 let unsubSite = null;
+async function backfillArchived() {
+  if (!isAdmin() || S.backfilled) return; S.backfilled = true;
+  for (const t of Object.values(S.tournaments)) if (t.archived === undefined) { try { await updateDoc(doc(FB.db, "tournaments", t.id), { archived: false }); } catch (e) { console.error(e); } }
+}
 function watchSite() {
   if (unsubSite || !FB) return;
   unsubSite = onSnapshot(doc(FB.db, "config", "site"), d => {
@@ -1796,7 +2082,7 @@ function watchSite() {
   }, () => { SITE.loaded = true; });
 }
 S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
-S.onTournaments = () => { if (S.tid) watchCodes(S.tid); };
+S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); };
 
 // links look like #<competition id> or #<competition id>.<code>
 function readHash() { const [tid, code] = location.hash.slice(1).split("."); return { tid: tid || null, code: code || null }; }
@@ -1832,7 +2118,7 @@ render();
 boot();
 
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, genSnake, render, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, recordResult, addDraw, MS, T };
+if (!window.claude || window.__testHook) window.__carreau = { S, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, recordResult, addDraw, MS, T };
 })();
 </script>
 

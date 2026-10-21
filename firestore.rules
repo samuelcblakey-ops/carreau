@@ -6,6 +6,8 @@ rules_version = '2';
 //    organiser (full control); one that presents the scorer code can enter scores and move games.
 //  - Site admins (Google sign-in, listed below) can change or delete any competition and switch
 //    open testing on or off (config/site). While open testing is on, anyone can run any competition.
+//  - Organisers can archive a finished competition; after that only the admin can see or restore it.
+//  - Visitors only list their own competitions plus the examples (listed); examples are view-only.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
@@ -18,8 +20,12 @@ service cloud.firestore {
     // Open testing (beta): every signed-in visitor can run every competition. On unless config/site says otherwise.
     function cfg() { return /databases/$(database)/documents/config/site; }
     function openTesting() { return !exists(cfg()) || get(cfg()).data.openTesting != false; }
-    function canEdit(tid) { return isAdmin() || owns(tid) || role(tid) == 'edit' || (signedIn() && openTesting()); }
+    // examples (listed) are view-only for visitors even in open testing
+    function canEdit(tid) { return isAdmin() || owns(tid) || role(tid) == 'edit'
+                                   || (signedIn() && openTesting() && get(tdoc(tid)).data.get('listed', false) != true); }
     function canScore(tid) { return canEdit(tid) || role(tid) == 'score'; }
+    // archived competitions are hidden from everyone except the admin
+    function notArchived(tid) { return get(tdoc(tid)).data.get('archived', false) != true; }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
 
     match /config/{docId} {
@@ -28,9 +34,11 @@ service cloud.firestore {
     }
 
     match /tournaments/{tid} {
-      allow read: if true;
+      allow get: if resource.data.get('archived', false) != true || isAdmin();
+      allow list: if isAdmin() || resource.data.archived == false;
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow update: if canEdit(tid) && request.resource.data.ownerUid == resource.data.ownerUid;
+      allow update: if ((canEdit(tid) && resource.data.get('archived', false) != true) || isAdmin())
+                    && request.resource.data.ownerUid == resource.data.ownerUid;
       allow delete: if owns(tid) || isAdmin();
 
       match /private/{docId} {
@@ -48,9 +56,9 @@ service cloud.firestore {
       }
 
       match /matches/{mid} {
-        allow read: if true;
-        allow create, update: if canScore(tid);
-        allow delete: if canEdit(tid);
+        allow read: if notArchived(tid) || isAdmin();
+        allow create, update: if (canScore(tid) && notArchived(tid)) || isAdmin();
+        allow delete: if (canEdit(tid) && notArchived(tid)) || isAdmin();
       }
     }
   }
