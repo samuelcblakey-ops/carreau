@@ -109,24 +109,21 @@ function watchTeamCodes(tid) {
   unsubTeamCodes = onSnapshot(doc(FB.db, "tournaments", tid, "private", "teamcodes"), d => { TEAMCODES[tid] = d.exists() ? d.data() : {}; render(); }, () => {});
 }
 const teamLink = (t, id) => `${base()}#${t.id}.t-${id}-${TEAMCODES[t.id][id]}`;
+// QR codes: the generator (public/qr.js) is loaded the first time one is needed, then works offline
+let qrLoad = null;
+const loadQr = () => window.qrcode ? Promise.resolve(window.qrcode) : (qrLoad = qrLoad || new Promise((res, rej) => { const el = document.createElement("script"); el.src = "qr.js"; el.onload = () => res(window.qrcode); el.onerror = () => { qrLoad = null; rej(new Error("qr.js")); }; document.head.appendChild(el); }));
+const qrSvg = url => { const q = window.qrcode(0, "M"); q.addData(url); q.make(); return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); };
+S.teamQr = null; // team whose QR code is showing
 function teamLinksPanel(t) {
   if (!S.teamScoringSetup(t) || !(t.scoreMode === "teams" || t.scoreMode === "teams-auto") || (t.entry !== "teams")) return "";
   watchTeamCodes(t.id);
   const codes = TEAMCODES[t.id] || {}; const teams = (t.teams || []).filter(e => e.active !== false); const missing = teams.filter(e => !codes[e.id]).length;
   return `<div class="panel stack" id="team-links"><div class="spread"><h3>Team links</h3>${teams.length ? `<span class="small muted">${teams.length - missing}/${teams.length} teams have a link</span>` : ""}</div>
     <p class="small muted">Give each team its own link or QR code (for example at check-in). It sets up their phone to enter scores for their games only, and to confirm their opponents' scores.</p>
-    <div class="row">${missing ? `<button class="btn primary sm" data-act="team-links-make">${missing === teams.length ? "Create team links" : `Create ${missing} more`}</button>` : ""}${teams.length - missing ? `<button class="btn sm" data-act="team-qr">Print QR codes</button>` : ""}</div>
-    ${teams.filter(e => codes[e.id]).map(e => `<div class="erow"><div class="who"><b>${esc(e.name || (e.players || []).join(", "))}</b></div><input id="tl-${e.id}" value="${esc(teamLink(t, e.id))}" readonly style="flex:1;min-width:160px" class="small"><button class="btn sm" data-act="copy" data-target="tl-${e.id}">Copy</button></div>`).join("")}
+    ${missing ? `<div><button class="btn primary sm" data-act="team-links-make">${missing === teams.length ? "Create team links" : `Create ${missing} more`}</button></div>` : ""}
+    ${teams.filter(e => codes[e.id]).map(e => { const name = e.name || (e.players || []).join(", "); const open = S.teamQr === e.id; return `<div class="erow"><div class="who"><b>${esc(name)}</b></div><input id="tl-${e.id}" value="${esc(teamLink(t, e.id))}" readonly style="flex:1;min-width:160px" class="small"><button class="btn sm" data-act="copy" data-target="tl-${e.id}">Copy</button><button class="btn sm ${open ? "primary" : ""}" data-act="team-qr" data-id="${e.id}" aria-expanded="${open}">${open ? "Hide QR" : "QR code"}</button></div>
+      ${open ? `<div class="qr-card" data-notr><div class="qr-name">${esc(name)}</div><div class="qr-box">${window.qrcode ? qrSvg(teamLink(t, e.id)) : `<p class="muted small">Loading…</p>`}</div><p class="small muted">Scan with the phone that will enter this team's scores. It opens Carreau already set up for ${esc(name)}.</p></div>` : ""}`; }).join("")}
   </div>`;
-}
-async function showTeamQr() {
-  const t = T(); const codes = TEAMCODES[t.id] || {}; const teams = (t.teams || []).filter(e => codes[e.id]);
-  let qr = null; try { qr = (await import("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/+esm")).default; } catch (e) { console.warn("QR library unavailable", e); }
-  const img = url => { if (!qr) return ""; const q = qr(0, "M"); q.addData(url); q.make(); return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); };
-  const w = open("", "_blank"); if (!w) { toast("Allow pop-ups to print the QR codes."); return; }
-  w.document.write(`<!doctype html><meta charset="utf-8"><title>Team links · ${esc(t.name)}</title><style>body{font-family:system-ui,sans-serif;margin:16px}h1{font-size:18px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}.c{border:1px solid #ccc;border-radius:10px;padding:10px;text-align:center;break-inside:avoid}.c svg{width:150px;height:150px}.n{font-weight:700;margin-bottom:6px}.u{font-size:9px;word-break:break-all;color:#555}</style>
-    <h1>${esc(t.name)} · scan to enter your scores</h1><div class="g">${teams.map(e => `<div class="c"><div class="n">${esc(e.name || (e.players || []).join(", "))}</div>${img(teamLink(t, e.id))}<div class="u">${esc(teamLink(t, e.id))}</div></div>`).join("")}</div><script>setTimeout(()=>print(),400)<\/script>`);
-  w.document.close();
 }
 // organisers archive; only the admin can delete a competition (also enforced in firestore.rules)
 S.canDelete = () => isAdmin();
@@ -204,7 +201,11 @@ S.extraAction = async (act, a) => {
     return;
   }
   if (act === "team-links-make") { await makeTeamCodes(S.tid); return; }
-  if (act === "team-qr") { await showTeamQr(); return; }
+  if (act === "team-qr") {
+    const id = a.dataset.id; if (S.teamQr === id) { S.teamQr = null; render(); return; }
+    try { await loadQr(); } catch { toast("Couldn't load the QR code generator. The link next to the team still works."); return; }
+    S.teamQr = id; render(); setTimeout(() => document.querySelector(".qr-card")?.scrollIntoView({ block: "nearest", behavior: "smooth" }), 0); return;
+  }
   if (act === "admin-in") { try { await signInWithPopup(FB.auth, new GoogleAuthProvider()); } catch (e) { if (e?.code !== "auth/popup-closed-by-user" && e?.code !== "auth/cancelled-popup-request") toast("Sign-in didn't complete. Allow pop-ups for this site and try again."); return; }
     if (!isAdmin()) { toast("That Google account isn't an admin for this site."); await signOut(FB.auth); } else { toast("Signed in as admin."); render(); } }
   if (act === "admin-out") { await signOut(FB.auth); toast("Signed out."); }
