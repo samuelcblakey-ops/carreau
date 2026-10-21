@@ -76,6 +76,10 @@ h3{font-size:19px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .spread{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel.rp-live{border-color:var(--danger);background:var(--danger-soft);box-shadow:inset 0 0 0 1px var(--danger)}
+.panel.rp-ready{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.rp-state{font-weight:600}.rp-live .rp-state{color:var(--danger)}.rp-ready .rp-state{color:var(--accent)}
+.btn.wait:disabled{opacity:.7;color:var(--danger);border-color:var(--danger);background:var(--surface)}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
 .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px}
 .btn:hover{border-color:var(--muted)}
@@ -357,6 +361,9 @@ const FR_TEXT = {
   "{n} teams checked in": "{1} équipes pointées", "{n} teams entered": "{1} équipes inscrites", "{n} players checked in": "{1} joueurs pointés", "{n} players entered": "{1} joueurs inscrits", "{n} pistes": "{1} pistes",
   "Fill free pistes": "Remplir les pistes libres", "Export results (CSV)": "Exporter les résultats (CSV)",
   "Round {n} of {n} planned": "Partie {1} sur {2} prévues", "Morning complete": "Matinée terminée", "{n}/{n} games finished": "{1}/{2} parties terminées", "{n} rounds": "{1} parties",
+  "Round finished": "Partie terminée", "1 game still to finish": "1 partie à terminer", "{n} games still to finish": "{1} parties à terminer", "All games finished": "Toutes les parties sont terminées",
+  "Enter every score of round {n} first": "Saisissez d'abord tous les scores de la partie {1}",
+  "drawn in advance": "tirées d'avance", "All {n} rounds drawn": "{1} parties tirées", "round {n} in play": "partie {1} en cours", "all rounds finished": "toutes les parties terminées",
   "Undo round {n}": "Annuler la partie {1}", "Undo schedule": "Annuler le calendrier", "Undo pools": "Annuler les poules", "Undo bracket": "Annuler le tableau",
   "Round {n}": "Partie {1}", "Draw the knockouts": "Tirer les tableaux",
   "Draw once the last round is finished": "Tirage quand la dernière partie est terminée", "Draw once every game is finished": "Tirage quand toutes les parties sont terminées",
@@ -648,6 +655,7 @@ function checkPanel(t) {
       <button class="btn sm primary" data-act="check-accept" data-id="${m.id}">Accept ${p.sa}–${p.sb}</button><button class="btn sm" data-match="${m.id}">Enter score</button></div>`; }).join("")}</div>`;
 }
 function sideName(t, side) { if (!side) return null; return side.map(id => entName(t, id)).join(isIndiv(t) ? " · " : " / "); }
+const gamesLeft = n => n === 1 ? "1 game still to finish" : `${n} games still to finish`;
 function mStatus(m) { if (m.done) return "done"; if (!m.a || !m.b) return "pending"; if (m.court) return "playing"; return "ready"; }
 const ents = m => [...(m.a || []), ...(m.b || [])];
 const aWon = m => m.win ? m.win === "a" : m.sa > m.sb;
@@ -1751,11 +1759,15 @@ function renderDraw(t) {
     const finalsExist = (t.brackets || []).length > 0;
     const adv = isMelee(t) && meleeMode(t) === "advance";
     const allMs = adv ? ms.filter(m => m.stage === "melee") : []; const inPlay = adv ? (allMs.filter(m => !m.done).sort((x, y) => x.round - y.round)[0]?.round || null) : null;
-    if (adv) html += `<div class="panel spread"><div><div class="eyebrow">Mêlée · drawn in advance</div><b>All ${rounds.length} rounds drawn</b> · ${inPlay ? `round ${inPlay} in play` : `<span style="color:var(--accent);font-weight:600">all rounds finished</span>`} · ${allMs.filter(m => m.done).length}/${allMs.length} games finished</div>
+    // the box is red while games are still being played and turns green once the round is finished
+    if (adv) html += `<div class="panel spread ${inPlay ? "rp-live" : "rp-ready"}"><div><div class="eyebrow">Mêlée · drawn in advance</div><b>All ${rounds.length} rounds drawn</b> · ${inPlay ? `round ${inPlay} in play` : `<span class="rp-state">all rounds finished</span>`} · ${allMs.filter(m => m.done).length}/${allMs.length} games finished</div>
       <div class="row"><button class="btn sm" data-act="print-draw">Print the draw</button>${wr && !allMs.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo-all">Undo the draw</button>` : ""}</div></div>`;
-    else html += `<div class="panel spread"><div><div class="eyebrow">${SYSTEM_LABEL[sys]}</div><b>Round ${last.round} of ${t.swissRounds} planned</b>${lastDone && last.round >= t.swissRounds && sys === "swiss" ? ` · <span style="color:var(--accent);font-weight:600">Morning complete</span>` : ""} · ${lastMs.filter(m => m.done).length}/${lastMs.length} games finished</div>
-      ${wr && !finalsExist ? `<div class="row">${lastDone ? `<button class="btn primary" data-act="next-round">Draw round ${last.round + 1}</button>` : ""}
+    else {
+      const state = lastDone ? (sys === "swiss" && last.round >= t.swissRounds ? "Morning complete" : "Round finished") : gamesLeft(lastMs.filter(m => !m.done).length);
+      html += `<div class="panel spread ${lastDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${SYSTEM_LABEL[sys]}</div><b>Round ${last.round} of ${t.swissRounds} planned</b> · ${lastMs.filter(m => m.done).length}/${lastMs.length} games finished · <span class="rp-state">${state}</span></div>
+      ${wr && !finalsExist ? `<div class="row">${lastDone ? `<button class="btn primary" data-act="next-round">Draw round ${last.round + 1}</button>` : `<button class="btn wait" disabled title="Enter every score of round ${last.round} first">Draw round ${last.round + 1}</button>`}
         ${!lastMs.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${last.id}">Undo round ${last.round}</button>` : ""}</div>` : ""}</div>`;
+    }
   }
   // afternoon knockout planner
   if (PLAN_SYSTEMS.includes(sys) && !(t.brackets || []).length && wr) {
@@ -1773,7 +1785,8 @@ function renderDraw(t) {
   // round robin and snake (whole schedule drawn at once)
   for (const [gid, label] of [["RR", "Round robin"], ["SN", "Snake"]]) if (t.draws.some(d => d.id === gid)) {
     const rr = ms.filter(m => m.group === gid); if (!rr.length) continue; const maxR = Math.max(...rr.map(m => m.round));
-    html += `<div class="panel spread"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds</div>
+    const rrDone = rr.every(m => m.done);
+    html += `<div class="panel spread ${rrDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds · <span class="rp-state">${rrDone ? "All games finished" : gamesLeft(rr.filter(m => !m.done).length)}</span></div>
       ${wr ? `<div class="row">${!rr.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${gid}">Undo schedule</button>` : ""}</div>` : ""}</div>`;
     for (let r = 1; r <= maxR; r++) { const rm = rr.filter(m => m.round === r).sort(byOrder); html += `<section class="stack" style="gap:10px"><h3>Round ${r}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; }
   }
