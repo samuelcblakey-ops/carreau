@@ -5,7 +5,7 @@
 // Helpers open a link containing the code (or type it in) and their device is remembered as a member.
 const ADMIN_EMAILS = ["samuelcblakey@gmail.com"]; // site admins (enforced in firestore.rules too)
 const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.includes((AUTH.user.email || "").toLowerCase()));
-const SITE = { openTesting: true, teamScoring: false, loaded: false }; // site settings (config/site); open testing is the beta default
+const SITE = { openTesting: true, teamScoring: false, teamComps: {}, loaded: false }; // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
 const ROLE = {};   // tid -> "edit" | "score" (membership of this device)
@@ -75,7 +75,14 @@ S.permFn = t => {
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
-S.teamScoringOn = () => !!SITE.teamScoring;
+// team score entry has three site states: off, admin only (the admin picks competitions; registered in config/site), everyone
+S.teamScoringSetup = t => SITE.teamScoring === true || (SITE.teamScoring === "admin" && isAdmin());
+S.teamScoringOn = t => SITE.teamScoring === true || (SITE.teamScoring === "admin" && (isAdmin() || !!(t && SITE.teamComps[t.id])));
+S.onFieldSet = async (t, k, v) => {
+  if (k !== "scoreMode" || SITE.teamScoring !== "admin" || !isAdmin()) return;
+  try { await setDoc(doc(FB.db, "config", "site"), { teamScoringComps: { [t.id]: v !== "organiser" } }, { merge: true }); }
+  catch (e) { console.error(e); toast("Couldn't register this competition for team score entry."); }
+};
 S.viewAllTabs = t => !!t.listed; // examples show every tab, locked
 S.myTeam = t => TEAM[t.id] || null;
 S.teamPropose = async (t, m, sa, sb) => {
@@ -97,13 +104,13 @@ async function makeTeamCodes(tid) {
   catch (e) { console.error(e); toast("Couldn't create the team links. Check your connection and try again."); }
 }
 function watchTeamCodes(tid) {
-  if (unsubTeamCodes || tid !== S.tid || !SITE.teamScoring) return;
+  if (unsubTeamCodes || tid !== S.tid || !S.teamScoringSetup(S.tournaments[tid])) return;
   const t = S.tournaments[tid]; if (!t || !(isOwner(t) || isAdmin() || ROLE[tid] === "edit" || SITE.openTesting)) return;
   unsubTeamCodes = onSnapshot(doc(FB.db, "tournaments", tid, "private", "teamcodes"), d => { TEAMCODES[tid] = d.exists() ? d.data() : {}; render(); }, () => {});
 }
 const teamLink = (t, id) => `${base()}#${t.id}.t-${id}-${TEAMCODES[t.id][id]}`;
 function teamLinksPanel(t) {
-  if (!SITE.teamScoring || !(t.scoreMode === "teams" || t.scoreMode === "teams-auto") || (t.entry !== "teams")) return "";
+  if (!S.teamScoringSetup(t) || !(t.scoreMode === "teams" || t.scoreMode === "teams-auto") || (t.entry !== "teams")) return "";
   watchTeamCodes(t.id);
   const codes = TEAMCODES[t.id] || {}; const teams = (t.teams || []).filter(e => e.active !== false); const missing = teams.filter(e => !codes[e.id]).length;
   return `<div class="panel stack" id="team-links"><div class="spread"><h3>Team links</h3>${teams.length ? `<span class="small muted">${teams.length - missing}/${teams.length} teams have a link</span>` : ""}</div>
@@ -191,8 +198,8 @@ S.extraAction = async (act, a) => {
     return;
   }
   if (act === "team-scoring") {
-    const on = a.dataset.on === "1";
-    try { await setDoc(doc(FB.db, "config", "site"), { teamScoring: on, updated: Date.now() }, { merge: true }); toast(on ? "Team score entry is available to organisers." : "Team score entry is switched off."); }
+    const mode = a.dataset.mode; const on = mode === "all" ? true : mode === "admin" ? "admin" : false;
+    try { await setDoc(doc(FB.db, "config", "site"), { teamScoring: on, updated: Date.now() }, { merge: true }); toast(on === true ? "Team score entry is available to every organiser." : on === "admin" ? "Team score entry is available to you only." : "Team score entry is switched off."); }
     catch (e) { console.error(e); toast("That setting didn't save."); }
     return;
   }
@@ -301,9 +308,9 @@ function adminView() {
       <div><button class="btn ${SITE.openTesting ? "" : "primary"}" data-act="open-testing" data-on="${SITE.openTesting ? "0" : "1"}">${SITE.openTesting ? "Turn open testing off" : "Turn open testing on"}</button></div>
     </div>
     <div class="panel stack">
-      <div class="spread"><h3>Team score entry <span class="small muted">beta</span></h3><span class="pill ${SITE.teamScoring ? "playing" : ""}">${SITE.teamScoring ? "On" : "Off"}</span></div>
-      <p class="muted">${SITE.teamScoring ? "Organisers can choose, in each competition's Setup, to let teams enter scores on their phones with the other team confirming." : "Hidden from everyone. Turn on to let organisers offer team score entry (each team gets a link; the other team confirms the score)."}</p>
-      <div><button class="btn ${SITE.teamScoring ? "" : "primary"}" data-act="team-scoring" data-on="${SITE.teamScoring ? "0" : "1"}">${SITE.teamScoring ? "Turn team score entry off" : "Turn team score entry on"}</button></div>
+      <div class="spread"><h3>Team score entry <span class="small muted">beta</span></h3><span class="pill ${SITE.teamScoring ? "playing" : ""}">${SITE.teamScoring === true ? "Everyone" : SITE.teamScoring === "admin" ? "Admin only" : "Off"}</span></div>
+      <p class="muted">${SITE.teamScoring === true ? "Every organiser can choose, in a competition's Setup, to let teams enter scores on their phones with the other team confirming." : SITE.teamScoring === "admin" ? "Only you see the Score entry choice in Setup (on any competition you open while signed in here). Teams can only submit scores on competitions you switched on; other organisers can't turn it on." : "Hidden from everyone. Each team gets a link; the other team confirms the score; disputes come to the organiser."}</p>
+      <div class="seg" role="group" aria-label="Team score entry">${[["off", "Off"], ["admin", "Admin only"], ["all", "Everyone"]].map(([m, l]) => `<button type="button" data-act="team-scoring" data-mode="${m}" aria-pressed="${(SITE.teamScoring === true ? "all" : SITE.teamScoring === "admin" ? "admin" : "off") === m}">${l}</button>`).join("")}</div>
     </div>
     <div class="panel stack" style="gap:6px" id="adm-creators">
       <h3>Who's creating <span class="muted small">${cs.length}</span></h3>
@@ -383,7 +390,7 @@ function watchSite() {
   if (unsubSite || !FB) return;
   unsubSite = onSnapshot(doc(FB.db, "config", "site"), d => {
     const was = SITE.openTesting;
-    SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() && d.data().teamScoring === true; SITE.loaded = true;
+    SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() ? (d.data().teamScoring === true ? true : d.data().teamScoring === "admin" ? "admin" : false) : false; SITE.teamComps = d.exists() ? (d.data().teamScoringComps || {}) : {}; SITE.loaded = true;
     if (was !== SITE.openTesting) startWatching();
     render();
   }, () => { SITE.loaded = true; });
@@ -443,6 +450,7 @@ function boot() {
   if (window.__CARREAU_EMULATOR) { // local testing only
     connectFirestoreEmulator(FB.db, "127.0.0.1", 8080); connectAuthEmulator(FB.auth, "http://127.0.0.1:9099", { disableWarnings: true });
     window.__testGoogle = (email) => signInWithCredential(FB.auth, GoogleAuthProvider.credential(JSON.stringify({ sub: email, email, email_verified: true })));
+    window.__testSetSite = data => setDoc(doc(FB.db, "config", "site"), data, { merge: true });
   }
   S.store = fbStore();
   onAuthStateChanged(FB.auth, async u => {
