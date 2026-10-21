@@ -13,14 +13,17 @@ const { chromium } = require('playwright');
   log('flag off, no score entry choice:', !(await has(A, '[data-set="scoreMode"]')));
   const AD = await mk('admin'); await AD.goto(base + '#admin'); await w(3000);
   await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
-  log('admin switch shows off:', (await AD.textContent('main')).includes('Turn team score entry on'));
-  await AD.click('[data-act="team-scoring"]'); await w(1500);
+  log('admin switch shows off:', await AD.evaluate(() => document.querySelector('[data-act="team-scoring"][data-mode="off"]')?.getAttribute('aria-pressed') === 'true'));
+  await AD.click('[data-act="team-scoring"][data-mode="admin"]'); await w(1500);
   await AD.click('[data-act="open-testing"]'); await w(2500); // strict mode: rules decide who can do what
   await A.click('[data-tab="setup"]'); await w(800);
-  log('flag on, choice shown:', await has(A, '[data-set="scoreMode"]'));
-  await A.click('[data-set="scoreMode"][data-val="teams"]'); await w(1500);
-  await A.click('[data-act="team-links-make"]'); await w(1500);
-  const links = await A.evaluate(() => Object.fromEntries([...document.querySelectorAll('#team-links input[id^="tl-"]')].map(i => [i.id.slice(3), i.value])));
+  log('admin mode, organiser sees no choice:', !(await has(A, '[data-set="scoreMode"]')));
+  await AD.evaluate(id => { location.hash = id; }, tid); await w(2500); await AD.click('[data-tab="setup"]'); await w(800);
+  log('admin mode, admin sees choice:', await has(AD, '[data-set="scoreMode"]'));
+  await AD.click('[data-set="scoreMode"][data-val="teams"]'); await w(2500);
+  log('competition registered:', await A.evaluate(() => window.__carreau.S.teamScoringOn(window.__carreau.T())), '| organiser still no choice:', !(await has(A, '[data-set="scoreMode"]')));
+  await AD.click('[data-act="team-links-make"]'); await w(1500);
+  const links = await AD.evaluate(() => Object.fromEntries([...document.querySelectorAll('#team-links input[id^="tl-"]')].map(i => [i.id.slice(3), i.value])));
   log('team links:', Object.keys(links).length);
   await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="first-draw"]'); await w(2500);
   const games = await A.evaluate(() => window.__carreau.MS().filter(m => m.a && m.b).sort((x, y) => x.order - y.order).map(m => ({ id: m.id, a: m.a[0], b: m.b[0] })));
@@ -52,9 +55,22 @@ const { chromium } = require('playwright');
   log('organiser sees dispute:', (await A.textContent('.check-panel')).includes('Disputed'), '| not published:', await A.evaluate(id => !window.__carreau.S.matches[id].done, g2.id));
   await A.click(`[data-act="check-accept"][data-id="${g2.id}"]`); await w(2000);
   log('organiser settled:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb; }, g2.id));
-  // switch off again: everything hidden
-  await AD.click('[data-act="team-scoring"]'); await w(2000);
-  await A.click('[data-tab="setup"]'); await w(500);
+  // registration gate: the field alone isn't enough, the admin must have switched this competition on
+  const setReg = (on) => AD.evaluate(async on => { const { getFirestore, doc, setDoc } = await import('/fb/firebase-firestore.js'); const { getApp } = await import('/fb/firebase-app.js');
+    await setDoc(doc(getFirestore(getApp()), 'config', 'site'), { teamScoringComps: { [location.hash.slice(1)]: on } }, { merge: true }); }, on);
+  await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="next-round"]'); await w(2500);
+  await setReg(false); await w(2000);
+  const tryPropose = () => T1.evaluate(async () => { const C = window.__carreau, S = C.S, t = C.T(); const me = S.myTeam(t); const m = C.MS().find(m => !m.done && m.a && m.b && (m.a.includes(me) || m.b.includes(me)));
+    try { await S.teamPropose(t, m, 13, 3); return 'WROTE'; } catch (e) { return e.code; } });
+  log('unregistered comp, team propose:', await tryPropose());
+  await setReg(true); await w(2000);
+  log('re-registered, team propose:', await tryPropose());
+  // everyone mode: organisers see the choice; off: hidden everywhere
+  await AD.evaluate(() => { location.hash = 'admin'; }); await w(1500);
+  await AD.click('[data-act="team-scoring"][data-mode="all"]'); await w(2000);
+  await A.click('[data-tab="setup"]'); await w(500); log('everyone mode, organiser sees choice:', await has(A, '[data-set="scoreMode"]'));
+  await AD.click('[data-act="team-scoring"][data-mode="off"]'); await w(2000);
+  await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-tab="setup"]'); await w(500);
   log('switched off hides it:', !(await has(A, '[data-set="scoreMode"]')) && !(await has(A, '#team-links')), '| team panel gone:', !(await has(T1, '.team-panel')));
   await AD.click('[data-act="open-testing"]'); await w(1500); // back to the beta default for later tests
   log('errs', errs); await b.close();

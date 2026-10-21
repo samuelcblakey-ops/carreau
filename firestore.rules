@@ -8,7 +8,7 @@ rules_version = '2';
 //    open testing on or off (config/site). While open testing is on, anyone can run any competition.
 //  - Organisers can archive a finished competition; after that only the admin can see or restore it.
 //  - Only the admin can delete a competition; organisers archive instead.
-//  - Team score entry (off unless config/site.teamScoring): a team link makes a device a 'team' member; it can only
+//  - Team score entry (config/site.teamScoring: false, 'admin' = only admin-registered competitions, true = everyone): a team link makes a device a 'team' member; it can only
 //    propose a score for its own game, or confirm/dispute the other team's. An organiser's screen publishes results.
 //  - Visitors only list their own competitions plus the examples (listed); examples are view-only.
 service cloud.firestore {
@@ -31,7 +31,11 @@ service cloud.firestore {
     function notArchived(tid) { return get(tdoc(tid)).data.get('archived', false) != true; }
     // team score entry (site switch config/site.teamScoring, and the competition's scoreMode)
     function myTeam(tid) { return signedIn() && exists(mdoc(tid)) && get(mdoc(tid)).data.role == 'team' ? get(mdoc(tid)).data.teamId : ''; }
-    function teamScoringOn(tid) { return exists(cfg()) && get(cfg()).data.get('teamScoring', false) == true
+    // site switch: true = every organiser; 'admin' = only competitions the admin registered in config/site.teamScoringComps
+    function teamScoringOn(tid) { return exists(cfg())
+                                   && (get(cfg()).data.get('teamScoring', false) == true
+                                       || (get(cfg()).data.get('teamScoring', false) == 'admin'
+                                           && get(cfg()).data.get('teamScoringComps', {}).get(tid, false) == true))
                                    && get(tdoc(tid)).data.get('scoreMode', 'organiser') in ['teams', 'teams-auto']; }
     // a team may only touch the proposal on its own unfinished game: propose a score, or confirm/dispute the other team's
     function teamUpdate(tid) {
