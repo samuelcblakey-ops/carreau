@@ -4,7 +4,8 @@ rules_version = '2';
 //  - Every device signs in anonymously; the device that creates a competition owns it.
 //  - The owner keeps two private codes. A device that presents the organiser code becomes an
 //    organiser (full control); one that presents the scorer code can enter scores and move games.
-//  - Site admins (Google sign-in, listed below) can change or delete any competition.
+//  - Site admins (Google sign-in, listed below) can change or delete any competition and switch
+//    open testing on or off (config/site). While open testing is on, anyone can run any competition.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
@@ -14,9 +15,17 @@ service cloud.firestore {
     function role(tid) { return signedIn() && exists(mdoc(tid)) ? get(mdoc(tid)).data.role : ''; }
     function isAdmin() { return signedIn() && request.auth.token.email_verified == true
                            && request.auth.token.email in ['samuelcblakey@gmail.com']; }
-    function canEdit(tid) { return isAdmin() || owns(tid) || role(tid) == 'edit'; }
+    // Open testing (beta): every signed-in visitor can run every competition. On unless config/site says otherwise.
+    function cfg() { return /databases/$(database)/documents/config/site; }
+    function openTesting() { return !exists(cfg()) || get(cfg()).data.openTesting != false; }
+    function canEdit(tid) { return isAdmin() || owns(tid) || role(tid) == 'edit' || (signedIn() && openTesting()); }
     function canScore(tid) { return canEdit(tid) || role(tid) == 'score'; }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
+
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     match /tournaments/{tid} {
       allow read: if true;

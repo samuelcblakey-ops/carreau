@@ -115,7 +115,10 @@ tr.q td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 /* bracket */
 /* bracket: every round column is the same height and each match sits in an equal share of it,
    so a match always lines up halfway between the two games that feed it; wires are drawn with borders */
-.bk-scroll{overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.bk-scroll{overflow:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;max-width:100%}
+.bk-tools{display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.bk-tools .btn{min-width:36px;justify-content:center}
+.bk-tools .zv{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted);min-width:4ch;text-align:center}
 .bk{--gap:40px;display:grid;grid-auto-columns:minmax(200px,230px);grid-template-rows:auto 1fr;column-gap:var(--gap);width:max-content;min-width:100%}
 .bk h4{font-family:var(--display);font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 6px;grid-row:1}
 .bk-col{grid-row:2;display:flex;flex-direction:column}
@@ -386,7 +389,14 @@ const FR_TEXT = {
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
-  "Copied.": "Copié.", "Admin": "Admin", "Admin sign in": "Connexion admin", "Sign out": "Se déconnecter", "Signed out.": "Déconnecté.", "Signed in as admin.": "Connecté en tant qu'admin.", "Admin: {x}": "Admin : {1}",
+  "Copied.": "Copié.", "Fit": "Ajuster", "Zoom in": "Zoom avant", "Zoom out": "Zoom arrière", "Open testing": "Test ouvert", "Admin back end": "Administration", "Back to competitions": "Retour aux concours",
+  "Open testing is on: everyone who opens a competition can run it, including registration, setup, draws and scores. Spectator and organiser links are switched off while it's on.": "Le test ouvert est activé : toute personne qui ouvre un concours peut le gérer, y compris les inscriptions, les paramètres, les tirages et les scores. Les liens spectateur et organisateur sont désactivés pendant ce mode.",
+  "Link to this competition": "Lien vers ce concours", "Anyone with this link can run this competition while open testing is on.": "Toute personne ayant ce lien peut gérer ce concours tant que le test ouvert est activé.",
+  "Everyone can run every competition (beta testing). Spectator and organiser links are switched off.": "Tout le monde peut gérer tous les concours (test bêta). Les liens spectateur et organisateur sont désactivés.",
+  "Off: spectators see the draw, results, standings and big screen; organisers use their organiser link or code.": "Désactivé : les spectateurs voient le tirage, les résultats, le classement et le grand écran ; les organisateurs utilisent leur lien ou code organisateur.",
+  "Turn open testing off": "Désactiver le test ouvert", "Turn open testing on": "Activer le test ouvert", "Open testing is on.": "Test ouvert activé.", "Open testing is off.": "Test ouvert désactivé.",
+  "Sign in with the admin Google account to change site settings.": "Connectez-vous avec le compte Google admin pour modifier les réglages du site.", "Sign in with Google": "Se connecter avec Google",
+  "Signed in as {x}": "Connecté en tant que {1}", "Competitions": "Concours", "Test mode": "Mode test", "That setting didn't save.": "Le réglage n'a pas été enregistré.", "Admin": "Admin", "Admin sign in": "Connexion admin", "Sign out": "Se déconnecter", "Signed out.": "Déconnecté.", "Signed in as admin.": "Connecté en tant qu'admin.", "Admin: {x}": "Admin : {1}",
   "That Google account isn't an admin for this site.": "Ce compte Google n'est pas administrateur de ce site.", "Sign-in didn't complete. Allow pop-ups for this site and try again.": "La connexion n'a pas abouti. Autorisez les fenêtres pop-up pour ce site et réessayez.", "That code didn't work. Check it with the organiser.": "Ce code ne fonctionne pas. Vérifiez-le auprès de l'organisateur.",
   "You're now an organiser for this competition.": "Vous êtes maintenant organisateur de ce concours.", "You can now enter scores for this competition.": "Vous pouvez maintenant saisir les scores de ce concours.",
   "Couldn't connect. Check your internet connection and reload.": "Connexion impossible. Vérifiez votre connexion internet et rechargez la page.",
@@ -1060,11 +1070,15 @@ function render() {
   S.pendingRender = false;
   renderHeader();
   const t = T(); const main = $("#main");
+  const scrolls = {}; document.querySelectorAll("[data-scroll-key]").forEach(el => scrolls[el.dataset.scrollKey] = [el.scrollLeft, el.scrollTop]);
+  const restore = () => { document.querySelectorAll("[data-scroll-key]").forEach(el => { const v = scrolls[el.dataset.scrollKey]; if (v) { el.scrollLeft = v[0]; el.scrollTop = v[1]; } }); };
+  if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
   const fn = { setup: renderSetup, entries: renderEntries, draw: renderDraw, courts: renderCourts, standings: renderStandings, display: renderDisplay }[S.tab] || renderDraw;
   main.innerHTML = (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
   localize($("header.app")); localize(main);
+  fitBrackets(); restore();
 }
 function renderHeader() {
   const list = Object.values(S.tournaments).sort((a, b) => (b.created || 0) - (a.created || 0));
@@ -1324,6 +1338,21 @@ function bkCard(t, b, m) {
     ${foot ? `<div class="bkm-foot">${foot}</div>` : ""}
   </${tag}>`;
 }
+// bracket zoom: "fit" (default) shrinks a wide bracket to the screen width, never enlarges it
+S.bkZoom = S.bkZoom || {};
+function bkZoomFor(b) { const z = S.bkZoom[S.tid + ":" + b.id]; return typeof z === "number" ? z : (S.bkFit?.[S.tid + ":" + b.id] ?? 1); }
+function fitBrackets() {
+  S.bkFit = S.bkFit || {}; let changed = false;
+  document.querySelectorAll(".bk[data-bk]").forEach(el => {
+    const key = S.tid + ":" + el.dataset.bk; if (typeof S.bkZoom[key] === "number") return;
+    const prev = el.style.zoom; el.style.zoom = 1;
+    const natural = el.scrollWidth, avail = el.parentElement.clientWidth;
+    const f = Math.max(0.35, Math.min(1, Math.floor((avail / natural) * 100) / 100));
+    el.style.zoom = f; S.bkFit[key] = f;
+    const zv = el.parentElement.previousElementSibling?.querySelector(".zv"); if (zv) zv.textContent = Math.round(f * 100) + "%";
+  });
+}
+window.addEventListener("resize", () => { clearTimeout(S.fitTimer); S.fitTimer = setTimeout(fitBrackets, 150); });
 function bracketGrid(t, b, ms) {
   const bm = ms.filter(m => m.bracket === b.id);
   const final = bm.find(m => m.round === b.rounds && !m.third);
@@ -1341,7 +1370,9 @@ function bracketGrid(t, b, ms) {
   heads += `<h4 style="grid-column:${b.rounds + 1}">Winner</h4>`;
   cols += `<div class="bk-col in" style="grid-column:${b.rounds + 1}"><div class="bk-slot"><div class="bk-champ ${champ ? "" : "tbc"}"><span class="eyebrow">${champ ? "Champion" : "To be decided"}</span><b>${champ ? esc(champ) : "—"}</b></div></div></div>`;
   const tp = bm.find(m => m.third);
-  return `<div class="bk-scroll"><div class="bk">${heads}${cols}</div></div>
+  const z = bkZoomFor(b);
+  return `<div class="bk-tools"><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="out" aria-label="Zoom out">−</button><span class="zv">${Math.round(z * 100)}%</span><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="in" aria-label="Zoom in">+</button><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="fit">Fit</button><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="1">100%</button></div>
+    <div class="bk-scroll" data-scroll-key="bk-${b.id}"><div class="bk" data-bk="${b.id}" style="zoom:${z}">${heads}${cols}</div></div>
     ${tp ? `<div class="bk-third"><div class="stack" style="gap:6px"><h4>Third place</h4>${bkCard(t, b, tp)}</div></div>` : ""}`;
 }
 function renderBracket(t, b, ms) {
@@ -1432,6 +1463,14 @@ function renderDisplay(t) {
 
 /* ---------------- events ---------------- */
 document.addEventListener("click", async e => {
+  const bz = e.target.closest('[data-act="bk-zoom"]');
+  if (bz) {
+    const key = S.tid + ":" + bz.dataset.b; const cur = bkZoomFor({ id: bz.dataset.b }); const z = bz.dataset.z;
+    if (z === "fit") delete S.bkZoom[key]; else S.bkZoom[key] = z === "in" ? Math.min(1.5, +(cur + 0.1).toFixed(2)) : z === "out" ? Math.max(0.3, +(cur - 0.1).toFixed(2)) : 1;
+    render();
+    if (z === "fit") { const sc = document.querySelector(`[data-scroll-key="bk-${bz.dataset.b}"]`); if (sc) { sc.scrollLeft = 0; sc.scrollTop = 0; } }
+    return;
+  }
   const lg = e.target.closest("[data-lang]");
   if (lg) { I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
   const tab = e.target.closest("[data-tab]");
@@ -1573,6 +1612,7 @@ function startWatching() {
 // Helpers open a link containing the code (or type it in) and their device is remembered as a member.
 const ADMIN_EMAILS = ["samuelcblakey@gmail.com"]; // site admins (enforced in firestore.rules too)
 const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.includes((AUTH.user.email || "").toLowerCase()));
+const SITE = { openTesting: true, loaded: false }; // site settings (config/site); open testing is the beta default
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
 const ROLE = {};   // tid -> "edit" | "score" (membership of this device)
@@ -1601,7 +1641,7 @@ function fbStore() {
       const tc = collection(db, "tournaments");
       subQ("listed", query(tc, where("listed", "==", true), limit(100)));
       if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), limit(200)));
-      if (isAdmin()) subQ("all", query(tc, limit(300)));
+      if (isAdmin() || SITE.openTesting) subQ("all", query(tc, limit(300)));
       new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
@@ -1630,7 +1670,7 @@ function fbStore() {
 const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);
 S.permFn = t => {
   if (!AUTH.user || !t) return { edit: false, score: false };
-  const r = isOwner(t) || isAdmin() ? "edit" : ROLE[t.id];
+  const r = isOwner(t) || isAdmin() || SITE.openTesting ? "edit" : ROLE[t.id];
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
@@ -1643,6 +1683,7 @@ S.headerExtra = () => {
   const t = T(); if (!CONFIGURED || !t) return "";
   const p = S.permFn(t);
   if (isAdmin()) return `<span class="pill done">Admin</span>`;
+  if (SITE.openTesting) return `<span class="pill playing" title="Open testing">Test mode</span>`;
   if (isOwner(t)) return `<span class="pill done">Organiser</span>`;
   if (p.edit) return `<span class="pill done">Organiser</span>`;
   if (p.score) return `<span class="pill done">Scorer</span>`;
@@ -1655,6 +1696,11 @@ const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px">
 S.setupExtra = t => {
   if (!CONFIGURED) return "";
   const l = links(t);
+  if (SITE.openTesting) return `<div class="panel stack">
+    <h3>Sharing</h3>
+    <div class="notice">Open testing is on: everyone who opens a competition can run it, including registration, setup, draws and scores. Spectator and organiser links are switched off while it's on.</div>
+    ${copyRow("share-watch", "Link to this competition", l.watch, "Anyone with this link can run this competition while open testing is on.")}
+  </div>`;
   return `<div class="panel stack">
     <h3>Sharing</h3>
     ${copyRow("share-watch", "Link for players and spectators", l.watch, "Anyone with this link can follow the draw, results, standings and big screen live. They can't change anything.")}
@@ -1665,8 +1711,15 @@ S.setupExtra = t => {
 S.extraAction = async (act, a) => {
   if (act === "copy") { const el = document.getElementById(a.dataset.target); try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } }
   if (act === "enter-code") openCodeBox();
+  if (act === "admin-exit") { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); S.overlayView = null; render(); return; }
+  if (act === "open-testing") {
+    const on = a.dataset.on === "1";
+    try { await setDoc(doc(FB.db, "config", "site"), { openTesting: on, updated: Date.now() }); toast(on ? "Open testing is on." : "Open testing is off."); }
+    catch (e) { console.error(e); toast("That setting didn't save."); }
+    return;
+  }
   if (act === "admin-in") { try { await signInWithPopup(FB.auth, new GoogleAuthProvider()); } catch (e) { if (e?.code !== "auth/popup-closed-by-user" && e?.code !== "auth/cancelled-popup-request") toast("Sign-in didn't complete. Allow pop-ups for this site and try again."); return; }
-    if (!isAdmin()) { toast("That Google account isn't an admin for this site."); await signOut(FB.auth); } else toast("Signed in as admin."); }
+    if (!isAdmin()) { toast("That Google account isn't an admin for this site."); await signOut(FB.auth); } else { toast("Signed in as admin."); render(); } }
   if (act === "admin-out") { await signOut(FB.auth); toast("Signed out."); }
   if (act === "code-close") closeCodeBox();
   if (act === "code-submit") { const v = document.getElementById("code-input").value; if (await joinWithCode(S.tid, v)) closeCodeBox(); }
@@ -1715,13 +1768,32 @@ function watchCodes(tid) {
   unsubCodes = onSnapshot(doc(FB.db, "tournaments", tid, "private", "codes"), d => { if (d.exists()) { CODES[tid] = d.data(); render(); } }, () => {});
 }
 function restart() { if (!FB) return; startWatching(); watchRole(); renderFooter(); }
-function renderFooter() {
-  let f = document.getElementById("site-foot");
-  if (!f) { document.body.insertAdjacentHTML("beforeend", `<footer id="site-foot" class="wrap" style="padding-block:8px 28px;display:flex;justify-content:flex-end;gap:8px;align-items:center" class="small"></footer>`); f = document.getElementById("site-foot"); }
-  f.innerHTML = isAdmin()
-    ? `<span class="small muted">Admin: ${esc(AUTH.user.email)}</span><button class="btn sm ghost" data-act="admin-out">Sign out</button>`
-    : `<button class="btn sm ghost" data-act="admin-in">Admin sign in</button>`;
-  localize(f);
+function renderFooter() { /* admin lives at #admin (the back end); nothing shown to guests */ }
+function adminView() {
+  const all = Object.values(S.tournaments).sort((x, y) => (y.created || 0) - (x.created || 0));
+  return `<div class="stack" style="max-width:720px">
+    <div class="spread"><h2>Admin back end</h2><button class="btn sm" data-act="admin-exit">Back to competitions</button></div>
+    ${!isAdmin() ? `<div class="panel stack"><p>Sign in with the admin Google account to change site settings.</p><div><button class="btn primary" data-act="admin-in">Sign in with Google</button></div></div>` : `
+    <div class="panel spread"><span class="muted">Signed in as ${esc(AUTH.user.email)}</span><button class="btn sm ghost" data-act="admin-out">Sign out</button></div>
+    <div class="panel stack">
+      <div class="spread"><h3>Open testing</h3><span class="pill ${SITE.openTesting ? "playing" : ""}">${SITE.openTesting ? "On" : "Off"}</span></div>
+      <p class="muted">${SITE.openTesting ? "Everyone can run every competition (beta testing). Spectator and organiser links are switched off." : "Off: spectators see the draw, results, standings and big screen; organisers use their organiser link or code."}</p>
+      <div><button class="btn ${SITE.openTesting ? "" : "primary"}" data-act="open-testing" data-on="${SITE.openTesting ? "0" : "1"}">${SITE.openTesting ? "Turn open testing off" : "Turn open testing on"}</button></div>
+    </div>
+    <div class="panel stack" style="gap:6px"><h3>Competitions <span class="muted small">${all.length}</span></h3>
+      ${all.map(t => `<div class="erow"><div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(t.date || "")}</span></div><a class="btn sm" href="#${t.id}" data-act="admin-exit">Open</a></div>`).join("")}
+    </div>`}
+  </div>`;
+}
+let unsubSite = null;
+function watchSite() {
+  if (unsubSite || !FB) return;
+  unsubSite = onSnapshot(doc(FB.db, "config", "site"), d => {
+    const was = SITE.openTesting;
+    SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.loaded = true;
+    if (was !== SITE.openTesting) startWatching();
+    render();
+  }, () => { SITE.loaded = true; });
 }
 S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
 S.onTournaments = () => { if (S.tid) watchCodes(S.tid); };
@@ -1729,7 +1801,10 @@ S.onTournaments = () => { if (S.tid) watchCodes(S.tid); };
 // links look like #<competition id> or #<competition id>.<code>
 function readHash() { const [tid, code] = location.hash.slice(1).split("."); return { tid: tid || null, code: code || null }; }
 async function handleHash() {
-  const { tid, code } = readHash(); if (!tid) return;
+  const { tid, code } = readHash();
+  if (tid === "admin") { S.overlayView = adminView; render(); return; }
+  S.overlayView = null;
+  if (!tid) return;
   if (tid !== S.tid) { S.tid = tid; S.matches = {}; restart(); }
   if (code && AUTH.user) { history.replaceState(null, "", "#" + tid); await joinWithCode(tid, code); }
 }
@@ -1738,7 +1813,7 @@ window.addEventListener("hashchange", handleHash);
 S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
 
 function boot() {
-  const h = readHash(); if (h.tid) S.tid = h.tid;
+  const h = readHash(); if (h.tid && h.tid !== "admin") S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView;
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
   FB = { db: getFirestore(app), auth: getAuth(app) };
@@ -1749,7 +1824,7 @@ function boot() {
   S.store = fbStore();
   onAuthStateChanged(FB.auth, async u => {
     if (!u) { try { await signInAnonymously(FB.auth); } catch (e) { console.error(e); toast("Couldn't connect. Check your internet connection and reload."); } return; }
-    AUTH.user = u; AUTH.ready = true; restart(); render();
+    AUTH.user = u; AUTH.ready = true; watchSite(); restart(); render();
     await handleHash();
   });
 }
