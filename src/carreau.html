@@ -1729,9 +1729,9 @@ document.addEventListener("click", async e => {
   const t = T();
   switch (act) {
     case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
-    case "del-t": S.confirmDelete = true; render(); break;
+    case "del-t": if (S.canDelete && !S.canDelete(t)) break; S.confirmDelete = true; render(); break;
     case "del-t-no": S.confirmDelete = false; render(); break;
-    case "del-t-yes": { S.confirmDelete = false; const id = t.id; delete S.tournaments[id]; S.tid = Object.keys(S.tournaments)[0] || null; S.matches = {}; watchMatches(); render(); await guard(() => S.store.deleteTournament(id)); S.onSelect?.(); toast("Competition deleted."); break; }
+    case "del-t-yes": { if (S.canDelete && !S.canDelete(t)) break;  S.confirmDelete = false; const id = t.id; delete S.tournaments[id]; S.tid = Object.keys(S.tournaments)[0] || null; S.matches = {}; watchMatches(); render(); await guard(() => S.store.deleteTournament(id)); S.onSelect?.(); toast("Competition deleted."); break; }
     case "first-draw": {
       const sys = sysOf(t);
       if (sys === "shooting") await guard(() => addDraw(drawShootQualifying(t)));
