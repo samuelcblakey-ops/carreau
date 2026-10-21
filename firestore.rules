@@ -28,8 +28,9 @@ service cloud.firestore {
     function notArchived(tid) { return get(tdoc(tid)).data.get('archived', false) != true; }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
 
+    // config/site is public (open testing switch); config/creators holds the admin's private nicknames for creators
     match /config/{docId} {
-      allow read: if true;
+      allow read: if docId == 'site' || isAdmin();
       allow write: if isAdmin();
     }
 
