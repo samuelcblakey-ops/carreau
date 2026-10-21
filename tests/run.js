@@ -49,6 +49,11 @@ const SUITES = {
     'web-shooting.js': [/final sides true done true/, /third sides true done true/, /errs \[\]/],
     'web-pwa.js': [/manifest: \[true,"standalone",3,true,200,"image\/png",true\]/, /service worker: true/, /no banner before prompt event: true/, /banner after prompt event: true/,
       /install prompt shown: true \| banner gone: true/, /dismissed stays hidden: true/, /picker offers install: true/, /ios banner: true/, /ios steps: true/, /errs \[\]/],
+    'web-team-scoring.js': [/flag off, no score entry choice: true/, /admin switch shows off: true/, /flag on, choice shown: true/, /team links: 4/,
+      /team panel: true \| team has no organiser tools: true/, /proposal pending: \{"sa":13,"sb":7,"status":"pending"\}/,
+      /team security: result permission-denied \| self-confirm permission-denied \| other game permission-denied/, /opponent asked to confirm: true/,
+      /organiser screen published: true 13-7 applied/, /team sees result: true/, /organiser sees dispute: true \| not published: true/, /organiser settled: true 13-2/,
+      /switched off hides it: true \| team panel gone: true/, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
       /admin page \(signed in\):.*Open testingOn/, /B tabs \(testing off\): Draw & results\|Standings\|Big screen/,

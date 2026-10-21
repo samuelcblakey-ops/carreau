@@ -5,11 +5,14 @@
 // Helpers open a link containing the code (or type it in) and their device is remembered as a member.
 const ADMIN_EMAILS = ["samuelcblakey@gmail.com"]; // site admins (enforced in firestore.rules too)
 const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.includes((AUTH.user.email || "").toLowerCase()));
-const SITE = { openTesting: true, loaded: false }; // site settings (config/site); open testing is the beta default
+const SITE = { openTesting: true, teamScoring: false, loaded: false }; // site settings (config/site); open testing is the beta default
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
 const ROLE = {};   // tid -> "edit" | "score" (membership of this device)
 const CODES = {};  // tid -> { edit, score } (only readable by organisers)
+const TEAM = {};   // tid -> team id this device scores for (team links)
+const TEAMCODES = {}; // tid -> { teamId: code } (only readable by organisers)
+let unsubTeamCodes = null;
 let FB = null, unsubRole = null, unsubCodes = null;
 const JOINED_KEY = "carreau-joined";
 const joined = () => { try { return JSON.parse(lsGet(JOINED_KEY) || "[]"); } catch { return []; } };
@@ -72,6 +75,51 @@ S.permFn = t => {
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
+S.teamScoringOn = () => !!SITE.teamScoring;
+S.myTeam = t => TEAM[t.id] || null;
+S.teamPropose = async (t, m, sa, sb) => {
+  const me = TEAM[t.id]; if (!me) return false;
+  const proposal = { sa, sb, by: me, at: Date.now(), status: "pending" };
+  await updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal }); S.matches[m.id].proposal = proposal; return true;
+};
+S.teamRespond = async (t, m, status) => {
+  const me = TEAM[t.id]; const p = m.proposal; if (!me || !p) return false;
+  const proposal = { ...p, status, confirmedBy: me, respondedAt: Date.now() };
+  await updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal }); S.matches[m.id].proposal = proposal; return true;
+};
+// team links: #<competition>.t-<team id>-<code>
+async function makeTeamCodes(tid) {
+  const t = S.tournaments[tid]; if (!t) return; const have = TEAMCODES[tid] || {}; const add = {};
+  (t.teams || []).filter(e => e.active !== false && !have[e.id]).forEach(e => add[e.id] = newCode());
+  if (!Object.keys(add).length) { toast("Every team already has a link."); return; }
+  try { await setDoc(doc(FB.db, "tournaments", tid, "private", "teamcodes"), add, { merge: true }); TEAMCODES[tid] = { ...have, ...add }; toast(`${Object.keys(add).length} team links created.`); render(); }
+  catch (e) { console.error(e); toast("Couldn't create the team links. Check your connection and try again."); }
+}
+function watchTeamCodes(tid) {
+  if (unsubTeamCodes || tid !== S.tid || !SITE.teamScoring) return;
+  const t = S.tournaments[tid]; if (!t || !(isOwner(t) || isAdmin() || ROLE[tid] === "edit" || SITE.openTesting)) return;
+  unsubTeamCodes = onSnapshot(doc(FB.db, "tournaments", tid, "private", "teamcodes"), d => { TEAMCODES[tid] = d.exists() ? d.data() : {}; render(); }, () => {});
+}
+const teamLink = (t, id) => `${base()}#${t.id}.t-${id}-${TEAMCODES[t.id][id]}`;
+function teamLinksPanel(t) {
+  if (!SITE.teamScoring || !(t.scoreMode === "teams" || t.scoreMode === "teams-auto") || (t.entry !== "teams")) return "";
+  watchTeamCodes(t.id);
+  const codes = TEAMCODES[t.id] || {}; const teams = (t.teams || []).filter(e => e.active !== false); const missing = teams.filter(e => !codes[e.id]).length;
+  return `<div class="panel stack" id="team-links"><div class="spread"><h3>Team links</h3>${teams.length ? `<span class="small muted">${teams.length - missing}/${teams.length} teams have a link</span>` : ""}</div>
+    <p class="small muted">Give each team its own link or QR code (for example at check-in). It sets up their phone to enter scores for their games only, and to confirm their opponents' scores.</p>
+    <div class="row">${missing ? `<button class="btn primary sm" data-act="team-links-make">${missing === teams.length ? "Create team links" : `Create ${missing} more`}</button>` : ""}${teams.length - missing ? `<button class="btn sm" data-act="team-qr">Print QR codes</button>` : ""}</div>
+    ${teams.filter(e => codes[e.id]).map(e => `<div class="erow"><div class="who"><b>${esc(e.name || (e.players || []).join(", "))}</b></div><input id="tl-${e.id}" value="${esc(teamLink(t, e.id))}" readonly style="flex:1;min-width:160px" class="small"><button class="btn sm" data-act="copy" data-target="tl-${e.id}">Copy</button></div>`).join("")}
+  </div>`;
+}
+async function showTeamQr() {
+  const t = T(); const codes = TEAMCODES[t.id] || {}; const teams = (t.teams || []).filter(e => codes[e.id]);
+  let qr = null; try { qr = (await import("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/+esm")).default; } catch (e) { console.warn("QR library unavailable", e); }
+  const img = url => { if (!qr) return ""; const q = qr(0, "M"); q.addData(url); q.make(); return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); };
+  const w = open("", "_blank"); if (!w) { toast("Allow pop-ups to print the QR codes."); return; }
+  w.document.write(`<!doctype html><meta charset="utf-8"><title>Team links · ${esc(t.name)}</title><style>body{font-family:system-ui,sans-serif;margin:16px}h1{font-size:18px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}.c{border:1px solid #ccc;border-radius:10px;padding:10px;text-align:center;break-inside:avoid}.c svg{width:150px;height:150px}.n{font-weight:700;margin-bottom:6px}.u{font-size:9px;word-break:break-all;color:#555}</style>
+    <h1>${esc(t.name)} · scan to enter your scores</h1><div class="g">${teams.map(e => `<div class="c"><div class="n">${esc(e.name || (e.players || []).join(", "))}</div>${img(teamLink(t, e.id))}<div class="u">${esc(teamLink(t, e.id))}</div></div>`).join("")}</div><script>setTimeout(()=>print(),400)<\/script>`);
+  w.document.close();
+}
 // organisers archive; only the admin can delete a competition (also enforced in firestore.rules)
 S.canDelete = () => isAdmin();
 S.canSeeArchived = () => isAdmin();
@@ -95,6 +143,7 @@ S.headerExtra = () => {
   if (SITE.openTesting && t.listed) return `<span class="pill" title="Example competition, view only">Example</span>`;
   if (SITE.openTesting) return `<span class="pill playing" title="Open testing">Test mode</span>`;
   if (isOwner(t)) return `<span class="pill done">Organiser</span>`;
+  if (TEAM[t.id]) return `<span class="pill done">Team</span>`;
   if (p.edit) return `<span class="pill done">Organiser</span>`;
   if (p.score) return `<span class="pill done">Scorer</span>`;
   return `<button class="btn sm ghost" data-act="enter-code">Organiser code</button>`;
@@ -103,7 +152,8 @@ S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link 
 const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px"><div class="eyebrow">${label}</div>
   <div class="row" style="flex-wrap:nowrap"><input type="text" id="${id}" readonly value="${esc(value)}" aria-label="${label}"><button class="btn" data-act="copy" data-target="${id}">Copy</button></div>
   <p class="small muted">${note}</p></div>`;
-S.setupExtra = t => {
+S.setupExtra = t => teamLinksPanel(t) + sharingPanel(t);
+const sharingPanel = t => {
   if (!CONFIGURED) return "";
   const l = links(t);
   if (SITE.openTesting) return `<div class="panel stack">
@@ -135,10 +185,18 @@ S.extraAction = async (act, a) => {
   }
   if (act === "open-testing") {
     const on = a.dataset.on === "1";
-    try { await setDoc(doc(FB.db, "config", "site"), { openTesting: on, updated: Date.now() }); toast(on ? "Open testing is on." : "Open testing is off."); }
+    try { await setDoc(doc(FB.db, "config", "site"), { openTesting: on, updated: Date.now() }, { merge: true }); toast(on ? "Open testing is on." : "Open testing is off."); }
     catch (e) { console.error(e); toast("That setting didn't save."); }
     return;
   }
+  if (act === "team-scoring") {
+    const on = a.dataset.on === "1";
+    try { await setDoc(doc(FB.db, "config", "site"), { teamScoring: on, updated: Date.now() }, { merge: true }); toast(on ? "Team score entry is available to organisers." : "Team score entry is switched off."); }
+    catch (e) { console.error(e); toast("That setting didn't save."); }
+    return;
+  }
+  if (act === "team-links-make") { await makeTeamCodes(S.tid); return; }
+  if (act === "team-qr") { await showTeamQr(); return; }
   if (act === "admin-in") { try { await signInWithPopup(FB.auth, new GoogleAuthProvider()); } catch (e) { if (e?.code !== "auth/popup-closed-by-user" && e?.code !== "auth/cancelled-popup-request") toast("Sign-in didn't complete. Allow pop-ups for this site and try again."); return; }
     if (!isAdmin()) { toast("That Google account isn't an admin for this site."); await signOut(FB.auth); } else { toast("Signed in as admin."); render(); } }
   if (act === "admin-out") { await signOut(FB.auth); toast("Signed out."); }
@@ -158,7 +216,14 @@ function openCodeBox() {
 function closeCodeBox() { document.getElementById("modal").innerHTML = ""; }
 document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "code-input") { e.preventDefault(); document.querySelector('[data-act="code-submit"]')?.click(); } });
 
+async function joinTeam(tid, teamId, code) {
+  const ref = doc(FB.db, "tournaments", tid, "members", AUTH.user.uid);
+  try { await setDoc(ref, { role: "team", teamId, code, joinedAt: Date.now() }); TEAM[tid] = teamId; remember(tid); restart(); S.tab = "draw"; render();
+    const t = S.tournaments[tid]; const nm = t?.teams?.find(e => e.id === teamId)?.name; toast(`This phone now enters scores for ${nm || "your team"}.`); return true; }
+  catch (e) { console.error(e); toast("That team link didn't work. Ask the organiser for a new one."); return false; }
+}
 async function joinWithCode(tid, raw) {
+  const tm = /^t-([A-Za-z0-9]+)-([A-Z0-9]+)$/.exec(String(raw || "")); if (tm && tid && AUTH.user) return joinTeam(tid, tm[1], tm[2]);
   const code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (!code || !tid || !AUTH.user) return false;
   const ref = doc(FB.db, "tournaments", tid, "members", AUTH.user.uid);
@@ -175,11 +240,11 @@ async function joinWithCode(tid, raw) {
 }
 
 function watchRole() {
-  unsubRole?.(); unsubRole = null; unsubCodes?.(); unsubCodes = null;
+  unsubRole?.(); unsubRole = null; unsubCodes?.(); unsubCodes = null; unsubTeamCodes?.(); unsubTeamCodes = null;
   if (!FB || !AUTH.user || !S.tid) return;
   const tid = S.tid;
   unsubRole = onSnapshot(doc(FB.db, "tournaments", tid, "members", AUTH.user.uid),
-    d => { ROLE[tid] = d.exists() ? d.data().role : undefined; if (d.exists()) remember(tid); render(); watchCodes(tid); },
+    d => { ROLE[tid] = d.exists() ? d.data().role : undefined; TEAM[tid] = d.exists() && d.data().role === "team" ? d.data().teamId : undefined; if (d.exists()) remember(tid); render(); watchCodes(tid); },
     () => { ROLE[tid] = undefined; render(); watchCodes(tid); });
 }
 function watchCodes(tid) {
@@ -233,6 +298,11 @@ function adminView() {
       <div class="spread"><h3>Open testing</h3><span class="pill ${SITE.openTesting ? "playing" : ""}">${SITE.openTesting ? "On" : "Off"}</span></div>
       <p class="muted">${SITE.openTesting ? "Everyone can run every competition (beta testing). Spectator and organiser links are switched off." : "Off: spectators see the draw, results, standings and big screen; organisers use their organiser link or code."}</p>
       <div><button class="btn ${SITE.openTesting ? "" : "primary"}" data-act="open-testing" data-on="${SITE.openTesting ? "0" : "1"}">${SITE.openTesting ? "Turn open testing off" : "Turn open testing on"}</button></div>
+    </div>
+    <div class="panel stack">
+      <div class="spread"><h3>Team score entry <span class="small muted">beta</span></h3><span class="pill ${SITE.teamScoring ? "playing" : ""}">${SITE.teamScoring ? "On" : "Off"}</span></div>
+      <p class="muted">${SITE.teamScoring ? "Organisers can choose, in each competition's Setup, to let teams enter scores on their phones with the other team confirming." : "Hidden from everyone. Turn on to let organisers offer team score entry (each team gets a link; the other team confirms the score)."}</p>
+      <div><button class="btn ${SITE.teamScoring ? "" : "primary"}" data-act="team-scoring" data-on="${SITE.teamScoring ? "0" : "1"}">${SITE.teamScoring ? "Turn team score entry off" : "Turn team score entry on"}</button></div>
     </div>
     <div class="panel stack" style="gap:6px" id="adm-creators">
       <h3>Who's creating <span class="muted small">${cs.length}</span></h3>
@@ -312,7 +382,7 @@ function watchSite() {
   if (unsubSite || !FB) return;
   unsubSite = onSnapshot(doc(FB.db, "config", "site"), d => {
     const was = SITE.openTesting;
-    SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.loaded = true;
+    SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() && d.data().teamScoring === true; SITE.loaded = true;
     if (was !== SITE.openTesting) startWatching();
     render();
   }, () => { SITE.loaded = true; });
