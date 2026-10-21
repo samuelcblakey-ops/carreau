@@ -153,7 +153,7 @@ S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link 
 const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px"><div class="eyebrow">${label}</div>
   <div class="row" style="flex-wrap:nowrap"><input type="text" id="${id}" readonly value="${esc(value)}" aria-label="${label}"><button class="btn" data-act="copy" data-target="${id}">Copy</button></div>
   <p class="small muted">${note}</p></div>`;
-S.setupExtra = t => teamLinksPanel(t) + sharingPanel(t);
+S.setupExtra = t => S.permFn(t).edit ? teamLinksPanel(t) + sharingPanel(t) : ""; // view-only examples: no sharing box
 const sharingPanel = t => {
   if (!CONFIGURED) return "";
   const l = links(t);
