@@ -76,6 +76,7 @@ S.permFn = t => {
 };
 S.canCreate = () => !!AUTH.user;
 S.teamScoringOn = () => !!SITE.teamScoring;
+S.viewAllTabs = t => !!t.listed; // examples show every tab, locked
 S.myTeam = t => TEAM[t.id] || null;
 S.teamPropose = async (t, m, sa, sb) => {
   const me = TEAM[t.id]; if (!me) return false;

@@ -20,6 +20,12 @@ const { chromium } = require('playwright');
   await B.reload(); await w(4000);
   log('B list after example:', await names(B));
 
+  await B.evaluate(id=>{location.hash=id;}, ex); await w(2500);
+  log('example tabs:', await B.evaluate(()=>[...document.querySelectorAll('#tabs button')].map(x=>x.dataset.tab).join(',')));
+  await B.click('[data-tab="setup"]'); await w(400);
+  log('example setup locked:', await B.evaluate(()=>!!document.querySelector('fieldset.ro-view[disabled] #f-name') && document.querySelector('main').innerText.includes('Example competition.')));
+  await B.click('[data-tab="entries"]'); await w(400); log('example entries locked:', await B.evaluate(()=>!!document.querySelector('fieldset.ro-view[disabled]')));
+  await B.click('[data-tab="draw"]'); await w(300);
   // B tries to edit example via direct link
   await B.evaluate(id=>{location.hash=id;}, ex); await w(2500);
   const r = await B.evaluate(async()=>{ const S=window.__carreau.S; const t=JSON.parse(JSON.stringify(S.tournaments[S.tid])); t.name='hacked'; try { await S.store.setTournament(t); return 'saved'; } catch(e){ return 'denied '+e.code; } });

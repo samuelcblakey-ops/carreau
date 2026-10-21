@@ -34,7 +34,7 @@ const SUITES = {
     'web-isolation.js': [
       /B list \(should be B comp only\): B comp\n/, /admin list: A comp, B comp, Example comp/,
       /B list after example: B comp, Example comp/, /B edit example: denied permission-denied/,
-      /B direct link to A comp opens: true/, /toast Competition deleted\./, /errs \[\]/,
+      /B direct link to A comp opens: true/, /example tabs: entries,setup,draw,courts,standings,display/, /example setup locked: true/, /example entries locked: true/, /toast Competition deleted\./, /errs \[\]/,
     ],
     'web-archive.js': [
       /owner sees Delete button: false \| owner sees Archive button: true/, /owner delete via rules: blocked/, /matches kept after blocked delete: true/,
