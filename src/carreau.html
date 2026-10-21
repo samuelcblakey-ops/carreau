@@ -215,6 +215,7 @@ table.shots td,table.shots th{padding:5px 6px}
 @media (max-width:560px){.at-label{display:none}table.shots td.wrap{min-width:0}table.shots td,table.shots th{padding:4px 3px}}
 .shotcell{min-width:40px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-family:var(--display);font-size:17px;font-weight:700;cursor:pointer}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
+@media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px)}
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* display mode */
@@ -422,7 +423,7 @@ const FR_TEXT = {
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
-  "Copied.": "Copié.", "Get the app.": "Installez l'appli.", "Add Carreau to your home screen for one-tap access, full screen.": "Ajoutez Carreau à votre écran d'accueil : un seul geste, en plein écran.", "Add to home screen": "Ajouter à l'écran d'accueil", "Not now": "Plus tard", "Add Carreau to your home screen": "Ajouter Carreau à l'écran d'accueil", "Opens full screen, one tap away": "S'ouvre en plein écran, en un geste", "Draw": "Tirage", "Table": "Classement", "Screen": "Écran", "Your competitions": "Vos concours", "Examples": "Exemples", "Choose a competition": "Choisir un concours", "No competitions match.": "Aucun concours ne correspond.", "Not started": "Pas commencé", "Tap a shot, then tap its score. Each shot scores 0, 1, 3 or 5.": "Touchez un tir, puis son score. Chaque tir vaut 0, 1, 3 ou 5.", "Clear this shot": "Effacer ce tir", "Live scorer": "Pointage en direct", "Grid view": "Vue grille", "Undo last shot": "Annuler le dernier tir", "Finish scorecard": "Terminer la feuille", "Now shooting": "Au tir", "All 20 shots in": "Les 20 tirs sont faits", "Check the strip below, then finish the scorecard.": "Vérifiez la ligne ci-dessous, puis terminez la feuille.", "Miss": "Raté", "point": "point", "points": "points", "Try it yourself": "Essayez vous-même", "Score now": "Pointer", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
+  "Copied.": "Copié.", "Mêlée style": "Type de mêlée", "New teams every round": "Nouvelles équipes à chaque partie", "All rounds drawn in advance": "Toutes les parties tirées d'avance", "Teams drawn once": "Équipes tirées une fois", "Draw the teams": "Tirer les équipes", "Redraw teams": "Refaire le tirage des équipes", "Back to players": "Revenir aux joueurs", "Print the draw": "Imprimer le tirage", "Undo the draw": "Annuler le tirage", "Get the app.": "Installez l'appli.", "Add Carreau to your home screen for one-tap access, full screen.": "Ajoutez Carreau à votre écran d'accueil : un seul geste, en plein écran.", "Add to home screen": "Ajouter à l'écran d'accueil", "Not now": "Plus tard", "Add Carreau to your home screen": "Ajouter Carreau à l'écran d'accueil", "Opens full screen, one tap away": "S'ouvre en plein écran, en un geste", "Draw": "Tirage", "Table": "Classement", "Screen": "Écran", "Your competitions": "Vos concours", "Examples": "Exemples", "Choose a competition": "Choisir un concours", "No competitions match.": "Aucun concours ne correspond.", "Not started": "Pas commencé", "Tap a shot, then tap its score. Each shot scores 0, 1, 3 or 5.": "Touchez un tir, puis son score. Chaque tir vaut 0, 1, 3 ou 5.", "Clear this shot": "Effacer ce tir", "Live scorer": "Pointage en direct", "Grid view": "Vue grille", "Undo last shot": "Annuler le dernier tir", "Finish scorecard": "Terminer la feuille", "Now shooting": "Au tir", "All 20 shots in": "Les 20 tirs sont faits", "Check the strip below, then finish the scorecard.": "Vérifiez la ligne ci-dessous, puis terminez la feuille.", "Miss": "Raté", "point": "point", "points": "points", "Try it yourself": "Essayez vous-même", "Score now": "Pointer", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
   "Visitors only see the competitions they created on their own device, plus the examples. Examples are view-only for visitors.": "Les visiteurs ne voient que les concours créés sur leur propre appareil, plus les exemples. Les exemples sont en lecture seule pour les visiteurs.",
   "Precision shooting": "Tir de précision", "Shooting scorecard": "Feuille de tir", "Atelier": "Atelier", "Lone boule": "Boule seule", "Boule behind the jack": "Boule derrière le but", "Boule between two boules": "Boule entre deux boules", "Boule behind an obstacle": "Boule derrière un obstacle", "The jack": "Le but",
   "Each shot scores 0, 1, 3 or 5. Maximum 100.": "Chaque tir vaut 0, 1, 3 ou 5 points. Maximum 100.", "{n} pts · {n}/20 shots": "{1} pts · {2}/20 tirs", "{n} pts": "{1} pts",
@@ -568,9 +569,13 @@ const canScore = () => !!T() && S.permFn(T()).score;
 const MS = () => Object.values(S.matches);
 
 /* ---------------- domain helpers ---------------- */
-const isMelee = t => t.entry === "melee";
+// mêlée styles: "rounds" new random teams each round (mêlée-démêlée), "advance" the same but every round drawn up front,
+// "once" players drawn into teams at the start, who then play as fixed teams
+const meleeMode = t => t.meleeMode || "rounds";
+const isMelee = t => t.entry === "melee" && meleeMode(t) !== "once";
+const isMeleeOnce = t => t.entry === "melee" && meleeMode(t) === "once";
 const isShoot = t => t.entry === "shooting";
-const isIndiv = t => isMelee(t) || isShoot(t); // entries are individual players
+const isIndiv = t => t.entry === "melee" || isShoot(t); // entries are individual players
 const sysOf = t => isMelee(t) ? "melee" : isShoot(t) ? "shooting" : t.system;
 const entities = t => isIndiv(t) ? t.players : t.teams;
 // who goes into the draw: entered, not withdrawn, and checked in when check-in is switched on
@@ -643,7 +648,7 @@ function planCourts(t, ms) {
     if (!free.length) break;
     const me = ents(m);
     if (me.some(e => busyEnt.has(e))) continue;
-    const earlier = ms.some(o => o !== m && !o.done && o.group === m.group && (o.round || 0) < (m.round || 0) && ents(o).some(e => me.includes(e)));
+    const earlier = ms.some(o => o !== m && !o.done && (o.group === m.group || (o.stage === "melee" && m.stage === "melee")) && (o.round || 0) < (m.round || 0) && ents(o).some(e => me.includes(e)));
     if (earlier) continue;
     const c = free.shift();
     m.court = c.id; out.push({ id: m.id, court: c.id });
@@ -735,6 +740,31 @@ function drawMeleeRound(t, ms) {
   return { matches: out, draw: { id: gid, kind: "round", label: `Round ${n}`, round: n }, note: byes.length ? `${byes.length} player(s) have a bye to make the teams fit.` : "" };
 }
 
+// mêlée drawn in advance: every planned round at once, still avoiding repeat partners and opponents
+function drawMeleeAll(t) {
+  const tt = clone(t); let all = MS().map(clone); const matches = [], draws = [];
+  for (let r = 0; r < Math.max(1, tt.swissRounds || 1); r++) {
+    const res = drawMeleeRound(tt, all); if (res.error) return res;
+    tt.draws.push(res.draw); draws.push(res.draw); all = all.concat(res.matches); matches.push(...res.matches);
+  }
+  return { matches, draws, draw: draws[0], note: `All ${draws.length} rounds drawn. Print or post them before play starts.` };
+}
+// team sizes when players are drawn into fixed teams once: the chosen size, topped up with the nearest other size
+function teamSizes(n, pref) {
+  if (pref === 1) return Array(n).fill(1);
+  if (n < 2) return null;
+  if (pref === 3) { const r = n % 3, t3 = Math.floor(n / 3); return r === 0 ? Array(t3).fill(3) : r === 2 ? [...Array(t3).fill(3), 2] : t3 >= 1 ? [...Array(t3 - 1).fill(3), 2, 2] : null; }
+  const d = Math.floor(n / 2); return n % 2 ? [...Array(d - 1).fill(2), 3] : Array(d).fill(2);
+}
+function drawMeleeTeams(t) {
+  const ids = shuffle(activeIds(t)); const sizes = teamSizes(ids.length, SIZE[t.format]);
+  if (!sizes) return { error: "Not enough players to make teams." };
+  const nt = clone(t); let k = 0;
+  nt.teams = sizes.map((sz, i) => { const ps = ids.slice(k, k + sz); k += sz;
+    return { id: "e" + uid(), name: `Team ${i + 1}`, players: ps.map(id => t.players.find(p => p.id === id).name), club: "", active: true, checkedIn: true }; });
+  nt.entry = "teams"; nt.meleeDrawn = true;
+  return { t: nt, count: nt.teams.length };
+}
 function circle(ids) {
   const arr = [...ids]; if (arr.length % 2) arr.push(null);
   const n = arr.length, rounds = [];
@@ -994,7 +1024,7 @@ async function addDraw(res) {
   const t = clone(T());
   const all = [...MS().map(clone), ...res.matches];
   planCourts(t, all);
-  t.draws.push(Object.assign({ created: Date.now() }, res.draw));
+  (res.draws || [res.draw]).forEach(d => t.draws.push(Object.assign({ created: Date.now() }, d)));
   if (res.pools) t.pools = res.pools;
   if (res.bracket) t.brackets = [...(t.brackets || []), res.bracket];
   await saveT(t);
@@ -1501,7 +1531,10 @@ function renderSetup(t) {
       <h3>Entries</h3>
       <div class="stack" style="gap:8px"><div class="eyebrow">Entry type</div>${seg("entry", t.entry, [["teams", "Fixed teams"], ["melee", "Mêlée (random teams)"], ["shooting", "Precision shooting"]], locked)}</div>
       ${isShoot(t) ? `<p class="small muted">Shooters enter individually. Tir de précision to FIPJP rules: 5 ateliers (lone boule, boule behind the jack, boule between two boules, boule behind an obstacle, the jack), each shot from 6, 7, 8 and 9 m. Every shot scores 0, 1, 3 or 5, so a scorecard is out of 100.</p>` : `<div class="stack" style="gap:8px"><div class="eyebrow">Format</div>${seg("format", t.format, [["singles", "Singles"], ["doubles", "Doubles"], ["triples", "Triples"]], locked)}</div>`}
-      ${isMelee(t) ? `<p class="small muted">Players enter individually. Each round draws new random teams, mixing doubles and triples when numbers don't divide evenly, and avoids repeat partners where it can. Players are ranked individually.</p>` : ""}
+      ${t.entry === "melee" ? `<div class="stack" style="gap:8px"><div class="eyebrow">Mêlée style</div>${seg("meleeMode", meleeMode(t), [["rounds", "New teams every round"], ["advance", "All rounds drawn in advance"], ["once", "Teams drawn once"]], locked)}</div>
+        <p class="small muted">${{ rounds: "Players enter individually. Each round draws new random teams once the previous round is finished (mêlée-démêlée), mixing doubles and triples when numbers don't divide evenly and avoiding repeat partners where it can. Players are ranked individually.",
+          advance: "Players enter individually and get new random teams each round, but every round is drawn at the start so you can print or post the whole draw before play. Repeat partners are avoided where possible. Players who arrive late can't be added once the draw is made.",
+          once: "Players enter individually and are drawn into random teams once, at the start. Those teams then play together all day using the competition system you choose (Swiss, pools, knockout and so on)." }[meleeMode(t)]}</p>` : ""}
       ${isShoot(t) ? "" : `<div class="fields">
         <label class="f"><span>Points to win</span><input type="number" min="1" max="21" id="f-target" data-field="target" data-num value="${t.target}"></label>
         <label class="f"><span>Bye counts as</span><div class="row" style="flex-wrap:nowrap"><input type="number" min="0" id="f-bye0" data-field="byeScore.0" data-num value="${t.byeScore[0]}"><span>–</span><input type="number" min="0" id="f-bye1" data-field="byeScore.1" data-num value="${t.byeScore[1]}"></div></label>
@@ -1565,7 +1598,8 @@ function renderEntries(t) {
   const q = (S.regFilter || "").toLowerCase();
   const match = e => !q || [entName(t, e.id), ...(e.players || []), e.club || "", e.name || ""].join(" ").toLowerCase().includes(q);
   return `<div class="stack">
-    <div class="spread"><h2>Registration</h2><span class="muted small">${FORMAT_LABEL[t.format]} · ${melee ? "Mêlée" : SYSTEM_LABEL[t.system]}</span></div>
+    <div class="spread"><h2>Registration</h2><span class="muted small">${FORMAT_LABEL[t.format]} · ${t.meleeDrawn ? "Mêlée, teams drawn once · " + SYSTEM_LABEL[t.system] : melee ? "Mêlée" : SYSTEM_LABEL[t.system]}</span></div>
+    ${t.meleeDrawn && !t.draws.length && canEdit() ? `<div class="notice spread"><span>These teams were drawn at random from ${t.players.filter(p => p.active !== false && (!t.checkin || p.checkedIn)).length} players. Happy with them? Make the draw on Draw & results.</span><span class="row"><button class="btn sm" data-act="melee-redraw">Redraw teams</button><button class="btn sm ghost" data-act="melee-unteam">Back to players</button></span></div>` : ""}
     <div class="panel stack">
       ${t.checkin ? `<div class="spread"><div><div class="eyebrow">Checked in on the day</div><div class="reg-count"><b>${here.length}</b> of ${entered.length} ${noun}</div></div>
         ${canEdit() && !drawn ? `<div class="row"><button class="btn sm" data-act="checkin-all">Check in everyone</button>${here.length ? `<button class="btn sm ghost" data-act="checkin-clear">Clear check-ins</button>` : ""}</div>` : ""}</div>
@@ -1630,7 +1664,11 @@ function renderDraw(t) {
   const ms = MS(); const n = activeIds(t).length;
   const sys = sysOf(t);
   const wr = canEdit();
-  const minNeeded = sys === "melee" ? SIZE[t.format] * 2 : 2;
+  const minNeeded = sys === "melee" || isMeleeOnce(t) ? SIZE[t.format] * 2 : 2;
+  if (isMeleeOnce(t)) return `<div class="stack"><h2>Draw & results</h2><div class="panel stack">
+      <p>${n} players ${t.checkin ? "checked in" : "entered"} · teams drawn once, then ${SYSTEM_LABEL[t.system]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
+      ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} players on Registration first.</p>` : wr ? `<div><button class="btn primary" data-act="melee-teams">Draw the teams</button></div><p class="small muted">Players are shuffled into ${FORMAT_LABEL[t.format].toLowerCase()} (with a few ${t.format === "triples" ? "doubles" : "triples"} if the numbers don't divide evenly). You can redraw before the first game.</p>` : `<p class="muted">Waiting for the organiser to draw the teams.</p>`}
+    </div></div>`;
   if (!t.draws.length) {
     return `<div class="stack"><h2>Draw & results</h2><div class="panel stack">
       <p>${n} ${isIndiv(t) ? "players" : "teams"} ${t.checkin ? "checked in" : "entered"} · ${SYSTEM_LABEL[sys]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
@@ -1646,7 +1684,11 @@ function renderDraw(t) {
     const last = rounds[0]; const lastMs = ms.filter(m => m.group === last.id);
     const lastDone = lastMs.every(m => m.done);
     const finalsExist = (t.brackets || []).length > 0;
-    html += `<div class="panel spread"><div><div class="eyebrow">${SYSTEM_LABEL[sys]}</div><b>Round ${last.round} of ${t.swissRounds} planned</b>${lastDone && last.round >= t.swissRounds && sys === "swiss" ? ` · <span style="color:var(--accent);font-weight:600">Morning complete</span>` : ""} · ${lastMs.filter(m => m.done).length}/${lastMs.length} games finished</div>
+    const adv = isMelee(t) && meleeMode(t) === "advance";
+    const allMs = adv ? ms.filter(m => m.stage === "melee") : []; const inPlay = adv ? (allMs.filter(m => !m.done).sort((x, y) => x.round - y.round)[0]?.round || null) : null;
+    if (adv) html += `<div class="panel spread"><div><div class="eyebrow">Mêlée · drawn in advance</div><b>All ${rounds.length} rounds drawn</b> · ${inPlay ? `round ${inPlay} in play` : `<span style="color:var(--accent);font-weight:600">all rounds finished</span>`} · ${allMs.filter(m => m.done).length}/${allMs.length} games finished</div>
+      <div class="row"><button class="btn sm" data-act="print-draw">Print the draw</button>${wr && !allMs.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo-all">Undo the draw</button>` : ""}</div></div>`;
+    else html += `<div class="panel spread"><div><div class="eyebrow">${SYSTEM_LABEL[sys]}</div><b>Round ${last.round} of ${t.swissRounds} planned</b>${lastDone && last.round >= t.swissRounds && sys === "swiss" ? ` · <span style="color:var(--accent);font-weight:600">Morning complete</span>` : ""} · ${lastMs.filter(m => m.done).length}/${lastMs.length} games finished</div>
       ${wr && !finalsExist ? `<div class="row">${lastDone ? `<button class="btn primary" data-act="next-round">Draw round ${last.round + 1}</button>` : ""}
         ${!lastMs.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${last.id}">Undo round ${last.round}</button>` : ""}</div>` : ""}</div>`;
   }
@@ -1896,13 +1938,21 @@ document.addEventListener("click", async e => {
       const sys = sysOf(t);
       if (sys === "shooting") await guard(() => addDraw(drawShootQualifying(t)));
       else if (sys === "swiss") await guard(() => addDraw(drawSwissRound(t, MS())));
-      else if (sys === "melee") await guard(() => addDraw(drawMeleeRound(t, MS())));
+      else if (sys === "melee") await guard(() => addDraw(meleeMode(t) === "advance" ? drawMeleeAll(t) : drawMeleeRound(t, MS())));
       else if (sys === "roundrobin") await guard(() => addDraw(genRoundRobin(t)));
       else if (sys === "snake") await guard(() => addDraw(genSnake(t)));
       else if (sys === "pools") await guard(() => addDraw(drawPools(t)));
       else if (sys === "knockout") { const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t)); await guard(() => addDraw(createBracket(t, "A", "Main knockout", ids, { third: t.koThird }))); }
       break;
     }
+    case "melee-teams": case "melee-redraw": {
+      const src = act === "melee-redraw" ? Object.assign(clone(t), { entry: "melee", teams: [], meleeDrawn: false }) : t;
+      const res = drawMeleeTeams(src); if (res.error) { toast(res.error); break; }
+      await guard(() => saveT(res.t)); S.tab = "entries"; render(); toast(`${res.count} teams drawn. Check them on Registration, then make the draw.`); break;
+    }
+    case "melee-unteam": { const nt = Object.assign(clone(t), { entry: "melee", teams: [], meleeDrawn: false }); await guard(() => saveT(nt)); render(); break; }
+    case "print-draw": window.print(); break;
+    case "undo-all": { for (const d of t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round)) await guard(() => undoDraw(d.id)); toast("Draw undone."); render(); break; }
     case "shoot-next": await guard(() => addDraw((t.shootFormat || "ko8") === "final" ? drawShootFinal(t) : drawShootKnockout(t))); break;
     case "archive": S.confirmArchive = true; render(); break;
     case "archive-no": S.confirmArchive = false; render(); break;
