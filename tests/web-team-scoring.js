@@ -56,8 +56,7 @@ const { chromium } = require('playwright');
   await A.click(`[data-act="check-accept"][data-id="${g2.id}"]`); await w(2000);
   log('organiser settled:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb; }, g2.id));
   // registration gate: the field alone isn't enough, the admin must have switched this competition on
-  const setReg = (on) => AD.evaluate(async on => { const { getFirestore, doc, setDoc } = await import('/fb/firebase-firestore.js'); const { getApp } = await import('/fb/firebase-app.js');
-    await setDoc(doc(getFirestore(getApp()), 'config', 'site'), { teamScoringComps: { [location.hash.slice(1)]: on } }, { merge: true }); }, on);
+  const setReg = (on) => AD.evaluate(on => window.__testSetSite({ teamScoringComps: { [location.hash.slice(1)]: on } }), on);
   await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="next-round"]'); await w(2500);
   await setReg(false); await w(2000);
   const tryPropose = () => T1.evaluate(async () => { const C = window.__carreau, S = C.S, t = C.T(); const me = S.myTeam(t); const m = C.MS().find(m => !m.done && m.a && m.b && (m.a.includes(me) || m.b.includes(me)));

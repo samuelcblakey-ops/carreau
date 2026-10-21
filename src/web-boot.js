@@ -450,6 +450,7 @@ function boot() {
   if (window.__CARREAU_EMULATOR) { // local testing only
     connectFirestoreEmulator(FB.db, "127.0.0.1", 8080); connectAuthEmulator(FB.auth, "http://127.0.0.1:9099", { disableWarnings: true });
     window.__testGoogle = (email) => signInWithCredential(FB.auth, GoogleAuthProvider.credential(JSON.stringify({ sub: email, email, email_verified: true })));
+    window.__testSetSite = data => setDoc(doc(FB.db, "config", "site"), data, { merge: true });
   }
   S.store = fbStore();
   onAuthStateChanged(FB.auth, async u => {
