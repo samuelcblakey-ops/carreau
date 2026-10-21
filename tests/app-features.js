@@ -43,7 +43,8 @@ const { chromium } = require('playwright');
     await mk({entry:'shooting', system:'knockout', shootFormat:'ko8', name:'Shoot KO', koThird:true}, 10, true);
     document.querySelector('[data-act="first-draw"]').click(); await w(100);
     log.push('quals: '+C.MS().filter(m=>m.stage==='shoot').length);
-    const fill = (prefix, base) => { document.querySelectorAll(`select[id^="${prefix}-"]`).forEach((s,i)=>{ s.value = String([0,1,3,5][(i+base)%4]); }); };
+    const fill = (pre, base) => { const side = pre === 'sa' ? 'a' : 'b'; const n = document.querySelectorAll(`[data-act="shot-cell"][data-side="${side}"]`).length;
+      for (let i = 0; i < n; i++) { document.querySelectorAll(`[data-act="shot-cell"][data-side="${side}"]`)[i].click(); document.querySelector(`[data-act="cell-pick"][data-v="${[0, 1, 3, 5][(i + base) % 4]}"]`).click(); } };
     for (const m of C.MS().filter(m=>m.stage==='shoot')) {
       document.querySelector('[data-tab="draw"]').click(); await w(30);
       document.querySelector(`[data-shoot="${m.id}"]`).click(); await w(40); document.querySelector('[data-act=\"shoot-mode\"]')?.click(); await w(60);
