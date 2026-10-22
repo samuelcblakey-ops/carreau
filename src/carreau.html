@@ -229,6 +229,14 @@ table.shots td,table.shots th{padding:5px 6px}
 .modeseg{display:flex;width:100%;margin-bottom:4px}.modeseg button{flex:1}
 .quick{display:grid;gap:8px}.quick .qbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:16px}
 .quick .qbtn.on{border-color:var(--accent);background:var(--accent-soft)}
+.roundalert{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:70;background:var(--accent);color:var(--accent-ink);padding:10px 12px 10px 16px;border-radius:12px;display:flex;align-items:center;gap:10px;width:min(560px,calc(100% - 24px));box-sizing:border-box;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.roundalert>span{flex:1;min-width:0}
+.roundalert[hidden]{display:none}.roundalert .btn{background:var(--accent-ink);color:var(--accent);border-color:transparent}.roundalert .btn.ghost{background:none;color:inherit}
+.find-row{align-items:center}.find-row .who{display:flex;flex-direction:column;gap:2px}
+.me-card{border-color:var(--accent)}
+tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.st-more{display:none}
+@media (max-width:640px){.tw.st:not(.all) .x{display:none}.tw.st:not(.all){overflow:visible}.tw.st:not(.all) thead th{position:sticky;top:0;background:var(--surface);z-index:1}.st-more{display:block;margin-top:6px}}
 .pill.timeup{background:var(--jack-soft);color:var(--jack);font-weight:700}
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* display mode */
@@ -255,6 +263,7 @@ table.shots td,table.shots th{padding:5px 6px}
 </header>
 <main class="wrap" id="main"><div class="empty">Loading competitions…</div></main>
 <div id="modal"></div>
+<div id="roundalert" hidden class="roundalert" role="status" aria-live="polite"></div>
 <div id="toast" hidden class="toast"></div>
 
 <script>
@@ -399,6 +408,10 @@ const FR_TEXT = {
   "Ended on time: enter the score when play stopped. If it's level, play one more end first.": "Arrêtée au temps : saisissez le score à l'arrêt du jeu. En cas d'égalité, jouez d'abord une mène de plus.",
   "Level when time ran out: play one more end, then enter the score.": "Égalité à la fin du temps : jouez une mène de plus, puis saisissez le score.",
   "Time limit (minutes, 0 = none)": "Limite de temps (minutes, 0 = aucune)", "Time": "Temps",
+  "Find my game": "Trouver ma partie", "Type your name or team": "Tapez votre nom ou votre équipe", "This is me": "C'est moi", "My game": "Ma partie", "Not you?": "Ce n'est pas vous ?",
+  "waiting for a piste": "en attente d'une piste", "No game right now. Last game: {x}": "Pas de partie en cours. Dernière partie : {1}", "No game drawn yet.": "Aucune partie tirée pour l'instant.",
+  "No team matches that name.": "Aucune équipe ne correspond.", "No player matches that name.": "Aucun joueur ne correspond.", "{x} is out": "{1} : le tirage est sorti", "{x} drawn": "{1} tiré", "New draw is out": "Nouveau tirage",
+  "you're on Piste {x}": "vous êtes sur la piste {1}", "you're waiting for a piste": "vous attendez une piste", "View": "Voir", "Show all columns": "Toutes les colonnes", "Fewer columns": "Moins de colonnes", "{n}–{n} now": "{1}–{2} en cours",
   // pistes
   "{n} playing · {n} waiting": "{1} en jeu · {2} en attente", "Free": "Libre", "No game on this piste.": "Aucune partie sur cette piste.", "Not in use": "Hors service",
   "No games waiting.": "Aucune partie en attente.",
@@ -656,6 +669,52 @@ function teamPanel(t) {
   const done = mine.filter(m => m.done).slice(-3).reverse();
   return `<div class="panel stack team-panel" style="gap:10px;border-color:var(--accent);margin-bottom:16px"><div><div class="eyebrow">My team</div><h3>${esc(entName(t, me))}</h3></div>${body}
     ${done.length ? `<div class="small muted">${done.map(m => { const a = (m.a || []).includes(me); const won = winnerSide(m)?.includes(me); return `${won ? "Won" : "Lost"} ${a ? m.sa : m.sb}–${a ? m.sb : m.sa} v ${esc(sideName(t, a ? m.b : m.a) || "bye")}`; }).join(" · ")}</div>` : ""}</div>`;
+}
+// ---- Find my game: players and spectators pick themselves once (remembered on this device) ----
+const meKey = t => "carreau-me-" + t.id;
+const myPick = t => { if (!t) return null; const id = myTeam(t) || lsGet(meKey(t)); return id && (isIndiv(t) ? t.players : t.teams).some(e => e.id === id) ? id : null; };
+function gameLine(t, id) {
+  const ms = MS().filter(m => inMatch(m, id) && !m.bye).sort(byOrder);
+  const cur = ms.find(m => !m.done && m.a && m.b);
+  if (cur) { const opp = sideName(t, (cur.a || []).includes(id) ? cur.b : cur.a); const a = (cur.a || []).includes(id);
+    const live = cur.sa != null && cur.sb != null && (cur.sa || cur.sb) ? ` · ${a ? cur.sa : cur.sb}–${a ? cur.sb : cur.sa} now` : "";
+    return `<div><b>v ${esc(opp)}</b></div><div class="small muted">${esc(matchContext(t, cur))} · ${cur.court ? `<span class="court-tag">Piste ${esc(courtName(t, cur.court))}</span>` : "waiting for a piste"}${live}</div>`; }
+  const last = ms.filter(m => m.done).slice(-1)[0];
+  if (last) { const a = (last.a || []).includes(id); const won = winnerSide(last)?.includes(id);
+    return `<div class="small muted">No game right now. Last game: ${won ? "Won" : "Lost"} ${a ? last.sa : last.sb}–${a ? last.sb : last.sa} v ${esc(sideName(t, a ? last.b : last.a) || "bye")}</div>`; }
+  return `<div class="small muted">No game drawn yet.</div>`;
+}
+function findResults(t, q) {
+  q = (q || "").trim().toLowerCase(); if (q.length < 2) return "";
+  const list = (isIndiv(t) ? t.players : t.teams).filter(e => (entName(t, e.id) + " " + (isIndiv(t) ? "" : teamPlayers(t, e.id))).toLowerCase().includes(q)).slice(0, 6);
+  if (!list.length) return `<p class="small muted">No ${isIndiv(t) ? "player" : "team"} matches that name.</p>`;
+  return list.map(e => `<div class="erow find-row"><div class="who"><b>${esc(entName(t, e.id))}</b>${isIndiv(t) ? "" : `<span class="small muted">${esc(teamPlayers(t, e.id))}</span>`}${gameLine(t, e.id)}</div><button class="btn sm" data-act="find-me" data-id="${e.id}">This is me</button></div>`).join("");
+}
+function findPanel(t) {
+  if (myTeam(t) || isShoot(t)) return "";
+  const me = myPick(t);
+  if (me) return `<div class="panel stack find-panel me-card" style="gap:8px;margin-bottom:16px"><div class="spread"><div><div class="eyebrow">My game</div><h3>${esc(entName(t, me))}</h3></div><button class="btn sm ghost" data-act="find-clear">Not you?</button></div>${gameLine(t, me)}</div>`;
+  return `<div class="panel stack find-panel" style="gap:8px;margin-bottom:16px"><label class="f"><span>Find my game</span><input type="search" id="find-q" placeholder="Type your name or team" autocomplete="off" value="${esc(S.findQ || "")}"></label><div id="find-results" class="stack" style="gap:6px">${findResults(t, S.findQ)}</div></div>`;
+}
+// ---- New round alert: shown on every open screen when a new round or bracket is drawn ----
+function checkNewRound(t) {
+  if (!t) return; const n = [(t.draws || []).length, (t.brackets || []).length]; S.seenDraws = S.seenDraws || {};
+  const prev = S.seenDraws[t.id]; S.seenDraws[t.id] = n;
+  if (!prev || (n[0] <= prev[0] && n[1] <= prev[1]) || S.selfDraw) { S.selfDraw = false; return; }
+  const d = (t.draws || []).slice(-1)[0]; const b = (t.brackets || []).slice(-1)[0];
+  const label = n[1] > prev[1] && b ? `${b.name} drawn` : d?.label ? `${d.label} is out` : "New draw is out";
+  S.alert = { tid: t.id, label, until: Date.now() + 15000 };
+  try { navigator.vibrate && navigator.vibrate([150, 80, 150]); } catch {}
+  clearTimeout(S.alertTimer); S.alertTimer = setTimeout(() => { S.alert = null; renderAlert(); }, 15000);
+}
+function renderAlert() {
+  const el = $("#roundalert"); if (!el) return; const t = T(); const a = S.alert;
+  if (!a || !t || a.tid !== t.id) { el.hidden = true; el.innerHTML = ""; return; }
+  const me = myPick(t); let mine = "";
+  if (me) { const cur = MS().filter(m => inMatch(m, me) && !m.done && m.a && m.b && !m.bye).sort(byOrder)[0];
+    if (cur) mine = ` · ${cur.court ? `you're on Piste ${esc(courtName(t, cur.court))}` : "you're waiting for a piste"} v ${esc(sideName(t, (cur.a || []).includes(me) ? cur.b : cur.a))}`; }
+  el.innerHTML = `<span><b>${esc(a.label)}</b>${mine}</span><button type="button" class="btn sm" data-act="alert-view">View</button><button type="button" class="btn sm ghost" data-act="alert-close" aria-label="Close">✕</button>`;
+  el.hidden = false; localize(el);
 }
 function checkPanel(t) {
   if (!teamScoring(t) || !canEdit() || myTeam(t)) return "";
@@ -1057,7 +1116,7 @@ function renderPlanEditor(t, { locked, compact } = {}) {
   </div>`;
 }
 async function startKnockouts() {
-  const t = T(); const ms = MS(); const plan = getPlan(t); const made = [];
+  S.selfDraw = true; const t = T(); const ms = MS(); const plan = getPlan(t); const made = [];
   for (const br of plan.brackets) {
     const ents = koEntrants(T(), ms, br);
     if (ents.length < 2) continue;
@@ -1101,6 +1160,7 @@ async function assignCourts() {
 }
 async function addDraw(res) {
   if (res.error) { toast(res.error); return; }
+  S.selfDraw = true;
   const t = clone(T());
   const all = [...MS().map(clone), ...res.matches];
   planCourts(t, all);
@@ -1549,10 +1609,10 @@ const TAB_ICON = {
 const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["display", "Big screen"]];
 function render() {
   const ae = document.activeElement;
-  if (ae && $("#main").contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName) && ae.type !== "checkbox") { S.pendingRender = true; return; }
+  if (ae && $("#main").contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName) && ae.type !== "checkbox") { S.pendingRender = true; checkNewRound(T()); renderAlert(); return; }
   S.pendingRender = false;
   renderHeader();
-  const t = T(); const main = $("#main");
+  const t = T(); const main = $("#main"); checkNewRound(t); renderAlert();
   const scrolls = {}; document.querySelectorAll("[data-scroll-key]").forEach(el => scrolls[el.dataset.scrollKey] = [el.scrollLeft, el.scrollTop]);
   const restore = () => { document.querySelectorAll("[data-scroll-key]").forEach(el => { const v = scrolls[el.dataset.scrollKey]; if (v) { el.scrollLeft = v[0]; el.scrollTop = v[1]; } }); };
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
@@ -1791,7 +1851,7 @@ function renderDraw(t) {
       wr ? `<div><button class="btn primary" data-act="first-draw">${{ swiss: "Draw round 1", melee: "Draw round 1", roundrobin: "Generate round robin schedule", snake: "Draw snake rounds", pools: "Draw pools", knockout: "Draw knockout bracket" }[sys]}</button></div>` : `<p class="muted">Waiting for the organiser to make the draw.</p>`}
     </div></div>`;
   }
-  let html = teamPanel(t) + checkPanel(t) + `<div class="stack"><div class="spread"><h2>Draw & results</h2><div class="row">${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}${wr && S.downloads ? `<button class="btn sm" data-act="export">Export results (CSV)</button>` : ""}</div></div>`;
+  let html = findPanel(t) + teamPanel(t) + checkPanel(t) + `<div class="stack"><div class="spread"><h2>Draw & results</h2><div class="row">${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}${wr && S.downloads ? `<button class="btn sm" data-act="export">Export results (CSV)</button>` : ""}</div></div>`;
   // rounds (swiss / melee)
   const rounds = t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round);
   if (rounds.length) {
@@ -1960,9 +2020,10 @@ function overallTable(t, stage) {
 }
 function standingsTable(t, rows, opts = {}) {
   const useB = opts.buch;
-  return `<div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n">Pld</th><th class="n">W</th><th class="n">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n">For</th><th class="n">Agst</th><th class="n">+/-</th></tr></thead><tbody>
-    ${rows.map((s, i) => `<tr><td class="rank">${i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${!isIndiv(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n">${s.fbuch}</td>` : ""}<td class="n">${s.pf}</td><td class="n">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
-  </tbody></table></div>`;
+  const me = myPick(t);
+  return `<div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n x">Pld</th><th class="n">W</th><th class="n x">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n x" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n x">For</th><th class="n x">Agst</th><th class="n">+/-</th></tr></thead><tbody>
+    ${rows.map((s, i) => `<tr class="${s.id === me ? "me" : ""}"><td class="rank">${i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${!isIndiv(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n x">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n x">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n x">${s.fbuch}</td>` : ""}<td class="n x">${s.pf}</td><td class="n x">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
+  </tbody></table></div><div class="st-more"><button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`;
 }
 function renderStandings(t) {
   const sys = sysOf(t);
@@ -2071,6 +2132,11 @@ document.addEventListener("click", async e => {
     }
     case "melee-unteam": { const nt = Object.assign(clone(t), { entry: "melee", teams: [], meleeDrawn: false }); await guard(() => saveT(nt)); render(); break; }
     case "print-draw": window.print(); break;
+    case "find-me": { lsSet(meKey(t), a.dataset.id); S.findQ = ""; document.activeElement?.blur?.(); render(); break; }
+    case "find-clear": { lsSet(meKey(t), ""); render(); setTimeout(() => $("#find-q")?.focus(), 30); break; }
+    case "alert-close": S.alert = null; renderAlert(); break;
+    case "alert-view": S.alert = null; renderAlert(); S.tab = "draw"; render(); window.scrollTo(0, 0); break;
+    case "st-cols": S.allCols = !S.allCols; render(); break;
     case "toast-undo": { const fn = S.undo; S.undo = null; $("#toast").hidden = true; if (fn) await fn(); break; }
     case "team-score": { const m = S.matches[a.dataset.id]; if (!m) break; const p = m.proposal;
       S.modal = { id: m.id, team: true, sa: p && p.status === "pending" ? p.sa : 0, sb: p && p.status === "pending" ? p.sb : 0, early: false, err: "", mode: "quick", pad: null }; renderModal(); break; }
@@ -2140,6 +2206,7 @@ document.addEventListener("input", e => {
     const none = document.querySelector(".pick-none"); if (none) none.hidden = n > 0; return;
   }
   if (S.overlayView && S.overlayInput && S.overlayInput(e.target)) return;
+  if (e.target.id === "find-q") { S.findQ = e.target.value; const box = $("#find-results"); const t = T(); if (box && t) { box.innerHTML = findResults(t, S.findQ); localize(box); } return; }
   if (e.target.id !== "reg-search") return;
   S.regFilter = e.target.value; const q = S.regFilter.toLowerCase();
   document.querySelectorAll("[data-row]").forEach(r => r.hidden = !!q && !r.dataset.text.includes(q));
