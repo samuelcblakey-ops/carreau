@@ -1,7 +1,7 @@
 {
-  "name": "Carreau Competition Desk",
-  "short_name": "Carreau",
-  "description": "Run petanque competitions live: draws, pistes, scores and standings.",
+  "name": "SN Pétanque Competition Desk",
+  "short_name": "SN Pétanque",
+  "description": "Petanque competitions in loving memory of Steve Noel: draws, pistes, live scores and standings.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
