@@ -7,7 +7,7 @@
 :root{
   --bg:#eceeea; --surface:#ffffff; --surface-2:#f5f6f3; --ink:#1a2320; --muted:#5d6a64; --line:#d3d9d5;
   --accent:#1d6a54; --accent-ink:#ffffff; --accent-soft:#dcebe5;
-  --jack:#d48d0b; --jack-soft:#fbefd6; --danger:#b3261e; --danger-soft:#f8e0de; --wire:#b9c3be;
+  --jack:#d48d0b; --jack-ink:#8a5a00; --jack-soft:#fbefd6; --danger:#b3261e; --danger-soft:#f8e0de; --wire:#b9c3be;
   --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r:10px;
@@ -15,11 +15,11 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#111614; --surface:#1a211e; --surface-2:#202825; --ink:#e5ebe8; --muted:#97a49e; --line:#2d3833;
   --accent:#5fc19d; --accent-ink:#0b1511; --accent-soft:#1f3a30;
-  --jack:#f0b443; --jack-soft:#3a2f17; --danger:#ef7a70; --danger-soft:#3d1f1d; --wire:#3e4b45; color-scheme:dark}}
+  --jack:#f0b443; --jack-ink:#f0b443; --jack-soft:#3a2f17; --danger:#ef7a70; --danger-soft:#3d1f1d; --wire:#3e4b45; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111614; --surface:#1a211e; --surface-2:#202825; --ink:#e5ebe8; --muted:#97a49e; --line:#2d3833;
   --accent:#5fc19d; --accent-ink:#0b1511; --accent-soft:#1f3a30;
-  --jack:#f0b443; --jack-soft:#3a2f17; --danger:#ef7a70; --danger-soft:#3d1f1d; --wire:#3e4b45; color-scheme:dark}
+  --jack:#f0b443; --jack-ink:#f0b443; --jack-soft:#3a2f17; --danger:#ef7a70; --danger-soft:#3d1f1d; --wire:#3e4b45; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -101,7 +101,7 @@ textarea{min-height:110px;resize:vertical}
 .seg button:disabled{cursor:not-allowed;opacity:.6}
 .chk{display:flex;gap:8px;align-items:center;font-size:14px}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
-.pill.playing{background:var(--jack-soft);color:var(--jack)}
+.pill.playing{background:var(--jack-soft);color:var(--jack-ink)}
 .pill.done{background:var(--accent-soft);color:var(--accent)}
 .pill.ready{background:var(--surface-2);color:var(--ink);border:1px dashed var(--line)}
 .pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
@@ -168,7 +168,7 @@ button.bkm:hover{border-color:var(--muted)}
 .bkm-row.lose .nm,.bkm-row.lose .sc{color:var(--muted)}
 .bkm-row .tbd{font-size:13px}
 .bkm-foot{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;background:var(--surface-2);color:var(--muted);border-top:1px solid var(--line)}
-.bkm.playing .bkm-foot{background:var(--jack-soft);color:var(--jack)}
+.bkm.playing .bkm-foot{background:var(--jack-soft);color:var(--jack-ink)}
 .bk-champ{border:2px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px}
 .bk-champ b{font-family:var(--display);font-size:22px;line-height:1.1;overflow-wrap:anywhere}
 .bk-champ.tbc{border-style:dashed;border-color:var(--wire);background:none}
@@ -242,7 +242,13 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
 .netdot.sync::before{background:var(--jack);animation:netpulse 1s ease-in-out infinite}.netdot.off::before{background:var(--danger)}.netdot.off{color:var(--danger)}
 @keyframes netpulse{50%{opacity:.35}}
 @media (max-width:640px){.netdot .nl{display:none}.netdot.off .nl,.netdot.sync .nl{display:inline}}
-.pill.timeup{background:var(--jack-soft);color:var(--jack);font-weight:700}
+/* touch screens: every control at least thumb-sized (44px; small buttons 40px) */
+@media (pointer:coarse){.btn{min-height:44px}.btn.sm{min-height:40px}.seg button{min-height:44px}.f input,.f select,input[type=search]{min-height:44px}.stepper button{min-width:44px;min-height:44px}.pad button{min-height:44px}.chk input{width:22px;height:22px}}
+.wiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:8px}
+.wiz-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:15px;color:var(--ink)}
+.wiz-opt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.wiz-dots{display:flex;gap:6px}.wiz-dots span{flex:1;height:4px;border-radius:2px;background:var(--line)}.wiz-dots span.on{background:var(--accent)}
+.pill.timeup{background:var(--jack-soft);color:var(--jack-ink);font-weight:700}
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* display mode */
 .disp{display:flex;flex-direction:column;gap:20px}
@@ -417,7 +423,15 @@ const FR_TEXT = {
   "Find my game": "Trouver ma partie", "Type your name or team": "Tapez votre nom ou votre équipe", "This is me": "C'est moi", "My game": "Ma partie", "Not you?": "Ce n'est pas vous ?",
   "waiting for a piste": "en attente d'une piste", "No game right now. Last game: {x}": "Pas de partie en cours. Dernière partie : {1}", "No game drawn yet.": "Aucune partie tirée pour l'instant.",
   "No team matches that name.": "Aucune équipe ne correspond.", "No player matches that name.": "Aucun joueur ne correspond.", "{x} is out": "{1} : le tirage est sorti", "{x} drawn": "{1} tiré", "New draw is out": "Nouveau tirage",
-  "you're on Piste {x}": "vous êtes sur la piste {1}", "you're waiting for a piste": "vous attendez une piste", "View": "Voir", "Show all columns": "Toutes les colonnes", "Live": "En direct", "Saving…": "Enregistrement…", "Offline": "Hors ligne", "Offline · {n} waiting to sync": "Hors ligne · {1} en attente", "Fewer columns": "Moins de colonnes", "{n}–{n} now": "{1}–{2} en cours",
+  "you're on Piste {x}": "vous êtes sur la piste {1}", "you're waiting for a piste": "vous attendez une piste", "View": "Voir", "Show all columns": "Toutes les colonnes", "Quick setup · step {n} of {n}": "Configuration rapide · étape {1} sur {2}", "Quick setup": "Configuration rapide", "Name": "Nom",
+  "Who's playing": "Qui joue", "Format": "Formule", "Pistes": "Pistes", "Skip, I'll use Setup": "Passer, j'utiliserai Paramètres", "Competition name": "Nom du concours", "Venue (optional)": "Lieu (facultatif)",
+  "e.g. Bristol Spring Triples": "ex. Triplettes de printemps", "Fixed teams of 3": "Équipes fixes de 3", "Fixed teams of 2": "Équipes fixes de 2", "One player each": "Un joueur", "Players drawn into new teams": "Joueurs tirés dans de nouvelles équipes",
+  "Tir de précision": "Tir de précision", "Precision shooting runs as a qualifying round, then a knockout. You can change the details in Setup.": "Le tir de précision se joue en qualification puis en élimination directe. Les détails se règlent dans Paramètres.",
+  "Mêlée plays Swiss rounds with new random teams each round.": "La mêlée se joue en parties suisses avec de nouvelles équipes à chaque partie.", "Rounds": "Parties", "Swiss rounds": "Parties suisses",
+  "Everyone plays every round, paired by results": "Tout le monde joue chaque partie, appariés selon les résultats", "Pools → knockout": "Poules → élimination", "Groups of 4, then knockouts": "Poules de 4, puis élimination directe",
+  "Everyone plays everyone": "Chacun rencontre tout le monde", "Lose and you're out": "Une défaite et c'est fini", "Number of pistes": "Nombre de pistes", "Next": "Suivant", "Back": "Retour", "Finish": "Terminer",
+  "All set. Now add your teams.": "C'est prêt. Ajoutez maintenant vos équipes.", "All set. Now add your shooters.": "C'est prêt. Ajoutez maintenant vos tireurs.", "All set. Now add your players.": "C'est prêt. Ajoutez maintenant vos joueurs.",
+  "Give the competition a name first.": "Donnez d'abord un nom au concours.", "Live": "En direct", "Saving…": "Enregistrement…", "Offline": "Hors ligne", "Offline · {n} waiting to sync": "Hors ligne · {1} en attente", "Fewer columns": "Moins de colonnes", "{n}–{n} now": "{1}–{2} en cours",
   // pistes
   "{n} playing · {n} waiting": "{1} en jeu · {2} en attente", "Free": "Libre", "No game on this piste.": "Aucune partie sur cette piste.", "Not in use": "Hors service",
   "No games waiting.": "Aucune partie en attente.",
@@ -1689,7 +1703,7 @@ function newTournament() {
   return { id, name: "New competition", date: new Date().toISOString().slice(0, 10), venue: "", entry: "teams", format: "triples", system: "swiss",
     checkin: true, target: 13, byeScore: [13, 7], swissRounds: 5, poolSize: 4, poolStyle: "french", qualify: 2, bBracket: true, consolante: false, seeding: "random", randomCourts: false,
     courts: Array.from({ length: 8 }, (_, i) => ({ id: "c" + (i + 1), name: String(i + 1), active: true })),
-    teams: [], players: [], draws: [], pools: [], brackets: [], archived: false, created: Date.now() };
+    teams: [], players: [], draws: [], pools: [], brackets: [], archived: false, wizard: true, created: Date.now() };
 }
 
 /* setup */
@@ -1698,7 +1712,7 @@ function renderSetup(t) {
   const locked = t.draws.length > 0;
   const sys = sysOf(t);
   return `<div class="stack">
-  <div class="spread"><h2>Setup</h2>${locked ? `<span class="pill">Format locked after the first draw</span>` : ""}</div>
+  <div class="spread"><h2>Setup</h2>${locked ? `<span class="pill">Format locked after the first draw</span>` : canEdit() ? `<button type="button" class="btn sm" data-act="wiz-again">Quick setup</button>` : ""}</div>
   ${S.setupExtra ? S.setupExtra(t) : ""}
   ${S.teamScoringSetup && S.teamScoringSetup(t) && !isIndiv(t) ? `<div class="panel stack"><h3>Score entry</h3>
     ${seg("scoreMode", t.scoreMode || "organiser", [["organiser", "Organisers only"], ["teams", "Teams enter, other team confirms"], ["teams-auto", "Teams enter, auto-confirm"]], false)}
@@ -1774,6 +1788,44 @@ function renderSetup(t) {
 }
 
 /* entries */
+/* quick setup: four short steps for a new competition (shown on Registration until finished or skipped) */
+const WIZ_STEPS = ["Name", "Who's playing", "Format", "Pistes"];
+function wizDraft(t) {
+  if (!S.wiz || S.wiz.tid !== t.id) S.wiz = { tid: t.id, step: 0, d: { name: t.name === "New competition" ? "" : t.name, date: t.date, venue: t.venue || "", kind: t.entry === "teams" ? t.format : t.entry, system: t.system, swissRounds: t.swissRounds, courts: t.courts.length, target: t.target, timeLimit: t.timeLimit || 0 } };
+  return S.wiz;
+}
+function wizPanel(t) {
+  if (!t.wizard || !canEdit() || t.draws.length) return "";
+  const w = wizDraft(t), d = w.d, st = w.step;
+  const opt = (k, v, label, sub) => `<button type="button" class="wiz-opt ${String(d[k]) === String(v) ? "on" : ""}" data-act="wiz-set" data-k="${k}" data-v="${v}"><b>${label}</b>${sub ? `<span class="small muted">${sub}</span>` : ""}</button>`;
+  let body = "";
+  if (st === 0) body = `<div class="fields"><label class="f"><span>Competition name</span><input id="wz-name" data-wz="name" value="${esc(d.name)}" placeholder="e.g. Bristol Spring Triples" autocomplete="off"></label>
+    <label class="f"><span>Date</span><input id="wz-date" data-wz="date" type="date" value="${esc(d.date || "")}"></label><label class="f"><span>Venue (optional)</span><input id="wz-venue" data-wz="venue" value="${esc(d.venue)}" autocomplete="off"></label></div>`;
+  if (st === 1) body = `<div class="wiz-grid">${opt("kind", "triples", "Triples", "Fixed teams of 3")}${opt("kind", "doubles", "Doubles", "Fixed teams of 2")}${opt("kind", "singles", "Singles", "One player each")}${opt("kind", "melee", "Mêlée", "Players drawn into new teams")}${opt("kind", "shooting", "Precision shooting", "Tir de précision")}</div>`;
+  if (st === 2) body = d.kind === "shooting" ? `<p class="muted">Precision shooting runs as a qualifying round, then a knockout. You can change the details in Setup.</p>`
+    : d.kind === "melee" ? `<p class="muted">Mêlée plays Swiss rounds with new random teams each round.</p><label class="f"><span>Rounds</span><input id="wz-rounds" data-wz="swissRounds" type="number" min="1" max="12" value="${d.swissRounds}"></label>`
+    : `<div class="wiz-grid">${opt("system", "swiss", "Swiss", "Everyone plays every round, paired by results")}${opt("system", "pools", "Pools → knockout", "Groups of 4, then knockouts")}${opt("system", "roundrobin", "Round robin", "Everyone plays everyone")}${opt("system", "knockout", "Knockout", "Lose and you're out")}</div>
+      ${d.system === "swiss" ? `<label class="f"><span>Swiss rounds</span><input id="wz-rounds" data-wz="swissRounds" type="number" min="1" max="12" value="${d.swissRounds}"></label>` : ""}`;
+  if (st === 3) body = `<div class="fields"><label class="f"><span>Number of pistes</span><input id="wz-courts" data-wz="courts" type="number" min="1" max="200" value="${d.courts}"></label>
+    ${d.kind === "shooting" ? "" : `<label class="f"><span>Points to win</span><input id="wz-target" data-wz="target" type="number" min="1" max="21" value="${d.target}"></label><label class="f"><span>Time limit (minutes, 0 = none)</span><input id="wz-time" data-wz="timeLimit" type="number" min="0" max="240" value="${d.timeLimit}"></label>`}</div>`;
+  return `<div class="panel stack wiz" style="gap:12px;margin-bottom:16px;border-color:var(--accent)">
+    <div class="spread"><div><div class="eyebrow">Quick setup · step ${st + 1} of ${WIZ_STEPS.length}</div><h3>${WIZ_STEPS[st]}</h3></div><button type="button" class="btn sm ghost" data-act="wiz-skip">Skip, I'll use Setup</button></div>
+    <div class="wiz-dots" aria-hidden="true">${WIZ_STEPS.map((_, i) => `<span class="${i <= st ? "on" : ""}"></span>`).join("")}</div>
+    ${body}
+    <div class="row">${st ? `<button type="button" class="btn" data-act="wiz-back">Back</button>` : ""}<button type="button" class="btn primary" data-act="wiz-next">${st === WIZ_STEPS.length - 1 ? "Finish" : "Next"}</button></div></div>`;
+}
+function wizRead() { document.querySelectorAll("[data-wz]").forEach(el => { const k = el.dataset.wz; S.wiz.d[k] = el.type === "number" ? (parseInt(el.value, 10) || 0) : el.value; }); }
+async function wizFinish(t) {
+  const d = S.wiz.d; const nt = clone(t);
+  nt.name = (d.name || "").trim() || nt.name; nt.date = d.date || nt.date; nt.venue = d.venue || "";
+  if (d.kind === "shooting") { nt.entry = "shooting"; nt.system = "knockout"; nt.shootFormat = nt.shootFormat || "ko8"; nt.format = "singles"; }
+  else if (d.kind === "melee") { nt.entry = "melee"; nt.system = "swiss"; nt.swissRounds = Math.max(1, d.swissRounds || 4); }
+  else { nt.entry = "teams"; nt.format = d.kind; nt.system = d.system; if (d.system === "swiss") nt.swissRounds = Math.max(1, d.swissRounds || 5); }
+  const n = Math.max(1, Math.min(200, d.courts || 1)); nt.courts = Array.from({ length: n }, (_, i) => nt.courts[i] || { id: "c" + (i + 1), name: String(i + 1), active: true });
+  if (d.kind !== "shooting") { nt.target = Math.max(1, Math.min(21, d.target || 13)); nt.timeLimit = Math.max(0, d.timeLimit || 0); }
+  nt.wizard = false; S.wiz = null; S.tab = "entries"; await guard(() => saveT(nt)); render();
+  toast(nt.entry === "teams" ? "All set. Now add your teams." : nt.entry === "shooting" ? "All set. Now add your shooters." : "All set. Now add your players.");
+}
 function renderEntries(t) {
   const melee = isIndiv(t); const size = SIZE[t.format]; const noun = melee ? "players" : "teams";
   const list = entities(t);
@@ -1784,7 +1836,7 @@ function renderEntries(t) {
   const pct = entered.length ? Math.round(100 * here.length / entered.length) : 0;
   const q = (S.regFilter || "").toLowerCase();
   const match = e => !q || [entName(t, e.id), ...(e.players || []), e.club || "", e.name || ""].join(" ").toLowerCase().includes(q);
-  return `<div class="stack">
+  return wizPanel(t) + `<div class="stack">
     <div class="spread"><h2>Registration</h2><span class="muted small">${FORMAT_LABEL[t.format]} · ${t.meleeDrawn ? "Mêlée, teams drawn once · " + SYSTEM_LABEL[t.system] : melee ? "Mêlée" : SYSTEM_LABEL[t.system]}</span></div>
     ${t.meleeDrawn && !t.draws.length && canEdit() ? `<div class="notice spread"><span>These teams were drawn at random from ${t.players.filter(p => p.active !== false && (!t.checkin || p.checkedIn)).length} players. Happy with them? Make the draw on Draw & results.</span><span class="row"><button class="btn sm" data-act="melee-redraw">Redraw teams</button><button class="btn sm ghost" data-act="melee-unteam">Back to players</button></span></div>` : ""}
     <div class="panel stack">
@@ -2150,6 +2202,12 @@ document.addEventListener("click", async e => {
     case "alert-close": S.alert = null; renderAlert(); break;
     case "alert-view": S.alert = null; renderAlert(); S.tab = "draw"; render(); window.scrollTo(0, 0); break;
     case "st-cols": S.allCols = !S.allCols; render(); break;
+    case "wiz-set": wizRead(); S.wiz.d[a.dataset.k] = a.dataset.v; render(); break;
+    case "wiz-next": { wizRead(); if (S.wiz.step === 0 && !(S.wiz.d.name || "").trim()) { toast("Give the competition a name first."); $("#wz-name")?.focus(); break; }
+      document.activeElement?.blur?.(); if (S.wiz.step >= WIZ_STEPS.length - 1) await wizFinish(t); else { S.wiz.step++; render(); } break; }
+    case "wiz-back": wizRead(); document.activeElement?.blur?.(); S.wiz.step = Math.max(0, S.wiz.step - 1); render(); break;
+    case "wiz-skip": { S.wiz = null; const nt = clone(t); nt.wizard = false; S.tab = "setup"; await guard(() => saveT(nt)); render(); break; }
+    case "wiz-again": { const nt = clone(t); nt.wizard = true; S.wiz = null; S.tab = "entries"; await guard(() => saveT(nt)); render(); break; }
     case "toast-undo": { const fn = S.undo; S.undo = null; $("#toast").hidden = true; if (fn) await fn(); break; }
     case "team-score": { const m = S.matches[a.dataset.id]; if (!m) break; const p = m.proposal;
       S.modal = { id: m.id, team: true, sa: p && p.status === "pending" ? p.sa : 0, sb: p && p.status === "pending" ? p.sb : 0, early: false, err: "", mode: "quick", pad: null }; renderModal(); break; }
