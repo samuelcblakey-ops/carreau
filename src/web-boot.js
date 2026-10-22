@@ -16,6 +16,8 @@ let unsubTeamCodes = null;
 let FB = null, unsubRole = null, unsubCodes = null;
 const JOINED_KEY = "carreau-joined";
 const joined = () => { try { return JSON.parse(lsGet(JOINED_KEY) || "[]"); } catch { return []; } };
+const forget = tid => lsSet(JOINED_KEY, JSON.stringify(joined().filter(x => x !== tid)));
+S.forgetComp = forget;
 const remember = tid => { const j = joined(); if (!j.includes(tid)) { j.push(tid); lsSet(JOINED_KEY, JSON.stringify(j.slice(-50))); } };
 const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode = () => { const a = new Uint32Array(8); crypto.getRandomValues(a); return [...a].map(x => ALPHA[x % ALPHA.length]).join(""); };
