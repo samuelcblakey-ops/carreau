@@ -20,6 +20,18 @@ const remember = tid => { const j = joined(); if (!j.includes(tid)) { j.push(tid
 const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode = () => { const a = new Uint32Array(8); crypto.getRandomValues(a); return [...a].map(x => ALPHA[x % ALPHA.length]).join(""); };
 
+// writes: count what's waiting for the server (for the connection light); when offline, don't make the
+// screen wait for the server to answer: the change is already in the local cache and syncs when back online
+const NET = { pending: 0 };
+const netChanged = () => { try { renderNet(); } catch {} };
+const track = p => {
+  NET.pending++; netChanged();
+  const done = () => { NET.pending = Math.max(0, NET.pending - 1); netChanged(); }; p.then(done, done);
+  if (navigator.onLine === false) { p.catch(e => { console.error(e); toast("A change made offline couldn't be saved."); }); return Promise.resolve(); }
+  return p;
+};
+S.connState = () => !FB ? null : navigator.onLine === false ? { k: "off", label: NET.pending ? `Offline · ${NET.pending} waiting to sync` : "Offline" } : NET.pending ? { k: "sync", label: "Saving…" } : { k: "live", label: "Live" };
+addEventListener("online", netChanged); addEventListener("offline", netChanged);
 function fbStore() {
   const { db } = FB;
   let unsubs = [];
@@ -47,11 +59,11 @@ function fbStore() {
     watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data())), onErr); },
     async setTournament(t) {
       const isNew = !!t._new; const body = clone(t); delete body._new; body.updated = Date.now();
-      await setDoc(doc(db, "tournaments", t.id), body);
+      await track(setDoc(doc(db, "tournaments", t.id), body));
       if (isNew) { // first save of a new competition: create its private codes
         delete t._new; if (S.tournaments[t.id]) delete S.tournaments[t.id]._new;
         const codes = { edit: newCode(), score: newCode() };
-        await setDoc(doc(db, "tournaments", t.id, "private", "codes"), codes); CODES[t.id] = codes; render();
+        await track(setDoc(doc(db, "tournaments", t.id, "private", "codes"), codes)); CODES[t.id] = codes; render();
       }
     },
     async deleteTournament(tid) {
@@ -61,9 +73,9 @@ function fbStore() {
       try { await deleteDoc(doc(db, "tournaments", tid, "private", "codes")); } catch {}
       await deleteDoc(doc(db, "tournaments", tid));
     },
-    setMatch(tid, m) { return setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m)); },
-    updateMatch(tid, id, patch) { return updateDoc(doc(db, "tournaments", tid, "matches", id), clone(patch)); },
-    deleteMatch(tid, id) { return deleteDoc(doc(db, "tournaments", tid, "matches", id)); }
+    setMatch(tid, m) { return track(setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m))); },
+    updateMatch(tid, id, patch) { return track(updateDoc(doc(db, "tournaments", tid, "matches", id), clone(patch))); },
+    deleteMatch(tid, id) { return track(deleteDoc(doc(db, "tournaments", tid, "matches", id))); }
   };
 }
 
@@ -88,12 +100,12 @@ S.myTeam = t => TEAM[t.id] || null;
 S.teamPropose = async (t, m, sa, sb, time) => {
   const me = TEAM[t.id]; if (!me) return false;
   const proposal = { sa, sb, by: me, at: Date.now(), status: "pending" }; if (time) proposal.time = true;
-  await updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal }); S.matches[m.id].proposal = proposal; return true;
+  await track(updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal })); S.matches[m.id].proposal = proposal; return true;
 };
 S.teamRespond = async (t, m, status) => {
   const me = TEAM[t.id]; const p = m.proposal; if (!me || !p) return false;
   const proposal = { ...p, status, confirmedBy: me, respondedAt: Date.now() };
-  await updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal }); S.matches[m.id].proposal = proposal; return true;
+  await track(updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal })); S.matches[m.id].proposal = proposal; return true;
 };
 // team links: #<competition>.t-<team id>-<code>
 async function makeTeamCodes(tid) {
@@ -447,7 +459,9 @@ function boot() {
   const h = readHash(); if (h.tid && h.tid !== "admin") S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView;
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
-  FB = { db: getFirestore(app), auth: getAuth(app) };
+  // keep a copy of what this device has seen (IndexedDB): competitions open instantly next time and keep working offline
+  let db; try { db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); } catch (e) { console.warn("Offline cache unavailable", e); db = getFirestore(app); }
+  FB = { db, auth: getAuth(app) };
   if (window.__CARREAU_EMULATOR) { // local testing only
     connectFirestoreEmulator(FB.db, "127.0.0.1", 8080); connectAuthEmulator(FB.auth, "http://127.0.0.1:9099", { disableWarnings: true });
     window.__testGoogle = (email) => signInWithCredential(FB.auth, GoogleAuthProvider.credential(JSON.stringify({ sub: email, email, email_verified: true })));
