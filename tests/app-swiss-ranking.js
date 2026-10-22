@@ -13,6 +13,21 @@ const { chromium } = require('playwright');
     for (const [gid, r, a, bb, sa, sb] of g) { const m = { id: `${gid}-${a}`, stage: 'swiss', group: gid, round: r, order: 0, a: [a], b: [bb], sa, sb, done: true }; await S.store.setMatch(t.id, m); S.matches[m.id] = m; }
     await w(50); q('[data-tab="standings"]').click(); await w(80);
     const order = [...document.querySelectorAll('main table tbody tr')].map(tr => tr.querySelector('b').textContent.replace('Team ', ''));
-    return ['order: ' + order.join(''), 'A above C: ' + (order.indexOf('A') < order.indexOf('C')), 'note: ' + q('main p.small.muted').textContent.slice(0, 60)]; });
+    const L = ['order: ' + order.join(''), 'A above C: ' + (order.indexOf('A') < order.indexOf('C')), 'note: ' + q('main p.rank-order').textContent];
+    const rows = () => [...document.querySelectorAll('main table tbody tr')].map(tr => tr.querySelector('b').textContent.replace('Team ', ''));
+    // Setup: ranking order panel, switch to Buchholz first
+    q('[data-tab="setup"]').click(); await w(80);
+    L.push('panel: ' + [...document.querySelectorAll('.tb-row .tb-name b')].map(b => b.textContent).join(','));
+    q('[data-act="tb-preset"][data-p="buch"]').click(); await w(120);
+    L.push('buchholz first: ' + JSON.stringify(C.T().tiebreaks));
+    q('[data-tab="standings"]').click(); await w(80); const o2 = rows(); L.push('C above A now: ' + (o2.indexOf('C') < o2.indexOf('A')) + ' | note ' + q('main p.rank-order').textContent);
+    // switch Buchholz off and move points for to the top
+    q('[data-tab="setup"]').click(); await w(80);
+    q('[data-act="tb-toggle"][data-k="buch"]').click(); await w(120);
+    q('[data-act="tb-move"][data-k="pf"][data-d="-1"]').click(); await w(120); q('[data-act="tb-move"][data-k="pf"][data-d="-1"]').click(); await w(120);
+    L.push('custom: ' + JSON.stringify(C.T().tiebreaks) + ' | off rows ' + document.querySelectorAll('.tb-row.off').length);
+    q('[data-act="tb-toggle"][data-k="pa"]').click(); await w(120); L.push('add against: ' + JSON.stringify(C.T().tiebreaks));
+    q('[data-lang="fr"]').click(); await w(80); L.push('french: ' + q('.tb .eyebrow').textContent + ' | ' + q('[data-act="tb-preset"][data-p="buch"]').textContent); q('[data-lang="en"]').click(); await w(60);
+    return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
