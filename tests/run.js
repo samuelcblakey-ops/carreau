@@ -36,7 +36,7 @@ const SUITES = {
       /level refused: Level when time ran out/, /time result: true 11-9 time true \| card says Ended on time/, /below target refused: true/, /time badge: late Time \| on time Playing/,
       /french: Vainqueur à 13 \/ Arrêtée au temps \| Qui a gagné/, /errs \[\]/],
     'app-find-game.js': [/own draw, no alert: true/, /find panel: true/, /result: Charlie Pat Charlie v \w+ Round 1 · Piste \d This is me/, /box kept focus: true/, /my game card: true/,
-      /alert: true \| Round 2 is out · you're on Piste \d v \w+ View/, /alert closed: true/, /my row: Charlie/, /phone columns: #,Team,W,Buch,\+\/-/, /sticky header: sticky/,
+      /alert: true \| Round 2 is out · you're on Piste \d v \w+ View/, /alert closed: true/, /my row: Charlie/, /phone columns: #,Team,W,L,Buch,\+\/-/, /sticky header: sticky/,
       /all columns: #,Team,Pld,W,L,Buch,Fine,For,Agst,\+\/-/, /cleared: true/, /errs \[\]/],
     'app-wizard.js': [/wizard shown: true \| step: Quick setup · step 1 of 4/, /name required: Give the competition a name first\./, /step 2: Who's playing options 5/, /swiss rounds hidden for pools: true/,
       /back keeps choice: true/, /saved: Spring Doubles \| Riverside \| teams doubles pools \| pistes 5 \| time 45 \| wizard false/, /wizard gone: true \| toast: All set\. Now add your teams\. \| on registration: true/,
