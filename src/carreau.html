@@ -237,6 +237,11 @@ table.shots td,table.shots th{padding:5px 6px}
 tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .st-more{display:none}
 @media (max-width:640px){.tw.st:not(.all) .x{display:none}.tw.st:not(.all){overflow:visible}.tw.st:not(.all) thead th{position:sticky;top:0;background:var(--surface);z-index:1}.st-more{display:block;margin-top:6px}}
+.netdot{display:inline-flex;align-items:center;gap:6px;font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0;text-transform:none}
+.netdot[hidden]{display:none}.netdot::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
+.netdot.sync::before{background:var(--jack);animation:netpulse 1s ease-in-out infinite}.netdot.off::before{background:var(--danger)}.netdot.off{color:var(--danger)}
+@keyframes netpulse{50%{opacity:.35}}
+@media (max-width:640px){.netdot .nl{display:none}.netdot.off .nl,.netdot.sync .nl{display:inline}}
 .pill.timeup{background:var(--jack-soft);color:var(--jack);font-weight:700}
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* display mode */
@@ -255,6 +260,7 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
       <div class="brand">
         <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="10" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 11.5c3.5 1.5 7.5 1.5 11 0M4.5 16.5c3.5-1.5 7.5-1.5 11 0" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="21" cy="6" r="3" fill="var(--jack)"/></svg>
         Carreau <small>Competition desk</small>
+        <span id="netdot" class="netdot" hidden role="status"></span>
       </div>
       <div class="tsel" id="tsel"></div>
     </div>
@@ -411,7 +417,7 @@ const FR_TEXT = {
   "Find my game": "Trouver ma partie", "Type your name or team": "Tapez votre nom ou votre équipe", "This is me": "C'est moi", "My game": "Ma partie", "Not you?": "Ce n'est pas vous ?",
   "waiting for a piste": "en attente d'une piste", "No game right now. Last game: {x}": "Pas de partie en cours. Dernière partie : {1}", "No game drawn yet.": "Aucune partie tirée pour l'instant.",
   "No team matches that name.": "Aucune équipe ne correspond.", "No player matches that name.": "Aucun joueur ne correspond.", "{x} is out": "{1} : le tirage est sorti", "{x} drawn": "{1} tiré", "New draw is out": "Nouveau tirage",
-  "you're on Piste {x}": "vous êtes sur la piste {1}", "you're waiting for a piste": "vous attendez une piste", "View": "Voir", "Show all columns": "Toutes les colonnes", "Fewer columns": "Moins de colonnes", "{n}–{n} now": "{1}–{2} en cours",
+  "you're on Piste {x}": "vous êtes sur la piste {1}", "you're waiting for a piste": "vous attendez une piste", "View": "Voir", "Show all columns": "Toutes les colonnes", "Live": "En direct", "Saving…": "Enregistrement…", "Offline": "Hors ligne", "Offline · {n} waiting to sync": "Hors ligne · {1} en attente", "Fewer columns": "Moins de colonnes", "{n}–{n} now": "{1}–{2} en cours",
   // pistes
   "{n} playing · {n} waiting": "{1} en jeu · {2} en attente", "Free": "Libre", "No game on this piste.": "Aucune partie sur cette piste.", "Not in use": "Hors service",
   "No games waiting.": "Aucune partie en attente.",
@@ -1649,7 +1655,14 @@ function pickCompetition(id) {
   S.picker = false; if (id === S.tid) { render(); return; }
   S.tid = id; lsSet("carreau-tid", S.tid); S.matches = {}; S.onSelect?.(); watchMatches(); render();
 }
+// connection light (website only): Live, Saving…, or Offline with changes waiting to sync
+function renderNet() {
+  const el = $("#netdot"); if (!el) return; const st = S.connState && S.connState();
+  if (!st) { el.hidden = true; return; }
+  el.hidden = false; el.className = "netdot " + st.k; el.title = tr(st.label); el.innerHTML = `<span class="nl">${esc(tr(st.label))}</span>`;
+}
 function renderHeader() {
+  renderNet();
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();

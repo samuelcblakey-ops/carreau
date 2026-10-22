@@ -65,6 +65,8 @@ const SUITES = {
       /team security: result permission-denied \| self-confirm permission-denied \| other game permission-denied/, /opponent asked to confirm: true/,
       /organiser screen published: true 13-7 applied/, /team sees result: true/, /organiser sees dispute: true \| not published: true/, /organiser settled: true 13-2/,
       /switched off hides it: true \| team panel gone: true/, /errs \[\]/],
+    'web-offline.js': [/online light: live Live/, /offline light: off Offline/, /offline save closes at once: true \| score shown: true 13-5/, /waiting light: off Offline · \d+ waiting to sync/,
+      /offline reopen: New competition \| score kept: true 13-5/, /back online light: live Live/, /other device sees it: true 13-5/, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
       /admin page \(signed in\):.*Open testingOn/, /B tabs \(testing off\): Draw & results\|Standings\|Big screen/,

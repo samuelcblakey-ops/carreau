@@ -10,7 +10,7 @@ body = src[:a] + boot + src[b:]
 
 V = "10.12.2"
 imports = f'''import {{ initializeApp }} from "https://www.gstatic.com/firebasejs/{V}/firebase-app.js";
-import {{ getFirestore, connectFirestoreEmulator, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, deleteField, getDocs, query, where, limit }} from "https://www.gstatic.com/firebasejs/{V}/firebase-firestore.js";
+import {{ getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, deleteField, getDocs, query, where, limit }} from "https://www.gstatic.com/firebasejs/{V}/firebase-firestore.js";
 import {{ getAuth, connectAuthEmulator, onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithCredential, signOut }} from "https://www.gstatic.com/firebasejs/{V}/firebase-auth.js";
 import {{ firebaseConfig }} from "./firebase-config.js";
 '''
@@ -56,5 +56,5 @@ open(os.path.join(out, ".nojekyll"), "w").write("")
 # stamp the service worker with this build so phones pick up new versions
 import hashlib
 sw = os.path.join(out, "sw.js"); ver = hashlib.md5(html.encode()).hexdigest()[:10]
-txt = open(sw).read(); open(sw, "w").write(txt.replace("__VERSION__", ver))
+txt = open(sw).read(); open(sw, "w").write(txt.replace("__VERSION__", ver).replace("__FBV__", V))
 print("built dist/index.html", len(html))
