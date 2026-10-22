@@ -28,7 +28,7 @@ const { chromium } = require('playwright');
     const pk = {}; ms.forEach(m => [m.a, m.b].forEach(s => s.forEach(x => s.forEach(y => { if (x < y) pk[x + y] = (pk[x + y] || 0) + 1; }))));
     L.push('repeat partners: ' + Object.values(pk).filter(v => v > 1).length);
     L.push('only round 1 on pistes: ' + ms.filter(m => m.court).every(m => m.round === 1) + ' r1 courts ' + ms.filter(m => m.court && m.round === 1).length);
-    L.push('status: ' + q('main .panel').innerText.replace(/\s+/g, ' ').slice(0, 90) + ' | print ' + !!q('[data-act="print-draw"]') + ' next-round hidden ' + !q('[data-act="next-round"]'));
+    L.push('status: ' + q('main .panel.rp-live, main .panel.rp-ready').innerText.replace(/\s+/g, ' ').slice(0, 90) + ' | print ' + !!q('[data-act="print-draw"]') + ' next-round hidden ' + !q('[data-act="next-round"]'));
     for (const m of C.MS().filter(m => m.round === 1)) await C.recordResult(m.id, 13, 5, true);
     q('[data-act="assign"]').click(); await w(200);
     L.push('round 2 gets pistes after round 1: ' + C.MS().filter(m => m.round === 2 && m.court).length);
