@@ -36,7 +36,7 @@ html = f"""<!doctype html>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Carreau">
+<meta name="apple-mobile-web-app-title" content="SN Pétanque">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 {reset}
 {head_part.replace('<meta name="claude:viewport-fit-sides" content="cover">', '')}

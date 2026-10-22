@@ -1,4 +1,4 @@
-<title>Carreau Competition Desk</title>
+<title>SN Pétanque · Competition Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
@@ -28,7 +28,10 @@ header.app{background:var(--surface);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px}
 .brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;margin-right:auto}
 .brand svg{flex:none}
-.brand small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.brand-txt{display:flex;flex-direction:column;line-height:1}.brand-name{white-space:nowrap}
+.memorial{font-family:var(--body);font-weight:500;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:3px;white-space:nowrap}
+.disp-memorial{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:8px}
+.brand small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-left:6px}
 .tsel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
 .picker-wrap{position:relative}
 .picker-btn{display:flex;align-items:center;gap:10px;max-width:320px;min-width:200px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;text-align:left}
@@ -49,7 +52,7 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
 @media (max-width:640px){
   input,select,textarea{font-size:16px} /* stops iPhone zooming in on tap */
   .bar{gap:8px;padding-block:10px}
-  .brand{font-size:20px}.brand small{display:none}
+  .brand{font-size:20px}.brand small{font-size:10.5px}
   .tsel{width:100%;flex-wrap:nowrap}.tsel .picker-wrap{flex:1 1 auto;min-width:0}.picker-btn{min-width:0}
   .tsel .pill,.hide-sm{display:none}
   .new-t{font-size:20px;padding:6px 12px;line-height:1}
@@ -265,7 +268,7 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
     <div class="bar">
       <div class="brand">
         <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="10" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 11.5c3.5 1.5 7.5 1.5 11 0M4.5 16.5c3.5-1.5 7.5-1.5 11 0" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="21" cy="6" r="3" fill="var(--jack)"/></svg>
-        Carreau <small>Competition desk</small>
+        <span class="brand-txt"><span class="brand-name">SN Pétanque <small>Competition desk</small></span><span class="memorial">In loving memory of Steve Noel</span></span>
         <span id="netdot" class="netdot" hidden role="status"></span>
       </div>
       <div class="tsel" id="tsel"></div>
@@ -298,7 +301,7 @@ const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
    (a team name, say); in the French, {1}, {2}… refer to those matches in order. */
 const FR_TEXT = {
   // header, tabs, general
-  "Carreau": "Carreau", "Competition desk": "Bureau du concours", "+ New competition": "+ Nouveau concours", "New competition": "Nouveau concours",
+  "In loving memory of Steve Noel": "À la mémoire de Steve Noel", "SN Pétanque · In loving memory of Steve Noel": "SN Pétanque · À la mémoire de Steve Noel", "Competition desk": "Bureau du concours", "+ New competition": "+ Nouveau concours", "New competition": "Nouveau concours",
   "Competition": "Concours", "Sections": "Sections", "This device only": "Cet appareil uniquement", "Saved in this browser only": "Enregistré dans ce navigateur uniquement",
   "Registration": "Inscriptions", "Setup": "Paramètres", "Draw & results": "Tirage et résultats", "Pistes": "Pistes", "Standings": "Classement", "Big screen": "Grand écran",
   "Loading competitions…": "Chargement des concours…", "No competitions yet": "Aucun concours pour l'instant",
@@ -477,7 +480,7 @@ const FR_TEXT = {
   "Scorer link": "Lien marqueur", "Organiser link": "Lien organisateur", "Loading the private codes…": "Chargement des codes privés…",
   "Show this competition on the site's front page": "Afficher ce concours sur la page d'accueil du site",
   "Organisers and scorers get a code from the person running the competition.": "Les organisateurs et marqueurs reçoivent un code de la personne qui gère le concours.",
-  "Copied.": "Copié.", "QR code": "QR code", "Hide QR": "Masquer le QR", "Admin only": "Admin seulement", "Everyone": "Tout le monde", "Example competition.": "Concours d'exemple.", "You can look around every page, but nothing here can be changed. Tap + to make your own.": "Vous pouvez parcourir toutes les pages, mais rien ne peut être modifié ici. Touchez + pour créer le vôtre.", "My team": "Mon équipe", "Enter score": "Saisir le score", "Confirm": "Confirmer", "Dispute": "Contester", "Disputed": "Contesté", "To check": "À vérifier", "Score entry": "Saisie des scores", "Organisers only": "Organisateurs seulement", "Teams enter, other team confirms": "Les équipes saisissent, l'adversaire confirme", "Teams enter, auto-confirm": "Les équipes saisissent, confirmation auto", "Send to the other team": "Envoyer à l'adversaire", "Awaiting other team": "En attente de l'adversaire", "Scores sent in by teams": "Scores envoyés par les équipes", "Mêlée style": "Type de mêlée", "New teams every round": "Nouvelles équipes à chaque partie", "All rounds drawn in advance": "Toutes les parties tirées d'avance", "Teams drawn once": "Équipes tirées une fois", "Draw the teams": "Tirer les équipes", "Redraw teams": "Refaire le tirage des équipes", "Back to players": "Revenir aux joueurs", "Print the draw": "Imprimer le tirage", "Undo the draw": "Annuler le tirage", "Get the app.": "Installez l'appli.", "Add Carreau to your home screen for one-tap access, full screen.": "Ajoutez Carreau à votre écran d'accueil : un seul geste, en plein écran.", "Add to home screen": "Ajouter à l'écran d'accueil", "Not now": "Plus tard", "Add Carreau to your home screen": "Ajouter Carreau à l'écran d'accueil", "Opens full screen, one tap away": "S'ouvre en plein écran, en un geste", "Draw": "Tirage", "Table": "Classement", "Screen": "Écran", "Your competitions": "Vos concours", "Examples": "Exemples", "Choose a competition": "Choisir un concours", "No competitions match.": "Aucun concours ne correspond.", "Not started": "Pas commencé", "Tap a shot, then tap its score. Each shot scores 0, 1, 3 or 5.": "Touchez un tir, puis son score. Chaque tir vaut 0, 1, 3 ou 5.", "Clear this shot": "Effacer ce tir", "Live scorer": "Pointage en direct", "Grid view": "Vue grille", "Undo last shot": "Annuler le dernier tir", "Finish scorecard": "Terminer la feuille", "Now shooting": "Au tir", "All 20 shots in": "Les 20 tirs sont faits", "Check the strip below, then finish the scorecard.": "Vérifiez la ligne ci-dessous, puis terminez la feuille.", "Miss": "Raté", "point": "point", "points": "points", "Try it yourself": "Essayez vous-même", "Score now": "Pointer", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
+  "Copied.": "Copié.", "QR code": "QR code", "Hide QR": "Masquer le QR", "Admin only": "Admin seulement", "Everyone": "Tout le monde", "Example competition.": "Concours d'exemple.", "You can look around every page, but nothing here can be changed. Tap + to make your own.": "Vous pouvez parcourir toutes les pages, mais rien ne peut être modifié ici. Touchez + pour créer le vôtre.", "My team": "Mon équipe", "Enter score": "Saisir le score", "Confirm": "Confirmer", "Dispute": "Contester", "Disputed": "Contesté", "To check": "À vérifier", "Score entry": "Saisie des scores", "Organisers only": "Organisateurs seulement", "Teams enter, other team confirms": "Les équipes saisissent, l'adversaire confirme", "Teams enter, auto-confirm": "Les équipes saisissent, confirmation auto", "Send to the other team": "Envoyer à l'adversaire", "Awaiting other team": "En attente de l'adversaire", "Scores sent in by teams": "Scores envoyés par les équipes", "Mêlée style": "Type de mêlée", "New teams every round": "Nouvelles équipes à chaque partie", "All rounds drawn in advance": "Toutes les parties tirées d'avance", "Teams drawn once": "Équipes tirées une fois", "Draw the teams": "Tirer les équipes", "Redraw teams": "Refaire le tirage des équipes", "Back to players": "Revenir aux joueurs", "Print the draw": "Imprimer le tirage", "Undo the draw": "Annuler le tirage", "Get the app.": "Installez l'appli.", "Add SN Pétanque to your home screen for one-tap access, full screen.": "Ajoutez SN Pétanque à votre écran d'accueil : un seul geste, en plein écran.", "Add to home screen": "Ajouter à l'écran d'accueil", "Not now": "Plus tard", "Add SN Pétanque to your home screen": "Ajouter SN Pétanque à l'écran d'accueil", "SN Pétanque is on your home screen.": "SN Pétanque est sur votre écran d'accueil.", "Tap <b>Add</b>. SN Pétanque then opens full screen like an app.": "Touchez <b>Ajouter</b>. SN Pétanque s'ouvre alors en plein écran comme une appli.", "Opens full screen, one tap away": "S'ouvre en plein écran, en un geste", "Draw": "Tirage", "Table": "Classement", "Screen": "Écran", "Your competitions": "Vos concours", "Examples": "Exemples", "Choose a competition": "Choisir un concours", "No competitions match.": "Aucun concours ne correspond.", "Not started": "Pas commencé", "Tap a shot, then tap its score. Each shot scores 0, 1, 3 or 5.": "Touchez un tir, puis son score. Chaque tir vaut 0, 1, 3 ou 5.", "Clear this shot": "Effacer ce tir", "Live scorer": "Pointage en direct", "Grid view": "Vue grille", "Undo last shot": "Annuler le dernier tir", "Finish scorecard": "Terminer la feuille", "Now shooting": "Au tir", "All 20 shots in": "Les 20 tirs sont faits", "Check the strip below, then finish the scorecard.": "Vérifiez la ligne ci-dessous, puis terminez la feuille.", "Miss": "Raté", "point": "point", "points": "points", "Try it yourself": "Essayez vous-même", "Score now": "Pointer", "Example": "Exemple", "Example ✓": "Exemple ✓", "Make example": "Mettre en exemple", "Confirm delete": "Confirmer la suppression",
   "Visitors only see the competitions they created on their own device, plus the examples. Examples are view-only for visitors.": "Les visiteurs ne voient que les concours créés sur leur propre appareil, plus les exemples. Les exemples sont en lecture seule pour les visiteurs.",
   "Precision shooting": "Tir de précision", "Shooting scorecard": "Feuille de tir", "Atelier": "Atelier", "Lone boule": "Boule seule", "Boule behind the jack": "Boule derrière le but", "Boule between two boules": "Boule entre deux boules", "Boule behind an obstacle": "Boule derrière un obstacle", "The jack": "Le but",
   "Each shot scores 0, 1, 3 or 5. Maximum 100.": "Chaque tir vaut 0, 1, 3 ou 5 points. Maximum 100.", "{n} pts · {n}/20 shots": "{1} pts · {2}/20 tirs", "{n} pts": "{1} pts",
@@ -2133,6 +2136,7 @@ function renderDisplay(t) {
     ${waiting.length ? `<section class="stack" style="gap:8px"><h3>Next up</h3><div class="mlist">${waiting.map(m => `<div class="match ro"><div class="meta"><span>${esc(matchContext(t, m))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.a))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.b))}</span></div></div>`).join("")}</div></section>` : ""}
     ${(t.brackets || []).map(b => `<section class="panel stack" style="gap:8px"><h3>${esc(b.name)}</h3>${bracketGrid(t, b, ms)}</section>`).join("")}
     ${table && !(t.brackets || []).length ? `<section class="panel stack" style="gap:8px"><h3>Standings</h3>${table}</section>` : ""}
+    <div class="disp-memorial">SN Pétanque · In loving memory of Steve Noel</div>
   </div>`;
 }
 

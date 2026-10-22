@@ -134,7 +134,7 @@ function teamLinksPanel(t) {
     <p class="small muted">Give each team its own link or QR code (for example at check-in). It sets up their phone to enter scores for their games only, and to confirm their opponents' scores.</p>
     ${missing ? `<div><button class="btn primary sm" data-act="team-links-make">${missing === teams.length ? "Create team links" : `Create ${missing} more`}</button></div>` : ""}
     ${teams.filter(e => codes[e.id]).map(e => { const name = e.name || (e.players || []).join(", "); const open = S.teamQr === e.id; return `<div class="erow"><div class="who"><b>${esc(name)}</b></div><input id="tl-${e.id}" value="${esc(teamLink(t, e.id))}" readonly style="flex:1;min-width:160px" class="small"><button class="btn sm" data-act="copy" data-target="tl-${e.id}">Copy</button><button class="btn sm ${open ? "primary" : ""}" data-act="team-qr" data-id="${e.id}" aria-expanded="${open}">${open ? "Hide QR" : "QR code"}</button></div>
-      ${open ? `<div class="qr-card" data-notr><div class="qr-name">${esc(name)}</div><div class="qr-box">${window.qrcode ? qrSvg(teamLink(t, e.id)) : `<p class="muted small">Loading…</p>`}</div><p class="small muted">Scan with the phone that will enter this team's scores. It opens Carreau already set up for ${esc(name)}.</p></div>` : ""}`; }).join("")}
+      ${open ? `<div class="qr-card" data-notr><div class="qr-name">${esc(name)}</div><div class="qr-box">${window.qrcode ? qrSvg(teamLink(t, e.id)) : `<p class="muted small">Loading…</p>`}</div><p class="small muted">Scan with the phone that will enter this team's scores. It opens SN Pétanque already set up for ${esc(name)}.</p></div>` : ""}`; }).join("")}
   </div>`;
 }
 // organisers archive; only the admin can delete a competition (also enforced in firestore.rules)
@@ -432,21 +432,21 @@ const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/
 const canInstall = () => !isStandalone() && (!!INSTALL.prompt || isIOS());
 const installDismissed = () => { try { return localStorage.getItem("carreau-install-dismissed") === "1"; } catch { return false; } };
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL.prompt = e; render(); });
-window.addEventListener("appinstalled", () => { INSTALL.prompt = null; render(); toast("Carreau is on your home screen."); });
+window.addEventListener("appinstalled", () => { INSTALL.prompt = null; render(); toast("SN Pétanque is on your home screen."); });
 function installHelp() {
-  return `<div class="stack" style="gap:6px"><b>Add Carreau to your home screen</b>
+  return `<div class="stack" style="gap:6px"><b>Add SN Pétanque to your home screen</b>
     <ol class="small" style="margin:0;padding-left:20px"><li>In Safari, tap the <b>Share</b> button (the square with an arrow, at the bottom or top of the screen).</li>
-    <li>Scroll down and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. Carreau then opens full screen like an app.</li></ol>
+    <li>Scroll down and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. SN Pétanque then opens full screen like an app.</li></ol>
     <span class="small muted">Using Chrome on iPhone? Tap the Share button in the address bar, then Add to Home Screen.</span></div>`;
 }
 S.topBanner = () => {
   if (!canInstall() || (installDismissed() && !INSTALL.help)) return "";
   if (INSTALL.help) return `<div class="notice stack install-banner" style="margin-bottom:16px;gap:10px">${installHelp()}<div><button class="btn sm" data-act="install-close">Done</button></div></div>`;
   if (!matchMedia("(max-width: 900px), (pointer: coarse)").matches) return "";
-  return `<div class="notice spread install-banner" style="margin-bottom:16px"><span><b>Get the app.</b> Add Carreau to your home screen for one-tap access, full screen.</span>
+  return `<div class="notice spread install-banner" style="margin-bottom:16px"><span><b>Get the app.</b> Add SN Pétanque to your home screen for one-tap access, full screen.</span>
     <span class="row"><button class="btn primary sm" data-act="install-app">Add to home screen</button><button class="btn sm ghost" data-act="install-dismiss">Not now</button></span></div>`;
 };
-S.pickerFooter = () => canInstall() ? `<button type="button" class="pick-row" data-act="install-app"><span class="pr-main"><b>Add Carreau to your home screen</b><span class="small muted">Opens full screen, one tap away</span></span></button>` : "";
+S.pickerFooter = () => canInstall() ? `<button type="button" class="pick-row" data-act="install-app"><span class="pr-main"><b>Add SN Pétanque to your home screen</b><span class="small muted">Opens full screen, one tap away</span></span></button>` : "";
 async function installApp() {
   if (INSTALL.prompt) { const p = INSTALL.prompt; INSTALL.prompt = null; try { await p.prompt(); const c = await p.userChoice; if (c?.outcome !== "accepted") INSTALL.prompt = null; } catch (e) { console.error(e); } render(); return; }
   INSTALL.help = true; S.picker = false; render(); scrollTo({ top: 0, behavior: "smooth" });
