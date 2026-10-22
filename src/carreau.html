@@ -223,7 +223,13 @@ table.shots td,table.shots th{padding:5px 6px}
 .shotcell{min-width:40px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-family:var(--display);font-size:17px;font-weight:700;cursor:pointer}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
 @media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
+.toast[hidden]{display:none}
+.toast-undo{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;min-height:36px}
+.modeseg{display:flex;width:100%;margin-bottom:4px}.modeseg button{flex:1}
+.quick{display:grid;gap:8px}.quick .qbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:16px}
+.quick .qbtn.on{border-color:var(--accent);background:var(--accent-soft)}
+.pill.timeup{background:var(--jack-soft);color:var(--jack);font-weight:700}
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* display mode */
 .disp{display:flex;flex-direction:column;gap:20px}
@@ -387,7 +393,12 @@ const FR_TEXT = {
   "Game ended on time limit (winner below {n})": "Partie arrêtée au temps (vainqueur sous {1})",
   "Save result": "Enregistrer le résultat", "Update result": "Modifier le résultat", "Save live score": "Enregistrer le score en cours", "Reopen match": "Rouvrir la partie",
   "Scores can't be level. Petanque games always have a winner.": "Les scores ne peuvent pas être à égalité : une partie de pétanque a toujours un vainqueur.",
-  "Scores can't go above {n}.": "Les scores ne peuvent pas dépasser {1}.", "The winner needs {n} points, or tick the time-limit box.": "Le vainqueur doit avoir {1} points, ou cochez la case de limite de temps.",
+  "Scores can't go above {n}.": "Les scores ne peuvent pas dépasser {1}.", "The winner needs {n} points. If time ran out, choose Ended on time.": "Le vainqueur doit avoir {1} points. Si le temps est écoulé, choisissez Arrêtée au temps.",
+  "Undo": "Annuler", "Result undone.": "Résultat annulé.", "Who won": "Qui a gagné", "Now tap the other team's score. It saves straight away.": "Touchez maintenant le score de l'autre équipe. Il est enregistré aussitôt.",
+  "Their score": "Leur score", "Won {n}": "Gagné {1}", "Enter both scores": "Saisir les deux scores", "Winner to {n}": "Vainqueur à {1}", "Ended on time": "Arrêtée au temps",
+  "Ended on time: enter the score when play stopped. If it's level, play one more end first.": "Arrêtée au temps : saisissez le score à l'arrêt du jeu. En cas d'égalité, jouez d'abord une mène de plus.",
+  "Level when time ran out: play one more end, then enter the score.": "Égalité à la fin du temps : jouez une mène de plus, puis saisissez le score.",
+  "Time limit (minutes, 0 = none)": "Limite de temps (minutes, 0 = aucune)", "Time": "Temps",
   // pistes
   "{n} playing · {n} waiting": "{1} en jeu · {2} en attente", "Free": "Libre", "No game on this piste.": "Aucune partie sur cette piste.", "Not in use": "Hors service",
   "No games waiting.": "Aucune partie en attente.",
@@ -615,12 +626,14 @@ async function applyProposals() {
     (t.scoreMode === "teams-auto" && m.proposal.status === "pending" && Date.now() - (m.proposal.at || 0) > autoMinutes(t) * 60000)));
   if (!due.length) return;
   S.applying = true;
-  try { for (const m of due) { const p = m.proposal; const r = await recordResult(m.id, p.sa, p.sb, true);
+  try { for (const m of due) { const p = m.proposal; const r = await recordResult(m.id, p.sa, p.sb, true, { time: !!p.time });
       if (r === true) { const np = { ...p, status: p.status === "confirmed" ? "applied" : "auto", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(S.tid, m.id, { proposal: np }); } }
     await assignCourts(); } catch (e) { console.error(e); } finally { S.applying = false; }
   render();
 }
 setInterval(() => { try { applyProposals(); } catch {} }, 30000);
+setInterval(() => { try { const t = T(); const ae = document.activeElement;
+  if (t?.timeLimit > 0 && !S.modal && S.tab === "draw" && !(ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName))) render(); } catch {} }, 60000);
 function teamPanel(t) {
   const me = myTeam(t); if (!me || !teamScoring(t)) return "";
   const mine = MS().filter(m => inMatch(m, me) && !m.bye).sort(byOrder);
@@ -656,6 +669,8 @@ function checkPanel(t) {
 }
 function sideName(t, side) { if (!side) return null; return side.map(id => entName(t, id)).join(isIndiv(t) ? " · " : " / "); }
 const gamesLeft = n => n === 1 ? "1 game still to finish" : `${n} games still to finish`;
+// time limit: a game still on its piste after the competition's time limit shows a Time badge to the organiser
+const timeUp = (t, m) => !!(t.timeLimit > 0 && !m.done && m.court && m.courtAt && Date.now() - m.courtAt >= t.timeLimit * 60000);
 function mStatus(m) { if (m.done) return "done"; if (!m.a || !m.b) return "pending"; if (m.court) return "playing"; return "ready"; }
 const ents = m => [...(m.a || []), ...(m.b || [])];
 const aWon = m => m.win ? m.win === "a" : m.sa > m.sb;
@@ -716,7 +731,7 @@ function planCourts(t, ms) {
     const earlier = ms.some(o => o !== m && !o.done && (o.group === m.group || (o.stage === "melee" && m.stage === "melee")) && (o.round || 0) < (m.round || 0) && ents(o).some(e => me.includes(e)));
     if (earlier) continue;
     const c = free.shift();
-    m.court = c.id; out.push({ id: m.id, court: c.id });
+    m.court = c.id; m.courtAt = Date.now(); out.push({ id: m.id, court: c.id });
     me.forEach(e => busyEnt.add(e));
   }
   return out;
@@ -1081,7 +1096,7 @@ async function writeMatches(list) { list.forEach(m => S.matches[m.id] = m); for 
 async function assignCourts() {
   const t = T(); const ms = MS().map(clone);
   const plan = planCourts(t, ms);
-  for (const p of plan) { S.matches[p.id] && (S.matches[p.id].court = p.court); await S.store.updateMatch(S.tid, p.id, { court: p.court }); }
+  for (const p of plan) { const at = Date.now(); S.matches[p.id] && Object.assign(S.matches[p.id], { court: p.court, courtAt: at }); await S.store.updateMatch(S.tid, p.id, { court: p.court, courtAt: at }); }
   return plan.length;
 }
 async function addDraw(res) {
@@ -1145,6 +1160,7 @@ async function recordResult(id, sa, sb, done, opts = {}) {
   if (resets.length && !overrideAllowed(prev)) { toast("Only the current and previous round can be corrected."); return false; }
   const patch = { sa, sb, done, finishedAt: m.finishedAt || null };
   if (opts.win !== undefined) patch.win = opts.win || null;
+  if (opts.time !== undefined) patch.time = !!opts.time;
   if (opts.shots) Object.assign(patch, opts.shots);
   if (wasDone && done && (prev.sa !== sa || prev.sb !== sb || (opts.win !== undefined && (prev.win || null) !== (opts.win || null)))) patch.corrected = { at: Date.now(), from: [prev.sa, prev.sb] };
   if (done) { patch.courtUsed = m.court || m.courtUsed || null; patch.court = null; }
@@ -1386,11 +1402,15 @@ function overrideBox(list) {
 
 /* ---------------- toast & modal ---------------- */
 let toastTimer;
-function toast(msg) { const el = $("#toast"); el.textContent = tr(msg); el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 3200); }
+function toast(msg, undo) {
+  const el = $("#toast"); S.undo = undo || null;
+  el.innerHTML = `<span>${esc(tr(msg))}</span>${undo ? ` <button type="button" class="toast-undo" data-act="toast-undo">${esc(tr("Undo"))}</button>` : ""}`;
+  el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; S.undo = null; }, undo ? 6000 : 3200);
+}
 
 function openMatch(id) {
   const m = S.matches[id]; if (!m || !m.a || (!m.b && m.stage !== "shoot")) return;
-  S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: false, err: "", pad: !m.done && canScore() ? "sa" : null };
+  S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: !!m.time, err: "", mode: m.done ? (m.time ? "time" : "full") : "quick", pad: null };
   if (m.stage === "shoot" || m.shoot) { const duel = !!m.b; S.modal.live = !m.done && canScore(); S.modal.shotsA = fullShots(duel ? m.shotsA : m.shots); if (duel) S.modal.shotsB = fullShots(m.shotsB); }
   renderModal();
 }
@@ -1402,20 +1422,28 @@ function renderModal() {
   const ro = !canScore() && !S.modal.team;
   const who = side => side.map(id => isIndiv(t) ? esc(entName(t, id)) : `<b>${esc(entName(t, id))}</b><span class="small muted">${esc(teamPlayers(t, id))}</span>`).join(isIndiv(t) ? "<br>" : "");
   const stp = k => `<div class="stepper">${ro ? "" : `<button type="button" data-act="dec" data-k="${k}" aria-label="Minus one">−</button>`}<input id="sc-${k}" type="text" readonly ${ro ? "" : `data-act="pad" data-k="${k}" class="padbox ${S.modal.pad === k ? "on" : ""}"`} value="${S.modal[k]}" aria-label="Score">${ro ? "" : `<button type="button" data-act="inc" data-k="${k}" aria-label="Plus one">+</button>`}</div>`;
-  const pad = k => ro || S.modal.pad !== k ? "" : `<div class="pad">${Array.from({ length: t.target + 1 }, (_, n) => `<button type="button" data-act="pick" data-k="${k}" data-n="${n}" class="${n === S.modal[k] ? "on" : ""} ${n === t.target ? "win" : ""}">${n}</button>`).join("")}</div>`;
+  const md = S.modal; const timed = md.mode === "time";
+  const pad = k => ro || md.pad !== k ? "" : `<div class="pad">${Array.from({ length: t.target + 1 }, (_, n) => `<button type="button" data-act="pick" data-k="${k}" data-n="${n}" class="${n === md[k] ? "on" : ""} ${n === t.target ? "win" : ""}">${n}</button>`).join("")}</div>`;
   const courts = t.courts.filter(c => c.active !== false);
+  // quick entry: tap the winner (they get the winning score), then tap the loser's score and it saves
+  const qside = s => { const k = s === "a" ? "sa" : "sb"; return `<button type="button" class="qbtn ${md.qwin === s ? "on" : ""}" data-act="qwin" data-side="${s}">${who(m[s])}${md.qwin === s ? `<span class="small">Won ${t.target}</span>` : ""}</button>${md.qwin && md.qwin !== s ? `<div class="small muted">Their score</div><div class="pad">${Array.from({ length: t.target }, (_, n) => `<button type="button" data-act="qlose" data-k="${k}" data-n="${n}">${n}</button>`).join("")}</div>` : ""}`; };
+  const quick = `<div class="quick"><div class="small muted">${md.qwin ? "Now tap the other team's score. It saves straight away." : "Who won?"}</div>${qside("a")}${qside("b")}
+    <div><button type="button" class="btn sm ghost" data-act="mode" data-mode="full">Enter both scores</button></div></div>`;
+  const scores = `${timed ? `<div class="notice">Ended on time: enter the score when play stopped. If it's level, play one more end first.</div>` : ""}
+    <div class="scorer"><div class="who">${who(m.a)}</div>${stp("sa")}</div>${pad("sa")}
+    <div class="scorer"><div class="who">${who(m.b)}</div>${stp("sb")}</div>${pad("sb")}`;
   el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Match score">
     <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>${m.court ? "Piste " + esc(courtName(t, m.court)) : m.done ? "Result" : "Waiting for a piste"}</h3></div>
       <button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
-    <div class="scorer"><div class="who">${who(m.a)}</div>${stp("sa")}</div>${pad("sa")}
-    <div class="scorer"><div class="who">${who(m.b)}</div>${stp("sb")}</div>${pad("sb")}
-    ${ro ? "" : `<label class="chk"><input type="checkbox" id="early" ${S.modal.early ? "checked" : ""}> Game ended on time limit (winner below ${t.target})</label>
+    ${ro ? "" : `<div class="seg modeseg" role="group"><button type="button" data-act="mode" data-mode="quick" aria-pressed="${md.mode !== "time"}">Winner to ${t.target}</button><button type="button" data-act="mode" data-mode="time" aria-pressed="${timed}">Ended on time</button></div>`}
+    ${!ro && md.mode === "quick" ? quick : scores}
+    ${ro ? "" : `
     ${!m.done && !S.modal.team ? `<label class="f"><span>Piste</span><select id="mcourt"><option value="">No piste yet</option>${courts.map(c => `<option value="${c.id}" ${m.court === c.id ? "selected" : ""}>Piste ${esc(c.name)}${MS().some(o => o.court === c.id && !o.done && o.id !== m.id) ? " (in use)" : ""}</option>`).join("")}</select></label>` : ""}
     ${S.modal.err ? `<div class="err">${esc(S.modal.err)}</div>` : ""}
     ${m.corrected && !m.corrected.reset ? `<p class="small muted">Corrected (was ${m.corrected.from?.[0] ?? "–"}–${m.corrected.from?.[1] ?? "–"}).</p>` : ""}
     ${m.done && canEdit() && !S.modal.blocked ? `<p class="small muted">To correct a wrong score, change it and press Update result. If the winner changes and a later game has already been played, you'll be asked to confirm an override${overrideAllowed(m) ? "" : " (only possible for the current and previous round)"}.</p>` : ""}
     ${S.modal.blocked ? overrideBox(S.modal.blocked) : `<div class="row">
-      <button class="btn primary" data-act="save-final">${S.modal.team ? "Send to the other team" : m.done ? "Update result" : "Save result"}</button>
+      ${md.mode === "quick" ? "" : `<button class="btn primary" data-act="save-final">${S.modal.team ? "Send to the other team" : m.done ? "Update result" : "Save result"}</button>`}
       ${S.modal.team ? "" : !m.done ? `<button class="btn" data-act="save-live">Save live score</button>` : `<button class="btn" data-act="reopen">Reopen match</button>`}
     </div>`}`}
   </div></div>`;
@@ -1429,8 +1457,9 @@ function matchContext(t, m) {
   return `Round ${m.round}`;
 }
 function readModalScores() {
+  if (!$("#sc-sa")) return; // quick entry has no score boxes
   const a = parseInt($("#sc-sa")?.value, 10), b = parseInt($("#sc-sb")?.value, 10);
-  S.modal.sa = isNaN(a) ? 0 : a; S.modal.sb = isNaN(b) ? 0 : b; S.modal.early = !!$("#early")?.checked;
+  S.modal.sa = isNaN(a) ? 0 : a; S.modal.sb = isNaN(b) ? 0 : b;
 }
 async function modalAction(act, k, a) {
   const t = T(); const md = S.modal; if (!md) return;
@@ -1456,32 +1485,43 @@ async function modalAction(act, k, a) {
   if (act === "override") {
     if (md.pending?.shoot) { md.override = true; md.blocked = null; renderModal(); await saveShooting(true); return; }
     const pd = md.pending || {};
-    const res = await guard(() => recordResult(md.id, pd.sa, pd.sb, pd.done !== false, { override: true }));
+    const res = await guard(() => recordResult(md.id, pd.sa, pd.sb, pd.done !== false, { override: true, time: !!pd.time }));
     if (res === true) { S.modal = null; renderModal(); toast("Result corrected and later games reset."); }
     return;
   }
   readModalScores();
+  if (act === "mode") { md.mode = a.dataset.mode; md.early = md.mode === "time"; md.err = ""; md.qwin = null; md.pad = md.mode === "quick" ? null : "sa"; md.pickedB = false;
+    if (md.mode !== "quick" && !S.matches[md.id]?.done) { md.sa = S.matches[md.id]?.sa ?? 0; md.sb = S.matches[md.id]?.sb ?? 0; } renderModal(); return; }
+  if (act === "qwin") { md.qwin = a.dataset.side; md.err = ""; renderModal(); return; }
   if (act === "pad") { md.pad = md.pad === k ? null : k; renderModal(); return; }
   if (act === "pick") { md[k] = +a.dataset.n; md.err = ""; md.pad = k === "sa" && !md.pickedB ? "sb" : null; if (k === "sb") md.pickedB = true; renderModal(); return; }
   if (act === "inc") { md[k] = Math.min(t.target, md[k] + 1); renderModal(); return; }
   if (act === "dec") { md[k] = Math.max(0, md[k] - 1); renderModal(); return; }
   const m = S.matches[md.id];
+  if (act === "qlose") { const lk = k, wk = k === "sa" ? "sb" : "sa"; md[wk] = t.target; md[lk] = +a.dataset.n; md.early = false; act = "save-final"; }
   if (act === "save-final") {
-    const { sa, sb } = md;
-    if (sa === sb) { md.err = "Scores can't be level. Petanque games always have a winner."; renderModal(); return; }
+    const { sa, sb } = md; const timed = md.mode === "time";
+    if (sa === sb) { md.err = timed ? "Level when time ran out: play one more end, then enter the score." : "Scores can't be level. Petanque games always have a winner."; renderModal(); return; }
     if (Math.max(sa, sb) > t.target) { md.err = `Scores can't go above ${t.target}.`; renderModal(); return; }
-    if (!md.early && Math.max(sa, sb) !== t.target) { md.err = `The winner needs ${t.target} points, or tick the time-limit box.`; renderModal(); return; }
-    if (md.team) { const ok = await guard(() => S.teamPropose(t, S.matches[md.id], sa, sb)); if (ok !== false) { S.modal = null; renderModal(); toast("Sent. The other team now confirms it."); render(); } return; }
-    const ok = await guard(() => recordResult(md.id, sa, sb, true));
-    if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa, sb, done: true }; renderModal(); return; }
-    if (ok) { S.modal = null; renderModal(); toast("Result saved."); }
+    if (!timed && Math.max(sa, sb) !== t.target) { md.err = `The winner needs ${t.target} points. If time ran out, choose Ended on time.`; renderModal(); return; }
+    const time = timed && Math.max(sa, sb) < t.target;
+    if (md.team) { const ok = await guard(() => S.teamPropose(t, S.matches[md.id], sa, sb, time)); if (ok !== false) { S.modal = null; renderModal(); toast("Sent. The other team now confirms it."); render(); } return; }
+    const before = { sa: m.sa ?? null, sb: m.sb ?? null, done: !!m.done, court: m.court || null, time: !!m.time };
+    const ok = await guard(() => recordResult(md.id, sa, sb, true, { time }));
+    if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa, sb, done: true, time }; renderModal(); return; }
+    if (ok) { const id = md.id; S.modal = null; renderModal();
+      toast("Result saved.", before.done ? null : async () => {
+        const r = await guard(() => recordResult(id, before.sa, before.sb, false, { time: false }));
+        if (r === true && before.court && !MS().some(o => o.court === before.court && !o.done)) { S.matches[id].court = before.court; await S.store.updateMatch(S.tid, id, { court: before.court }); }
+        render(); toast("Result undone.");
+      }); }
     return;
   }
   if (act === "save-live") {
     const c = $("#mcourt")?.value || null;
     await guard(async () => {
       const patch = { sa: md.sa, sb: md.sb };
-      if (c !== (m.court || null)) patch.court = c;
+      if (c !== (m.court || null)) { patch.court = c; patch.courtAt = c ? Date.now() : null; }
       Object.assign(S.matches[md.id], patch);
       await S.store.updateMatch(S.tid, md.id, patch);
     });
@@ -1610,6 +1650,7 @@ function renderSetup(t) {
           once: "Players enter individually and are drawn into random teams once, at the start. Those teams then play together all day using the competition system you choose (Swiss, pools, knockout and so on)." }[meleeMode(t)]}</p>` : ""}
       ${isShoot(t) ? "" : `<div class="fields">
         <label class="f"><span>Points to win</span><input type="number" min="1" max="21" id="f-target" data-field="target" data-num value="${t.target}"></label>
+        <label class="f"><span>Time limit (minutes, 0 = none)</span><input type="number" min="0" max="240" id="f-timelimit" data-field="timeLimit" data-num value="${t.timeLimit || 0}"></label>
         <label class="f"><span>Bye counts as</span><div class="row" style="flex-wrap:nowrap"><input type="number" min="0" id="f-bye0" data-field="byeScore.0" data-num value="${t.byeScore[0]}"><span>–</span><input type="number" min="0" id="f-bye1" data-field="byeScore.1" data-num value="${t.byeScore[1]}"></div></label>
       </div>`}
     </div>
@@ -1723,7 +1764,7 @@ function matchCard(t, m, opts = {}) {
   if (m.bye) return `<div class="match ro"><div class="meta"><span>${opts.ctx ? esc(matchContext(t, m)) : ""}</span><span class="pill">Bye</span></div>${side(m.a, m.sa, true)}<div class="small muted">Bye scored ${m.sa}–${m.sb}</div></div>`;
   const aw = m.done && aWon(m);
   const label = st === "playing" ? `<span class="court-tag">Piste ${esc(courtName(t, m.court))}</span>` : st === "done" ? (m.courtUsed ? `<span>Piste ${esc(courtName(t, m.courtUsed))}</span>` : "<span></span>") : st === "ready" ? `<span>Waiting for piste</span>` : `<span></span>`;
-  const pill = { playing: `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: m.corrected ? `<span class="pill done">Corrected</span>` : `<span class="pill done">Finished</span>`, ready: `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
+  const pill = { playing: timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: m.corrected ? `<span class="pill done">Corrected</span>` : m.time ? `<span class="pill done">Ended on time</span>` : `<span class="pill done">Finished</span>`, ready: `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
   return `<${ro ? "div" : "button"} class="match ${st} ${ro ? "ro" : ""}" ${ro ? "" : `data-match="${m.id}" type="button"`}>
     <div class="meta">${opts.ctx ? `<span>${esc(matchContext(t, m))}</span>` : label}${pill}</div>
     ${side(m.a, m.sa, aw)}${side(m.b, m.sb, m.done && !aw)}
@@ -2002,7 +2043,7 @@ document.addEventListener("click", async e => {
     case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
     case "use-template": {
       const src = clone(t); const nt = newTournament();
-      const keep = ["entry", "format", "system", "checkin", "target", "byeScore", "swissRounds", "poolSize", "poolStyle", "qualify", "bBracket", "consolante", "seeding", "randomCourts", "courts", "teams", "players", "shootFormat", "shootFinal", "koThird", "koPlan", "venue"];
+      const keep = ["entry", "format", "system", "checkin", "target", "byeScore", "swissRounds", "poolSize", "poolStyle", "qualify", "bBracket", "consolante", "seeding", "randomCourts", "courts", "teams", "players", "shootFormat", "shootFinal", "koThird", "koPlan", "venue", "timeLimit"];
       keep.forEach(k => { if (src[k] !== undefined) nt[k] = clone(src[k]); });
       nt.name = "My run-through · " + (src.name || "").replace(/^TEST \d+ · /, ""); nt.koPlan && (nt.koPlan = clone(src.koPlan));
       (nt.players || []).forEach(p => p.active = true); (nt.teams || []).forEach(x => x.active = true);
@@ -2030,11 +2071,12 @@ document.addEventListener("click", async e => {
     }
     case "melee-unteam": { const nt = Object.assign(clone(t), { entry: "melee", teams: [], meleeDrawn: false }); await guard(() => saveT(nt)); render(); break; }
     case "print-draw": window.print(); break;
+    case "toast-undo": { const fn = S.undo; S.undo = null; $("#toast").hidden = true; if (fn) await fn(); break; }
     case "team-score": { const m = S.matches[a.dataset.id]; if (!m) break; const p = m.proposal;
-      S.modal = { id: m.id, team: true, sa: p && p.status === "pending" ? p.sa : 0, sb: p && p.status === "pending" ? p.sb : 0, early: false, err: "", pad: "sa" }; renderModal(); break; }
+      S.modal = { id: m.id, team: true, sa: p && p.status === "pending" ? p.sa : 0, sb: p && p.status === "pending" ? p.sb : 0, early: false, err: "", mode: "quick", pad: null }; renderModal(); break; }
     case "team-confirm": case "team-dispute": { const m = S.matches[a.dataset.id]; if (!m) break; const ok = await guard(() => S.teamRespond(t, m, act === "team-confirm" ? "confirmed" : "disputed")); if (ok !== false) toast(act === "team-confirm" ? "Confirmed. Thanks!" : "Sent to the organiser to settle."); render(); break; }
     case "check-accept": { const m = S.matches[a.dataset.id]; if (!m?.proposal) break; const p = m.proposal;
-      const r = await guard(() => recordResult(m.id, p.sa, p.sb, true)); if (r === true) { const np = { ...p, status: "applied", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(S.tid, m.id, { proposal: np }); await guard(assignCourts); toast("Result saved."); } render(); break; }
+      const r = await guard(() => recordResult(m.id, p.sa, p.sb, true, { time: !!p.time })); if (r === true) { const np = { ...p, status: "applied", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(S.tid, m.id, { proposal: np }); await guard(assignCourts); toast("Result saved."); } render(); break; }
     case "undo-all": { for (const d of t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round)) await guard(() => undoDraw(d.id)); toast("Draw undone."); render(); break; }
     case "shoot-next": await guard(() => addDraw((t.shootFormat || "ko8") === "final" ? drawShootFinal(t) : drawShootKnockout(t))); break;
     case "archive": S.confirmArchive = true; render(); break;

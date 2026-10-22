@@ -8,6 +8,7 @@ const { chromium } = require('playwright');
     for(let i=0;i<4;i++) t.teams.push({id:'e'+i,name:'Team '+i,players:['a'],active:true}); await S.store.setTournament(t); S.tournaments[t.id]=t; await w(30);
     document.querySelector('[data-tab="draw"]').click(); await w(40); document.querySelector('[data-act="first-draw"]').click(); await w(150);
     const m=C.MS().find(m=>m.a&&m.b); document.querySelector(`[data-match="${m.id}"]`).click(); await w(50);
+    document.querySelector('[data-act="mode"][data-mode="full"]').click(); await w(40);
     const r=['pad buttons '+document.querySelectorAll('.pad button').length];
     document.querySelector('[data-act="pick"][data-k="sa"][data-n="13"]').click(); await w(40);
     r.push('after sa pick, pad on sb: '+!!document.querySelector('[data-act="pick"][data-k="sb"]'));
