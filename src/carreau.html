@@ -609,6 +609,13 @@ Object.assign(LANG_TEXT.de, {"Privacy": "Datenschutz", "No cookies, no tracking"
 Object.assign(LANG_TEXT.nl, {"Privacy": "Privacy", "No cookies, no tracking": "Geen cookies, geen tracking"});
 Object.assign(LANG_TEXT.pt, {"Privacy": "Privacidade", "No cookies, no tracking": "Sem cookies nem rastreio"});
 Object.assign(LANG_TEXT.th, {"Privacy": "ความเป็นส่วนตัว", "No cookies, no tracking": "ไม่มีคุกกี้ ไม่มีการติดตาม"});
+Object.assign(FR_TEXT, {"Losses": "Défaites", "Points against": "Points encaissés", "Played": "Joués"});
+Object.assign(LANG_TEXT.es, {"Losses": "Derrotas", "Points against": "Puntos en contra", "Played": "Jugados"});
+Object.assign(LANG_TEXT.it, {"Losses": "Sconfitte", "Points against": "Punti subiti", "Played": "Giocate"});
+Object.assign(LANG_TEXT.de, {"Losses": "Niederlagen", "Points against": "Gegenpunkte", "Played": "Gespielt"});
+Object.assign(LANG_TEXT.nl, {"Losses": "Nederlagen", "Points against": "Punten tegen", "Played": "Gespeeld"});
+Object.assign(LANG_TEXT.pt, {"Losses": "Derrotas", "Points against": "Pontos sofridos", "Played": "Jogados"});
+Object.assign(LANG_TEXT.th, {"Losses": "จำนวนแพ้", "Points against": "แต้มที่เสีย", "Played": "แข่งแล้ว"});
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
 const LOCALES = { en: undefined, fr: "fr-FR", es: "es-ES", it: "it-IT", de: "de-DE", nl: "nl-NL", pt: "pt-PT", th: "th-TH" };
 
@@ -2221,7 +2228,7 @@ function poolCard(t, p, ms, rk) {
   const pm = ms.filter(m => m.pool === p.id).sort(byOrder);
   return `<div class="panel stack" style="gap:10px">
     <div class="spread"><h3>${esc(p.name)}</h3>${rk.complete ? `<span class="pill done">Complete</span>` : `<span class="pill">${pm.filter(m => m.done).length}/${p.french ? 5 : pm.length} games</span>`}</div>
-    <div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n">W</th><th class="n">L</th><th class="n">For</th><th class="n">Agst</th><th class="n">+/-</th></tr></thead><tbody>
+    <div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th><th class="n" title="Points for">For</th><th class="n" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
       ${rk.rows.map((s, i) => `<tr class="${!s.unplaced && i < getPlan(t).brackets[0].to && i >= getPlan(t).brackets[0].from - 1 && rk.complete ? "q" : ""}"><td>${s.unplaced ? "–" : i + 1}</td><td class="wrap">${esc(entName(t, s.id))}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td><td class="n">${s.pf}</td><td class="n">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
     </tbody></table></div>
     <div class="stack" style="gap:8px">${pm.map(m => matchCard(t, m)).join("")}</div>
@@ -2327,8 +2334,8 @@ function overallTable(t, stage) {
 function standingsTable(t, rows, opts = {}) {
   const useB = opts.buch;
   const me = myPick(t);
-  return `<div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n x">Pld</th><th class="n">W</th><th class="n x">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n x" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n ${useB ? "x" : ""}">For</th><th class="n ${useB ? "x" : ""}">Agst</th><th class="n">+/-</th></tr></thead><tbody>
-    ${rows.map((s, i) => `<tr class="${s.id === me ? "me" : ""}"><td class="rank">${i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${!isIndiv(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n x">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n x">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n x">${s.fbuch}</td>` : ""}<td class="n ${useB ? "x" : ""}">${s.pf}</td><td class="n ${useB ? "x" : ""}">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
+  return `<div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n x" title="Played">Pld</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n x" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n ${useB ? "x" : ""}" title="Points for">For</th><th class="n ${useB ? "x" : ""}" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
+    ${rows.map((s, i) => `<tr class="${s.id === me ? "me" : ""}"><td class="rank">${i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${!isIndiv(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n x">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n x">${s.fbuch}</td>` : ""}<td class="n ${useB ? "x" : ""}">${s.pf}</td><td class="n ${useB ? "x" : ""}">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
   </tbody></table></div><div class="st-more"><button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`;
 }
 function renderStandings(t) {
