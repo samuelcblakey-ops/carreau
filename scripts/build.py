@@ -51,7 +51,9 @@ os.makedirs(out, exist_ok=True)
 open(os.path.join(out, "index.html"), "w").write(html)
 import shutil
 for f in os.listdir(os.path.join(root, "public")):
-    if os.path.isfile(os.path.join(root, "public", f)): shutil.copy(os.path.join(root, "public", f), out)
+    src = os.path.join(root, "public", f)
+    if os.path.isfile(src): shutil.copy(src, out)
+    elif os.path.isdir(src): shutil.copytree(src, os.path.join(out, f), dirs_exist_ok=True)
 open(os.path.join(out, ".nojekyll"), "w").write("")
 # stamp the service worker with this build so phones pick up new versions
 import hashlib
