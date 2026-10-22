@@ -8,7 +8,9 @@ const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.inc
 const SITE = { openTesting: true, teamScoring: false, teamComps: {}, loaded: false }; // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
-const ROLE = {};   // tid -> "edit" | "score" (membership of this device)
+const ROLE = {};   // tid -> "edit" | "score" | "team" | "live" (membership of this device)
+const LIVECODE = {}; // tid -> stream code (lets a helper's phone run the live desk; only readable by organisers)
+let unsubLiveCode = null;
 const CODES = {};  // tid -> { edit, score } (only readable by organisers)
 const TEAM = {};   // tid -> team id this device scores for (team links)
 const TEAMCODES = {}; // tid -> { teamId: code } (only readable by organisers)
@@ -72,9 +74,13 @@ function fbStore() {
       if (!isAdmin()) throw Object.assign(new Error("Only the admin can delete competitions."), { code: "permission-denied" }); // never half-delete
       const s = await getDocs(collection(db, "tournaments", tid, "matches"));
       for (const d of s.docs) await deleteDoc(d.ref);
+      try { const l = await getDocs(collection(db, "tournaments", tid, "live")); for (const d of l.docs) await deleteDoc(d.ref); } catch {}
       try { await deleteDoc(doc(db, "tournaments", tid, "private", "codes")); } catch {}
+      try { await deleteDoc(doc(db, "tournaments", tid, "private", "livecode")); } catch {}
       await deleteDoc(doc(db, "tournaments", tid));
     },
+    watchLive(tid, mid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "live", mid), d => cb(d.exists() ? d.data() : null), onErr); },
+    setLive(tid, mid, L) { return track(setDoc(doc(db, "tournaments", tid, "live", mid), clone(L))); },
     setMatch(tid, m) { return track(setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m))); },
     updateMatch(tid, id, patch) { return track(updateDoc(doc(db, "tournaments", tid, "matches", id), clone(patch))); },
     deleteMatch(tid, id) { return track(deleteDoc(doc(db, "tournaments", tid, "matches", id))); }
@@ -89,6 +95,17 @@ S.permFn = t => {
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user;
+// live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
+S.liveRole = t => !!(t && ROLE[t.id] === "live");
+S.deskLink = (t, mid) => `${base()}#${t.id}.desk.${mid}${LIVECODE[t.id] ? "." + LIVECODE[t.id] : ""}`;
+function watchLiveCode(tid) {
+  if (unsubLiveCode || tid !== S.tid) return; const t = S.tournaments[tid]; if (!t || !S.permFn(t).edit) return;
+  unsubLiveCode = onSnapshot(doc(FB.db, "tournaments", tid, "private", "livecode"), d => {
+    if (d.exists() && d.data().code) { LIVECODE[tid] = d.data().code; render(); return; }
+    // organisers create the stream code the first time they look at Setup (also allowed for a plain visitor in open testing)
+    if (!LIVECODE[tid] && S.permFn(S.tournaments[tid] || t).edit) { const code = newCode(); setDoc(doc(FB.db, "tournaments", tid, "private", "livecode"), { code }).catch(e => console.warn("stream code", e)); }
+  }, () => {});
+}
 // team score entry has three site states: off, admin only (the admin picks competitions; registered in config/site), everyone
 S.teamScoringSetup = t => SITE.teamScoring === true || (SITE.teamScoring === "admin" && isAdmin());
 S.teamScoringOn = t => SITE.teamScoring === true || (SITE.teamScoring === "admin" && (isAdmin() || !!(t && SITE.teamComps[t.id])));
@@ -171,7 +188,7 @@ S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link 
 const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px"><div class="eyebrow">${label}</div>
   <div class="row" style="flex-wrap:nowrap"><input type="text" id="${id}" readonly value="${esc(value)}" aria-label="${label}"><button class="btn" data-act="copy" data-target="${id}">Copy</button></div>
   <p class="small muted">${note}</p></div>`;
-S.setupExtra = t => S.permFn(t).edit ? teamLinksPanel(t) + sharingPanel(t) : ""; // view-only examples: no sharing box
+S.setupExtra = t => { if (S.permFn(t).edit) watchLiveCode(t.id); return S.permFn(t).edit ? teamLinksPanel(t) + sharingPanel(t) : ""; }; // view-only examples: no sharing box
 const sharingPanel = t => {
   if (!CONFIGURED) return "";
   const l = links(t);
@@ -250,11 +267,11 @@ async function joinWithCode(tid, raw) {
   const code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (!code || !tid || !AUTH.user) return false;
   const ref = doc(FB.db, "tournaments", tid, "members", AUTH.user.uid);
-  for (const role of ["edit", "score"]) {
+  for (const role of ["edit", "score", "live"]) {
     try {
       await setDoc(ref, { role, code, joinedAt: Date.now() });
       ROLE[tid] = role; remember(tid); restart(); render();
-      toast(role === "edit" ? "You're now an organiser for this competition." : "You can now enter scores for this competition.");
+      toast(role === "edit" ? "You're now an organiser for this competition." : role === "score" ? "You can now enter scores for this competition." : "This phone can now run the live desk for this competition.");
       return true;
     } catch (e) { /* not this role: try the next */ }
   }
@@ -263,11 +280,13 @@ async function joinWithCode(tid, raw) {
 }
 
 function watchRole() {
-  unsubRole?.(); unsubRole = null; unsubCodes?.(); unsubCodes = null; unsubTeamCodes?.(); unsubTeamCodes = null;
+  unsubRole?.(); unsubRole = null; unsubCodes?.(); unsubCodes = null; unsubTeamCodes?.(); unsubTeamCodes = null; unsubLiveCode?.(); unsubLiveCode = null;
   if (!FB || !AUTH.user || !S.tid) return;
   const tid = S.tid;
   unsubRole = onSnapshot(doc(FB.db, "tournaments", tid, "members", AUTH.user.uid),
-    d => { ROLE[tid] = d.exists() ? d.data().role : undefined; TEAM[tid] = d.exists() && d.data().role === "team" ? d.data().teamId : undefined; if (d.exists()) remember(tid); render(); watchCodes(tid); },
+    d => { ROLE[tid] = d.exists() ? d.data().role : undefined; TEAM[tid] = d.exists() && d.data().role === "team" ? d.data().teamId : undefined; if (d.exists()) remember(tid); render(); watchCodes(tid);
+      // a live desk link carries the stream code: phones with no role yet join as live desk helpers; organisers and teams keep what they have
+      const pj = S.pendingLiveJoin; if (pj && pj.tid === tid) { S.pendingLiveJoin = null; if (!d.exists() && !isOwner(S.tournaments[tid]) && !isAdmin()) joinWithCode(tid, pj.code); } },
     () => { ROLE[tid] = undefined; render(); watchCodes(tid); });
 }
 function watchCodes(tid) {
@@ -413,14 +432,20 @@ function watchSite() {
 S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
 S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); };
 
-// links look like #<competition id> or #<competition id>.<code>
-function readHash() { const [tid, code] = location.hash.slice(1).split("."); return { tid: tid || null, code: code || null }; }
+// links look like #<competition id> or #<competition id>.<code>; stream overlays and live desks: #<competition id>.stream.<game> / .desk.<game>[.<stream code>]
+function readHash() { const [tid, code] = location.hash.slice(1).split("?")[0].split("."); return { tid: tid || null, code: code || null }; }
 async function handleHash() {
+  const lr = parseLiveHash(); S.liveRoute = lr; S.overlayView = null;
+  if (lr) {
+    if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingLiveJoin = { tid: lr.tid, code: lr.code }; }
+    if (lr.tid !== S.tid) { S.tid = lr.tid; S.matches = {}; restart(); } else if (S.pendingLiveJoin) watchRole();
+    liveWatch(); render(); return;
+  }
   const { tid, code } = readHash();
   if (tid === "admin") { S.overlayView = adminView; render(); return; }
-  S.overlayView = null;
-  if (!tid) return;
+  if (!tid) { render(); return; }
   if (tid !== S.tid) { S.tid = tid; S.matches = {}; restart(); }
+  liveWatch(); render();
   if (code && AUTH.user) { history.replaceState(null, "", "#" + tid); await joinWithCode(tid, code); }
 }
 window.addEventListener("hashchange", handleHash);
@@ -459,6 +484,7 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__
 
 function boot() {
   const h = readHash(); if (h.tid && h.tid !== "admin") S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView;
+  const lr = parseLiveHash(); if (lr) { S.tid = lr.tid; S.liveRoute = lr; }
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
   // keep a copy of what this device has seen (IndexedDB): competitions open instantly next time and keep working offline
