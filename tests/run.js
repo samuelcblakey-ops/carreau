@@ -29,6 +29,9 @@ const SUITES = {
       /only round 1 on pistes: true r1 courts 4/, /All 3 rounds drawn · round 1 in play/, /print true next-round hidden true/, /round 2 gets pistes after round 1: 4/, /undo all: draws 0 games 0/, /errs \[\]/],
     'app-swiss-ranking.js': [/order: F/, /A above C: true/, /note: Ranked by wins, then points difference, then Buchholz/, /errs \[\]/],
     'app-score-keypad.js': [/pad buttons 14/, /after sa pick, pad on sb: true/, /pad closed true values 13-8/, /reopen sb pad true/, /saved true 13-8/, /errs \[\]/],
+    'app-round-status.js': [/round 1 drawn: live red true \| 2 games still to finish \| Draw round 2\|disabled/, /one score in: live red true \| 1 game still to finish \| Draw round 2\|disabled/,
+      /french: 1 partie à terminer \| Tirer la partie 2\|disabled/, /all scores in: ready green true \| Round finished \| Draw round 2\|enabled/,
+      /round 2 drawn: live \| 2 games still to finish \| Draw round 3\|disabled/, /last planned round finished: ready \| Morning complete \| Draw round 3\|enabled/, /errs \[\]/],
   },
   web: {
     'web-isolation.js': [
