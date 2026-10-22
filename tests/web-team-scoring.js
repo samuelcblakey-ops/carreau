@@ -39,8 +39,7 @@ const { chromium } = require('playwright');
   const T1 = await mk('teamA', 390); await T1.goto(links[g1.a]); await w(4500);
   log('team panel:', await has(T1, '.team-panel [data-act="team-score"]'), '| team has no organiser tools:', !(await has(T1, '[data-act="assign"]')));
   await T1.click('.team-panel [data-act="team-score"]'); await w(300);
-  await T1.click('[data-act="pick"][data-k="sa"][data-n="13"]'); await w(100); await T1.click('[data-act="pick"][data-k="sb"][data-n="7"]'); await w(100);
-  await T1.click('[data-act="save-final"]'); await w(1500);
+  await T1.click('[data-act="qwin"][data-side="a"]'); await w(100); await T1.click('[data-act="qlose"][data-k="sb"][data-n="7"]'); await w(1500);
   log('proposal pending:', await T1.evaluate(id => JSON.stringify((({ sa, sb, status }) => ({ sa, sb, status }))(window.__carreau.S.matches[id].proposal || {})), g1.id));
   const sec = await T1.evaluate(async ([g1, g2]) => { const C = window.__carreau, S = C.S, t = C.T(); const out = [];
     try { await S.store.updateMatch(t.id, g1, { sa: 13, sb: 0, done: true }); out.push('result WROTE'); } catch (e) { out.push('result ' + e.code); }
@@ -57,7 +56,7 @@ const { chromium } = require('playwright');
   // dispute on game 2
   const T3 = await mk('teamC', 390); await T3.goto(links[g2.a]); await w(4500);
   await T3.click('.team-panel [data-act="team-score"]'); await w(300);
-  await T3.click('[data-act="pick"][data-k="sa"][data-n="13"]'); await w(100); await T3.click('[data-act="pick"][data-k="sb"][data-n="2"]'); await w(100); await T3.click('[data-act="save-final"]'); await w(1500);
+  await T3.click('[data-act="mode"][data-mode="full"]'); await w(100); await T3.click('[data-act="pick"][data-k="sa"][data-n="13"]'); await w(100); await T3.click('[data-act="pick"][data-k="sb"][data-n="2"]'); await w(100); await T3.click('[data-act="save-final"]'); await w(1500);
   const T4 = await mk('teamD', 390); await T4.goto(links[g2.b]); await w(4500);
   await T4.click('[data-act="team-dispute"]'); await w(2500);
   log('organiser sees dispute:', (await A.textContent('.check-panel')).includes('Disputed'), '| not published:', await A.evaluate(id => !window.__carreau.S.matches[id].done, g2.id));

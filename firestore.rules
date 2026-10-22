@@ -45,7 +45,7 @@ service cloud.firestore {
       return me != '' && teamScoringOn(tid) && notArchived(tid) && resource.data.get('done', false) != true
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['proposal'])
         && (me in resource.data.get('a', []) || me in resource.data.get('b', []))
-        && ((p.status == 'pending' && p.by == me && p.keys().hasOnly(['sa', 'sb', 'by', 'at', 'status'])
+        && ((p.status == 'pending' && p.by == me && p.keys().hasOnly(['sa', 'sb', 'by', 'at', 'status', 'time']) && p.get('time', false) is bool
              && (old == null || old.by == me || old.status in ['disputed', 'applied', 'auto']))
          || (old != null && old.status == 'pending' && old.by != me && p.sa == old.sa && p.sb == old.sb && p.by == old.by
              && p.status in ['confirmed', 'disputed'] && p.confirmedBy == me));

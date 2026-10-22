@@ -85,9 +85,9 @@ S.onFieldSet = async (t, k, v) => {
 };
 S.viewAllTabs = t => !!t.listed; // examples show every tab, locked
 S.myTeam = t => TEAM[t.id] || null;
-S.teamPropose = async (t, m, sa, sb) => {
+S.teamPropose = async (t, m, sa, sb, time) => {
   const me = TEAM[t.id]; if (!me) return false;
-  const proposal = { sa, sb, by: me, at: Date.now(), status: "pending" };
+  const proposal = { sa, sb, by: me, at: Date.now(), status: "pending" }; if (time) proposal.time = true;
   await updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal }); S.matches[m.id].proposal = proposal; return true;
 };
 S.teamRespond = async (t, m, status) => {
