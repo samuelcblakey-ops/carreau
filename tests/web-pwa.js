@@ -8,7 +8,9 @@ const { chromium } = require('playwright');
   const banner = p => p.evaluate(() => !!document.querySelector('.install-banner'));
   const A = await mk('android'); await A.goto(base); await w(3500);
   const man = await A.evaluate(async () => { const r = await fetch('manifest.webmanifest'); const j = await r.json(); const i = await fetch(j.icons[1].src);
-    return [!!document.querySelector('link[rel="manifest"]'), j.display, j.icons.length, j.icons.some(x => x.purpose === 'maskable'), i.status, i.headers.get('content-type'), !!document.querySelector('link[rel="apple-touch-icon"]')]; });
+    const f = await fetch('fonts/barlow-400-latin.woff2'); const pv = await fetch('privacy.html');
+    return [!!document.querySelector('link[rel="manifest"]'), j.display, j.icons.length, j.icons.some(x => x.purpose === 'maskable'), i.status, i.headers.get('content-type'), !!document.querySelector('link[rel="apple-touch-icon"]')]
+      .concat([f.status, (await f.arrayBuffer()).byteLength > 1000, !document.querySelector('link[href*="fonts.googleapis"]'), pv.status, document.fonts.check('16px Barlow')]); });
   log('manifest:', JSON.stringify(man));
   log('service worker:', await A.evaluate(async () => { const r = await Promise.race([navigator.serviceWorker.ready, new Promise(r => setTimeout(() => r(null), 8000))]); return !!r && !!r.active; }));
   await A.click('[data-act="new-t"]'); await w(2500);
