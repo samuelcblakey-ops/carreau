@@ -1,6 +1,6 @@
 # Carreau Competition Desk
 
-Petanque competition tool: Swiss, snake, pools, knockout, round robin, mêlée and precision shooting, with piste allocation, live scores and standings. Live at <https://samuelcblakey-ops.github.io/carreau/>.
+Petanque competition tool: Swiss, snake, barrage, leagues, knockout, round robin, mêlée and precision shooting, with piste allocation, live scores and standings. Live at <https://samuelcblakey-ops.github.io/carreau/>.
 
 ## Layout
 
