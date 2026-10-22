@@ -90,5 +90,16 @@ service cloud.firestore {
         allow delete: if (canEdit(tid) && notArchived(tid)) || isAdmin();
       }
     }
+    // SN Pétanque Academy (academy.snpetanque.com): one document per player, keyed by their uid, with their results underneath.
+    // A player reads and writes only their own; the admin can read everyone's (the Academy admin page).
+    match /academy/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow create, update: if signedIn() && request.auth.uid == uid && request.resource.data.uid == uid;
+      allow delete: if signedIn() && request.auth.uid == uid;
+      match /attempts/{aid} {
+        allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+        allow write: if signedIn() && request.auth.uid == uid;
+      }
+    }
   }
 }
