@@ -230,6 +230,9 @@ table.shots td,table.shots th{padding:5px 6px}
 .qr-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px;border:1px solid var(--line);border-radius:var(--r);background:#fff;color:#1a2320;margin:4px 0 10px}
 .qr-card .qr-name{font-family:var(--display);font-size:22px;font-weight:700;text-align:center}.qr-card .qr-box{width:min(280px,80vw)}.qr-card svg{display:block;width:100%;height:auto}.qr-card .muted{color:#5d6a64;text-align:center}
 .shotcell{min-width:40px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-family:var(--display);font-size:17px;font-weight:700;cursor:pointer}
+.so-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.so-name{flex:1 1 120px;font-weight:700;min-width:0}.so-cells{display:flex;gap:4px;flex-wrap:wrap}
+.so .shotcell{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;height:44px}.so .shotcell small{font-size:10px;font-family:var(--body,inherit);font-weight:600;color:var(--muted)}
+.so-tot{font-family:var(--display);font-size:20px;min-width:30px;text-align:right}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
 @media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
@@ -569,6 +572,13 @@ Object.assign(LANG_TEXT.de, {"Round 1 is random. After that, teams on the same n
 Object.assign(LANG_TEXT.nl, {"Round 1 is random. After that, teams on the same number of wins play each other and rematches are avoided. Ties are split using the ranking order below.": "Ronde 1 wordt geloot. Daarna spelen teams met evenveel overwinningen tegen elkaar en worden herhalingen vermeden. Gelijke stand wordt beslist met de rangschikking hieronder.", "Ranking order": "Rangschikking", "Points difference first": "Puntenverschil eerst", "Buchholz first": "Buchholz eerst", "Wins": "Overwinningen", "Points difference": "Puntenverschil", "Buchholz": "Buchholz", "Fine Buchholz": "Fijne Buchholz", "Points for": "Punten voor", "Fewest points against": "Minste punten tegen", "Drawn lot": "Loting", "Opponents' total wins": "Totaal aantal zeges van de tegenstanders", "Opponents' Buchholz added up": "Opgetelde Buchholz van de tegenstanders", "Anything still level": "Bij verdere gelijke stand", "Switch tie-breaks on or off and move them up or down. Changes apply straight away to the standings and to the next round's pairings.": "Zet tiebreaks aan of uit en verschuif ze. Wijzigingen gelden meteen voor het klassement en de koppelingen van de volgende ronde.", "Byes count as a {n}–{n} win.": "Een bye telt als een overwinning van {1}–{2}.", "Move up": "Omhoog", "Move down": "Omlaag"});
 Object.assign(LANG_TEXT.pt, {"Round 1 is random. After that, teams on the same number of wins play each other and rematches are avoided. Ties are split using the ranking order below.": "A ronda 1 é sorteada. Depois, jogam entre si as equipas com o mesmo número de vitórias, evitando repetições. Os empates são desfeitos pela ordem de classificação abaixo.", "Ranking order": "Ordem de classificação", "Points difference first": "Diferença de pontos primeiro", "Buchholz first": "Buchholz primeiro", "Wins": "Vitórias", "Points difference": "Diferença de pontos", "Buchholz": "Buchholz", "Fine Buchholz": "Buchholz fino", "Points for": "Pontos marcados", "Fewest points against": "Menos pontos sofridos", "Drawn lot": "Sorteio", "Opponents' total wins": "Total de vitórias dos adversários", "Opponents' Buchholz added up": "Soma do Buchholz dos adversários", "Anything still level": "Se o empate persistir", "Switch tie-breaks on or off and move them up or down. Changes apply straight away to the standings and to the next round's pairings.": "Ative ou desative os desempates e mude a ordem. As alterações aplicam-se logo à classificação e aos emparelhamentos da ronda seguinte.", "Byes count as a {n}–{n} win.": "Uma folga conta como vitória por {1}–{2}.", "Move up": "Subir", "Move down": "Descer"});
 Object.assign(LANG_TEXT.th, {"Round 1 is random. After that, teams on the same number of wins play each other and rematches are avoided. Ties are split using the ranking order below.": "รอบที่ 1 จับสลาก จากนั้นทีมที่ชนะเท่ากันจะพบกันและเลี่ยงการเจอคู่เดิม หากคะแนนเท่ากันจะตัดสินตามลำดับการจัดอันดับด้านล่าง", "Ranking order": "ลำดับการจัดอันดับ", "Points difference first": "แต้มได้เสียก่อน", "Buchholz first": "Buchholz ก่อน", "Wins": "จำนวนชนะ", "Points difference": "แต้มได้เสีย", "Buchholz": "Buchholz", "Fine Buchholz": "Buchholz ละเอียด", "Points for": "แต้มที่ทำได้", "Fewest points against": "เสียแต้มน้อยที่สุด", "Drawn lot": "จับสลาก", "Opponents' total wins": "ผลรวมจำนวนชนะของคู่แข่ง", "Opponents' Buchholz added up": "ผลรวม Buchholz ของคู่แข่ง", "Anything still level": "หากยังเท่ากัน", "Switch tie-breaks on or off and move them up or down. Changes apply straight away to the standings and to the next round's pairings.": "เปิดหรือปิดเกณฑ์ตัดสินและเลื่อนลำดับขึ้นลงได้ การเปลี่ยนแปลงมีผลทันทีกับตารางคะแนนและการจับคู่รอบถัดไป", "Byes count as a {n}–{n} win.": "บายนับเป็นชนะ {1}–{2}", "Move up": "เลื่อนขึ้น", "Move down": "เลื่อนลง"});
+Object.assign(FR_TEXT, {"Shoot-out": "Barrage", "Tie-break": "Départage", "Count-back, then shoot-out": "Aux 5 puis aux 3, puis barrage", "Straight to a shoot-out": "Barrage direct", "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out.": "Les tireurs à égalité sont départagés par le plus de 5, puis le plus de 3. S'ils restent à égalité, barrage.", "Shooters level on points have a shoot-out.": "Les tireurs à égalité de points font un barrage.", "Only ties that decide who qualifies, the podium or a knockout duel need one.": "Seules les égalités qui décident de la qualification, du podium ou d'un duel à élimination nécessitent un barrage.", "Shoot-out ateliers": "Ateliers du barrage", "Shoot-out distance": "Distance du barrage", "Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.": "Chaque tireur à égalité tire une boule sur chaque atelier choisi à cette distance ; le meilleur total l'emporte. Toujours à égalité : nouveau tour.", "One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.": "Une boule chacun sur chaque atelier indiqué. Le meilleur total de barrage l'emporte. Toujours à égalité : nouveau tour.", "Still level": "Toujours à égalité", "Decided": "Départagés", "Level on {n} pts.": "Égalité à {1} pts.", "Level on {n} pts with the same number of 5s and 3s.": "Égalité à {1} pts avec le même nombre de 5 et de 3.", "wins on count-back (more 5s, then more 3s).": "l'emporte au départage (plus de 5, puis plus de 3).", "Shoot-out needed": "Barrage nécessaire", "Score the shoot-out": "Saisir le barrage", "Save shoot-out": "Enregistrer le barrage", "Shoot-out saved.": "Barrage enregistré.", "Shoot-out {n}": "Barrage {1}", "Level": "Égalité", "Available once the shoot-out is decided": "Disponible une fois le barrage décidé", "Decide the shoot-out first.": "Décidez d'abord le barrage.", "Keep at least one atelier in the shoot-out.": "Gardez au moins un atelier dans le barrage.", "Scores are level. Finish the shoot-out to decide the winner.": "Égalité. Terminez le barrage pour désigner le vainqueur.", "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.": "Qualification. A1 boule seule, A2 boule derrière le but, A3 boule entre deux boules, A4 boule derrière un obstacle, A5 le but.", "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out.": "Les tireurs à égalité de points sont départagés par le plus de 5, puis le plus de 3, puis un barrage.", "Shooters level on points go to a shoot-out.": "Les tireurs à égalité de points font un barrage."});
+Object.assign(LANG_TEXT.es, {"Shoot-out": "Desempate", "Tie-break": "Desempate", "Count-back, then shoot-out": "Más 5, luego más 3, luego desempate", "Straight to a shoot-out": "Desempate directo", "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out.": "Los tiradores empatados a puntos se separan por más 5 y luego más 3. Si siguen empatados, desempate.", "Shooters level on points have a shoot-out.": "Los tiradores empatados a puntos van a un desempate.", "Only ties that decide who qualifies, the podium or a knockout duel need one.": "Solo hace falta en los empates que deciden la clasificación, el podio o un duelo eliminatorio.", "Shoot-out ateliers": "Talleres del desempate", "Shoot-out distance": "Distancia del desempate", "Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.": "Cada tirador empatado tira una bola en cada taller elegido a esta distancia y gana el total más alto. Si siguen empatados: otra ronda.", "One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.": "Una bola cada uno en cada taller indicado. Gana el total más alto. Si siguen empatados: otra ronda.", "Still level": "Siguen empatados", "Decided": "Decidido", "Level on {n} pts.": "Empate a {1} pts.", "Level on {n} pts with the same number of 5s and 3s.": "Empate a {1} pts con el mismo número de 5 y de 3.", "wins on count-back (more 5s, then more 3s).": "gana por desempate (más 5, luego más 3).", "Shoot-out needed": "Desempate necesario", "Score the shoot-out": "Anotar el desempate", "Save shoot-out": "Guardar desempate", "Shoot-out saved.": "Desempate guardado.", "Shoot-out {n}": "Desempate {1}", "Level": "Empate", "Available once the shoot-out is decided": "Disponible cuando se decida el desempate", "Decide the shoot-out first.": "Decide primero el desempate.", "Keep at least one atelier in the shoot-out.": "Deja al menos un taller en el desempate.", "Scores are level. Finish the shoot-out to decide the winner.": "Empate. Termina el desempate para decidir el ganador.", "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.": "Ronda clasificatoria. A1 bola sola, A2 bola detrás del boliche, A3 bola entre dos bolas, A4 bola detrás de un obstáculo, A5 el boliche.", "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out.": "Los tiradores empatados a puntos se separan por más 5, luego más 3 y luego un desempate.", "Shooters level on points go to a shoot-out.": "Los tiradores empatados a puntos van a un desempate."});
+Object.assign(LANG_TEXT.it, {"Shoot-out": "Spareggio", "Tie-break": "Spareggio", "Count-back, then shoot-out": "Più 5, poi più 3, poi spareggio", "Straight to a shoot-out": "Spareggio diretto", "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out.": "I tiratori a pari punti sono separati dal maggior numero di 5, poi di 3. Se ancora pari, spareggio.", "Shooters level on points have a shoot-out.": "I tiratori a pari punti vanno allo spareggio.", "Only ties that decide who qualifies, the podium or a knockout duel need one.": "Serve solo per le parità che decidono la qualificazione, il podio o un duello a eliminazione.", "Shoot-out ateliers": "Atelier dello spareggio", "Shoot-out distance": "Distanza dello spareggio", "Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.": "Ogni tiratore a pari punti tira una boccia su ogni atelier scelto a questa distanza; vince il totale più alto. Ancora pari: un altro giro.", "One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.": "Una boccia a testa su ogni atelier indicato. Vince il totale più alto. Ancora pari: un altro giro.", "Still level": "Ancora pari", "Decided": "Deciso", "Level on {n} pts.": "Pari a {1} pt.", "Level on {n} pts with the same number of 5s and 3s.": "Pari a {1} pt con lo stesso numero di 5 e di 3.", "wins on count-back (more 5s, then more 3s).": "vince allo spareggio (più 5, poi più 3).", "Shoot-out needed": "Serve lo spareggio", "Score the shoot-out": "Segna lo spareggio", "Save shoot-out": "Salva spareggio", "Shoot-out saved.": "Spareggio salvato.", "Shoot-out {n}": "Spareggio {1}", "Level": "Pari", "Available once the shoot-out is decided": "Disponibile quando lo spareggio è deciso", "Decide the shoot-out first.": "Decidi prima lo spareggio.", "Keep at least one atelier in the shoot-out.": "Lascia almeno un atelier nello spareggio.", "Scores are level. Finish the shoot-out to decide the winner.": "Parità. Completa lo spareggio per decidere il vincitore.", "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.": "Qualificazione. A1 boccia sola, A2 boccia dietro il pallino, A3 boccia tra due bocce, A4 boccia dietro un ostacolo, A5 il pallino.", "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out.": "I tiratori a pari punti sono separati dal maggior numero di 5, poi di 3, poi da uno spareggio.", "Shooters level on points go to a shoot-out.": "I tiratori a pari punti vanno allo spareggio."});
+Object.assign(LANG_TEXT.de, {"Shoot-out": "Stechen", "Tie-break": "Gleichstand", "Count-back, then shoot-out": "Mehr 5er, dann mehr 3er, dann Stechen", "Straight to a shoot-out": "Direkt ins Stechen", "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out.": "Punktgleiche Schützen werden nach den meisten 5ern, dann den meisten 3ern getrennt. Wer dann noch gleich ist, geht ins Stechen.", "Shooters level on points have a shoot-out.": "Punktgleiche Schützen gehen ins Stechen.", "Only ties that decide who qualifies, the podium or a knockout duel need one.": "Nur nötig, wenn der Gleichstand über Qualifikation, Podium oder ein K.-o.-Duell entscheidet.", "Shoot-out ateliers": "Ateliers im Stechen", "Shoot-out distance": "Distanz im Stechen", "Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.": "Jeder punktgleiche Schütze schießt eine Kugel auf jedes gewählte Atelier aus dieser Distanz; die höchste Summe gewinnt. Immer noch gleich: noch eine Runde.", "One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.": "Je eine Kugel auf jedes genannte Atelier. Die höchste Summe gewinnt. Immer noch gleich: noch eine Runde.", "Still level": "Immer noch gleich", "Decided": "Entschieden", "Level on {n} pts.": "Gleichstand bei {1} Pkt.", "Level on {n} pts with the same number of 5s and 3s.": "Gleichstand bei {1} Pkt. mit gleich vielen 5ern und 3ern.", "wins on count-back (more 5s, then more 3s).": "gewinnt nach Wertung (mehr 5er, dann mehr 3er).", "Shoot-out needed": "Stechen nötig", "Score the shoot-out": "Stechen eintragen", "Save shoot-out": "Stechen speichern", "Shoot-out saved.": "Stechen gespeichert.", "Shoot-out {n}": "Stechen {1}", "Level": "Gleich", "Available once the shoot-out is decided": "Verfügbar, sobald das Stechen entschieden ist", "Decide the shoot-out first.": "Entscheide zuerst das Stechen.", "Keep at least one atelier in the shoot-out.": "Mindestens ein Atelier muss im Stechen bleiben.", "Scores are level. Finish the shoot-out to decide the winner.": "Gleichstand. Beende das Stechen, um den Sieger zu ermitteln.", "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.": "Qualifikation. A1 einzelne Kugel, A2 Kugel hinter der Zielkugel, A3 Kugel zwischen zwei Kugeln, A4 Kugel hinter einem Hindernis, A5 die Zielkugel.", "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out.": "Punktgleiche Schützen werden nach den meisten 5ern, dann den meisten 3ern und dann im Stechen getrennt.", "Shooters level on points go to a shoot-out.": "Punktgleiche Schützen gehen ins Stechen."});
+Object.assign(LANG_TEXT.nl, {"Shoot-out": "Barrage", "Tie-break": "Gelijkspel", "Count-back, then shoot-out": "Meeste 5'en, dan 3'en, dan barrage", "Straight to a shoot-out": "Direct naar barrage", "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out.": "Schutters met gelijke punten worden gescheiden op de meeste 5'en, dan de meeste 3'en. Nog gelijk: barrage.", "Shooters level on points have a shoot-out.": "Schutters met gelijke punten gaan naar een barrage.", "Only ties that decide who qualifies, the podium or a knockout duel need one.": "Alleen nodig bij gelijkspel dat beslist over kwalificatie, het podium of een knock-outduel.", "Shoot-out ateliers": "Ateliers in de barrage", "Shoot-out distance": "Afstand in de barrage", "Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.": "Elke gelijk geëindigde schutter schiet één boule op elk gekozen atelier vanaf deze afstand; het hoogste totaal wint. Nog gelijk: nog een ronde.", "One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.": "Eén boule per atelier per schutter. Het hoogste totaal wint. Nog gelijk: nog een ronde.", "Still level": "Nog gelijk", "Decided": "Beslist", "Level on {n} pts.": "Gelijk op {1} ptn.", "Level on {n} pts with the same number of 5s and 3s.": "Gelijk op {1} ptn met evenveel 5'en en 3'en.", "wins on count-back (more 5s, then more 3s).": "wint op telling (meer 5'en, dan meer 3'en).", "Shoot-out needed": "Barrage nodig", "Score the shoot-out": "Barrage invoeren", "Save shoot-out": "Barrage opslaan", "Shoot-out saved.": "Barrage opgeslagen.", "Shoot-out {n}": "Barrage {1}", "Level": "Gelijk", "Available once the shoot-out is decided": "Beschikbaar zodra de barrage beslist is", "Decide the shoot-out first.": "Beslis eerst de barrage.", "Keep at least one atelier in the shoot-out.": "Houd minstens één atelier in de barrage.", "Scores are level. Finish the shoot-out to decide the winner.": "Gelijke stand. Maak de barrage af om de winnaar te bepalen.", "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.": "Kwalificatie. A1 losse boule, A2 boule achter het but, A3 boule tussen twee boules, A4 boule achter een obstakel, A5 het but.", "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out.": "Schutters met gelijke punten worden gescheiden op de meeste 5'en, dan de meeste 3'en en dan een barrage.", "Shooters level on points go to a shoot-out.": "Schutters met gelijke punten gaan naar een barrage."});
+Object.assign(LANG_TEXT.pt, {"Shoot-out": "Desempate", "Tie-break": "Desempate", "Count-back, then shoot-out": "Mais 5, depois mais 3, depois desempate", "Straight to a shoot-out": "Desempate direto", "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out.": "Os atiradores empatados em pontos são separados pelo maior número de 5 e depois de 3. Se continuarem empatados, desempate.", "Shooters level on points have a shoot-out.": "Os atiradores empatados em pontos vão a desempate.", "Only ties that decide who qualifies, the podium or a knockout duel need one.": "Só é preciso nos empates que decidem a qualificação, o pódio ou um duelo a eliminar.", "Shoot-out ateliers": "Ateliers do desempate", "Shoot-out distance": "Distância do desempate", "Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.": "Cada atirador empatado lança uma bola em cada atelier escolhido a esta distância; ganha o total mais alto. Ainda empatados: nova ronda.", "One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.": "Uma bola cada um em cada atelier indicado. Ganha o total mais alto. Ainda empatados: nova ronda.", "Still level": "Ainda empatados", "Decided": "Decidido", "Level on {n} pts.": "Empate a {1} pts.", "Level on {n} pts with the same number of 5s and 3s.": "Empate a {1} pts com o mesmo número de 5 e de 3.", "wins on count-back (more 5s, then more 3s).": "ganha no desempate (mais 5, depois mais 3).", "Shoot-out needed": "Desempate necessário", "Score the shoot-out": "Registar o desempate", "Save shoot-out": "Guardar desempate", "Shoot-out saved.": "Desempate guardado.", "Shoot-out {n}": "Desempate {1}", "Level": "Empate", "Available once the shoot-out is decided": "Disponível quando o desempate estiver decidido", "Decide the shoot-out first.": "Decida primeiro o desempate.", "Keep at least one atelier in the shoot-out.": "Mantenha pelo menos um atelier no desempate.", "Scores are level. Finish the shoot-out to decide the winner.": "Empate. Termine o desempate para decidir o vencedor.", "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.": "Ronda de qualificação. A1 bola sozinha, A2 bola atrás do bolim, A3 bola entre duas bolas, A4 bola atrás de um obstáculo, A5 o bolim.", "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out.": "Os atiradores empatados em pontos são separados pelo maior número de 5, depois de 3, depois por um desempate.", "Shooters level on points go to a shoot-out.": "Os atiradores empatados em pontos vão a desempate."});
+Object.assign(LANG_TEXT.th, {"Shoot-out": "ยิงชี้ขาด", "Tie-break": "การตัดสินคะแนนเท่ากัน", "Count-back, then shoot-out": "นับ 5 แล้วนับ 3 แล้วยิงชี้ขาด", "Straight to a shoot-out": "ยิงชี้ขาดทันที", "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out.": "ผู้ยิงที่คะแนนเท่ากันจะตัดสินด้วยจำนวนลูก 5 คะแนนที่มากกว่า แล้วจำนวนลูก 3 คะแนน หากยังเท่ากันจะยิงชี้ขาด", "Shooters level on points have a shoot-out.": "ผู้ยิงที่คะแนนเท่ากันจะยิงชี้ขาด", "Only ties that decide who qualifies, the podium or a knockout duel need one.": "ยิงชี้ขาดเฉพาะเมื่อคะแนนเท่ากันมีผลต่อการผ่านรอบ อันดับโพเดียม หรือคู่น็อกเอาต์", "Shoot-out ateliers": "สถานีที่ใช้ยิงชี้ขาด", "Shoot-out distance": "ระยะยิงชี้ขาด", "Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.": "ผู้ยิงที่คะแนนเท่ากันยิงสถานีละหนึ่งลูกที่ระยะนี้ คะแนนรวมสูงสุดชนะ หากยังเท่ากันให้ยิงอีกรอบ", "One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.": "ยิงคนละหนึ่งลูกทุกสถานีที่ระบุ คะแนนรวมสูงสุดชนะ หากยังเท่ากันให้ยิงอีกรอบ", "Still level": "ยังเท่ากัน", "Decided": "ตัดสินแล้ว", "Level on {n} pts.": "เสมอที่ {1} คะแนน", "Level on {n} pts with the same number of 5s and 3s.": "เสมอที่ {1} คะแนน และจำนวนลูก 5 และ 3 เท่ากัน", "wins on count-back (more 5s, then more 3s).": "ชนะด้วยการนับลูก (ลูก 5 มากกว่า แล้วลูก 3)", "Shoot-out needed": "ต้องยิงชี้ขาด", "Score the shoot-out": "บันทึกการยิงชี้ขาด", "Save shoot-out": "บันทึกการยิงชี้ขาด", "Shoot-out saved.": "บันทึกการยิงชี้ขาดแล้ว", "Shoot-out {n}": "ยิงชี้ขาด {1}", "Level": "เสมอ", "Available once the shoot-out is decided": "ใช้ได้เมื่อยิงชี้ขาดเสร็จแล้ว", "Decide the shoot-out first.": "ยิงชี้ขาดให้เสร็จก่อน", "Keep at least one atelier in the shoot-out.": "ต้องมีอย่างน้อยหนึ่งสถานีในการยิงชี้ขาด", "Scores are level. Finish the shoot-out to decide the winner.": "คะแนนเท่ากัน ยิงชี้ขาดให้เสร็จเพื่อหาผู้ชนะ", "Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.": "รอบคัดเลือก A1 ลูกเดี่ยว, A2 ลูกหลังลูกเป้า, A3 ลูกระหว่างสองลูก, A4 ลูกหลังสิ่งกีดขวาง, A5 ลูกเป้า", "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out.": "ผู้ยิงที่คะแนนเท่ากันจะตัดสินด้วยลูก 5 ที่มากกว่า แล้วลูก 3 แล้วยิงชี้ขาด", "Shooters level on points go to a shoot-out.": "ผู้ยิงที่คะแนนเท่ากันจะยิงชี้ขาด"});
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
 const LOCALES = { en: undefined, fr: "fr-FR", es: "es-ES", it: "it-IT", de: "de-DE", nl: "nl-NL", pt: "pt-PT", th: "th-TH" };
 
@@ -1367,10 +1377,85 @@ function shotStrip(sh, cur) {
   return `<div class="shotstrip">${SHOT_SEQ.map((x, i) => { const v = sh[x.k][x.di]; return `<span class="${v != null ? "v" : ""} ${cur === i ? "cur" : ""}" title="${ATELIERS[x.ai][1]} ${x.d} m">${v ?? "·"}</span>`; }).join("")}</div>`;
 }
 const shootPhase = (t, ph) => MS().filter(m => m.stage === "shoot" && m.phase === ph);
+// tie-breaks: count-back (most 5s, then most 3s) then a shoot-out, or straight to a shoot-out (Setup → Tie-break)
+const shotN = (sh, v) => ATELIERS.reduce((n, [k]) => n + (sh?.[k] || []).filter(x => x != null && +x === v).length, 0);
+const soAteliers = t => (t.shootOutAt?.length ? ATELIERS.filter(([k]) => t.shootOutAt.includes(k)) : ATELIERS);
+const soDist = t => +(t.shootOutDist || 7);
+const soSum = (so, n) => (so || []).slice(0, n ?? 999).reduce((a, v) => a + (v == null ? 0 : +v), 0);
+const soFilled = (so, n) => (so || []).slice(0, n).filter(v => v != null).length === n;
+const shootKey = (t, sh) => t.shootTie === "shootout" ? [shotTotal(sh)] : [shotTotal(sh), shotN(sh, 5), shotN(sh, 3)];
+const keyCmp = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return b[i] - a[i]; return 0; };
+// order shooters who are level on their scorecards by shoot-out rounds (one shot per chosen atelier); still level → another round
+function soResolve(items, L, r = 1) {
+  if (items.length < 2) return { order: items, need: {}, open: false };
+  const n = r * L;
+  if (items.some(x => !soFilled(x.so, n))) return { order: items, need: Object.fromEntries(items.map(x => [x.id, n])), open: true };
+  const sums = [...new Set(items.map(x => soSum(x.so, n)))].sort((a, b) => b - a);
+  const out = { order: [], need: {}, open: false };
+  sums.forEach(v => { const res = soResolve(items.filter(x => soSum(x.so, n) === v), L, r + 1); out.order.push(...res.order); Object.assign(out.need, res.need); out.open = out.open || res.open; });
+  return out;
+}
 function shootRanking(t, ph) {
-  const order = id => entities(t).findIndex(e => e.id === id);
-  return shootPhase(t, ph).map(m => ({ id: m.a[0], m, total: shotTotal(m.shots), shots: m.shots, done: m.done }))
-    .sort((x, y) => (y.done - x.done) || y.total - x.total || order(x.id) - order(y.id));
+  const order = id => entities(t).findIndex(e => e.id === id); const L = soAteliers(t).length;
+  const rows = shootPhase(t, ph).map(m => ({ id: m.a[0], m, total: shotTotal(m.shots), shots: m.shots, done: m.done, key: shootKey(t, m.shots), so: m.so || [] }))
+    .sort((x, y) => (y.done - x.done) || keyCmp(x.key, y.key) || order(x.id) - order(y.id));
+  const out = [];
+  for (let i = 0; i < rows.length;) {
+    let j = i + 1; while (j < rows.length && rows[i].done && rows[j].done && !keyCmp(rows[i].key, rows[j].key)) j++;
+    const g = rows.slice(i, j);
+    if (g.length > 1) { const res = soResolve(g, L); res.order.forEach(r => Object.assign(r, { tie: i, tieN: g.length, open: res.open, soNeed: res.need[r.id] || 0 })); out.push(...res.order); }
+    else out.push(...g);
+    i = j;
+  }
+  return out;
+}
+// level groups that still need a shoot-out and decide something: who qualifies (cut), or the podium in a final
+function shootTies(t, ph, cut) {
+  const rows = shootRanking(t, ph); if (!rows.length || !rows.every(r => r.done)) return [];
+  const gs = {}; rows.forEach((r, i) => { if (r.tieN > 1 && r.open) (gs[r.tie] ||= []).push(r); });
+  return Object.entries(gs).map(([s, g]) => ({ start: +s, rows: g })).filter(g => ph === "F" ? g.start < Math.min(3, rows.length) : g.start < cut && g.start + g.rows.length > cut);
+}
+const shootCut = t => (t.shootFormat || "ko8") === "final" ? Math.max(2, t.shootFinal || 4) : t.shootFormat === "ko16" ? 16 : 8;
+function soBlock(t, md, rows, ro) {
+  const L = soAteliers(t), res = soResolve(rows.map(r => ({ id: r.key, so: md.soVals[r.key] })), L.length);
+  const n = soN(t, md, rows.map(r => r.key)); const c = md.socell;
+  return `<div class="notice stack so" style="gap:8px"><b>Shoot-out</b>
+    <span class="small">${L.map(a => a[0]).join(", ")} · ${soDist(t)} m</span>
+    <span class="small muted">One shot each on every atelier listed. Highest shoot-out total wins. Still level: shoot another round.</span>
+    ${rows.map(r => `<div class="so-row"><span class="so-name">${esc(r.name)}</span><span class="so-cells">${Array.from({ length: n }, (_, i) => { const v = md.soVals[r.key]?.[i];
+      return `<button type="button" class="shotcell ${c && c.key === r.key && c.i === i ? "sel" : ""} ${v != null ? "v" : ""}" data-act="so-cell" data-key="${r.key}" data-i="${i}" title="${L[i % L.length][1]}" ${ro ? "disabled" : ""}>${v ?? "–"}<small>${L[i % L.length][0]}</small></button>`; }).join("")}</span><b class="so-tot">${soSum(md.soVals[r.key], n)}</b></div>`).join("")}
+    ${!ro && c ? `<div class="shotpad">${SHOT_VALUES.map(v => `<button type="button" data-act="so-pick" data-v="${v}">${v}<small>${v === 0 ? "Miss" : "point" + (v === 1 ? "" : "s")}</small></button>`).join("")}</div>` : ""}
+    <span class="small"><b>${res.open ? "Still level" : "Decided"}</b>${res.open ? "" : ` · <span data-notr>${res.order.map(x => esc(rows.find(r => r.key === x.id).name)).join(" › ")}</span>`}</span></div>`;
+}
+const soClean = so => Array.from({ length: (so || []).length }, (_, i) => so[i] == null ? null : +so[i]);
+const soKeys = md => md.so ? md.ids : ["a", "b"];
+function renderSoModal(t, el) {
+  const md = S.modal; const ro = !canScore();
+  const rows = md.ids.map(id => S.matches[id]).filter(Boolean).map(m => ({ key: m.id, name: entName(t, m.a[0]), total: shotTotal(m.shots) }));
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Shoot-out">
+    <div class="spread"><div><div class="eyebrow">${md.ph === "F" ? "Final" : "Qualifying round"}</div><h3>Shoot-out</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    <p class="small muted">${(t.shootTie === "shootout" ? "Level on {n} pts." : "Level on {n} pts with the same number of 5s and 3s.").replace("{n}", rows[0]?.total ?? 0)}</p>
+    ${soBlock(t, md, rows, ro)}
+    ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
+    ${ro ? "" : `<div class="row"><button class="btn primary" data-act="so-save">Save shoot-out</button></div>`}
+  </div></div>`;
+  localize(el);
+}
+async function saveSoGroup() {
+  const md = S.modal;
+  for (const id of md.ids) { const patch = { so: soClean(md.soVals[id]) }; Object.assign(S.matches[id], patch); await S.store.updateMatch(S.tid, id, patch); }
+  S.modal = null; renderModal(); toast("Shoot-out saved."); render();
+}
+function soN(t, md, keys) {
+  const L = soAteliers(t).length, res = soResolve(keys.map(k => ({ id: k, so: md.soVals[k] })), L);
+  const fill = Math.max(...keys.map(k => (md.soVals[k] || []).reduce((n, v, i) => v != null ? i + 1 : n, 0)));
+  return Math.max(L, ...Object.values(res.need), Math.ceil(fill / L) * L);
+}
+// shoot-out shots go round the shooters: everyone's first shot, then everyone's second…
+function soNextCell(t, md, keys, from) {
+  const n = soN(t, md, keys); const seq = []; for (let i = 0; i < n; i++) keys.forEach(k => seq.push({ key: k, i }));
+  const at = seq.findIndex(x => x.key === from.key && x.i === from.i);
+  return seq.slice(at + 1).find(x => md.soVals[x.key]?.[x.i] == null) || null;
 }
 function drawShootQualifying(t) {
   const ids = t.seeding === "entry" ? activeIds(t) : shuffle(activeIds(t));
@@ -1404,7 +1489,7 @@ function nextCell(md, side, from) {
   const after = SHOT_SEQ.slice(i0 + 1).find(x => sh[x.k][x.di] == null) || SHOT_SEQ.slice(0, i0 + 1).find(x => sh[x.k][x.di] == null);
   return after ? { side, k: after.k, di: after.di } : null;
 }
-function renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, level }) {
+function renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, tie }) {
   const md = S.modal; const nx = liveNext(md, duel); const cur = nx ? SHOT_SEQ.findIndex(x => x.k === nx.k && x.di === nx.di) : -1;
   const name = side => esc(sideName(t, side === "a" ? m.a : m.b));
   const card = (side, sh, tot) => `<div class="stack" style="gap:4px"><div class="spread"><b>${name(side)}</b><span class="pill ${shotComplete(sh) ? "done" : ""}">${tot} pts · ${shotCount(sh)}/20</span></div>${shotStrip(sh, nx && nx.side === side ? cur : -1)}</div>`;
@@ -1419,9 +1504,7 @@ function renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, level }) {
       <div class="shotpad">${SHOT_VALUES.map(v => `<button type="button" data-act="shot-pick" data-v="${v}">${v}<small>${v === 0 ? "Miss" : "point" + (v === 1 ? "" : "s")}</small></button>`).join("")}</div>`
     : `<div class="live-shot"><div class="who">All 20 shots in</div><div class="small muted">Check the strip below, then finish the scorecard.</div></div>`}
     ${card("a", shA, tA)}${duel ? card("b", shB, tB) : ""}
-    ${level ? `<div class="notice stack" style="gap:6px"><b>Scores are level.</b><span>Choose the winner (for example after a shoot-off):</span>
-      <label class="chk"><input type="radio" name="sw" value="a" ${md.win === "a" ? "checked" : ""}> ${name("a")}</label>
-      <label class="chk"><input type="radio" name="sw" value="b" ${md.win === "b" ? "checked" : ""}> ${name("b")}</label></div>` : ""}
+    ${tie}
     ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
     ${md.blocked ? overrideBox(md.blocked) : ""}
     <div class="row">${!nx ? `<button class="btn primary" data-act="shoot-save" data-final="1">Finish scorecard</button>` : ""}
@@ -1436,8 +1519,11 @@ function renderShootModal(t, m, el) {
   const who = side => `<b>${esc(sideName(t, side))}</b>`;
   const shA = md.shotsA ?? (duel ? m.shotsA : m.shots) ?? {}, shB = md.shotsB ?? m.shotsB ?? {};
   const tA = shotTotal(shA), tB = shotTotal(shB);
-  const level = duel && shotComplete(shA) && shotComplete(shB) && tA === tB;
-  if (md.live && !ro) { renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, level }); return; }
+  const both = duel && shotComplete(shA) && shotComplete(shB);
+  const level = both && !keyCmp(shootKey(t, shA), shootKey(t, shB));
+  const cb = both && tA === tB && !level ? `<div class="notice small"><b>Level on ${tA} pts.</b> <span>${esc(sideName(t, keyCmp(shootKey(t, shA), shootKey(t, shB)) < 0 ? m.a : m.b))}</span> <span>wins on count-back (more 5s, then more 3s).</span></div>` : "";
+  const tie = level ? soBlock(t, md, [{ key: "a", name: sideName(t, m.a) }, { key: "b", name: sideName(t, m.b) }], ro) : cb;
+  if (md.live && !ro) { renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, tie }); return; }
   el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Shooting scorecard">
     <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>Shooting scorecard</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
     <p class="small muted">${ro ? "Each shot scores 0, 1, 3 or 5. Maximum 100." : "Tap a shot, then tap its score. Each shot scores 0, 1, 3 or 5."}</p>
@@ -1446,9 +1532,7 @@ function renderShootModal(t, m, el) {
       ${(md.cell.side === "a" ? shA : shB)[md.cell.k]?.[md.cell.di] != null ? `<div><button type="button" class="btn sm ghost" data-act="cell-clear">Clear this shot</button></div>` : ""}</div>` : ""}
     <div class="stack" style="gap:6px"><div class="spread">${who(m.a)}<span class="pill ${shotComplete(shA) ? "done" : ""}">${tA} pts · ${shotCount(shA)}/20 shots</span></div>${shotGrid("a", shA, ro, md.cell)}</div>
     ${duel ? `<div class="stack" style="gap:6px"><div class="spread">${who(m.b)}<span class="pill ${shotComplete(shB) ? "done" : ""}">${tB} pts · ${shotCount(shB)}/20 shots</span></div>${shotGrid("b", shB, ro, md.cell)}</div>` : ""}
-    ${level && !ro ? `<div class="notice stack" style="gap:6px"><b>Scores are level.</b><span>Choose the winner (for example after a shoot-off):</span>
-      <label class="chk"><input type="radio" name="sw" value="a" ${md.win === "a" || (!md.win && m.win === "a") ? "checked" : ""}> ${esc(sideName(t, m.a))}</label>
-      <label class="chk"><input type="radio" name="sw" value="b" ${md.win === "b" || (!md.win && m.win === "b") ? "checked" : ""}> ${esc(sideName(t, m.b))}</label></div>` : ""}
+    ${tie}
     ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
     ${md.blocked ? overrideBox(md.blocked) : ""}
     ${ro ? "" : `<div class="row"><button class="btn primary" data-act="shoot-save" data-final="1">${m.done ? "Update scorecard" : "Save scorecard"}</button>${!m.done ? `<button class="btn" data-act="shoot-save">Save progress</button><button class="btn ghost" data-act="shoot-mode">Live scorer</button>` : ""}</div>`}
@@ -1459,7 +1543,6 @@ async function saveShooting(final) {
   const t = T(); const md = S.modal; const m = S.matches[md.id]; const duel = !!m.b; const wasDone = !!m.done;
   const shA = fullShots(md.shotsA), shB = duel ? fullShots(md.shotsB) : null;
   md.shotsA = shA; if (duel) md.shotsB = shB;
-  const win = document.querySelector('input[name="sw"]:checked')?.value || null;
   if (!final) {
     const patch = duel ? { shotsA: shA, shotsB: shB, sa: shotTotal(shA), sb: shotTotal(shB) } : { shots: shA, sa: shotTotal(shA) };
     Object.assign(S.matches[md.id], patch); await S.store.updateMatch(S.tid, md.id, patch);
@@ -1474,12 +1557,19 @@ async function saveShooting(final) {
     if (nxt) { openMatch(nxt.id); S.modal.saved = `Saved ${sideName(t, m.a)}: ${patch.sa} pts. Next up: ${sideName(t, nxt.a)}.`; renderModal(); return; }
     S.modal = null; renderModal(); toast("Scorecard saved."); return;
   }
-  const tA = shotTotal(shA), tB = shotTotal(shB);
-  if (tA === tB && !win) { md.err = "Scores are level. Choose the winner."; renderModal(); return; }
-  const res = await guard(() => recordResult(md.id, tA, tB, true, { win: tA === tB ? win : null, shots: { shotsA: shA, shotsB: shB }, override: !!md.override }));
+  const tA = shotTotal(shA), tB = shotTotal(shB); const kc = keyCmp(shootKey(t, shA), shootKey(t, shB));
+  let win = null; const shots = { shotsA: shA, shotsB: shB, soA: null, soB: null };
+  if (tA === tB) {
+    if (kc) win = kc < 0 ? "a" : "b";
+    else { const so = soResolve([{ id: "a", so: md.soVals.a }, { id: "b", so: md.soVals.b }], soAteliers(t).length);
+      if (so.open) { md.err = "Scores are level. Finish the shoot-out to decide the winner."; renderModal(); return; }
+      win = so.order[0].id; shots.soA = soClean(md.soVals.a); shots.soB = soClean(md.soVals.b); }
+  }
+  const res = await guard(() => recordResult(md.id, tA, tB, true, { win, shots, override: !!md.override }));
   if (res && res.blocked) { md.blocked = res.blocked; md.pending = { shoot: true }; renderModal(); return; }
   if (res) { S.modal = null; renderModal(); toast("Scorecard saved."); }
 }
+const soMark = r => r.tieN > 1 && soSum(r.so) ? ` <span class="pill">Shoot-out ${soSum(r.so)}</span>` : r.tieN > 1 && r.open ? ` <span class="pill playing">Level</span>` : "";
 function renderShooting(t) {
   const ms = MS(); const wr = canEdit(); const n = activeIds(t).length;
   const fmt = t.shootFormat || "ko8";
@@ -1494,16 +1584,21 @@ function renderShooting(t) {
     return `<section class="panel stack" style="gap:8px"><div class="spread"><h3>${title}</h3><span class="pill ${doneN === rows.length ? "done" : ""}">${doneN}/${rows.length} scorecards</span></div>
       ${up ? `<div class="spread notice"><span>Next up on the piste: <b>${esc(entName(t, up.id))}</b> <span class="small muted">(shooter ${up.m.order + 1} of ${rows.length})</span></span>${canScore() ? `<button class="btn primary sm" data-shoot="${up.m.id}">${shotCount(up.shots) ? "Continue" : "Score now"}</button>` : ""}</div>` : ""}
       <div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th></th></tr></thead><tbody>
-      ${rows.map((r, i) => `<tr class="${cut && r.done && i < cut ? "q" : ""}"><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${r.m.corrected ? ` <span class="pill">Corrected</span>` : ""}</td>
+      ${rows.map((r, i) => `<tr class="${cut && r.done && i < cut ? "q" : ""}"><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${r.m.corrected ? ` <span class="pill">Corrected</span>` : ""}${soMark(r)}</td>
         ${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
         <td class="n"><b>${shotCount(r.shots) ? r.total : "–"}</b></td>
         <td>${canScore() ? `<button class="btn sm" data-shoot="${r.m.id}">${r.done ? "View" : shotCount(r.shots) ? "Continue" : "Score"}</button>` : r.done ? `<span class="pill done">Done</span>` : shotCount(r.shots) ? `<span class="pill playing">Shooting</span>` : ""}</td></tr>`).join("")}
       </tbody></table></div></section>`;
   };
-  const qRows = shootRanking(t, "Q"); const qDone = qRows.length && qRows.every(r => r.done);
-  const hasNext = t.draws.some(d => d.id === "F" || d.id === "A");
+  const tieAlert = (ph, cut) => shootTies(t, ph, cut).map(g => `<div class="notice spread so-alert"><span><b>Shoot-out needed</b> · <span data-notr>${g.rows.map(r => esc(entName(t, r.id))).join(", ")}</span> · <span>${t.shootTie === "shootout" ? "Level on {n} pts.".replace("{n}", g.rows[0].total) : "Level on {n} pts with the same number of 5s and 3s.".replace("{n}", g.rows[0].total)}</span></span>
+    ${canScore() ? `<button class="btn primary sm" data-act="so-open" data-ph="${ph}" data-g="${g.start}">Score the shoot-out</button>` : ""}</div>`).join("");
+  const qRows = shootRanking(t, "Q"); const hasNext = t.draws.some(d => d.id === "F" || d.id === "A");
+  const qTies = !hasNext ? shootTies(t, "Q", shootCut(t)) : [];
+  const qDone = qRows.length && qRows.every(r => r.done) && !qTies.length;
+  if (qTies.length) html += tieAlert("Q", shootCut(t));
+  if (t.draws.some(d => d.id === "F")) html += tieAlert("F", 3);
   if (!hasNext && wr) html += `<div class="panel spread" ${qDone ? `style="border-color:var(--accent)"` : ""}><div><div class="eyebrow">Next</div><b>${fmt === "final" ? `Final for the top ${t.shootFinal || 4}` : `Knockout for the top ${fmt === "ko16" ? 16 : 8}`}</b></div>
-    ${qDone ? `<button class="btn primary" data-act="shoot-next">${fmt === "final" ? "Start the final" : "Draw the knockout"}</button>` : `<span class="pill">Available once every qualifying scorecard is finished</span>`}</div>`;
+    ${qDone ? `<button class="btn primary" data-act="shoot-next">${fmt === "final" ? "Start the final" : "Draw the knockout"}</button>` : `<span class="pill">${qTies.length ? "Available once the shoot-out is decided" : "Available once every qualifying scorecard is finished"}</span>`}</div>`;
   if (t.draws.some(d => d.id === "F")) html += table("F", "Final", 1);
   (t.brackets || []).forEach(b => html += renderBracket(t, b, ms));
   html += table("Q", "Qualifying round", fmt === "final" ? (t.shootFinal || 4) : fmt === "ko16" ? 16 : 8);
@@ -1516,8 +1611,8 @@ function shootStandings(t) {
   const q = shootRanking(t, "Q");
   if (!q.length) return html + `<div class="empty">Standings appear once the qualifying round starts.</div>`;
   return html + `<div class="panel"><div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
-    ${q.map((r, i) => `<tr><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b></td>${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</td>`).join("")}<td class="n"><b>${r.total}</b></td></tr>`).join("")}
-  </tbody></table></div></div><p class="small muted">Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack. Shooters on the same total are listed in entry order.</p>`;
+    ${q.map((r, i) => `<tr><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${soMark(r)}</td>${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</td>`).join("")}<td class="n"><b>${r.total}</b></td></tr>`).join("")}
+  </tbody></table></div></div><p class="small muted">Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.</p><p class="small muted">${t.shootTie === "shootout" ? "Shooters level on points go to a shoot-out." : "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out."}</p>`;
 }
 
 /* ---------------- archive ---------------- */
@@ -1553,12 +1648,13 @@ function toast(msg, undo) {
 function openMatch(id) {
   const m = S.matches[id]; if (!m || !m.a || (!m.b && m.stage !== "shoot")) return;
   S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: !!m.time, err: "", mode: m.done ? (m.time ? "time" : "full") : "quick", pad: null };
-  if (m.stage === "shoot" || m.shoot) { const duel = !!m.b; S.modal.live = !m.done && canScore(); S.modal.shotsA = fullShots(duel ? m.shotsA : m.shots); if (duel) S.modal.shotsB = fullShots(m.shotsB); }
+  if (m.stage === "shoot" || m.shoot) { const duel = !!m.b; S.modal.live = !m.done && canScore(); S.modal.shotsA = fullShots(duel ? m.shotsA : m.shots); if (duel) S.modal.shotsB = fullShots(m.shotsB); S.modal.soVals = duel ? { a: [...(m.soA || [])], b: [...(m.soB || [])] } : {}; }
   renderModal();
 }
 function renderModal() {
   const el = $("#modal"); const t = T();
   if (!S.modal || !t) { el.innerHTML = ""; return; }
+  if (S.modal.so) { renderSoModal(t, el); return; }
   const m = S.matches[S.modal.id]; if (!m) { S.modal = null; el.innerHTML = ""; return; }
   if (m.stage === "shoot" || m.shoot) { renderShootModal(t, m, el); return; }
   const ro = !canScore() && !S.modal.team;
@@ -1607,6 +1703,10 @@ async function modalAction(act, k, a) {
   const t = T(); const md = S.modal; if (!md) return;
   if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
+  if (act === "so-cell") { md.socell = { key: a.dataset.key, i: +a.dataset.i }; renderModal(); return; }
+  if (act === "so-pick") { const c = md.socell; if (!c) return; const arr = md.soVals[c.key] ||= [];
+    while (arr.length < c.i) arr.push(null); arr[c.i] = +a.dataset.v; md.err = ""; md.socell = soNextCell(t, md, soKeys(md), c); renderModal(); return; }
+  if (act === "so-save") { await guard(saveSoGroup); return; }
   if (act === "shoot-mode") { const m = S.matches[md.id]; const duel = !!m.b;
     md.live = !md.live; md.err = ""; if (!md.live) md.cell = nextCell(md, "a", null) || (duel ? nextCell(md, "b", null) : null); renderModal(); return; }
   if (act === "shot-cell") { md.cell = { side: a.dataset.side, k: a.dataset.k, di: +a.dataset.di }; renderModal(); return; }
@@ -1785,6 +1885,17 @@ function tiebreakPanel(t) {
       <div class="tb-row fixed"><span class="tb-n">${on.length + 2}</span><span class="tb-name"><b>Drawn lot</b><span class="small muted">Anything still level</span></span></div></div>
     <p class="small muted">Switch tie-breaks on or off and move them up or down. Changes apply straight away to the standings and to the next round's pairings.</p></div>`;
 }
+function shootTiePanel(t) {
+  const cb = t.shootTie !== "shootout", on = soAteliers(t).map(a => a[0]);
+  return `<div class="stack so-setup" style="gap:8px"><div class="eyebrow">Tie-break</div>
+    ${seg("shootTie", cb ? "countback" : "shootout", [["countback", "Count-back, then shoot-out"], ["shootout", "Straight to a shoot-out"]])}
+    <p class="small muted"><span>${cb ? "Shooters level on points are split by the most 5s, then the most 3s. Anyone still level has a shoot-out." : "Shooters level on points have a shoot-out."}</span> <span>Only ties that decide who qualifies, the podium or a knockout duel need one.</span></p>
+    <div class="small"><b>Shoot-out ateliers</b></div>
+    <div class="seg" role="group">${ATELIERS.map(([k, l]) => `<button type="button" data-act="so-at" data-k="${k}" aria-pressed="${on.includes(k)}" title="${l}">${k}</button>`).join("")}</div>
+    <div class="small"><b>Shoot-out distance</b></div>
+    ${seg("shootOutDist", soDist(t), DISTANCES.map(d => [d, d + " m"]))}
+    <p class="small muted">Each tied shooter takes one shot on every chosen atelier at this distance, and the highest total wins. Still level: shoot another round.</p></div>`;
+}
 /* setup */
 function seg(name, cur, opts, locked) { return `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-set="${name}" data-val="${v}" aria-pressed="${String(cur) === String(v)}" ${locked ? "disabled" : ""}>${l}</button>`).join("")}</div>`; }
 function renderSetup(t) {
@@ -1827,7 +1938,8 @@ function renderSetup(t) {
           <p class="small muted">Everyone shoots a qualifying scorecard. The top shooters then shoot a final scorecard, and the highest final score wins.</p>`
         : `<label class="chk"><input type="checkbox" data-check="koThird" ${t.koThird ? "checked" : ""} ${locked ? "disabled" : ""}> Third-place duel</label>
           <p class="small muted">Everyone shoots a qualifying scorecard. The top ${(t.shootFormat || "ko8") === "ko16" ? 16 : 8} go into a knockout (1st v ${(t.shootFormat || "ko8") === "ko16" ? 16 : 8}th, and so on). Each knockout game is a duel: both shooters shoot a full scorecard and the higher total goes through.</p>`}
-        <div class="stack" style="gap:8px"><div class="eyebrow">Shooting order</div>${seg("seeding", t.seeding, [["random", "Random draw"], ["entry", "Entry order"]], locked)}</div>`
+        <div class="stack" style="gap:8px"><div class="eyebrow">Shooting order</div>${seg("seeding", t.seeding, [["random", "Random draw"], ["entry", "Entry order"]], locked)}</div>
+        ${shootTiePanel(t)}`
       : isMelee(t) ? `<p class="muted">Mêlée competitions play a set number of rounds.</p>` :
       seg("system", t.system, [["swiss", "Swiss"], ["snake", "Snake"], ["pools", "Pools → KO"], ["knockout", "Knockout"], ["roundrobin", "Round robin"]], locked)}
       ${sys === "snake" ? `<label class="f"><span>Rounds</span><input type="number" min="1" max="15" id="f-snrounds" data-field="snakeRounds" data-num value="${t.snakeRounds || 5}" ${locked ? "disabled" : ""}></label>
@@ -2303,7 +2415,13 @@ document.addEventListener("click", async e => {
     case "check-accept": { const m = S.matches[a.dataset.id]; if (!m?.proposal) break; const p = m.proposal;
       const r = await guard(() => recordResult(m.id, p.sa, p.sb, true, { time: !!p.time })); if (r === true) { const np = { ...p, status: "applied", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(S.tid, m.id, { proposal: np }); await guard(assignCourts); toast("Result saved."); } render(); break; }
     case "undo-all": { for (const d of t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round)) await guard(() => undoDraw(d.id)); toast("Draw undone."); render(); break; }
-    case "shoot-next": await guard(() => addDraw((t.shootFormat || "ko8") === "final" ? drawShootFinal(t) : drawShootKnockout(t))); break;
+    case "so-open": { const g = shootTies(t, a.dataset.ph, a.dataset.ph === "F" ? 3 : shootCut(t)).find(g => g.start === +a.dataset.g); if (!g) break;
+      S.modal = { so: true, ph: a.dataset.ph, ids: g.rows.map(r => r.m.id), soVals: Object.fromEntries(g.rows.map(r => [r.m.id, [...(r.m.so || [])]])), err: "" };
+      S.modal.socell = soNextCell(t, S.modal, S.modal.ids, { key: S.modal.ids[S.modal.ids.length - 1], i: -1 }); renderModal(); break; }
+    case "so-at": { if (!canEdit()) break; const nt = clone(t); const on = (nt.shootOutAt?.length ? nt.shootOutAt : ATELIERS.map(a => a[0])).slice(); const k = a.dataset.k;
+      const nx = on.includes(k) ? on.filter(x => x !== k) : ATELIERS.map(a => a[0]).filter(x => on.includes(x) || x === k);
+      if (!nx.length) { toast("Keep at least one atelier in the shoot-out."); break; } nt.shootOutAt = nx; await guard(() => saveT(nt)); break; }
+    case "shoot-next": if (shootTies(t, "Q", shootCut(t)).length) { toast("Decide the shoot-out first."); break; } await guard(() => addDraw((t.shootFormat || "ko8") === "final" ? drawShootFinal(t) : drawShootKnockout(t))); break;
     case "archive": S.confirmArchive = true; render(); break;
     case "archive-no": S.confirmArchive = false; render(); break;
     case "archive-yes": S.confirmArchive = false; await archiveCompetition(true); break;
