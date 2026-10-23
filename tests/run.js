@@ -74,6 +74,8 @@ const SUITES = {
       /triples: triples boxes 3/, /links: s\.\S+\.stream \| desk href s\.\S+\.desk/, /more links: 5/, /desk: true \| Club friendly · Piste 3 \| Les Carreaux v Boule d'Or \| to to 11 \| boules Boule thrown · 6 left \/ Boule thrown · 6 left/,
       /end: 4-0 ends 1 \| shown 4-0/, /players: Marc Dupont, Sophie Martin, Pierre Lefèvre, Aline Rossi/, /overlay: true Les Carreaux v Boule d'Or 4-0 end 2 \| line: Club friendly · Piste 3Lefèvre shoot 1\/1 · 1 carreau \| card CarreauPierre Lefèvre/,
       /capped at 11: 6/, /finish: Finish game · 11–1 true/, /over: true \| notice Game over: 11–1\.New game \| new game button true/, /new game: 0-0 done false layout kept \{"l":\{"line":\[50,10\]\}\}/, /list: Les Carreaux v Boule d'Or/, /deleted: true #streams/, /errs \[\]/],
+    'app-draw-table.js': [/swiss before results: Table/, /swiss draw: #,Team,W,L,Buch,\+\/- \| \+\/- visible true \| Team \w \+9 \/ Team \w \+6 \/ Team \w -6 \/ Team \w -9/, /swiss matches standings: true/, /full standings button: true/,
+      /rr draw: #,Team,W,L,For,Agst,\+\/- \| \+\/- visible true \| Team \w \+2 \/ Team \w 0 \/ Team \w 0 \/ Team \w -2/, /barrage: extra table false \| pool tables 1/, /errs \[\]/],
     'app-round-status.js': [/round 1 drawn: live red true \| 2 games still to finish \| Draw round 2\|disabled/, /one score in: live red true \| 1 game still to finish \| Draw round 2\|disabled/,
       /french: 1 partie à terminer \| Tirer la partie 2\|disabled/, /all scores in: ready green true \| Round finished \| Draw round 2\|enabled/,
       /round 2 drawn: live \| 2 games still to finish \| Draw round 3\|disabled/, /last planned round finished: ready \| Morning complete \| Draw round 3\|enabled/, /errs \[\]/],
