@@ -22,7 +22,7 @@ const { chromium } = require('playwright');
   log('offline light:', await dot(A));
   const mid = await A.evaluate(() => window.__carreau.MS().find(m => m.a && m.b && !m.bye).id);
   await A.click('[data-tab="draw"]'); await w(300); await A.click(`[data-match="${mid}"]`); await w(300);
-  const t0 = Date.now(); await A.click('[data-act="qwin"][data-side="a"]'); await w(100); await A.click('[data-act="qlose"][data-k="sb"][data-n="5"]');
+  const t0 = Date.now(); await A.click('[data-act="qlose"][data-k="sb"][data-n="5"]');
   await A.waitForFunction(() => !window.__carreau.S.modal, null, { timeout: 5000 }).catch(() => {});
   log('offline save closes at once:', Date.now() - t0 < 2500, '| score shown:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb; }, mid));
   log('waiting light:', await dot(A));

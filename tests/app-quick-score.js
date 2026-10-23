@@ -12,11 +12,10 @@ const { chromium } = require('playwright');
     q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300);
     const games = C.MS().filter(m => m.a && m.b && !m.bye);
     const open = async id => { q('[data-tab="draw"]').click(); await w(40); q(`[data-match="${id}"]`).click(); await w(60); };
-    // 1. quick: two taps
+    // 1. quick: one tap on the loser's score
     await open(games[0].id);
-    L.push('quick by default: ' + !!q('[data-act="qwin"]') + ' | no score boxes: ' + !q('#sc-sa'));
-    q('[data-act="qwin"][data-side="b"]').click(); await w(40);
-    L.push('loser pad buttons: ' + document.querySelectorAll('[data-act="qlose"]').length);
+    L.push('quick by default: ' + !!q('.quick [data-act="qlose"]') + ' | no score boxes: ' + !q('#sc-sa') + ' | no who-won step: ' + !q('[data-act="qwin"]'));
+    L.push('loser pad buttons: ' + document.querySelectorAll('[data-act="qlose"][data-k="sa"]').length + '+' + document.querySelectorAll('[data-act="qlose"][data-k="sb"]').length + ' | teams ' + [...document.querySelectorAll('.qteam .qwho')].map(x => x.textContent.trim()).join(' / ') + ' | ' + q('#modal .quick .small.muted').textContent);
     q('[data-act="qlose"][data-k="sa"][data-n="6"]').click(); await w(200);
     let m = S.matches[games[0].id]; L.push(`saved: ${m.done} ${m.sa}-${m.sb} modal closed ${!S.modal} | undo shown ${!!q('#toast:not([hidden]) [data-act="toast-undo"]')}`);
     // 2. undo

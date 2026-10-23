@@ -15,7 +15,7 @@ const { chromium } = require('playwright');
     const cards = document.querySelectorAll('.fixture button.match[data-match]'); L.push('score buttons: ' + cards.length);
     // enter a score the way an organiser does: tap the game, tap the winner, tap the loser's score
     const m = ms.find(x => x.round === 1); q(`[data-match="${m.id}"]`).click(); await w(300);
-    q('[data-act="qwin"][data-side="a"]').click(); await w(150); q('[data-act="qlose"][data-n="7"]')?.click(); await w(1500);
+    q('[data-act="qlose"][data-k="sb"][data-n="7"]').click(); await w(1500);
     const m2 = C.MS().find(x => x.id === m.id); L.push(`scored: done ${m2.done} ${m2.sa}-${m2.sb} | fixture ${q('.fixture .fx').innerText.replace(/\s+/g, ' ')}`);
     // the organiser moves the day-2 fixture to day 3
     const f2 = C.T().clubFix.find(f => f.day === 2); q(`[data-act="fx-day"][data-fx="${f2.id}"][data-day="3"]`).click(); await w(2000);
