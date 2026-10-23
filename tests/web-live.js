@@ -5,6 +5,9 @@ const { chromium } = require('playwright');
   const mk = async (n, vw = 1100, vh = 900) => { const c = await b.newContext({ viewport: { width: vw, height: vh } }); await c.addInitScript(() => { window.__CARREAU_EMULATOR = true; }); const p = await c.newPage(); p.on('pageerror', e => errs.push(n + ': ' + e.message)); return p; };
   const w = ms => new Promise(r => setTimeout(r, ms)); const log = (...a) => console.log(...a);
   const has = (p, sel) => p.evaluate(s => !!document.querySelector(s), sel);
+  const AD = await mk('admin'); await AD.goto(base + '#admin'); await w(3000);
+  await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
+  await AD.evaluate(() => window.__testSetSite({ streaming: true })); await w(1500); // streaming is off by default
   const A = await mk('organiser'); await A.goto(base); await w(3500);
   await A.click('[data-act="new-t"]'); await w(2500);
   const tid = await A.evaluate(() => location.hash.slice(1));
@@ -12,12 +15,10 @@ const { chromium } = require('playwright');
   await A.click('[data-act="checkin-all"]'); await w(800);
   await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="first-draw"]'); await w(2500);
   const g = await A.evaluate(() => window.__carreau.MS().filter(m => m.a && m.b).sort((x, y) => x.order - y.order)[0].id);
-  await A.click('[data-tab="setup"]'); await w(2500); // the stream code is created the first time Setup opens
+  await A.click('[data-tab="setup"]'); await w(1500); await A.click('[data-tab="stream"]'); await w(2000); // the stream code is created the first time Setup opens
   await A.click(`[data-act="lv-links"][data-id="${g}"]`); await w(500);
   const links = await A.evaluate(() => Object.fromEntries([...document.querySelectorAll('.lv-links input')].map(i => [i.getAttribute('aria-label'), i.value])));
   log('streaming panel:', await has(A, '#stream-panel'), '| desk link has code:', /\.desk\.[^.]+\.[A-Z2-9]{8}$/.test(links['Live desk link']), '| overlay link:', /\.stream\./.test(links['Overlay (everything)']));
-  const AD = await mk('admin'); await AD.goto(base + '#admin'); await w(3000);
-  await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
   await AD.click('[data-act="open-testing"]'); await w(2500); // strict mode: the rules decide who can write
   // a spectator's phone loads the overlay: transparent page, score bar, no account needed; it can't write the live doc
   const V = await mk('viewer', 1280, 720); await V.goto(links['Overlay (everything)']); await w(4000);
@@ -39,6 +40,6 @@ const { chromium } = require('playwright');
   log('organiser finish:', await A.textContent('[data-act="lv-finish"]'));
   await A.click('[data-act="lv-finish"]'); await w(3000);
   log('result:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return `${m.done} ${m.sa}-${m.sb}`; }, g), '| overlay final:', await V.evaluate(() => document.querySelector('.ov-lbl').textContent + ' ' + [...document.querySelectorAll('.ov-score')].map(e => e.textContent).join('-')));
-  await AD.click('[data-act="open-testing"]'); await w(1500); // back to the beta default
+  await AD.click('[data-act="open-testing"]'); await w(1000); await AD.evaluate(() => window.__testSetSite({ streaming: false })); await w(1000); // back to the defaults
   log('errs', errs); await b.close();
 })();

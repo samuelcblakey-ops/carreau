@@ -15,7 +15,7 @@ const { chromium } = require('playwright');
     await S.store.setMatch(t.id, Object.assign(gs[0], { a: ['A'], b: ['B'] })); await S.store.setMatch(t.id, Object.assign(gs[1], { a: ['C'], b: ['D'] })); await w(60);
     const g = S.matches[gs[0].id];
     // 1. Setup shows the streaming panel with links for the game
-    q('[data-tab="setup"]').click(); await w(60);
+    q('[data-tab="stream"]').click(); await w(60);
     L.push('setup panel: ' + !!q('#stream-panel') + ' | desk link: ' + q('#stream-panel a.btn')?.getAttribute('href').endsWith(`#${t.id}.desk.${g.id}`));
     q(`[data-act="lv-links"][data-id="${g.id}"]`).click(); await w(60);
     L.push('overlay links: ' + qa('.lv-links input').map(i => i.value.split('#')[1]).join(' '));
