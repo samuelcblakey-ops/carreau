@@ -39,13 +39,15 @@ html = f"""<!doctype html>
 <meta name="apple-mobile-web-app-title" content="SN Pétanque">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 {reset}
-{head_part.replace('<meta name="claude:viewport-fit-sides" content="cover">', '')}
+{head_part.replace('<meta name="claude:viewport-fit-sides" content="cover">', '').replace('<meta charset="utf-8">', '', 1)}
 </head>
 <body>
 {body_part}
 </body>
 </html>
 """
+# the page may only declare its character set once (a W3C validation error otherwise)
+assert html.lower().count("<meta charset") == 1, "dist/index.html must have exactly one <meta charset>"
 out = os.path.join(root, "dist")
 os.makedirs(out, exist_ok=True)
 open(os.path.join(out, "index.html"), "w").write(html)
