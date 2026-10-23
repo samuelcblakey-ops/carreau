@@ -86,6 +86,8 @@ const SUITES = {
       /rotation: days 3 \| fixtures\/day 2,2,2 \| games 54 \| labels Game 1,Game 2,Game 3 \| each meets each: true \| game headings 18/, /game 1 like for like: true \| own club never: true/,
       /all: days 1 \| games 9 \| labels true \| headings 0/, /french: Suisse,Serpent,Poules → tableau,Ligues,Inter-clubs,Élimination directe,Tous contre tous \| Numéro contre numéro,Rotation,Chacun rencontre tout le monde/,
       /french day: Journée 1 \| INTER-CLUBS/, /wizard saved: clubs 4/, /errs \[\]/],
+    'app-mini-league.js': [/round robin: A\(\+5\) C\(\+5\) B\(\+5\) D\(-15\)/, /note: true/, /still level: lot order stable true \| D last true/, /two-way: A\(\+6\) B\(\+6\)/,
+      /barrage: A\(\+5\) C\(\+5\) B\(\+5\) D\(-15\)/, /league: A\(\+5\) C\(\+5\) B\(\+5\) D\(-15\)/, /errs \[\]/],
     'app-round-status.js': [/round 1 drawn: live red true \| 2 games still to finish \| Draw round 2\|disabled/, /one score in: live red true \| 1 game still to finish \| Draw round 2\|disabled/,
       /french: 1 partie à terminer \| Tirer la partie 2\|disabled/, /all scores in: ready green true \| Round finished \| Draw round 2\|enabled/,
       /round 2 drawn: live \| 2 games still to finish \| Draw round 3\|disabled/, /last planned round finished: ready \| Morning complete \| Draw round 3\|enabled/, /errs \[\]/],
