@@ -124,6 +124,8 @@ const SUITES = {
     'web-streams.js': [/admin switch default off: true/, /off: stream tab open to all: true \| competition games hidden: true \| no big screen tab: true/, /off: live write denied: permission-denied/, /admin only: organiser still hidden: true/,
       /everyone: competition games shown: true/, /stream links: true true/, /viewer overlay: Les Carreaux v Boule d'Or 0-0/, /viewer write: permission-denied/, /helper joined: #s\.\S+\.desk can true/, /helper end: 3-0 ends 1/, /helper rename denied: permission-denied/,
       /overlay follows: 3-0 \| Club friendly/, /owner list: Les Carreaux v Boule d'Or/, /off again: standalone still live: 3-2 \| competition live write: permission-denied/, /errs \[\]/],
+    'web-clubs.js': [/saved: games 12 \| days 3 \| toast Club days drawn\./, /score buttons: 12/, /scored: done true 13-7 \| fixture \w+ 1 – 0 \w+/,
+      /after reload: games 12 \| done 1 \| days 3/, /errs \[\]/],
     'web-offline.js': [/online light: live Live/, /offline light: off Offline/, /offline save closes at once: true \| score shown: true 13-5/, /waiting light: off Offline · \d+ waiting to sync/,
       /offline reopen: New competition \| score kept: true 13-5/, /back online light: live Live/, /other device sees it: true 13-5/, /errs \[\]/],
     'web-open-testing.js': [
