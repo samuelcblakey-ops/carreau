@@ -77,11 +77,15 @@ function fbStore() {
       const s = await getDocs(collection(db, "tournaments", tid, "matches"));
       for (const d of s.docs) await deleteDoc(d.ref);
       try { const l = await getDocs(collection(db, "tournaments", tid, "live")); for (const d of l.docs) await deleteDoc(d.ref); } catch {}
+      try { await deleteDoc(doc(db, "tournaments", tid, "brand", "logo")); } catch {}
       try { await deleteDoc(doc(db, "tournaments", tid, "private", "codes")); } catch {}
       try { await deleteDoc(doc(db, "tournaments", tid, "private", "livecode")); } catch {}
       await deleteDoc(doc(db, "tournaments", tid));
     },
     watchLive(tid, mid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "live", mid), d => cb(d.exists() ? d.data() : null), onErr); },
+    // club logo: its own small document so the competition document stays light
+    watchBrand(tid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "brand", "logo"), d => cb(d.exists() ? d.data() : null), onErr); },
+    setBrand(tid, b) { const ref = doc(db, "tournaments", tid, "brand", "logo"); return track(b ? setDoc(ref, b) : deleteDoc(ref)); },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },
