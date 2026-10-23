@@ -102,6 +102,16 @@ service cloud.firestore {
         allow delete: if (canEdit(tid) && notArchived(tid)) || isAdmin();
       }
 
+      // club logo (a small image stored as a data URL), shown to everyone following the competition
+      match /brand/{docId} {
+        allow read: if docId == 'logo' && (notArchived(tid) || isAdmin());
+        allow delete: if docId == 'logo' && ((canEdit(tid) && notArchived(tid)) || isAdmin());
+        allow create, update: if docId == 'logo' && ((canEdit(tid) && notArchived(tid)) || isAdmin())
+          && request.resource.data.keys().hasOnly(['logo', 'at'])
+          && request.resource.data.logo is string && request.resource.data.logo.size() < 150000
+          && request.resource.data.logo.matches('data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+');
+      }
+
       // live streaming feed, one doc per streamed game (only while streaming is switched on for the site)
       match /live/{mid} {
         allow read: if notArchived(tid) || isAdmin();
