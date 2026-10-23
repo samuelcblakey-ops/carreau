@@ -54,6 +54,13 @@ service cloud.firestore {
              && p.status in ['confirmed', 'disputed'] && p.confirmedBy == me));
     }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
+    // overlays for competition games are a site switch: off, admin only, or everyone (config/site.streaming);
+    // standalone streams (the Stream tab) are open to everyone
+    function streamingOn() { return exists(cfg()) && (get(cfg()).data.get('streaming', false) == true
+                               || (get(cfg()).data.get('streaming', false) == 'admin' && isAdmin())); }
+    function sRole(sid) { return signedIn() && exists(/databases/$(database)/documents/streams/$(sid)/members/$(request.auth.uid))
+                               ? get(/databases/$(database)/documents/streams/$(sid)/members/$(request.auth.uid)).data.role : ''; }
+    function ownsStream(sid) { return signedIn() && get(/databases/$(database)/documents/streams/$(sid)).data.ownerUid == request.auth.uid; }
 
     // config/site is public (open testing switch); config/creators holds the admin's private nicknames for creators
     match /config/{docId} {
@@ -95,10 +102,33 @@ service cloud.firestore {
         allow delete: if (canEdit(tid) && notArchived(tid)) || isAdmin();
       }
 
-      // live streaming feed, one doc per streamed game
+      // live streaming feed, one doc per streamed game (only while streaming is switched on for the site)
       match /live/{mid} {
         allow read: if notArchived(tid) || isAdmin();
-        allow write: if ((canScore(tid) || role(tid) == 'live') && notArchived(tid)) || isAdmin();
+        allow write: if streamingOn() && (((canScore(tid) || role(tid) == 'live') && notArchived(tid)) || isAdmin());
+      }
+    }
+
+    // standalone streams (Stream tab): any game, in a competition or not. Anyone can read (the overlay needs no account);
+    // the device that created it runs it; a phone with the desk code (role 'live') may only change the live score.
+    match /streams/{sid} {
+      allow get: if true;
+      allow list: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if request.resource.data.ownerUid == resource.data.ownerUid
+                    && (ownsStream(sid) || isAdmin()
+                        || (sRole(sid) == 'live' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['live', 'updated'])));
+      allow delete: if ownsStream(sid) || isAdmin();
+      match /private/{docId} {
+        allow read, write: if docId == 'code' && (ownsStream(sid) || isAdmin());
+      }
+      match /members/{uid} {
+        allow read: if signedIn() && (request.auth.uid == uid || ownsStream(sid) || isAdmin());
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['role', 'code', 'joinedAt']) && request.resource.data.role == 'live'
+          && request.resource.data.code is string && request.resource.data.code.size() > 0
+          && request.resource.data.code == get(/databases/$(database)/documents/streams/$(sid)/private/code).data.get('code', '#');
+        allow delete: if signedIn() && (request.auth.uid == uid || ownsStream(sid) || isAdmin());
       }
     }
   }
