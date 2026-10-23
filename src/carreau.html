@@ -1243,16 +1243,18 @@ function createBracket(t, bid, name, entrants, opts = {}) {
   }
   const slots = [];
   for (let i = 0; i < size / 2; i++) { const sa = order[2 * i], sb = order[2 * i + 1]; slots.push([sa <= n ? entrants[sa - 1] : null, sb <= n ? entrants[sb - 1] : null]); }
-  // keep teams from the same pool apart in the first round where possible
+  // keep teams from the same barrage/league apart in the first round where possible: a clashing game swaps its lower
+  // seed for the nearest-ranked lower seed from another game, top seeds first, so 1 v 8, 2 v 7… is kept wherever it can be
   if (opts.groupOf) {
-    const g = opts.groupOf, clash = s => s[0] && s[1] && g(s[0]) === g(s[1]);
-    slots.forEach((si, i) => {
-      if (!clash(si)) return;
-      for (let d = 1; d < slots.length; d++) {
-        const j = (i + d) % slots.length, sj = slots[j];
-        if (!sj[1] || !sj[0]) continue;
-        if (g(si[0]) !== g(sj[1]) && g(sj[0]) !== g(si[1])) { [si[1], sj[1]] = [sj[1], si[1]]; break; }
-      }
+    const g = opts.groupOf, clash = s => s[0] && s[1] && g(s[0]) === g(s[1]); const seedOf = id => entrants.indexOf(id);
+    const done = new Set();
+    slots.map((s, i) => i).sort((a, b) => seedOf(slots[a][0]) - seedOf(slots[b][0])).forEach(i => {
+      const si = slots[i]; done.add(i); if (!clash(si)) return;
+      const near = (x, y) => Math.abs(seedOf(x[1]) - seedOf(si[1])) - Math.abs(seedOf(y[1]) - seedOf(si[1]));
+      const ok = (sj, j) => j !== i && sj[0] && sj[1];
+      // games already settled for a higher seed are only touched if nothing else works
+      const cands = [...slots.filter((sj, j) => ok(sj, j) && !done.has(j)).sort(near), ...slots.filter((sj, j) => ok(sj, j) && done.has(j)).sort(near)];
+      for (const sj of cands) if (g(si[0]) !== g(sj[1]) && g(sj[0]) !== g(si[1])) { [si[1], sj[1]] = [sj[1], si[1]]; break; }
     });
   }
   if (opts.third && R >= 2 && n >= 4) {
