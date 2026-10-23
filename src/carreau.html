@@ -1243,7 +1243,7 @@ function drawClubs(t) {
     for (let i = 0; i < n / 2; i++) {
       const A = arr[i], B = arr[n - 1 - i];
       if (!A || !B) { restClub = A || B; continue; }
-      fixtures.push([A, B]);
+      fixtures.push({ a: A, b: B }); // Firestore can't store a list inside a list
       const a = clubs.find(c => c.id === A).teams, b = clubs.find(c => c.id === B).teams;
       const add = (i, j, g, order) => out.push(mkMatch({ id: `CL-d${d + 1}-${A}v${B}-g${g}-m${order + 1}`, stage: "club", group: "CL", round: d + 1, order, a: [a[i]], b: [b[j]], ca: A, cb: B, game: g, label: pat === "rotation" ? `Game ${g}` : "" }));
       if (pat === "like") for (let i = 0; i < N; i++) add(i, i, 1, i);
@@ -2739,7 +2739,7 @@ function renderDraw(t) {
       const dm = cm.filter(m => m.round === dy.day); const dDone = dm.length > 0 && dm.every(m => m.done);
       html += `<section class="stack" style="gap:10px"><div class="spread"><h3>Day ${dy.day}</h3><span class="pill ${dDone ? "done" : dy.day === curDay ? "playing" : ""}">${dDone ? "Finished" : dy.day === curDay ? `${dm.filter(m => m.done).length}/${dm.length} games` : "Pistes once the day before is finished"}</span></div>
         ${dy.rest ? `<p class="small muted"><b>${esc(clubName(t, dy.rest))}</b> <span>rests today.</span></p>` : ""}
-        ${dy.fixtures.map(([A, B]) => { const fm = dm.filter(m => m.ca === A && m.cb === B).sort(byOrder); const wa = fm.filter(m => m.done && aWon(m)).length, wb = fm.filter(m => m.done && !aWon(m)).length;
+        ${dy.fixtures.map(f => { const [A, B] = Array.isArray(f) ? f : [f.a, f.b]; const fm = dm.filter(m => m.ca === A && m.cb === B).sort(byOrder); const wa = fm.filter(m => m.done && aWon(m)).length, wb = fm.filter(m => m.done && !aWon(m)).length;
           const games = [...new Set(fm.map(m => m.game))].sort((x, y) => x - y);
           return `<div class="panel stack fixture" style="gap:10px"><div class="spread"><span class="fx"><b>${esc(clubName(t, A))}</b> <span class="fx-score">${wa} – ${wb}</span> <b>${esc(clubName(t, B))}</b></span><span class="small muted">${fm.filter(m => m.done).length}/${fm.length} games</span></div>
             ${games.map(g => `${pat === "rotation" ? `<div class="eyebrow">Game ${g}</div>` : ""}<div class="mlist">${fm.filter(m => m.game === g).map(m => matchCard(t, m)).join("")}</div>`).join("")}</div>`; }).join("")}

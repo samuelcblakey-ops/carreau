@@ -29,7 +29,7 @@ const { chromium } = require('playwright');
     q('[data-act="first-draw"]').click(); await w(250);
     const t = C.T(); const ms = C.MS();
     L.push('drawn: clubs ' + t.clubs.map(c => c.name).join(',') + ' | days ' + t.clubSched.length + ' | games ' + ms.length + ' | rests ' + t.clubSched.map(d => d.rest ? t.clubs.find(c => c.id === d.rest).name : '-').join(','));
-    L.push('fixtures: ' + t.clubSched.map(d => d.fixtures.map(([A, B]) => C.T().clubs.find(c => c.id === A).name[0] + 'v' + C.T().clubs.find(c => c.id === B).name[0]).join('+')).join(' | '));
+    L.push('fixtures: ' + t.clubSched.map(d => d.fixtures.map(({ a: A, b: B }) => C.T().clubs.find(c => c.id === A).name[0] + 'v' + C.T().clubs.find(c => c.id === B).name[0]).join('+')).join(' | '));
     L.push('own club never: ' + ms.every(m => C.T().teams.find(x => x.id === m.a[0]).club !== C.T().teams.find(x => x.id === m.b[0]).club) + ' | like for like: ' + ms.every(m => m.a[0].slice(-1) === m.b[0].slice(-1)));
     L.push('pistes day 1 only: ' + (ms.filter(m => m.court).map(m => m.round).join(',')) + ' | page: ' + txt(q('main .rp-live')).slice(0, 60));
     L.push('day pills: ' + qa('main section h3 + .pill').map(x => x.textContent).join(' / ') + ' | fixture: ' + txt(q('.fixture .fx')));
