@@ -177,21 +177,25 @@ tr.q td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .bk-col.out .bk-pair::after{content:"";position:absolute;right:calc(var(--gap) / -2);top:25%;bottom:25%;border-right:2px solid var(--wire)}
 .bk-col.in .bk-slot::before{content:"";position:absolute;left:calc(var(--gap) / -2);width:calc(var(--gap) / 2);top:50%;border-top:2px solid var(--wire)}
 .bk-col.out .bk-slot.done::after{border-color:var(--accent)}
-.bkm{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;text-align:left;padding:0;cursor:pointer;font-size:14px}
+.bkm{display:flex;flex-direction:column;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:8px;text-align:left;padding:0;cursor:pointer;font-size:14px}
 .bkm.ro{cursor:default}
 button.bkm:hover{border-color:var(--muted)}
-.bkm.playing{border-color:var(--jack);box-shadow:inset 3px 0 0 var(--jack)}
-.bkm.bye{opacity:.6;background:var(--surface-2);border-style:dashed}
-.bkm-row{display:flex;align-items:center;gap:8px;padding:6px 10px;min-height:34px}
+/* status by colour, never by extra height: grey not started, red playing, green finished */
+.bkm.playing{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger)}
+.bkm.done{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.bkm-pst{position:absolute;top:-8px;right:8px;font-size:10px;line-height:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:6px;background:var(--danger);color:#fff;white-space:nowrap;pointer-events:none}
+.bk-key{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-right:auto;font-size:12px;color:var(--muted)}
+.bk-key span{display:inline-flex;align-items:center;gap:5px}.bk-key i{width:14px;height:10px;border-radius:3px;border:2px solid var(--line);display:inline-block}
+.bk-key i.playing{border-color:var(--danger)}.bk-key i.done{border-color:var(--accent)}
+.bkm.bye{opacity:.6;background:var(--surface-2);border-style:dashed;border-color:var(--line);box-shadow:none}
+.bkm-row{display:flex;align-items:center;gap:8px;padding:0 10px;height:34px;line-height:20px} /* fixed height: a score never makes a game taller */
 .bkm-row+.bkm-row{border-top:1px solid var(--line)}
 .bkm-row .sd{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:1.6ch;text-align:right}
 .bkm-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bkm-row .sc{font-family:var(--display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.bkm-row .sc{font-family:var(--display);font-weight:700;font-size:18px;line-height:20px;font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
 .bkm-row.win .nm{font-weight:700}.bkm-row.win .sc{color:var(--accent)}
 .bkm-row.lose .nm,.bkm-row.lose .sc{color:var(--muted)}
 .bkm-row .tbd{font-size:13px}
-.bkm-foot{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;background:var(--surface-2);color:var(--muted);border-top:1px solid var(--line)}
-.bkm.playing .bkm-foot{background:var(--jack-soft);color:var(--jack-ink)}
 .bk-champ{border:2px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px}
 .bk-champ b{font-family:var(--display);font-size:22px;line-height:1.1;overflow-wrap:anywhere}
 .bk-champ.tbc{border-style:dashed;border-color:var(--wire);background:none}
@@ -2917,12 +2921,14 @@ function bkCard(t, b, m) {
     const showSc = !m.bye && (st === "done" || st === "playing") && sc !== null && sc !== undefined;
     return `<div class="bkm-row ${cls}"><span class="sd">${sd || ""}</span><span class="nm">${ids ? esc(sideName(t, ids)) : `<span class="tbd muted">${feeder(side)}</span>`}</span><span class="sc">${showSc ? sc : ""}</span></div>`;
   };
-  const foot = m.corrected && st === "done" ? "Corrected" : m.bye ? "Bye" : st === "playing" ? `Piste ${esc(courtName(t, m.court))} · playing` : st === "ready" ? "Waiting for a piste" : "";
+  // status is shown by the border colour (no footer, so every game is the same height and the lines meet its middle);
+  // the piste sits on the top edge of a game in play, and the rest goes in the tooltip
+  const tip = m.corrected && st === "done" ? "Corrected" : m.bye ? "Bye" : st === "playing" ? `Piste ${courtName(t, m.court)} · playing` : st === "ready" ? "Waiting for a piste" : st === "done" ? "Finished" : "";
   const tag = ro ? "div" : "button";
-  return `<${tag} class="bkm ${st} ${m.bye ? "bye" : ""} ${ro ? "ro" : ""}" ${ro ? "" : `type="button" data-match="${m.id}"`} aria-label="${esc(matchContext(t, m))}">
+  return `<${tag} class="bkm ${st} ${m.bye ? "bye" : ""} ${ro ? "ro" : ""}" ${ro ? "" : `type="button" data-match="${m.id}"`} aria-label="${esc(matchContext(t, m))}${tip ? " · " + esc(tip) : ""}" ${tip ? `title="${esc(tip)}"` : ""}>
+    ${st === "playing" && m.court ? `<span class="bkm-pst">Piste ${esc(courtName(t, m.court))}</span>` : ""}
     ${row("a", m.sa, m.done && m.b ? (aw ? "win" : "lose") : m.bye ? "win" : "")}
     ${m.bye ? "" : row("b", m.sb, m.done && m.b ? (aw ? "lose" : "win") : "")}
-    ${foot ? `<div class="bkm-foot">${foot}</div>` : ""}
   </${tag}>`;
 }
 // bracket zoom: "fit" (default) shrinks a wide bracket to the screen width, never enlarges it
@@ -2958,7 +2964,7 @@ function bracketGrid(t, b, ms) {
   cols += `<div class="bk-col in" style="grid-column:${b.rounds + 1}"><div class="bk-slot"><div class="bk-champ ${champ ? "" : "tbc"}"><span class="eyebrow">${champ ? "Champion" : "To be decided"}</span><b>${champ ? esc(champ) : "—"}</b></div></div></div>`;
   const tp = bm.find(m => m.third);
   const z = bkZoomFor(b);
-  return `<div class="bk-tools"><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="out" aria-label="Zoom out">−</button><span class="zv">${Math.round(z * 100)}%</span><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="in" aria-label="Zoom in">+</button><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="fit">Fit</button><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="1">100%</button></div>
+  return `<div class="bk-tools"><span class="bk-key" aria-hidden="true"><span><i></i>Not started</span><span><i class="playing"></i>Playing</span><span><i class="done"></i>Finished</span></span><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="out" aria-label="Zoom out">−</button><span class="zv">${Math.round(z * 100)}%</span><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="in" aria-label="Zoom in">+</button><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="fit">Fit</button><button type="button" class="btn sm" data-act="bk-zoom" data-b="${b.id}" data-z="1">100%</button></div>
     <div class="bk-scroll" data-scroll-key="bk-${b.id}"><div class="bk" data-bk="${b.id}" style="zoom:${z}">${heads}${cols}</div></div>
     ${tp ? `<div class="bk-third"><div class="stack" style="gap:6px"><h4>Third place</h4>${bkCard(t, b, tp)}</div></div>` : ""}`;
 }
