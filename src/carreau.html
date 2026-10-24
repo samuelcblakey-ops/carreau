@@ -767,6 +767,13 @@ Object.assign(LANG_TEXT.de, {"Tap the losing team's score. The winner gets {n} a
 Object.assign(LANG_TEXT.nl, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Tik op de score van het verliezende team. De winnaar krijgt {1} en het wordt meteen opgeslagen.", "Score if they lost": "Score als ze verloren"});
 Object.assign(LANG_TEXT.pt, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Toque no resultado da equipa que perdeu. O vencedor fica com {1} e fica guardado de imediato.", "Score if they lost": "Resultado se perderam"});
 Object.assign(LANG_TEXT.th, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "แตะคะแนนของทีมที่แพ้ ผู้ชนะได้ {1} และบันทึกทันที", "Score if they lost": "คะแนนถ้าแพ้"});
+Object.assign(FR_TEXT, {"All rights reserved": "Tous droits réservés"});
+Object.assign(LANG_TEXT.es, {"All rights reserved": "Todos los derechos reservados"});
+Object.assign(LANG_TEXT.it, {"All rights reserved": "Tutti i diritti riservati"});
+Object.assign(LANG_TEXT.de, {"All rights reserved": "Alle Rechte vorbehalten"});
+Object.assign(LANG_TEXT.nl, {"All rights reserved": "Alle rechten voorbehouden"});
+Object.assign(LANG_TEXT.pt, {"All rights reserved": "Todos os direitos reservados"});
+Object.assign(LANG_TEXT.th, {"All rights reserved": "สงวนลิขสิทธิ์"});
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
 const LOCALES = { en: undefined, fr: "fr-FR", es: "es-ES", it: "it-IT", de: "de-DE", nl: "nl-NL", pt: "pt-PT", th: "th-TH" };
 // live streaming: overlay and live desk
@@ -2523,7 +2530,7 @@ function renderHeader() {
   renderNet();
   // the brand lines are static markup: reset them to English so the current language is applied afresh
   const mem = $(".memorial"), sub = $(".brand-name small"); if (mem) mem.textContent = "In loving memory of Steve Noel"; if (sub) sub.textContent = "Competition desk";
-  const foot = $("#foot"); if (foot) { foot.innerHTML = `SN Pétanque Competition Desk · <a href="privacy.html">Privacy</a> · <span>No cookies, no tracking</span>`; localize(foot); }
+  const foot = $("#foot"); if (foot) { foot.innerHTML = `© 2026 Sam Blakey · SN Pétanque Competition Desk · <span>All rights reserved</span> · <a href="privacy.html">Privacy</a> · <span>No cookies, no tracking</span>`; localize(foot); }
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();

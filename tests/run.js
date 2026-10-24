@@ -43,7 +43,7 @@ const SUITES = {
       /setup offers quick setup: true/, /skip goes to setup: true wizard false/, /touch sizes: btn true small true seg true/, /playing pill text: rgb\(138, 90, 0\)/, /errs \[\]/],
     'app-languages.js': [/menu closed: true/, /menu open: true options 8/, /outside click closes: true/, /fr: FR \| À la mémoire de Steve Noel/, /es: ES \| En memoria de Steve Noel/,
       /it: IT \| In ricordo di Steve Noel/, /de: DE \| In liebevoller Erinnerung an Steve Noel/, /nl: NL \| Ter liefdevolle nagedachtenis aan Steve Noel/, /pt: PT \| Em memória de Steve Noel/,
-      /th: TH \| ด้วยรักและระลึกถึง Steve Noel/, /footer fr: SN Pétanque Competition Desk · Confidentialité · Sans cookies ni traçage \| link privacy.html/, /remembered: fr/, /back to english: In loving memory of Steve Noel/, /errs \[\]/],
+      /th: TH \| ด้วยรักและระลึกถึง Steve Noel/, /footer fr: © 2026 Sam Blakey · SN Pétanque Competition Desk · Tous droits réservés · Confidentialité · Sans cookies ni traçage \| link privacy.html/, /remembered: fr/, /back to english: In loving memory of Steve Noel/, /errs \[\]/],
     'app-live.js': [/setup panel: true \| desk link: true/, /overlay links: \S+\.stream\.\S+ \S+\?parts=bar \S+\?parts=line \S+\?parts=card \S+\.desk\.\S+/, /desk: true header hidden: true \| Piste \d · Round 1 \| nums 0-0/,
       /boules: Boule thrown · 6 left \/ Boule thrown · 6 left/, /after boules: thrown 2-1 holding a \| dots on 4/, /question: Who won the end\? \| pts hidden: true/, /after winner: How many points\? \| pts: 6/,
       /end saved: 2-0 ends 1 thrown 0-0 holding null \| shown 2-0 end 2 \| match live score 2-0/, /players: Marc Dupont, Sophie Martin, Pierre Lefèvre, Aline Rossi/, /events 3 card Carreau Marc Dupont \| a0 line: shoot 1\/2 · 1 carreau/,

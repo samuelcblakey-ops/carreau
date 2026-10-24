@@ -51,6 +51,11 @@ assert html.lower().count("<meta charset") == 1, "dist/index.html must have exac
 out = os.path.join(root, "dist")
 os.makedirs(out, exist_ok=True)
 open(os.path.join(out, "index.html"), "w").write(html)
+# minify the live page (smaller, much harder to read or copy); CARREAU_NO_MINIFY=1 keeps it readable for debugging
+import subprocess
+if os.environ.get("CARREAU_NO_MINIFY") != "1":
+    subprocess.run(["node", os.path.join(here, "minify.js"), os.path.join(out, "index.html")], check=True)
+    html = open(os.path.join(out, "index.html")).read()
 import shutil
 for f in os.listdir(os.path.join(root, "public")):
     src = os.path.join(root, "public", f)

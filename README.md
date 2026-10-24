@@ -36,3 +36,9 @@ npm run test:app    # quick: app tests only, no Java needed
 - **Settings → Pages → Source: GitHub Actions**, so Pages serves what the pipeline builds.
 - **Settings → Secrets and variables → Actions → `FIREBASE_SERVICE_ACCOUNT`**: the JSON key of a Firebase service account with the *Firebase Rules Admin* role. Without it, the pipeline skips the rules deploy and warns.
 - **Settings → Branches → protect `main`**: require the `test` check to pass before merging.
+
+## Licence
+
+© 2026 Sam Blakey · SN Pétanque Competition Desk. All rights reserved. See [LICENSE](LICENSE): the code may not be copied, modified or reused without written permission. Third-party parts (QR generator, fonts, Firebase SDK) keep their own licences.
+
+The live site is built with the app code minified (`scripts/minify.js`); set `CARREAU_NO_MINIFY=1` when running `npm run build` to get a readable build for debugging.
