@@ -3578,9 +3578,9 @@ document.addEventListener("click", async e => {
     case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; leaveLive(); await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
     case "use-template": {
       const src = clone(t); const nt = newTournament();
-      const keep = ["entry", "format", "system", "checkin", "target", "byeScore", "swissRounds", "poolSize", "poolStyle", "qualify", "bBracket", "consolante", "seeding", "randomCourts", "courts", "teams", "players", "shootFormat", "shootFinal", "koThird", "koPlan", "venue", "timeLimit", "tiebreaks"];
+      const keep = ["entry", "format", "system", "checkin", "target", "byeScore", "swissRounds", "poolSize", "poolStyle", "qualify", "bBracket", "consolante", "seeding", "randomCourts", "courts", "teams", "players", "shootFormat", "shootFinal", "shootTie", "shootOutAt", "shootOutDist", "koThird", "koPlan", "venue", "timeLimit", "tiebreaks"];
       keep.forEach(k => { if (src[k] !== undefined) nt[k] = clone(src[k]); });
-      nt.name = "My run-through · " + (src.name || "").replace(/^TEST \d+ · /, ""); nt.koPlan && (nt.koPlan = clone(src.koPlan));
+      nt.name = "My run-through · " + (src.name || "").replace(/^(TEST \d+|Try it yourself) · /, ""); nt.koPlan && (nt.koPlan = clone(src.koPlan));
       (nt.players || []).forEach(p => p.active = true); (nt.teams || []).forEach(x => x.active = true);
       if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "draw"; S.matches = {}; leaveLive();
       await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); render(); toast("Your own copy is ready. Start the qualifying round when you're set."); break;

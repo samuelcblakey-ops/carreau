@@ -87,6 +87,8 @@ const SUITES = {
       /plain 16: 1v16 9v8 5v12 13v4 3v14 11v6 7v10 15v2/, /12 with byes: 1vye 9v8 5v12 4vye 3vye 11v6 7v10 2vye/,
       /barrages: 07815 16914 251013 341112/, /seeds: 0,1,2,3,4,5,6,7/, /round 1: 1v7 6v4 3v5 8v2 \| same barrage: 0 \| pools: AB CD CD AB/,
       /favourites win: semis 1v4 3v2 \| final 1v2/, /drawn: top line 1 Team 0 13 \| bottom line 2 Team 1 13/, /errs \[\]/],
+    'app-examples.js': [/copy: true \| My run-through · Precision shooting \| final final top 2 \| tie shootout \| shooters 4 \| template false/,
+      /picker: Clubs .* · Inter-club · 4 teams · Fixtures drawn/, /errs \[\]/],
     'app-stream-nav.js': [/on stream set-up: true \| tabs still shown true/, /setup tab: true \| #\w+ \| Setup \| stream page false/, /back button: ‹ Streams/,
       /after back: true \| #\w+ \| Stream \| stream page false \| stream tab current stream/, /streams list back: ‹ Competitions/, /after list back: true \| stream page false/,
       /browser back: #streams \| stream page true/, /new competition from stream page: true \| true \| #\w+ \| Registration \| stream page false/,
