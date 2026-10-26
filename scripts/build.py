@@ -10,7 +10,7 @@ body = src[:a] + boot + src[b:]
 
 V = "10.12.2"
 imports = f'''import {{ initializeApp }} from "https://www.gstatic.com/firebasejs/{V}/firebase-app.js";
-import {{ getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, deleteField, getDocs, query, where, limit }} from "https://www.gstatic.com/firebasejs/{V}/firebase-firestore.js";
+import {{ getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, deleteField, getDocs, writeBatch, query, where, limit }} from "https://www.gstatic.com/firebasejs/{V}/firebase-firestore.js";
 import {{ getAuth, connectAuthEmulator, onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithCredential, signOut }} from "https://www.gstatic.com/firebasejs/{V}/firebase-auth.js";
 import {{ firebaseConfig }} from "./firebase-config.js";
 '''

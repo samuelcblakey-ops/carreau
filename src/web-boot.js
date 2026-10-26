@@ -74,13 +74,14 @@ function fbStore() {
     },
     async deleteTournament(tid) {
       if (!isAdmin()) throw Object.assign(new Error("Only the admin can delete competitions."), { code: "permission-denied" }); // never half-delete
-      const s = await getDocs(collection(db, "tournaments", tid, "matches"));
-      for (const d of s.docs) await deleteDoc(d.ref);
-      try { const l = await getDocs(collection(db, "tournaments", tid, "live")); for (const d of l.docs) await deleteDoc(d.ref); } catch {}
-      try { await deleteDoc(doc(db, "tournaments", tid, "brand", "logo")); } catch {}
-      try { await deleteDoc(doc(db, "tournaments", tid, "private", "codes")); } catch {}
-      try { await deleteDoc(doc(db, "tournaments", tid, "private", "livecode")); } catch {}
-      await deleteDoc(doc(db, "tournaments", tid));
+      // games go in batches (up to 450 per request) rather than one request per game
+      const refs = (await getDocs(collection(db, "tournaments", tid, "matches"))).docs.map(d => d.ref);
+      for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await b.commit(); }
+      // the extras may be refused by their own rules (e.g. live scores while streaming is off): best effort, side by side
+      const extra = [doc(db, "tournaments", tid, "brand", "logo"), doc(db, "tournaments", tid, "private", "codes"), doc(db, "tournaments", tid, "private", "livecode")];
+      try { (await getDocs(collection(db, "tournaments", tid, "live"))).docs.forEach(d => extra.push(d.ref)); } catch {}
+      await Promise.allSettled(extra.map(r => deleteDoc(r)));
+      await deleteDoc(doc(db, "tournaments", tid)); // last, so a failure part-way never leaves games without their competition
     },
     watchLive(tid, mid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "live", mid), d => cb(d.exists() ? d.data() : null), onErr); },
     // club logo: its own small document so the competition document stays light
@@ -432,11 +433,14 @@ async function adminAction(act, a) {
   if (act === "adm-bulk-cancel") { ADM.confirm = null; render(); return true; }
   if (act === "adm-bulk-del-yes" || act === "adm-bulk-arch") {
     const ids = [...ADM.sel]; ADM.confirm = null; let ok = 0, failed = 0; const del = act === "adm-bulk-del-yes";
-    for (const id of ids) {
-      ADM.busy = `${del ? "Deleting" : "Archiving"} ${ok + failed + 1} of ${ids.length}…`; render();
+    const one = async id => {
       try { if (del) { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; } else await updateDoc(doc(FB.db, "tournaments", id), { archived: true }); ok++; ADM.sel.delete(id); }
       catch (e) { console.error(e); failed++; }
-    }
+      ADM.busy = `${del ? "Deleting" : "Archiving"}… ${ok + failed} of ${ids.length} done`; render();
+    };
+    ADM.busy = `${del ? "Deleting" : "Archiving"}… 0 of ${ids.length} done`; render();
+    // four at a time: much quicker than one by one, without flooding the connection
+    const queue = ids.slice(); await Promise.all(Array.from({ length: Math.min(4, ids.length) }, async () => { while (queue.length) await one(queue.shift()); }));
     ADM.busy = ""; render(); toast(failed ? `${ok} done, ${failed} didn't save. Check your connection and try again.` : `${ok} competition${ok === 1 ? "" : "s"} ${del ? "deleted" : "archived"}.`); return true;
   }
   if (act === "adm-name") { ADM.naming = a.dataset.uid; render(); setTimeout(() => document.getElementById("adm-name")?.focus(), 0); return true; }
