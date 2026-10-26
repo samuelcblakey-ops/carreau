@@ -1,5 +1,5 @@
-// Knockout seeding after a barrage/leagues: 1 v 8, 4 v 5 | 3 v 6, 2 v 7 (seed 1 in the top game, seed 2 in the bottom game,
-// meeting only in the final), with same-group clashes fixed by the nearest swap.
+// Knockout seeding after a barrage/leagues: pairings 1 v 8, 4 v 5, 3 v 6, 2 v 7, laid out so the two best seeds of every part of
+// the bracket sit at opposite edges (1 top line, 2 bottom line; 1/4 in the top half, 3/2 in the bottom half), with same-group clashes fixed by the nearest swap.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1100, height: 900 } });
@@ -44,7 +44,7 @@ const { chromium } = require('playwright');
     q('[data-tab="draw"]').click(); await w(80);
     const col = [...document.querySelectorAll('.bk .bk-col')][0], rows = col ? [...col.querySelectorAll('.bkm-row')] : [];
     const line = r => r ? [...r.children].map(c => c.textContent.trim()).filter(Boolean).join(' ') : '';
-    L.push(`drawn: top line ${line(rows[0])} | bottom game ${line(rows[rows.length - 2])}`);
+    L.push(`drawn: top line ${line(rows[0])} | bottom line ${line(rows[rows.length - 1])}`);
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); } return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
