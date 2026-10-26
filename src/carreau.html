@@ -2358,6 +2358,14 @@ function streamPanel(t) {
 }
 /* standalone streams: a game that isn't in any competition. Type two team names, get the overlay and live desk links. */
 const myStreams = () => Object.values(S.streams).filter(st => S.streamMine ? S.streamMine(st) : true).sort((x, y) => (y.created || 0) - (x.created || 0));
+// leaving a stream page (a stream's set-up, the streams list) for the open competition: drop the stream route so the
+// tabs, the picker and the back buttons work again. The browser's back button still returns to the stream page.
+function leaveLive() {
+  if (!S.liveRoute) return;
+  S.liveRoute = null; liveWatch();
+  const h = S.tid ? "#" + S.tid : "";
+  history.pushState(null, "", h || location.pathname + location.search);
+}
 // this device's streams are watched once, for the Stream tab and the #streams page
 function watchStreams() { if (S.unsubS || !S.canCreate()) return; S.unsubS = S.store.watchStreams(list => { const keep = S.liveRoute?.sid; const cur = keep && S.streams[keep]; S.streams = {}; list.forEach(x => S.streams[x.id] = x); if (cur && !S.streams[keep]) S.streams[keep] = cur; S.streamsLoaded = true; render(); }, e => console.error(e)); }
 function streamsBlock() {
@@ -2366,9 +2374,11 @@ function streamsBlock() {
       <div><button type="button" class="btn primary" data-act="strm-new" ${S.canCreate() ? "" : "disabled"}>New stream</button></div></div>
     ${list.length ? `<div class="panel stack" style="gap:8px"><h3>Your streams</h3>${list.map(st => `<div class="erow"><div class="who"><b data-notr>${esc(streamSide(st, "a").name)} v ${esc(streamSide(st, "b").name)}</b><span class="small muted">${esc([st.label, st.piste ? `Piste ${st.piste}` : "", st.live ? `${st.live.sa ?? 0}–${st.live.sb ?? 0}${st.live.done ? " · finished" : ""}` : ""].filter(Boolean).join(" · ") || "Not set up yet")}</span></div><a class="btn sm" href="#s.${st.id}">Open</a><a class="btn sm primary" href="#s.${st.id}.desk">Live desk</a></div>`).join("")}</div>` : (S.streamsLoaded || !S.canCreate() ? "" : `<p class="muted">Loading…</p>`)}`;
 }
+// back from a stream's set-up: to the open competition's Stream tab (it lists the same streams), or the streams list
+const streamsBack = (cls, label) => T() ? `<button type="button" class="${cls}" data-tab="stream">${label}</button>` : `<a class="${cls}" href="#streams">${label}</a>`;
 function renderStreamsHome() {
   return `<div class="stack" style="max-width:640px;margin:0 auto">
-    <div class="spread"><div><div class="eyebrow">Streaming</div><h2>Stream a game</h2></div><a class="btn sm ghost" href="${location.pathname}">‹ Competitions</a></div>
+    <div class="spread"><div><div class="eyebrow">Streaming</div><h2>Stream a game</h2></div><button type="button" class="btn sm ghost" data-tab="${esc(S.tab || "draw")}">‹ Competitions</button></div>
     ${streamsBlock()}
   </div>`;
 }
@@ -2381,7 +2391,7 @@ function renderStreamTab(t) {
   </div>`;
 }
 function renderStreamSetup() {
-  const st = S.streams[S.liveRoute.sid]; if (!st) return S.streamsLoaded ? `<div class="panel stack" style="max-width:520px;margin:24px auto"><h3>This stream can't be found</h3><div><a class="btn" href="#streams">Back to streams</a></div></div>` : "";
+  const st = S.streams[S.liveRoute.sid]; if (!st) return S.streamsLoaded ? `<div class="panel stack" style="max-width:520px;margin:24px auto"><h3>This stream can't be found</h3><div>${streamsBack("btn", "Back to streams")}</div></div>` : "";
   const ro = !streamCan(st); const n = SIZE[st.format] || 2;
   const K = liveCols(st);
   const side = k => { const sd = st[k] || {}; return `<div class="panel stack" style="gap:8px;border-color:${K[k] === "#FFFFFF" ? "var(--line)" : K[k]};border-width:2px"><div class="eyebrow">Team ${k.toUpperCase()}</div>
@@ -2390,7 +2400,7 @@ function renderStreamSetup() {
     <div class="fields">${Array.from({ length: n }, (_, i) => `<label class="f"><span>Player ${i + 1}</span><input type="text" data-sfield="${k}.p${i}" value="${esc((sd.players || [])[i] || "")}" ${ro ? "disabled" : ""}></label>`).join("")}</div></div>`; };
   const open = S.lvLinks === st.id;
   return `<div class="stack" style="max-width:640px;margin:0 auto">
-    <div class="spread"><div><div class="eyebrow">Streaming</div><h2 data-notr>${esc(streamSide(st, "a").name)} v ${esc(streamSide(st, "b").name)}</h2></div><a class="btn sm ghost" href="#streams">‹ Streams</a></div>
+    <div class="spread"><div><div class="eyebrow">Streaming</div><h2 data-notr>${esc(streamSide(st, "a").name)} v ${esc(streamSide(st, "b").name)}</h2></div>${streamsBack("btn sm ghost", "‹ Streams")}</div>
     ${ro ? `<div class="notice">Set up on another phone. You can open the overlay, and the live desk if you have its link.</div>` : ""}
     <div class="panel stack">
       <div class="fields"><label class="f"><span>What's on (shown on the info line)</span><input type="text" data-sfield="label" value="${esc(st.label || "")}" placeholder="Club friendly · Round 3" ${ro ? "disabled" : ""}></label>
@@ -2524,7 +2534,7 @@ function renderPicker(list) {
 }
 function pickCompetition(id) {
   S.picker = false; if (id === S.tid) { render(); return; }
-  S.tid = id; lsSet("carreau-tid", S.tid); S.matches = {}; S.onSelect?.(); watchMatches(); render();
+  S.tid = id; lsSet("carreau-tid", S.tid); S.matches = {}; leaveLive(); S.onSelect?.(); watchMatches(); render();
 }
 // connection light (website only): Live, Saving…, or Offline with changes waiting to sync
 function renderNet() {
@@ -3122,7 +3132,7 @@ document.addEventListener("click", async e => {
   if (th) { lsSet("carreau-theme", th.dataset.themePick); applyTheme(); S.langMenu = false; render(); return; }
   if (lg) { S.langMenu = false; I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
   const tab = e.target.closest("[data-tab]");
-  if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); render(); return; }
+  if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); render(); return; }
   if (e.target.closest(".day-plan > summary")) { const dp = e.target.closest(".day-plan"); setTimeout(() => { S.dayPlan = dp.open; }, 0); }
   const sc = e.target.closest("[data-shoot]");
   if (sc) { openMatch(sc.dataset.shoot); return; }
@@ -3145,14 +3155,14 @@ document.addEventListener("click", async e => {
     case "logo-remove": { try { await S.store.setBrand(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
     case "lv-links": S.lvLinks = S.lvLinks === a.dataset.id ? null : a.dataset.id; render(); break;
     case "copy": { const el = document.getElementById(a.dataset.target); if (!el) break; try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } break; }
-    case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
+    case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; leaveLive(); await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
     case "use-template": {
       const src = clone(t); const nt = newTournament();
       const keep = ["entry", "format", "system", "checkin", "target", "byeScore", "swissRounds", "poolSize", "poolStyle", "qualify", "bBracket", "consolante", "seeding", "randomCourts", "courts", "teams", "players", "shootFormat", "shootFinal", "koThird", "koPlan", "venue", "timeLimit", "tiebreaks"];
       keep.forEach(k => { if (src[k] !== undefined) nt[k] = clone(src[k]); });
       nt.name = "My run-through · " + (src.name || "").replace(/^TEST \d+ · /, ""); nt.koPlan && (nt.koPlan = clone(src.koPlan));
       (nt.players || []).forEach(p => p.active = true); (nt.teams || []).forEach(x => x.active = true);
-      if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "draw"; S.matches = {};
+      if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "draw"; S.matches = {}; leaveLive();
       await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); render(); toast("Your own copy is ready. Start the qualifying round when you're set."); break;
     }
     case "del-t": if (S.canDelete && !S.canDelete(t)) break; S.confirmDelete = true; render(); break;
