@@ -42,7 +42,7 @@ header.app{background:var(--surface);border-bottom:1px solid var(--line)}
 .brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;margin-right:auto}
 .brand svg{flex:none}
 .brand-txt{display:flex;flex-direction:column;line-height:1}.brand-name{white-space:nowrap}
-.memorial{font-family:var(--body);font-weight:500;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:3px;white-space:nowrap}
+.memorial{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .site-foot{font-size:12px;color:var(--muted);text-align:center;padding:12px 16px 24px}.site-foot a{color:inherit}
 .disp-memorial{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:8px}
 .brand small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-left:6px}
@@ -397,7 +397,7 @@ body.desk header.app{display:none}
     <div class="bar">
       <div class="brand">
         <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="10" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 11.5c3.5 1.5 7.5 1.5 11 0M4.5 16.5c3.5-1.5 7.5-1.5 11 0" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="21" cy="6" r="3" fill="var(--jack)"/></svg>
-        <span class="brand-txt"><span class="brand-name">SN Pétanque <small>Competition desk</small></span><span class="memorial">In loving memory of Steve Noel</span></span>
+        <span class="brand-txt"><span class="brand-name">SN Pétanque <small>Competition desk</small></span></span>
         <span id="netdot" class="netdot" hidden role="status"></span>
       </div>
       <div class="tsel" id="tsel"></div>
@@ -1394,7 +1394,13 @@ function poolRanking(t, p, ms) {
   return { rows: rankStats(t, st, false, !!p.league, pm), complete };
 }
 
-function seedOrder(size) { let o = [1]; while (o.length < size) { const m = o.length * 2 + 1; o = o.flatMap(s => [s, m - s]); } return o; }
+// bracket slots in seed order: 1 v 8, 4 v 5 | 3 v 6, 2 v 7. The bottom half is the mirror of the top half, so the top
+// seeds sit on the outside: seed 1 in the top game, seed 2 in the bottom game, and they can only meet in the final
+function seedOrder(size) {
+  let o = [1]; while (o.length < size) { const m = o.length * 2 + 1; o = o.flatMap(s => [s, m - s]); }
+  const h = size / 2, games = []; for (let i = h; i < size; i += 2) games.push([o[i], o[i + 1]]);
+  return size >= 4 ? [...o.slice(0, h), ...games.reverse().flat()] : o;
+}
 function roundLabel(R, r) { const left = R - r; return left === 0 ? "Final" : left === 1 ? "Semi-finals" : left === 2 ? "Quarter-finals" : `Last ${2 ** (left + 1)}`; }
 function createBracket(t, bid, name, entrants, opts = {}) {
   if (opts.random) entrants = shuffle(entrants);
@@ -2528,9 +2534,11 @@ function renderNet() {
 }
 function renderHeader() {
   renderNet();
-  // the brand lines are static markup: reset them to English so the current language is applied afresh
-  const mem = $(".memorial"), sub = $(".brand-name small"); if (mem) mem.textContent = "In loving memory of Steve Noel"; if (sub) sub.textContent = "Competition desk";
-  const foot = $("#foot"); if (foot) { foot.innerHTML = `© 2026 Sam Blakey · SN Pétanque Competition Desk · <span>All rights reserved</span> · <a href="privacy.html">Privacy</a> · <span>No cookies, no tracking</span>`; localize(foot); }
+  // the brand line is static markup: reset it to English so the current language is applied afresh
+  const sub = $(".brand-name small"); if (sub) sub.textContent = "Competition desk";
+  // the dedication to Steve Noel sits at the foot of every page, above the copyright line
+  const foot = $("#foot"); if (foot) { foot.innerHTML = `<div class="memorial">In loving memory of Steve Noel</div>
+    <div>© 2026 Sam Blakey · SN Pétanque Competition Desk · <span>All rights reserved</span> · <a href="privacy.html">Privacy</a> · <span>No cookies, no tracking</span></div>`; localize(foot); }
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();

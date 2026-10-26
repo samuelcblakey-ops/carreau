@@ -1,4 +1,5 @@
-// Knockout seeding after a barrage/leagues: 1 v 8, 2 v 7, 3 v 6, 4 v 5, with same-group clashes fixed by the nearest swap.
+// Knockout seeding after a barrage/leagues: 1 v 8, 4 v 5 | 3 v 6, 2 v 7 (seed 1 in the top game, seed 2 in the bottom game,
+// meeting only in the final), with same-group clashes fixed by the nearest swap.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1100, height: 900 } });
@@ -35,6 +36,15 @@ const { chromium } = require('playwright');
     const games = C.MS().filter(m => m.bracket === 'A' && m.round === 1).sort((x, y) => x.order - y.order);
     L.push('seeds: ' + A.seeds.map(id => id.slice(1)).join(','));
     L.push('round 1: ' + games.map(m => `${sd(m.a[0])}v${sd(m.b[0])}`).join(' ') + ' | same barrage: ' + games.filter(m => pl(m.a[0]) === pl(m.b[0])).length + ' | pools: ' + games.map(m => pl(m.a[0]) + pl(m.b[0])).join(' '));
+    // the top seed of every game wins: seed 1 stays along the top edge, seed 2 along the bottom, and they meet in the final
+    const pair = m => `${sd(m.a[0])}v${sd(m.b[0])}`;
+    for (let r = 1; r <= A.rounds; r++) for (const m of C.MS().filter(m => m.bracket === 'A' && m.round === r && !m.third && m.a && m.b)) { const aw = sd(m.a[0]) < sd(m.b[0]); await C.recordResult(m.id, aw ? 13 : 5, aw ? 5 : 13, true); await w(30); }
+    const rd = r => C.MS().filter(m => m.bracket === 'A' && m.round === r && !m.third).sort((x, y) => x.order - y.order).map(pair).join(' ');
+    L.push(`favourites win: semis ${rd(2)} | final ${rd(3)}`);
+    q('[data-tab="draw"]').click(); await w(80);
+    const col = [...document.querySelectorAll('.bk .bk-col')][0], rows = col ? [...col.querySelectorAll('.bkm-row')] : [];
+    const line = r => r ? [...r.children].map(c => c.textContent.trim()).filter(Boolean).join(' ') : '';
+    L.push(`drawn: top line ${line(rows[0])} | bottom game ${line(rows[rows.length - 2])}`);
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); } return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
