@@ -1395,12 +1395,15 @@ function poolRanking(t, p, ms) {
   return { rows: rankStats(t, st, false, !!p.league, pm), complete };
 }
 
-// bracket slots in seed order: 1 v 8, 4 v 5 | 3 v 6, 2 v 7. The bottom half is the mirror of the top half, so the top
-// seeds sit on the outside: seed 1 in the top game, seed 2 in the bottom game, and they can only meet in the final
+// bracket lines, top to bottom, by seed. In every part of the bracket its two best seeds sit at opposite edges:
+// 1 on the top line and 2 on the bottom line; in the top half 1 at the top and 4 at the bottom, in the bottom half 3 at the
+// top and 2 at the bottom; in each quarter 1 and 8, 4 and 5, 3 and 6, 2 and 7 at opposite edges, and so on. If the higher
+// seeds keep winning, each stays on its edge until it meets the seed on the other edge. Pairings are the usual 1 v 16, 8 v 9…
+// 16 teams: 1 16 | 9 8 | 5 12 | 13 4 | 3 14 | 11 6 | 7 10 | 15 2
 function seedOrder(size) {
   let o = [1]; while (o.length < size) { const m = o.length * 2 + 1; o = o.flatMap(s => [s, m - s]); }
-  const h = size / 2, games = []; for (let i = h; i < size; i += 2) games.push([o[i], o[i + 1]]);
-  return size >= 4 ? [...o.slice(0, h), ...games.reverse().flat()] : o;
+  const fold = a => a.length < 2 ? a : [...fold(a.slice(0, a.length / 2)), ...fold(a.slice(a.length / 2)).reverse()];
+  return fold(o);
 }
 function roundLabel(R, r) { const left = R - r; return left === 0 ? "Final" : left === 1 ? "Semi-finals" : left === 2 ? "Quarter-finals" : `Last ${2 ** (left + 1)}`; }
 function createBracket(t, bid, name, entrants, opts = {}) {
@@ -1414,8 +1417,10 @@ function createBracket(t, bid, name, entrants, opts = {}) {
         next: r < R ? { id: `${bid}-r${r + 1}-m${Math.floor(i / 2) + 1}`, side: i % 2 ? "b" : "a" } : null });
     }
   }
-  const slots = [];
-  for (let i = 0; i < size / 2; i++) { const sa = order[2 * i], sb = order[2 * i + 1]; slots.push([sa <= n ? entrants[sa - 1] : null, sb <= n ? entrants[sb - 1] : null]); }
+  // each game as [higher seed, lower seed]; flip[i] says the higher seed goes on the lower line (bottom of its part of the bracket)
+  const slots = [], flip = [];
+  for (let i = 0; i < size / 2; i++) { const sa = order[2 * i], sb = order[2 * i + 1]; const hi = Math.min(sa, sb), lo = Math.max(sa, sb);
+    flip.push(sa > sb); slots.push([hi <= n ? entrants[hi - 1] : null, lo <= n ? entrants[lo - 1] : null]); }
   // keep teams from the same barrage/league apart in the first round where possible: a clashing game swaps its lower
   // seed for the nearest-ranked lower seed from another game, top seeds first, so 1 v 8, 2 v 7… is kept wherever it can be
   if (opts.groupOf) {
@@ -1437,7 +1442,8 @@ function createBracket(t, bid, name, entrants, opts = {}) {
   }
   for (let i = 0; i < size / 2; i++) {
     const m = out[`${bid}-r1-m${i + 1}`];
-    m.a = slots[i][0] ? [slots[i][0]] : null; m.b = slots[i][1] ? [slots[i][1]] : null;
+    const [top, bottom] = flip[i] ? [slots[i][1], slots[i][0]] : slots[i];
+    m.a = top ? [top] : null; m.b = bottom ? [bottom] : null;
     if (!m.a && m.b) { m.a = m.b; m.b = null; }
     if (m.a && !m.b) { Object.assign(m, { done: true, bye: true, sa: t.byeScore[0], sb: t.byeScore[1] }); out[m.next.id][m.next.side] = m.a; }
   }
