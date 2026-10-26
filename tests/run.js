@@ -24,6 +24,8 @@ const SUITES = {
     'app-picker.js': [/no select: true/, /open: true groups: Your competitions 6 \/ Examples 2/, /meta: .*Triples · Swiss · 0 teams · Not started/, /search focused: true/,
       /search filters: Bristol Open 7\n/, /picked: Bristol Open 7 closed: true button shows: Bristol Open 7/, /outside click closes: true/, /escape closes: true/, /errs \[\]/],
     'app-mobile.js': [/phone: \{"overflow":false,"navFixed":true,"navBottom":true,"icons":true,"header":\d{2,3},"langOneRow":true,"inputFont":"16px"\}/, /desktop: \{"overflow":false,"navFixed":false,"navBottom":false,"icons":false/, /errs \[\]/],
+    'app-print-draw.js': [/order on screen: Round 1 \| Round 2 \| Round 3/, /table on page: true/, /print page: pages 3 \| Round 1 \| Round 2 \| Round 3 \| table false \| page breaks true \| round 1 rows \d+ \| piste shown true \| team names true/,
+      /fallback: printed 1 \| hides table true \| round per page true/, /swiss order: Round 2 \| Round 1/, /errs \[\]/],
     'app-melee.js': [/setup shows style: true/, /draw teams button: true/, /teams drawn: teams 5 sizes 23333 players kept 14/, /registration notice: true/, /redraw: true/,
       /back to players: melee 0/, /swiss with drawn teams: 3 games, bye true notice gone true/, /advance: draws 3 games 12 rounds 1,2,3/, /repeat partners: 0/,
       /only round 1 on pistes: true r1 courts 4/, /All 3 rounds drawn · round 1 in play/, /print true next-round hidden true/, /round 2 gets pistes after round 1: 4/, /undo all: draws 0 games 0/, /errs \[\]/],

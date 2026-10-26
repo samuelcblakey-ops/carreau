@@ -254,7 +254,8 @@ table.shots td,table.shots th{padding:5px 6px}
 .so-tot{font-family:var(--display);font-size:20px;min-width:30px;text-align:right}
 .fx{font-size:17px}.day-plan summary{cursor:pointer;list-style-position:inside}.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:4px 0;border-top:1px solid var(--line)}.dp-row:first-child{border-top:0}.dp-fx{font-weight:600}.dp-days{flex-wrap:wrap}.dp-days button{min-width:44px}.fx-score{font-family:var(--display);font-size:22px;font-weight:700;color:var(--accent);padding:0 6px}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
-@media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}}
+@media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
+  .draw-table,.find-panel{display:none!important}.draw-round~.draw-round{break-before:page}.draw-round .mlist{grid-template-columns:repeat(2,1fr)}.draw-round .match{break-inside:avoid}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
 .toast[hidden]{display:none}
 .toast-undo{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;min-height:36px}
@@ -553,7 +554,7 @@ const FR_TEXT = {
   "Enter every score of round {n} first": "Saisissez d'abord tous les scores de la partie {1}",
   "drawn in advance": "tirées d'avance", "All {n} rounds drawn": "{1} parties tirées", "round {n} in play": "partie {1} en cours", "all rounds finished": "toutes les parties terminées",
   "Undo round {n}": "Annuler la partie {1}", "Undo schedule": "Annuler le calendrier", "Undo pools": "Annuler les poules", "Undo bracket": "Annuler le tableau",
-  "Round {n}": "Partie {1}", "Draw the knockouts": "Tirer les tableaux",
+  "Round {n}": "Partie {1}", "Print": "Imprimer", "one per page": "une par page", "round": "partie", "rounds": "parties", "Team": "Équipe", "Draw the knockouts": "Tirer les tableaux",
   "Draw once the last round is finished": "Tirage quand la dernière partie est terminée", "Draw once every game is finished": "Tirage quand toutes les parties sont terminées",
   "Only {n} of {n} planned rounds have been played. You can still draw the knockouts now, or play another round first.": "Seules {1} des {2} parties prévues ont été jouées. Vous pouvez tirer les tableaux maintenant ou jouer une partie de plus.",
   "{n}/{n} pools complete": "{1}/{2} poules terminées", "Complete": "Terminée", "{n}/{n} games": "{1}/{2} parties",
@@ -2824,6 +2825,38 @@ function matchCard(t, m, opts = {}) {
   </${ro ? "div" : "button"}>`;
 }
 
+/* printable draw (mêlée drawn in advance): one round per page, games in order, no results table.
+   Opens as its own page so it prints the same everywhere (including the installed app on a phone);
+   if a new page can't be opened, prints this page with the print styles above. */
+function drawPrintHtml(t) {
+  const ms = MS(); const rounds = t.draws.filter(d => d.kind === "round").sort((a, b) => a.round - b.round);
+  const T_ = x => tr(x); const names = s => s ? esc(sideName(t, s)) : "";
+  const pages = rounds.map(d => {
+    const rm = ms.filter(m => m.group === d.id).sort(byOrder); let n = 0;
+    const rows = rm.map(m => m.bye
+      ? `<tr><td class="n"></td><td class="pi"></td><td>${names(m.a)}</td><td class="v"></td><td><i>${esc(T_("Bye"))}</i></td></tr>`
+      : `<tr><td class="n">${++n}</td><td class="pi">${m.court || m.courtUsed ? esc(courtName(t, m.court || m.courtUsed)) : ""}</td><td>${names(m.a)}</td><td class="v">v</td><td>${names(m.b)}</td></tr>`).join("");
+    return `<section class="pg"><div class="hd"><div><div class="comp">${esc(t.name || "")}</div><h1>${esc(T_(d.label || `Round ${d.round}`))}</h1></div><div class="brand">SN Pétanque</div></div>
+      <table><thead><tr><th class="n">#</th><th class="pi">${esc(T_("Piste"))}</th><th>${esc(T_("Team"))}</th><th class="v"></th><th>${esc(T_("Team"))}</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="ft">${esc(T_("In loving memory of Steve Noel"))}</div></section>`;
+  }).join("");
+  return `<!doctype html><html lang="${I18N.lang}"><head><meta ${"charset"}="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(t.name || "Draw")} · ${esc(T_("Draw"))}</title>
+<style>body{font:17px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;color:#111;margin:0;background:#fff}.bar{position:sticky;top:0;display:flex;gap:10px;align-items:center;padding:10px 16px;background:#f2f4f1;border-bottom:1px solid #ccc}
+.bar button{font:inherit;font-weight:600;padding:8px 16px;border-radius:8px;border:1px solid #1d6a54;background:#1d6a54;color:#fff;cursor:pointer}.pg{padding:16px;max-width:900px;margin:0 auto}.pg+.pg{border-top:2px dashed #ccc}
+.hd{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:10px}.comp{font-size:13px;color:#555;text-transform:uppercase;letter-spacing:.06em}h1{margin:2px 0 0;font-size:32px}.brand{font-weight:700;color:#1d6a54}
+table{width:100%;border-collapse:collapse}th,td{padding:10px 6px;border-bottom:1px solid #ccc;text-align:left;vertical-align:top}th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#555}td.n,th.n{width:28px;color:#555}td.pi,th.pi{width:56px;font-weight:700}td.v{width:18px;color:#777;text-align:center}.ft{margin-top:14px;font-size:11px;color:#777;text-align:center;letter-spacing:.06em;text-transform:uppercase}
+@media print{.bar{display:none}.pg{padding:0;max-width:none}.pg+.pg{border-top:0;break-before:page}tr{break-inside:avoid}@page{margin:14mm}}</style></head>
+<body><div class="bar"><button type="button" onclick="window.print()">${esc(T_("Print"))}</button><span>${rounds.length} ${esc(T_(rounds.length === 1 ? "round" : "rounds"))} · ${esc(T_("one per page"))}</span></div>${pages}
+<script>window.addEventListener("load",function(){setTimeout(function(){try{window.print()}catch(e){}},300)});<\/script></body></html>`;
+}
+function printDraw(t) {
+  const html = drawPrintHtml(t); let w = null;
+  try { w = window.open("", "_blank"); } catch {}
+  if (w && w.document) { w.document.open(); w.document.write(html); w.document.close(); return; }
+  // no new page allowed (pop-ups blocked): print this page; the print styles drop the table and put each round on its own page
+  try { window.print(); } catch { toast("Printing isn't available here. Open the competition in your browser to print the draw."); }
+}
+
 /* draw */
 function renderDraw(t) {
   if (isShoot(t)) return renderShooting(t);
@@ -2878,7 +2911,9 @@ function renderDraw(t) {
   // the morning's live table (wins, losses, points for/against, points difference), the same one as on Standings
   const stStage = ["swiss", "melee", "snake"].includes(sys) ? sys : sys === "roundrobin" ? "rr" : null;
   if (stStage && ms.some(m => m.stage === stStage)) html += `<section class="panel stack draw-table" style="gap:8px"><div class="spread"><h3>${(t.brackets || []).length ? "Morning table" : "Table"}</h3><button type="button" class="btn sm ghost" data-tab="standings">Full standings</button></div>${standingsTable(t, overallTable(t, stStage), { buch: stStage === "swiss" || stStage === "snake" })}</section>`;
-  if (rounds.length) rounds.forEach(d => { const rm = ms.filter(m => m.group === d.id).sort(byOrder); html += `<section class="stack" style="gap:10px"><h3>${esc(d.label)}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; });
+  // drawn in advance: round 1 at the top, in order; round by round (Swiss etc.): newest first
+  const listed = isMelee(t) && meleeMode(t) === "advance" ? rounds.slice().sort((a, b) => a.round - b.round) : rounds;
+  if (listed.length) listed.forEach(d => { const rm = ms.filter(m => m.group === d.id).sort(byOrder); html += `<section class="stack draw-round" style="gap:10px"><h3>${esc(d.label)}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; });
   // round robin and snake (whole schedule drawn at once)
   for (const [gid, label] of [["RR", "Round robin"], ["SN", "Snake"]]) if (t.draws.some(d => d.id === gid)) {
     const rr = ms.filter(m => m.group === gid); if (!rr.length) continue; const maxR = Math.max(...rr.map(m => m.round));
@@ -3186,7 +3221,7 @@ document.addEventListener("click", async e => {
       await guard(() => saveT(res.t)); S.tab = "entries"; render(); toast(`${res.count} teams drawn. Check them on Registration, then make the draw.`); break;
     }
     case "melee-unteam": { const nt = Object.assign(clone(t), { entry: "melee", teams: [], meleeDrawn: false }); await guard(() => saveT(nt)); render(); break; }
-    case "print-draw": window.print(); break;
+    case "print-draw": printDraw(t); break;
     case "find-me": { lsSet(meKey(t), a.dataset.id); S.findQ = ""; document.activeElement?.blur?.(); render(); break; }
     case "find-clear": { lsSet(meKey(t), ""); render(); setTimeout(() => $("#find-q")?.focus(), 30); break; }
     case "alert-close": S.alert = null; renderAlert(); break;
