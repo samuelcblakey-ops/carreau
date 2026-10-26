@@ -150,6 +150,11 @@ const SUITES = {
     'web-theme.js': [/organiser colour: #b3261e/, /organiser logo: WROTE/, /bad logo refused: permission-denied/, /follower sees: #b3261e \| logo true/, /follower writes logo: permission-denied/, /follower has no look panel: true/, /errs \[\]/],
     'web-offline.js': [/online light: live Live/, /offline light: off Offline/, /offline save closes at once: true \| score shown: true 13-5/, /waiting light: off Offline · \d+ waiting to sync/,
       /offline reopen: New competition \| score kept: true 13-5/, /back online light: live Live/, /other device sees it: true 13-5/, /errs \[\]/],
+    'web-organiser-login.js': [/admin panel: Organiser login OFF/, /off: visitor new button true/, /off: login page: .*isn't switched on yet/, /code made: true \| link: true/, /codes listed: true/, /live pill: LIVE/,
+      /live: visitor new button false \| header login button true \| sees example true/, /live: visitor create via store: blocked permission-denied/, /wrong code: That code isn't valid or has expired/, /expired code: That code isn't valid/,
+      /logged in: .*You're logged in with code [A-Z0-9]{8}.* \| org \{"code":"[A-Z0-9]{8}","active":true,"canCreate":true\}/, /organiser created: true \| on registration true/, /second device: lists it true/, /second device edit: ok/,
+      /organiser cannot move it to another code: blocked permission-denied/, /visitor tabs: Draw & results\|Standings\|Stream/, /visitor edit: blocked permission-denied/, /after revoke edit: blocked permission-denied \| new button false/,
+      /after revoke page: true/, /off again: visitor new button true/, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
       /admin page \(signed in\):.*Open testingOn/, /B tabs \(testing off\): Draw & results\|Standings\|Stream/,
