@@ -14,6 +14,7 @@ const { chromium } = require('playwright');
       L.push(`${l}: ${q('.lang-btn').textContent.trim().slice(0, 2)} | ${q('.memorial').textContent} | ${q('[data-tab="entries"]').textContent.trim()} | ${q('.wiz h3')?.textContent} | html lang ${document.documentElement.lang}`);
     }
     L.push('footer fr: ' + (q('[data-act="lang-menu"]').click(), await w(40), q('[data-lang="fr"]').click(), await w(80), q('#foot').textContent.replace(/\s+/g, ' ').trim()) + ' | link ' + q('#foot a').getAttribute('href'));
+    L.push('dedication in the footer: ' + !!q('#foot .memorial') + ' | not in the header: ' + !q('header .memorial'));
     L.push('remembered: ' + localStorage.getItem('carreau-lang'));
     q('[data-lang="en"]').click(); await w(60); L.push('back to english: ' + q('.memorial').textContent);
     } catch (e) { L.push('ERR ' + e.message); } return L; });
