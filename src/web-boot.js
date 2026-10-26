@@ -5,9 +5,15 @@
 // Helpers open a link containing the code (or type it in) and their device is remembered as a member.
 const ADMIN_EMAILS = ["samuelcblakey@gmail.com"]; // site admins (enforced in firestore.rules too)
 const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.includes((AUTH.user.email || "").toLowerCase()));
-const SITE = { openTesting: true, teamScoring: false, teamComps: {}, streaming: false, loaded: false }; // streaming: false | "admin" | true // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
+const SITE = { openTesting: true, teamScoring: false, teamComps: {}, streaming: false, organiserLogin: false, loaded: false }; // streaming: false | "admin" | true // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
+// organiser login (site switch, off by default): this device's code and what it unlocks; the admin's list of codes
+const ORG = { code: null, info: null, busy: false, err: "" };  // info: { label, expiresAt (ms), revoked }
+const ORG_DAYS = 3;
+let unsubOrg = null, unsubOrgCode = null, unsubOrgCodes = null; const ORGCODES = { list: null, label: "", made: null };
+const orgActive = () => !!(ORG.code && ORG.info && !ORG.info.revoked && ORG.info.expiresAt > Date.now());
+const loginMode = () => SITE.organiserLogin === true;
 const ROLE = {};   // tid -> "edit" | "score" | "team" | "live" (membership of this device)
 const LIVECODE = {}; // tid -> stream code (lets a helper's phone run the live desk; only readable by organisers)
 let unsubLiveCode = null;
@@ -58,6 +64,7 @@ function fbStore() {
       else {
         subQ("listed", query(tc, where("listed", "==", true), where("archived", "==", false), limit(100)));
         if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), where("archived", "==", false), limit(200)));
+        if (ORG.code) subQ("org", query(tc, where("orgCode", "==", ORG.code), where("archived", "==", false), limit(200)));
       }
       new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
@@ -102,11 +109,13 @@ function fbStore() {
 const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);
 S.permFn = t => {
   if (!AUTH.user || !t) return { edit: false, score: false };
-  // open testing lets guests run competitions they open, except the examples (listed), which stay view-only
-  const r = isOwner(t) || isAdmin() || (SITE.openTesting && !t.listed) ? "edit" : ROLE[t.id];
+  // open testing lets guests run competitions they open, except the examples (listed), which stay view-only.
+  // With organiser login on, only a logged-in organiser (for competitions made with their code), the admin, and organiser-link holders can change things.
+  const r = isAdmin() ? "edit" : loginMode() ? (orgActive() && t.orgCode === ORG.code ? "edit" : ROLE[t.id])
+    : isOwner(t) || (SITE.openTesting && !t.listed) ? "edit" : ROLE[t.id];
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
-S.canCreate = () => !!AUTH.user;
+S.canCreate = () => !!AUTH.user && (!loginMode() || isAdmin() || orgActive());
 // live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
 S.liveRole = t => !!(t && ROLE[t.id] === "live");
 // streaming is a site switch: Off / Admin only / Everyone (config/site.streaming, enforced in firestore.rules)
@@ -165,7 +174,7 @@ async function makeTeamCodes(tid) {
 }
 function watchTeamCodes(tid) {
   if (unsubTeamCodes || tid !== S.tid || !S.teamScoringSetup(S.tournaments[tid])) return;
-  const t = S.tournaments[tid]; if (!t || !(isOwner(t) || isAdmin() || ROLE[tid] === "edit" || SITE.openTesting)) return;
+  const t = S.tournaments[tid]; if (!t || !S.permFn(t).edit) return;
   unsubTeamCodes = onSnapshot(doc(FB.db, "tournaments", tid, "private", "teamcodes"), d => { TEAMCODES[tid] = d.exists() ? d.data() : {}; render(); }, () => {});
 }
 const teamLink = (t, id) => `${base()}#${t.id}.t-${id}-${TEAMCODES[t.id][id]}`;
@@ -188,7 +197,7 @@ function teamLinksPanel(t) {
 // organisers archive; only the admin can delete a competition (also enforced in firestore.rules)
 S.canDelete = () => isAdmin();
 S.canSeeArchived = () => isAdmin();
-S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.device = deviceLabel(); nt.listed = false; nt._new = true; remember(nt.id); };
+S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.device = deviceLabel(); nt.listed = false; nt._new = true; if (loginMode() && orgActive() && !isAdmin()) nt.orgCode = ORG.code; remember(nt.id); };
 // a rough "what kind of device" label so the admin can tell creators apart (no personal data)
 function deviceLabel() {
   const u = navigator.userAgent || "";
@@ -202,6 +211,17 @@ S.menuFilter = t => !isAdmin() || t.listed || isOwner(t);
 const base = () => `${location.origin}${location.pathname}`;
 const links = t => ({ watch: `${base()}#${t.id}`, edit: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].edit}` : "", score: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].score}` : "" });
 S.headerExtra = () => {
+  if (CONFIGURED && loginMode() && !isAdmin() && !S.liveRoute) {
+    const who = orgActive() ? `<button class="btn sm ghost" data-act="org-page" title="${esc(ORG.info.label || "")}"><span class="pill done">Organiser</span></button>` : `<button class="btn sm ghost" data-act="org-page">Organiser login</button>`;
+    const t = T(); if (!t) return who;
+    const p = S.permFn(t);
+    if (orgActive() && p.edit) return who;
+    if (t.listed) return `<span class="pill" title="Example competition, view only">Example</span>` + who;
+    if (TEAM[t.id]) return `<span class="pill done">Team</span>`;
+    if (p.edit) return `<span class="pill done">Organiser</span>`;
+    if (p.score) return `<span class="pill done">Scorer</span>`;
+    return who;
+  }
   const t = T(); if (!CONFIGURED || !t) return "";
   const p = S.permFn(t);
   if (isAdmin()) return `<span class="pill done">Admin</span>`;
@@ -213,7 +233,7 @@ S.headerExtra = () => {
   if (p.score) return `<span class="pill done">Scorer</span>`;
   return `<button class="btn sm ghost" data-act="enter-code">Organiser code</button>`;
 };
-S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link the organiser sent you.</p>`;
+S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link the organiser sent you.</p>${loginMode() ? `<p class="muted">Running one? <button class="btn sm" data-act="org-page">Organiser login</button></p>` : ""}`;
 const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px"><div class="eyebrow">${label}</div>
   <div class="row" style="flex-wrap:nowrap"><input type="text" id="${id}" readonly value="${esc(value)}" aria-label="${label}"><button class="btn" data-act="copy" data-target="${id}">Copy</button></div>
   <p class="small muted">${note}</p></div>`;
@@ -221,7 +241,7 @@ S.setupExtra = t => { if (S.permFn(t).edit && S.streamingOn()) watchLiveCode(t.i
 const sharingPanel = t => {
   if (!CONFIGURED) return "";
   const l = links(t);
-  if (SITE.openTesting) return `<div class="panel stack">
+  if (SITE.openTesting && !loginMode()) return `<div class="panel stack">
     <h3>Sharing</h3>
     <div class="notice">Open testing is on: everyone who opens a competition can run it, including registration, setup, draws and scores. Spectator and organiser links are switched off while it's on.</div>
     ${copyRow("share-watch", "Link to this competition", l.watch, "Anyone with this link can run this competition while open testing is on.")}
@@ -264,6 +284,25 @@ S.extraAction = async (act, a) => {
     const mode = a.dataset.mode; const on = mode === "all" ? true : mode === "admin" ? "admin" : false;
     try { await setDoc(doc(FB.db, "config", "site"), { streaming: on, updated: Date.now() }, { merge: true }); toast(on === true ? "Competition game overlays are on for everyone." : on === "admin" ? "Competition game overlays are on for you only." : "Competition game overlays are switched off."); }
     catch (e) { console.error(e); toast("That setting didn't save."); }
+    return;
+  }
+  if (act === "org-login") { await orgLogin(document.getElementById("org-code")?.value); return; }
+  if (act === "org-logout") { await orgLogout(); return; }
+  if (act === "org-page") { location.hash = "#login"; return; }
+  if (act === "org-new") { S.overlayView = null; history.replaceState(null, "", location.pathname); render(); document.querySelector('#tsel [data-act="new-t"], [data-act="new-t"]')?.click(); return; }
+  if (act === "org-back") { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); S.overlayView = null; render(); return; }
+  if (act === "organiser-login") {
+    const on = a.dataset.on === "1";
+    try { await setDoc(doc(FB.db, "config", "site"), { organiserLogin: on, updated: Date.now() }, { merge: true }); toast(on ? "Organiser login is live. Only organisers with a code can create competitions." : "Organiser login is off."); }
+    catch (e) { console.error(e); toast("That setting didn't save."); }
+    return;
+  }
+  if (act === "org-make") { await makeOrgCode(); return; }
+  if (act === "org-revoke" || act === "org-extend" || act === "org-restore") {
+    const ref = doc(FB.db, "orgcodes", a.dataset.code);
+    const patch = act === "org-revoke" ? { revoked: true } : act === "org-restore" ? { revoked: false } : { expiresAt: new Date(Math.max(Date.now(), +a.dataset.exp || 0) + ORG_DAYS * 864e5) };
+    try { await updateDoc(ref, patch); toast(act === "org-revoke" ? "Code revoked. It stops working straight away." : act === "org-restore" ? "Code restored." : `Code extended by ${ORG_DAYS} days.`); }
+    catch (e) { console.error(e); toast("That change didn't save."); }
     return;
   }
   if (act === "team-links-make") { await makeTeamCodes(S.tid); return; }
@@ -312,6 +351,93 @@ async function joinWithCode(tid, raw) {
   }
   toast("That code didn't work. Check it with the organiser.");
   return false;
+}
+
+/* ---------- organiser login ---------- */
+// The admin creates codes (orgcodes/{code}: label, expiresAt, revoked). An organiser types one in on #login; the device
+// records it in organisers/{uid} (the rules only accept a valid, unexpired code) and can then create competitions, which
+// carry the code, so any device logged in with the same code can run them. Codes stop working when they expire.
+const msOf = v => v == null ? 0 : typeof v === "number" ? v : v.toMillis ? v.toMillis() : +new Date(v);
+function watchOrg() {
+  unsubOrg?.(); unsubOrg = null; if (!FB || !AUTH.user) return;
+  unsubOrg = onSnapshot(doc(FB.db, "organisers", AUTH.user.uid), d => {
+    const code = d.exists() ? d.data().code : null;
+    if (code !== ORG.code) { ORG.code = code; ORG.info = null; unsubOrgCode?.(); unsubOrgCode = null;
+      if (code) unsubOrgCode = onSnapshot(doc(FB.db, "orgcodes", code), c => { ORG.info = c.exists() ? { label: c.data().label || "", expiresAt: msOf(c.data().expiresAt), revoked: !!c.data().revoked } : { label: "", expiresAt: 0, revoked: true }; startWatching(); render(); }, () => { ORG.info = null; render(); });
+      startWatching(); }
+    render();
+  }, () => {});
+}
+async function orgLogin(raw) {
+  const code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (!code) { ORG.err = "Type the code you were given."; render(); return; }
+  ORG.busy = true; ORG.err = ""; render();
+  try { await setDoc(doc(FB.db, "organisers", AUTH.user.uid), { code, at: Date.now() }); ORG.busy = false; toast("You're logged in as an organiser."); history.replaceState(null, "", "#login"); render(); }
+  catch (e) { console.error(e); ORG.busy = false; ORG.err = "That code isn't valid or has expired. Check it with the SN Pétanque admin."; render(); }
+}
+async function orgLogout() {
+  try { await deleteDoc(doc(FB.db, "organisers", AUTH.user.uid)); } catch (e) { console.error(e); }
+  ORG.code = null; ORG.info = null; unsubOrgCode?.(); unsubOrgCode = null; startWatching(); toast("Logged out. Your competitions are kept; log in again with the same code to run them."); render();
+}
+const until = ms => { const h = Math.max(0, Math.round((ms - Date.now()) / 36e5)); return h >= 48 ? `${Math.round(h / 24)} days` : h >= 1 ? `${h} hour${h === 1 ? "" : "s"}` : "less than an hour"; };
+const dayTime = ms => new Date(ms).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+function loginView() {
+  const back = `<button class="btn sm" data-act="org-back">Back to competitions</button>`;
+  if (!loginMode() && !isAdmin()) return `<div class="stack" style="max-width:560px"><div class="spread"><h2>Organiser login</h2>${back}</div>
+    <div class="panel stack"><p>Organiser login isn't switched on yet. For now, anyone can create a competition from the competition menu.</p></div></div>`;
+  const mine = Object.values(S.tournaments).filter(t => ORG.code && t.orgCode === ORG.code && !t.archived).sort((a, b) => (b.created || 0) - (a.created || 0));
+  if (ORG.code && ORG.info) {
+    const ok = orgActive();
+    return `<div class="stack" style="max-width:640px"><div class="spread"><h2>Organiser</h2>${back}</div>
+      <div class="panel stack ${ok ? "" : "rp-live"}">
+        ${ORG.info.label ? `<div class="eyebrow" data-notr>${esc(ORG.info.label)}</div>` : ""}
+        <p>${ok ? `You're logged in with code <b data-notr>${esc(ORG.code)}</b>. It works until <b>${esc(dayTime(ORG.info.expiresAt))}</b> (${until(ORG.info.expiresAt)} left).` : ORG.info.revoked ? `Code <b data-notr>${esc(ORG.code)}</b> has been switched off by the admin.` : `Code <b data-notr>${esc(ORG.code)}</b> expired on ${esc(dayTime(ORG.info.expiresAt))}.`}</p>
+        <p class="small muted">${ok ? "You can create competitions and run them. Log in with the same code on another phone or laptop and you'll see the same competitions there." : "Your competitions are kept and everyone can still follow them, but they can't be changed any more. Ask the admin for a new code if you need more time."}</p>
+        <div class="row">${ok ? `<button class="btn primary" data-act="org-new">Create a competition</button>` : ""}<button class="btn" data-act="org-logout">Log out</button></div>
+      </div>
+      ${mine.length ? `<div class="panel stack" style="gap:6px"><h3>Your competitions</h3>${mine.map(t => `<div class="erow"><div class="who"><b data-notr>${esc(t.name)}</b><span class="small muted">${esc(statusOf(t))}</span></div><a class="btn sm" href="#${t.id}">Open</a></div>`).join("")}</div>` : ""}
+    </div>`;
+  }
+  return `<div class="stack" style="max-width:560px"><div class="spread"><h2>Organiser login</h2>${back}</div>
+    <div class="panel stack">
+      ${!loginMode() ? `<div class="notice">Organiser login is switched off, so this page isn't live yet. You're seeing it because you're the admin.</div>` : ""}
+      <p>Enter the organiser code you were given. Codes last ${ORG_DAYS} days.</p>
+      <input type="text" id="org-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. K7RM2QXP" value="${esc(ORG.prefill || "")}" style="font-size:22px;letter-spacing:.12em;text-transform:uppercase">
+      ${ORG.err ? `<div class="notice">${esc(ORG.err)}</div>` : ""}
+      <div><button class="btn primary" data-act="org-login" ${ORG.busy ? "disabled" : ""}>${ORG.busy ? "Checking…" : "Log in"}</button></div>
+      <p class="small muted">Just following a competition? You don't need a code: open the link the organiser sent you.</p>
+    </div></div>`;
+}
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "org-code") { e.preventDefault(); document.querySelector('[data-act="org-login"]')?.click(); } });
+// admin: organiser codes
+function watchOrgCodes() {
+  if (unsubOrgCodes || !isAdmin() || !FB) return;
+  unsubOrgCodes = onSnapshot(query(collection(FB.db, "orgcodes"), limit(300)), s => { ORGCODES.list = s.docs.map(d => ({ code: d.id, ...d.data(), expiresAt: msOf(d.data().expiresAt), createdAt: msOf(d.data().createdAt) })); if (S.overlayView) render(); }, e => { console.error(e); ORGCODES.list = []; });
+}
+async function makeOrgCode() {
+  const label = (document.getElementById("org-label")?.value || "").trim().slice(0, 60);
+  const code = newCode(); const now = Date.now();
+  try { await setDoc(doc(FB.db, "orgcodes", code), { label, createdAt: new Date(now), expiresAt: new Date(now + ORG_DAYS * 864e5), revoked: false, by: AUTH.user.email || "" });
+    ORGCODES.made = code; ORGCODES.label = ""; toast(`Code ${code} created, valid for ${ORG_DAYS} days.`); render(); }
+  catch (e) { console.error(e); toast("Couldn't create the code."); }
+}
+function orgAdminPanel() {
+  watchOrgCodes();
+  const list = (ORGCODES.list || []).slice().sort((a, b) => b.createdAt - a.createdAt); const now = Date.now();
+  const state = c => c.revoked ? ["Revoked", ""] : c.expiresAt > now ? [`${until(c.expiresAt)} left`, "playing"] : ["Expired", ""];
+  return `<div class="panel stack" id="adm-org">
+      <div class="spread"><h3>Organiser login</h3><span class="pill ${loginMode() ? "playing" : ""}">${loginMode() ? "Live" : "Off"}</span></div>
+      <p class="muted">${loginMode() ? "Live: only organisers who log in with a code you give them can create competitions. Everyone else can follow competitions and view the examples. Open testing doesn't apply while this is on." : `Off: nothing changes for visitors (${SITE.openTesting ? "open testing applies" : "open testing is off"}). You can make codes now and test the login page at <a href="#login">#login</a> before going live.`}</p>
+      <div><button class="btn ${loginMode() ? "" : "primary"}" data-act="organiser-login" data-on="${loginMode() ? "0" : "1"}">${loginMode() ? "Turn organiser login off" : "Make organiser login live"}</button></div>
+      <h3 style="margin-top:8px">Organiser codes</h3>
+      <p class="small muted">Each code works for ${ORG_DAYS} days from when you create it. Competitions are saved against the code, so the organiser sees them on any device they log in on. Give the organiser the code or the login link.</p>
+      <div class="row" style="flex-wrap:wrap;gap:6px"><input id="org-label" placeholder="Who it's for, e.g. Bristol PC · Spring Triples" value="${esc(ORGCODES.label)}" style="max-width:320px"><button class="btn primary" data-act="org-make">Create a code</button></div>
+      ${ORGCODES.made ? `<div class="notice stack" style="gap:6px"><b>New code: <span data-notr style="letter-spacing:.12em">${esc(ORGCODES.made)}</span></b>${copyRow("org-link", "Login link", `${base()}#login.${ORGCODES.made}`, "Opens the organiser login with the code filled in.")}</div>` : ""}
+      ${ORGCODES.list === null ? `<p class="small muted">Loading codes…</p>` : !list.length ? `<p class="small muted">No codes yet.</p>` : list.map(c => { const [st, cls] = state(c); return `<div class="erow">
+        <div class="who"><b data-notr style="letter-spacing:.08em">${esc(c.code)}</b><span class="small muted"><span data-notr>${esc(c.label || "No label")}</span> · created ${when(c.createdAt)} · ${c.expiresAt > now ? "expires" : "expired"} ${when(c.expiresAt)} · ${Object.values(S.tournaments).filter(t => t.orgCode === c.code).length} competitions</span></div>
+        <span class="pill ${cls}">${st}</span>
+        ${c.revoked ? `<button class="btn sm" data-act="org-restore" data-code="${esc(c.code)}">Restore</button>` : `<button class="btn sm" data-act="org-extend" data-code="${esc(c.code)}" data-exp="${c.expiresAt}">+${ORG_DAYS} days</button><button class="btn sm danger" data-act="org-revoke" data-code="${esc(c.code)}">Revoke</button>`}</div>`; }).join("")}
+    </div>`;
 }
 
 function watchRole() {
@@ -376,6 +502,7 @@ function adminView() {
       <p class="muted">${SITE.openTesting ? "Everyone can run every competition (beta testing). Spectator and organiser links are switched off." : "Off: spectators see the draw, results, standings and big screen; organisers use their organiser link or code."}</p>
       <div><button class="btn ${SITE.openTesting ? "" : "primary"}" data-act="open-testing" data-on="${SITE.openTesting ? "0" : "1"}">${SITE.openTesting ? "Turn open testing off" : "Turn open testing on"}</button></div>
     </div>
+    ${orgAdminPanel()}
     <div class="panel stack">
       <div class="spread"><h3>Team score entry <span class="small muted">beta</span></h3><span class="pill ${SITE.teamScoring ? "playing" : ""}">${SITE.teamScoring === true ? "Everyone" : SITE.teamScoring === "admin" ? "Admin only" : "Off"}</span></div>
       <p class="muted">${SITE.teamScoring === true ? "Every organiser can choose, in a competition's Setup, to let teams enter scores on their phones with the other team confirming." : SITE.teamScoring === "admin" ? "Only you see the Score entry choice in Setup (on any competition you open while signed in here). Teams can only submit scores on competitions you switched on; other organisers can't turn it on." : "Hidden from everyone. Each team gets a link; the other team confirms the score; disputes come to the organiser."}</p>
@@ -463,9 +590,10 @@ async function backfillArchived() {
 function watchSite() {
   if (unsubSite || !FB) return;
   unsubSite = onSnapshot(doc(FB.db, "config", "site"), d => {
-    const was = SITE.openTesting;
+    const was = SITE.openTesting, wasLogin = SITE.organiserLogin;
+    SITE.organiserLogin = d.exists() ? d.data().organiserLogin === true : false;
     SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() ? (d.data().teamScoring === true ? true : d.data().teamScoring === "admin" ? "admin" : false) : false; SITE.teamComps = d.exists() ? (d.data().teamScoringComps || {}) : {}; SITE.streaming = d.exists() ? (d.data().streaming === true ? true : d.data().streaming === "admin" ? "admin" : false) : false; SITE.loaded = true;
-    if (was !== SITE.openTesting) startWatching();
+    if (was !== SITE.openTesting || wasLogin !== SITE.organiserLogin) startWatching();
     render();
   }, () => { SITE.loaded = true; });
 }
@@ -485,6 +613,7 @@ async function handleHash() {
   }
   const { tid, code } = readHash();
   if (tid === "admin") { S.overlayView = adminView; render(); return; }
+  if (tid === "login") { if (code) { ORG.prefill = code; history.replaceState(null, "", "#login"); if (AUTH.user && loginMode() && !orgActive()) await orgLogin(code); } S.overlayView = loginView; render(); return; }
   if (!tid) { render(); return; }
   if (tid !== S.tid) { S.tid = tid; S.matches = {}; restart(); }
   liveWatch(); render();
@@ -525,7 +654,7 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__
 }
 
 function boot() {
-  const h = readHash(); if (h.tid && h.tid !== "admin") S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView;
+  const h = readHash(); if (h.tid && h.tid !== "admin" && h.tid !== "login") S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView;
   const lr = parseLiveHash(); if (lr) { if (lr.tid) S.tid = lr.tid; S.liveRoute = lr; }
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
@@ -536,11 +665,14 @@ function boot() {
     connectFirestoreEmulator(FB.db, "127.0.0.1", 8080); connectAuthEmulator(FB.auth, "http://127.0.0.1:9099", { disableWarnings: true });
     window.__testGoogle = (email) => signInWithCredential(FB.auth, GoogleAuthProvider.credential(JSON.stringify({ sub: email, email, email_verified: true })));
     window.__testSetSite = data => setDoc(doc(FB.db, "config", "site"), data, { merge: true });
+    window.__testDoc = (path, data) => setDoc(doc(FB.db, ...path.split("/")), data, { merge: true });
+    window.__testOrg = () => ({ code: ORG.code, active: orgActive(), canCreate: S.canCreate() });
+    window.__testUid = () => AUTH.user?.uid;
   }
   S.store = fbStore();
   onAuthStateChanged(FB.auth, async u => {
     if (!u) { try { await signInAnonymously(FB.auth); } catch (e) { console.error(e); toast("Couldn't connect. Check your internet connection and reload."); } return; }
-    AUTH.user = u; AUTH.ready = true; watchSite(); restart(); render();
+    AUTH.user = u; AUTH.ready = true; watchSite(); watchOrg(); restart(); render();
     await handleHash();
   });
 }

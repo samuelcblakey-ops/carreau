@@ -14,6 +14,11 @@ rules_version = '2';
 //  - Live streaming: each streamed game has a small live doc (running score, ends, boules, player stats, overlay layout).
 //    Anyone can read it (the overlay needs no account). Organisers and scorers write it, and so can a phone that joined
 //    with the competition's stream code (role 'live'), which can do nothing else.
+//  - Organiser login (site switch config/site.organiserLogin, off by default): the admin issues organiser codes
+//    (orgcodes/{code}, each valid for a set time, normally 3 days, and revocable). A device that logs in with a valid
+//    code (organisers/{uid}) can create competitions, which carry that code (orgCode); every device logged in with the
+//    same code can run them until the code expires. While the switch is on, open testing no longer applies: other
+//    visitors can't create or change competitions, but can still follow them and view the examples.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
@@ -26,9 +31,20 @@ service cloud.firestore {
     // Open testing (beta): every signed-in visitor can run every competition. On unless config/site says otherwise.
     function cfg() { return /databases/$(database)/documents/config/site; }
     function openTesting() { return !exists(cfg()) || get(cfg()).data.openTesting != false; }
-    // examples (listed) are view-only for visitors even in open testing
-    function canEdit(tid) { return isAdmin() || owns(tid) || role(tid) == 'edit'
-                                   || (signedIn() && openTesting() && get(tdoc(tid)).data.get('listed', false) != true); }
+    // organiser login: off unless config/site says otherwise
+    function loginOn() { return exists(cfg()) && get(cfg()).data.get('organiserLogin', false) == true; }
+    function ocode(c) { return /databases/$(database)/documents/orgcodes/$(c); }
+    function codeOk(c) { return c is string && c.size() >= 6 && c.size() <= 20 && exists(ocode(c))
+                               && get(ocode(c)).data.get('revoked', false) != true && get(ocode(c)).data.expiresAt > request.time; }
+    function odoc() { return /databases/$(database)/documents/organisers/$(request.auth.uid); }
+    function myCode() { return signedIn() && exists(odoc()) ? get(odoc()).data.code : ''; }
+    function orgValid() { return myCode() != '' && codeOk(myCode()); }
+    function orgEdits(tid) { return orgValid() && get(tdoc(tid)).data.get('orgCode', '') == myCode(); }
+    // examples (listed) are view-only for visitors even in open testing; with organiser login on, only logged-in organisers
+    // (for their own code's competitions), organiser-link holders and the admin can change anything
+    function canEdit(tid) { return isAdmin() || role(tid) == 'edit'
+                                   || (loginOn() ? orgEdits(tid)
+                                                 : (owns(tid) || (signedIn() && openTesting() && get(tdoc(tid)).data.get('listed', false) != true))); }
     function canScore(tid) { return canEdit(tid) || role(tid) == 'score'; }
     // archived competitions are hidden from everyone except the admin
     function notArchived(tid) { return get(tdoc(tid)).data.get('archived', false) != true; }
@@ -71,9 +87,11 @@ service cloud.firestore {
     match /tournaments/{tid} {
       allow get: if resource.data.get('archived', false) != true || isAdmin();
       allow list: if isAdmin() || resource.data.archived == false;
-      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
+                    && (!loginOn() || isAdmin() || (orgValid() && request.resource.data.get('orgCode', '') == myCode()));
       allow update: if ((canEdit(tid) && resource.data.get('archived', false) != true) || isAdmin())
-                    && request.resource.data.ownerUid == resource.data.ownerUid;
+                    && request.resource.data.ownerUid == resource.data.ownerUid
+                    && (isAdmin() || request.resource.data.get('orgCode', '') == resource.data.get('orgCode', ''));
       // organisers can only archive; deleting a competition is admin-only
       allow delete: if isAdmin();
 
@@ -117,6 +135,20 @@ service cloud.firestore {
         allow read: if notArchived(tid) || isAdmin();
         allow write: if streamingOn() && (((canScore(tid) || role(tid) == 'live') && notArchived(tid)) || isAdmin());
       }
+    }
+
+    // organiser codes: only the admin can list, create or change them; a device can look up one code it already knows
+    match /orgcodes/{code} {
+      allow get: if signedIn();
+      allow list, write: if isAdmin();
+    }
+    // organiser login: one doc per device, holding the code it logged in with (only a valid code is accepted)
+    match /organisers/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create, update: if signedIn() && request.auth.uid == uid
+                            && request.resource.data.keys().hasOnly(['code', 'at']) && codeOk(request.resource.data.code);
+      allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
     }
 
     // standalone streams (Stream tab): any game, in a competition or not. Anyone can read (the overlay needs no account);
