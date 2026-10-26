@@ -127,6 +127,7 @@ const SUITES = {
       /visitor cannot read nicknames: true/, /show theirs: true/, /confirm shown: true/,
       /bulk delete toast: 2 competitions deleted\./, /A comps gone, B kept: true/, /A list after delete: 0/, /errs \[\]/,
     ],
+    'web-delete.js': [/before: big games 1000 \| small games 15,15,15,15/, /toast: 5 competitions deleted\./, /after: big games 0 doc false \| small 0,0,0,0 docs false/, /quick: true/, /errs \[\]/],
     'web-shooting.js': [/final sides true done true/, /third sides true done true/, /errs \[\]/],
     'web-pwa.js': [/manifest: \[true,"standalone",3,true,200,"image\/png",true,200,true,true,200,true\]/, /service worker: true/, /no banner before prompt event: true/, /banner after prompt event: true/,
       /install prompt shown: true \| banner gone: true/, /dismissed stays hidden: true/, /picker offers install: true/, /ios banner: true/, /ios steps: true/, /errs \[\]/],
