@@ -67,11 +67,19 @@ const IR = require('./fixtures/ir2026-div1.js');
     await tab('standings');
     L.push('final table matches: ' + (rows(table()).join(' | ') === pub(IR.final)) + ' | headings ' + qa('main .panel h3').map(h => h.textContent).slice(0, 3).join(','));
     if (rows(table()).join(' | ') !== pub(IR.final)) L.push('ours: ' + rows(table()).join(' | '));
+    L.push('podium: clubs ' + [...qa('main .panel')[0].querySelectorAll('tbody tr')].slice(0, 4).map(r => r.className + ':' + (r.querySelector('.medal')?.className || '-')).join(' ') + ' | day 1 table plain ' + !qa('main .panel')[1].querySelector('.medal') + ' | teams top ' + qa('main .panel').find(p => p.querySelector('h3')?.textContent === 'Teams').querySelector('tbody tr').className + ' | facts before teams ' + (qa('main .panel').indexOf(q('.facts-panel')) < qa('main .panel').findIndex(p => p.querySelector('h3')?.textContent === 'Teams')));
+    L.push('facts: ' + qa('.facts .fact').map(f => txt(f.querySelector('.eyebrow')) + ' = ' + txt(f.querySelector('.fact-v')) + ' (' + txt(f.querySelector('.small')) + ')').join(' ; '));
     L.push('day 1 panel still matches: ' + (rows(qa('main .panel')[1].querySelectorAll('tbody tr')).join(' | ') === pub(IR.day1)));
     // 4. French
     q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80); await tab('draw');
     L.push('french: ' + txt(q('.day2-panel')).slice(0, 60) + ' | ' + txt(qa('main section h3').find(h => /12/.test(h.textContent))));
     q('[data-lang="en"]')?.click(); await w(40);
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); } return L; }, IR);
-  console.log(out.join('\n')); console.log('errs', errs); await b.close();
+  console.log(out.join('\n'));
+  // screenshots of the finished Standings (light and dark, desktop and phone) for a visual check
+  await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('[data-act="lang-menu"]')?.click(); await w(40); document.querySelector('[data-lang="en"]')?.click(); await w(60); document.querySelector('[data-tab="standings"]').click(); await w(200); });
+  await p.screenshot({ path: process.env.OUT + '/club-day2-standings.png', fullPage: true });
+  await p.evaluate(() => { document.documentElement.dataset.theme = 'dark'; }); await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
+  await p.screenshot({ path: process.env.OUT + '/club-day2-standings-phone-dark.png', fullPage: true });
+  console.log('errs', errs); await b.close();
 })();
