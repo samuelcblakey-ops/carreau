@@ -3819,7 +3819,9 @@ function startWatching() {
   S.store.watchTournaments(list => {
     S.tournaments = {}; list.filter(t => !t.archived || S.canSeeArchived()).forEach(t => S.tournaments[t.id] = t);
     S.loaded = true;
-    if ((!S.tid || !S.tournaments[S.tid]) && !S.home) { const first = list.filter(t => !t.archived && !(t.listed || t.example)).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
+    // on load (or when the open competition goes away): the newest of this person's own competitions (not a half-written
+    // one still waiting on the server); none → the start screen
+    if ((!S.tid || !S.tournaments[S.tid]) && !S.home) { const first = list.filter(t => !t.archived && !(t.listed || t.example) && Array.isArray(t.teams) && (!S.menuFilter || S.menuFilter(t))).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
     if (T() && !canEdit() && !viewAll(T()) && (S.tab === "setup" || S.tab === "entries")) S.tab = canScore() ? "courts" : "draw";
     S.onTournaments?.();
     render();

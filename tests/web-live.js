@@ -11,6 +11,7 @@ const { chromium } = require('playwright');
   const A = await mk('organiser'); await A.goto(base); await w(3500);
   await A.click('[data-act="new-t"]'); await w(2500);
   const tid = await A.evaluate(() => location.hash.slice(1));
+  await A.click('[data-act="wiz-skip"]'); await w(800); await A.click('[data-tab="entries"]'); await w(400); // a new competition opens on the quick setup
   await A.fill('#bulk', 'Les Carreaux: Marc Dupont, Sophie Martin\nBoule d\'Or: Pierre Lefèvre, Aline Rossi\nGravier Collines: Cc, Dd\nMistral Lions: Ee, Ff'); await A.click('#bulk-form button[type=submit]'); await w(1200);
   await A.click('[data-act="checkin-all"]'); await w(800);
   await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="first-draw"]'); await w(2500);
