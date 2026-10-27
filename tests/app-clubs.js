@@ -51,7 +51,7 @@ const { chromium } = require('playwright');
     L.push('pistes from any day: ' + [...new Set(C.MS().filter(m => m.court && !m.done).map(m => m.round))].sort().join(','));
     // 5. Standings: club table + team table
     await tab('standings');
-    L.push('standings: ' + qa('main h3').map(h => h.textContent).join(',') + ' | club cols ' + qa('main .panel')[0].querySelectorAll('thead th').length + ' | top club ' + txt(qa('main .panel')[0].querySelector('tbody tr')) + ' | team row ' + txt(qa('main .panel')[1].querySelector('tbody tr')));
+    L.push('standings: ' + qa('main h3').map(h => h.textContent).join(',') + ' | club cols ' + qa('main .panel')[0].querySelectorAll('thead th').length + ' | top club ' + txt(qa('main .panel')[0].querySelector('tbody tr')) + ' | team row ' + txt(qa('main .panel').find(x => x.querySelector('h3')?.textContent === 'Teams').querySelector('tbody tr')) + ' | grid cells ' + qa('.results-grid .cgrid .g-res').map(b => b.textContent).join(','));
     // 6. Rotation, 4 clubs × 3 teams: 3 days, 2 fixtures a day, 9 games each with Game 1–3
     await mk({ name: 'Rotation', clubPairing: 'rotation' }, ['Alpha', 'Bravo', 'Charlie', 'Delta'], 3); await tab('draw'); q('[data-act="first-draw"]').click(); await w(250);
     const r = C.T(), rm = C.MS();
