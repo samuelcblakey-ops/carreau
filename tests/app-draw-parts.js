@@ -27,7 +27,7 @@ const { chromium } = require('playwright');
     await playAll(m => m.round === 2); q('[data-act="next-round"]').click(); await w(250); await playAll(m => m.round === 3);
     L.push('new round resets the pick: ' + chips());
     q('[data-act="start-kos"]').click(); await w(300);
-    L.push('knockouts drawn: chips ' + chips() + ' | groups ' + groups() + ' | bracket shown ' + !!q('main .bk') + ' | rounds shown ' + qa('main section.draw-round').length);
+    L.push('knockouts drawn: chips ' + chips() + ' | groups ' + groups() + ' | bracket shown ' + !!q('main .bk, main .bk-list') + ' | rounds shown ' + qa('main section.draw-round').length);
     const h0 = document.documentElement.scrollHeight;
     q('[data-act="draw-sel"][data-v="all"]').click(); await w(80);
     L.push('all: shown ' + shown() + ' | page ' + (document.documentElement.scrollHeight > h0 + 600 ? 'much longer' : 'similar ' + h0 + ' ' + document.documentElement.scrollHeight));
