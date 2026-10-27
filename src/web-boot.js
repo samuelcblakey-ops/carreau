@@ -291,6 +291,8 @@ S.extraAction = async (act, a) => {
   if (act === "org-login") { await orgLogin(document.getElementById("org-code")?.value); return; }
   if (act === "org-logout") { await orgLogout(); return; }
   if (act === "org-page") { location.hash = "#login"; return; }
+  if (act === "guide-play") { openGuide(a.dataset.id); return; }
+  if (act === "guide-close") { closeGuide(); return; }
   if (act === "org-new") { S.overlayView = null; history.replaceState(null, "", location.pathname); render(); document.querySelector('#tsel [data-act="new-t"], [data-act="new-t"]')?.click(); return; }
   if (act === "org-back") { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); S.overlayView = null; render(); return; }
   if (act === "organiser-login") {
@@ -355,6 +357,40 @@ async function joinWithCode(tid, raw) {
   return false;
 }
 
+
+// ---------- guides: walk-through videos, served from the site itself (no YouTube, so no cookies or tracking) ----------
+const GUIDES = [
+  { id: "first", title: "Your first competition", len: "2½ min", file: "videos/first-competition",
+    desc: "From a blank page to round 1 on the pistes: create a competition, add teams, check in, share the link, draw and enter scores.",
+    cta: "New to the desk? Watch the 2-minute walk-through." },
+  { id: "shooting", title: "Running a shooting competition", len: "3 min", file: "videos/shooting-competition",
+    desc: "Tir de précision: qualifying scorecards with the live scorer, then a knockout to the final and the podium.",
+    cta: "Running a shooting day? Watch how it works (3 min)." },
+];
+const guideOf = id => GUIDES.find(g => g.id === id);
+S.guideLink = id => { const g = guideOf(id); return g ? `<button type="button" class="btn sm ghost guide-btn" data-act="guide-play" data-id="${g.id}"><span class="gi" aria-hidden="true">▶</span><span>${g.cta}</span></button>` : ""; };
+function guidesView() {
+  return `<div class="stack" style="max-width:900px"><div class="spread"><h2>Guides</h2><button class="btn sm" data-act="org-back">Back to competitions</button></div>
+    <p class="muted">Short videos that walk you through the competition desk, step by step.</p>
+    <div class="guide-grid">${GUIDES.map(g => `<div class="panel stack guide-card" id="guide-${g.id}">
+      <button type="button" class="guide-thumb" data-act="guide-play" data-id="${g.id}" aria-label="Play: ${g.title}"><img src="${g.file}.jpg" alt="" loading="lazy" width="960" height="600"><span class="gp" aria-hidden="true">▶</span></button>
+      <div class="guide-body"><b>${g.title}</b><span class="small muted">${g.len}</span><p class="small muted" style="margin:4px 0 0">${g.desc}</p></div></div>`).join("")}</div>
+    ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}
+  </div>`;
+}
+function openGuide(id) {
+  const g = guideOf(id); if (!g) return; closeGuide();
+  const el = document.createElement("div"); el.id = "guide-modal";
+  el.innerHTML = `<div class="scrim"><div class="modal guide stack" role="dialog" aria-modal="true" aria-label="${esc(g.title)}" style="gap:10px">
+    <div class="spread"><h3>${g.title}</h3><button type="button" class="btn ghost" data-act="guide-close" aria-label="Close">✕</button></div>
+    <video class="guide-video" src="${g.file}.mp4" poster="${g.file}.jpg" controls autoplay playsinline preload="metadata"></video>
+    ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}</div></div>`;
+  el.addEventListener("click", e => { if (e.target.classList.contains("scrim")) closeGuide(); });
+  document.body.appendChild(el); localize(el); el.querySelector('[data-act="guide-close"]').focus();
+}
+function closeGuide() { const el = document.getElementById("guide-modal"); if (!el) return; el.querySelector("video")?.pause(); el.remove(); }
+document.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("guide-modal")) closeGuide(); });
+
 /* ---------- organiser login ---------- */
 // The admin creates codes (orgcodes/{code}: label, expiresAt, revoked). An organiser types one in on #login; the device
 // records it in organisers/{uid} (the rules only accept a valid, unexpired code) and can then create competitions, which
@@ -396,6 +432,7 @@ function loginView() {
         <p>${ok ? `You're logged in with code <b data-notr>${esc(ORG.code)}</b>. It works until <b>${esc(dayTime(ORG.info.expiresAt))}</b> (${until(ORG.info.expiresAt)} left).` : ORG.info.revoked ? `Code <b data-notr>${esc(ORG.code)}</b> has been switched off by the admin.` : `Code <b data-notr>${esc(ORG.code)}</b> expired on ${esc(dayTime(ORG.info.expiresAt))}.`}</p>
         <p class="small muted">${ok ? "You can create competitions and run them. Log in with the same code on another phone or laptop and you'll see the same competitions there." : "Your competitions are kept and everyone can still follow them, but they can't be changed any more. Ask the admin for a new code if you need more time."}</p>
         <div class="row">${ok ? `<button class="btn primary" data-act="org-new">Create a competition</button>` : ""}<button class="btn" data-act="org-logout">Log out</button></div>
+        ${ok ? `<div>${S.guideLink("first")}</div>` : ""}
       </div>
       ${mine.length ? `<div class="panel stack" style="gap:6px"><h3>Your competitions</h3>${mine.map(t => `<div class="erow"><div class="who"><b data-notr>${esc(t.name)}</b><span class="small muted">${esc(statusOf(t))}</span></div><a class="btn sm" href="#${t.id}">Open</a></div>`).join("")}</div>` : ""}
     </div>`;
@@ -619,6 +656,7 @@ async function handleHash() {
   }
   const { tid, code } = readHash();
   if (tid === "admin") { S.overlayView = adminView; render(); return; }
+  if (tid === "guides") { S.overlayView = guidesView; render(); return; }
   if (tid === "login") { if (code) { ORG.prefill = code; history.replaceState(null, "", "#login"); if (AUTH.user && loginMode() && !orgActive()) await orgLogin(code); } S.overlayView = loginView; render(); return; }
   if (!tid) { render(); return; }
   S.home = false;
@@ -661,7 +699,7 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__
 }
 
 function boot() {
-  const h = readHash(); if (h.tid && h.tid !== "admin" && h.tid !== "login") S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView;
+  const h = readHash(); if (h.tid && !["admin", "login", "guides"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
   const lr = parseLiveHash(); if (lr) { if (lr.tid) S.tid = lr.tid; S.liveRoute = lr; }
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);

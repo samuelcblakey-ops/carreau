@@ -218,6 +218,11 @@ const SUITES = {
       /logged in: .*You're logged in with code [A-Z0-9]{8}.* \| org \{"code":"[A-Z0-9]{8}","active":true,"canCreate":true\}/, /organiser created: true \| on registration true/, /second device: lists it true/, /second device edit: ok/,
       /organiser cannot move it to another code: blocked permission-denied/, /visitor tabs: Draw & results\|Standings\|Stream/, /visitor edit: blocked permission-denied/, /after revoke edit: blocked permission-denied \| new button false/,
       /after revoke page: true/, /off again: visitor new button true/, /errs \[\]/],
+    'web-guides.js': [/welcome link: Watch how it works A 2½-minute walk-through of a first competition/, /footer link: true/,
+      /guides page: Guides \| Your first competition \/ Running a shooting competition \| posters true/,
+      /video files: 200 video\/mp4 true \| 200 video\/mp4 true/, /player: Running a shooting competition \| videos\/shooting-competition\.mp4 \| controls true \| long (true|n\/a)/,
+      /escape closes: true/, /click outside closes: true/, /wizard step 1: first/, /step 2 triples: -/, /step 2 shooting: shooting/, /step 3 shooting: shooting/,
+      /wizard opens: videos\/shooting-competition\.mp4 \| wizard kept: true/, /french: Guides \| De courtes vidéos .* \| Les vidéos sont en anglais\./, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
       /admin page \(signed in\):.*Open testingOn/, /B tabs \(testing off\): Draw & results\|Standings\|Stream/,
