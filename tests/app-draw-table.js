@@ -13,7 +13,7 @@ const { chromium } = require('playwright');
       Object.assign(t, { name: system, system, format: 'singles', checkin: false, swissRounds: 3, wizard: false }, extra);
       ['A', 'B', 'C', 'D'].forEach(n => t.teams.push({ id: n, name: 'Team ' + n, players: ['Marc Dupontel Montpellier'], active: true })); // long names: the +/- column must still fit a phone
       await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30);
-      q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300); return t; };
+      q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300); q('[data-act="draw-sel"][data-v="table"]')?.click(); await w(60); return t; };
     // Swiss: round 1, one result in
     await make('swiss');
     L.push('swiss before results: ' + (q('.draw-table h3')?.textContent || 'none'));

@@ -278,6 +278,13 @@ table.shots td,table.shots th{padding:5px 6px}
 .g-res.g-w{background:rgba(46,160,67,.22)}.g-res.g-l{background:rgba(214,69,65,.18)}.g-res.g-d{background:rgba(232,185,35,.24)}.g-res.g-live{background:var(--surface);box-shadow:inset 0 0 0 2px var(--jack)}.g-res.g-wait{color:var(--muted);font-size:12px;font-weight:600}
 .g-key{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.g-key .g-res{display:inline-grid;place-items:center;width:auto;min-height:22px;padding:0 8px;font-size:12px;cursor:default}
 details.day1-table>summary{cursor:pointer;list-style-position:inside}details.day1-table>summary h3{display:inline}
+.rchip.txt{font-family:var(--body);font-size:14px;font-weight:600;padding:0 14px}.pools.single{grid-template-columns:minmax(0,1fr)}
+.rlist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.rrow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;width:100%;padding:10px 14px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left}
+.rrow:first-child{border-top:0}button.rrow{cursor:pointer}button.rrow:hover{background:var(--surface-2)}
+.rr-a{text-align:right}.rr-a,.rr-b{min-width:0;overflow-wrap:anywhere;color:var(--muted)}.rr-a.win,.rr-b.win{color:var(--ink);font-weight:700}
+.rr-sc{font-family:var(--display);font-size:18px;font-weight:700;white-space:nowrap;text-align:center;min-width:52px}.rr-sc.rr-bye{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted)}
+.ko-plan > summary{cursor:pointer;list-style-position:inside;padding:2px 0}.ko-plan[open] > summary{margin-bottom:10px}
 .fx{font-size:17px}.day-plan summary{cursor:pointer;list-style-position:inside}.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:4px 0;border-top:1px solid var(--line)}.dp-row:first-child{border-top:0}.dp-fx{font-weight:600}.dp-days{flex-wrap:wrap}.dp-days button{min-width:44px}.fx-score{font-family:var(--display);font-size:22px;font-weight:700;color:var(--accent);padding:0 6px}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
 @media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
@@ -825,6 +832,13 @@ Object.assign(LANG_TEXT.de, {"Grid": "Raster", "All": "Alle", "Results grid": "E
 Object.assign(LANG_TEXT.nl, {"Grid": "Raster", "All": "Alles", "Results grid": "Uitslagenraster", "Days": "Speeldagen", "Won": "Gewonnen", "Lost": "Verloren", "In play": "Bezig", "Each cell is games won – lost by the club on the left. Tap a score to see its games.": "Elk vak toont de gewonnen – verloren partijen van de club links. Tik op een uitslag om de partijen te zien."});
 Object.assign(LANG_TEXT.pt, {"Grid": "Grelha", "All": "Tudo", "Results grid": "Grelha de resultados", "Days": "Jornadas", "Won": "Ganho", "Lost": "Perdido", "In play": "Em jogo", "Each cell is games won – lost by the club on the left. Tap a score to see its games.": "Cada casa mostra os jogos ganhos – perdidos pelo clube da esquerda. Toque num resultado para ver os seus jogos."});
 Object.assign(LANG_TEXT.th, {"Grid": "ตาราง", "All": "ทั้งหมด", "Results grid": "ตารางผลการแข่งขัน", "Days": "วันแข่ง", "Won": "ชนะ", "Lost": "แพ้", "In play": "กำลังแข่ง", "Each cell is games won – lost by the club on the left. Tap a score to see its games.": "แต่ละช่องคือจำนวนเกมที่ชนะ – แพ้ของสโมสรทางซ้าย แตะที่ผลเพื่อดูเกมทั้งหมด"});
+Object.assign(FR_TEXT, {"Barrages": "Barrages", "Fixtures drawn": "Rencontres tirées", "Schedule drawn": "Calendrier tiré", "Plan the knockouts": "Organiser les tableaux", "Who goes into each knockout": "Qui va dans chaque tableau"});
+Object.assign(LANG_TEXT.es, {"Barrages": "Barrages", "Fixtures drawn": "Encuentros sorteados", "Schedule drawn": "Calendario sorteado", "Plan the knockouts": "Planificar los cuadros", "Who goes into each knockout": "Quién entra en cada cuadro"});
+Object.assign(LANG_TEXT.it, {"Barrages": "Barrage", "Fixtures drawn": "Incontri sorteggiati", "Schedule drawn": "Calendario sorteggiato", "Plan the knockouts": "Pianifica i tabelloni", "Who goes into each knockout": "Chi entra in ogni tabellone"});
+Object.assign(LANG_TEXT.de, {"Barrages": "Barragen", "Fixtures drawn": "Begegnungen ausgelost", "Schedule drawn": "Spielplan ausgelost", "Plan the knockouts": "K.-o.-Runden planen", "Who goes into each knockout": "Wer in welche K.-o.-Runde kommt"});
+Object.assign(LANG_TEXT.nl, {"Barrages": "Barrages", "Fixtures drawn": "Ontmoetingen geloot", "Schedule drawn": "Schema geloot", "Plan the knockouts": "Knock-outs plannen", "Who goes into each knockout": "Wie in welke knock-out komt"});
+Object.assign(LANG_TEXT.pt, {"Barrages": "Barragens", "Fixtures drawn": "Encontros sorteados", "Schedule drawn": "Calendário sorteado", "Plan the knockouts": "Planear os quadros", "Who goes into each knockout": "Quem entra em cada quadro"});
+Object.assign(LANG_TEXT.th, {"Barrages": "รอบบาราจ", "Fixtures drawn": "จับสลากคู่แข่งแล้ว", "Schedule drawn": "จับสลากตารางแข่งแล้ว", "Plan the knockouts": "วางแผนรอบน็อกเอาต์", "Who goes into each knockout": "ใครเข้ารอบน็อกเอาต์ไหน"});
 Object.assign(FR_TEXT, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Touchez le score de l'équipe perdante. Le vainqueur marque {1} et c'est enregistré tout de suite.", "Score if they lost": "Score s'ils ont perdu"});
 Object.assign(LANG_TEXT.es, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Toca el resultado del equipo perdedor. El ganador se queda con {1} y se guarda al momento.", "Score if they lost": "Resultado si perdieron"});
 Object.assign(LANG_TEXT.it, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Tocca il punteggio della squadra che ha perso. Il vincitore prende {1} e si salva subito.", "Score if they lost": "Punteggio se hanno perso"});
@@ -977,7 +991,7 @@ const S = {
   store: localStore(), tournaments: {}, tid: lsGet("carreau-tid"), matches: {}, unsubM: null,
   tab: lsGet("carreau-tab") || "draw", canWrite: true, modal: null, downloads: null, loaded: false, pendingRender: false,
   live: {}, liveRoute: null, unsubL: null, liveKey: null, desk: { win: null, stats: false, layout: false, lo: "l" }, streams: {}, unsubS: null, streamKey: null,
-  clubSel: {}, fxOpen: {} // inter-club: the round picked on Draw & results (per competition) and fixtures opened or closed by hand
+  clubSel: {}, fxOpen: {}, drawSel: {}, // inter-club: the round picked on Draw & results (per competition) and fixtures opened or closed by hand
 };
 const T = () => S.tournaments[S.tid];
 // who can do what: replaced by the web build (owner / scorer / viewer)
@@ -2723,7 +2737,9 @@ const SYS_NAME = { swiss: "Swiss", snake: "Snake", pools: "Barrage", leagues: "L
 function compMeta(t) {
   const n = (isIndiv(t) ? t.players : t.teams || []).length;
   const kind = isShoot(t) ? "Precision shooting" : isMelee(t) ? "Mêlée" : `${t.format ? t.format[0].toUpperCase() + t.format.slice(1) : ""} · ${SYS_NAME[t.system] || ""}`;
-  const stage = t.archived ? "Archived" : (t.brackets || []).length ? "Knockout" : (t.pools || []).length ? (isLeagues(t) ? "Leagues" : "Barrage") : (t.draws || []).length ? `Round ${t.draws.length}` : n ? "Registration" : "Not started";
+  const rnds = (t.draws || []).filter(d => d.kind === "round").length, drew = id => (t.draws || []).some(d => d.id === id);
+  const stage = t.archived ? "Archived" : (t.brackets || []).length ? "Knockout" : (t.pools || []).length ? (isLeagues(t) ? "Leagues" : "Barrage")
+    : drew("CL") ? (drew("CL2") ? "Day 2" : "Fixtures drawn") : rnds ? `Round ${rnds}` : (t.draws || []).length ? "Schedule drawn" : n ? "Registration" : "Not started";
   const d = t.date ? new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" }) : "";
   return [d, kind, `${n} ${isIndiv(t) ? "players" : "teams"}`, stage].filter(Boolean).join(" · ");
 }
@@ -3116,24 +3132,58 @@ function renderDraw(t) {
       <div class="spread"><div><div class="eyebrow">Afternoon</div><h3>Knockouts</h3></div>
         ${ready ? `<button class="btn primary" data-act="start-kos">Draw the knockouts</button>` : `<span class="pill">${sys === "swiss" ? "Draw once the last round is finished" : "Draw once every game is finished"}</span>`}</div>
       ${ready && sys === "swiss" && rounds.length && rounds[0].round < t.swissRounds ? `<div class="notice">Only ${rounds[0].round} of ${t.swissRounds} planned rounds have been played. You can still draw the knockouts now, or play another round first.</div>` : ""}
-      ${renderPlanEditor(t, { compact: true })}
-    </div>`;
+      <details class="ko-plan" ${ready || S.koPlan ? "open" : ""}><summary><b>Plan the knockouts</b> <span class="small muted">Who goes into each knockout</span></summary>${renderPlanEditor(t, { compact: true })}</details>
+    </div>`; // the plan stays folded during the morning so the round in play is near the top
   }
-  // brackets first if present (most recent stage)
-  (t.brackets || []).forEach(b => html += renderBracket(t, b, ms));
+  // the parts of a draw: each knockout, the table, each round (or barrage/league). With two or more parts the page
+  // shows one at a time, picked with chips and opening on the part being played; "All" shows everything as before.
+  const parts = [], top = [];
+  const rsec = (label, rm) => `<section class="stack draw-round" style="gap:10px"><h3>${esc(label)}</h3>${gameList(t, rm)}</section>`;
+  (t.brackets || []).forEach(b => parts.push({ v: "ko-" + b.id, kind: "ko", label: b.name, games: ms.filter(m => m.bracket === b.id), html: () => renderBracket(t, b, ms) }));
   // the morning's live table (wins, losses, points for/against, points difference), the same one as on Standings
   const stStage = ["swiss", "melee", "snake"].includes(sys) ? sys : sys === "roundrobin" ? "rr" : null;
-  if (stStage && ms.some(m => m.stage === stStage)) html += `<section class="panel stack draw-table" style="gap:8px"><div class="spread"><h3>${(t.brackets || []).length ? "Morning table" : "Table"}</h3><button type="button" class="btn sm ghost" data-tab="standings">Full standings</button></div>${standingsTable(t, overallTable(t, stStage), { buch: stStage === "swiss" || stStage === "snake" })}</section>`;
-  // drawn in advance: round 1 at the top, in order; round by round (Swiss etc.): newest first
-  const listed = isMelee(t) && meleeMode(t) === "advance" ? rounds.slice().sort((a, b) => a.round - b.round) : rounds;
-  if (listed.length) listed.forEach(d => { const rm = ms.filter(m => m.group === d.id).sort(byOrder); html += `<section class="stack draw-round" style="gap:10px"><h3>${esc(d.label)}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; });
+  if (stStage && ms.some(m => m.stage === stStage)) parts.push({ v: "table", kind: "table", label: (t.brackets || []).length ? "Morning table" : "Table", games: [], html: () => `<section class="panel stack draw-table" style="gap:8px"><div class="spread"><h3>${(t.brackets || []).length ? "Morning table" : "Table"}</h3><button type="button" class="btn sm ghost" data-tab="standings">Full standings</button></div>${standingsTable(t, overallTable(t, stStage), { buch: stStage === "swiss" || stStage === "snake" })}</section>` });
+  // rounds drawn one at a time (Swiss, mêlée) or all at once (mêlée in advance): "All" lists round by round as before
+  const advance = isMelee(t) && meleeMode(t) === "advance";
+  rounds.slice().sort((a, b) => a.round - b.round).forEach(d => { const rm = ms.filter(m => m.group === d.id).sort(byOrder); parts.push({ v: "r-" + d.id, kind: "round", label: String(d.round), title: d.label, games: rm, html: () => rsec(d.label, rm) }); });
   // round robin and snake (whole schedule drawn at once)
   for (const [gid, label] of [["RR", "Round robin"], ["SN", "Snake"]]) if (t.draws.some(d => d.id === gid)) {
     const rr = ms.filter(m => m.group === gid); if (!rr.length) continue; const maxR = Math.max(...rr.map(m => m.round));
     const rrDone = rr.every(m => m.done);
-    html += `<div class="panel spread ${rrDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds · <span class="rp-state">${rrDone ? "All games finished" : gamesLeft(rr.filter(m => !m.done).length)}</span></div>
-      ${wr ? `<div class="row">${!rr.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${gid}">Undo schedule</button>` : ""}</div>` : ""}</div>`;
-    for (let r = 1; r <= maxR; r++) { const rm = rr.filter(m => m.round === r).sort(byOrder); html += `<section class="stack" style="gap:10px"><h3>Round ${r}</h3><div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div></section>`; }
+    top.push(`<div class="panel spread ${rrDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds · <span class="rp-state">${rrDone ? "All games finished" : gamesLeft(rr.filter(m => !m.done).length)}</span></div>
+      ${wr ? `<div class="row">${!rr.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${gid}">Undo schedule</button>` : ""}</div>` : ""}</div>`);
+    for (let r = 1; r <= maxR; r++) { const rm = rr.filter(m => m.round === r).sort(byOrder); parts.push({ v: gid + "-" + r, kind: "round", label: String(r), title: `Round ${r}`, games: rm, html: () => rsec(`Round ${r}`, rm) }); }
+  }
+  // barrages and leagues: one part per group
+  if ((t.pools || []).length) {
+    const ranks = t.pools.map(p => poolRanking(t, p, ms));
+    const koStarted = (t.brackets || []).some(b => b.id === "A");
+    const lg = isLeagues(t);
+    top.push(`<div class="panel spread"><div><div class="eyebrow">${lg ? "Leagues" : "Barrage"}</div><b>${ranks.filter(r => r.complete).length}/${t.pools.length} ${lg ? "leagues" : "barrages"} complete</b></div>
+      ${wr && !koStarted ? `<div class="row">${!ms.some(m => m.pool && m.done) ? `<button class="btn danger sm" data-act="undo" data-id="pools">${lg ? "Undo the leagues" : "Undo the barrage"}</button>` : ""}</div>` : ""}</div>`);
+    t.pools.forEach((p, i) => parts.push({ v: "p-" + p.id, kind: "pool", group: lg ? "Leagues" : "Barrages", label: (p.name || "").replace(/^(Barrage|League) /, ""), title: p.name, games: ms.filter(m => m.pool === p.id), html: () => poolCard(t, p, ms, ranks[i]) }));
+  }
+  html += top.join("");
+  if (parts.length) {
+    const ko = parts.filter(p => p.kind === "ko"), rp = parts.filter(p => p.kind === "round"), pp = parts.filter(p => p.kind === "pool");
+    const open = p => p.games.some(m => !m.done && !m.bye);
+    const now = ko.length ? (ko.find(open) || ko[0]) : rp.length ? (rp.find(open) || rp[rp.length - 1]) : pp.length ? (pp.find(open) || pp[0]) : parts[0];
+    const sig = t.draws.length + "/" + (t.brackets || []).length; const saved = S.drawSel[t.id];
+    // a new round or knockout puts the page back on the part being played
+    const pick = parts.length < 2 ? "all" : saved && saved.sig === sig && (saved.v === "all" || parts.some(p => p.v === saved.v)) ? saved.v : now.v;
+    const allHtml = () => ko.map(p => p.html()).join("") + parts.filter(p => p.kind === "table").map(p => p.html()).join("")
+      + (advance ? rp : rp.filter(p => p.v.startsWith("r-")).reverse().concat(rp.filter(p => !p.v.startsWith("r-")))).map(p => p.html()).join("")
+      + (pp.length ? `<div class="pools">${pp.map(p => p.html()).join("")}</div>` : "");
+    if (parts.length >= 2) {
+      const st = p => !p.games.length ? "" : p.games.every(m => m.done) ? "done" : p.games.some(m => (m.court && !m.done) || m.done) ? "live" : "";
+      const chip = (p, txt) => `<button type="button" class="rchip ${txt ? "txt " : ""}${st(p)}${p === now ? " now" : ""}" data-act="draw-sel" data-v="${p.v}" aria-pressed="${pick === p.v}" ${p.title ? `title="${esc(p.title)}"` : ""}>${esc(p.label)}</button>`;
+      const grp = (label, list, txt) => list.length ? `<span class="rb-group">${label ? `<span class="eyebrow">${label}</span>` : ""}${list.map(p => chip(p, txt)).join("")}</span>` : "";
+      html += `<div class="round-bar draw-bar" role="group" aria-label="Draw">
+        <span class="rb-group"><button type="button" class="rchip txt" data-act="draw-sel" data-v="all" aria-pressed="${pick === "all"}">All</button>${parts.filter(p => p.kind === "table").map(p => chip(p, true)).join("")}</span>
+        ${grp(ko.length > 1 ? "Knockouts" : "", ko, true)}${grp("Rounds", rp)}${grp(pp[0]?.group || "", pp)}</div>`;
+    }
+    const sel = parts.find(p => p.v === pick);
+    html += pick === "all" || !sel ? allHtml() : sel.kind === "pool" ? `<div class="pools single">${sel.html()}</div>` : sel.html();
   }
   // inter-club days: the organiser decides which day each fixture is on
   if (isClubs(t) && t.draws.some(d => d.id === "CL")) {
@@ -3181,16 +3231,6 @@ function renderDraw(t) {
       </section>`;
     }
   }
-  // pools
-  if ((t.pools || []).length) {
-    const ranks = t.pools.map(p => poolRanking(t, p, ms));
-    const allDone = ranks.every(r => r.complete);
-    const koStarted = (t.brackets || []).some(b => b.id === "A");
-    const lg = isLeagues(t);
-    html += `<div class="panel spread"><div><div class="eyebrow">${lg ? "Leagues" : "Barrage"}</div><b>${ranks.filter(r => r.complete).length}/${t.pools.length} ${lg ? "leagues" : "barrages"} complete</b></div>
-      ${wr && !koStarted ? `<div class="row">${!ms.some(m => m.pool && m.done) ? `<button class="btn danger sm" data-act="undo" data-id="pools">${lg ? "Undo the leagues" : "Undo the barrage"}</button>` : ""}</div>` : ""}</div>
-      <div class="pools">${t.pools.map((p, i) => poolCard(t, p, ms, ranks[i])).join("")}</div>`;
-  }
   // knockout consolante control
   if (t.system === "knockout" && t.consolante && !isMelee(t) && wr) {
     const a = (t.brackets || []).find(b => b.id === "A"); const hasB = (t.brackets || []).some(b => b.id === "B");
@@ -3201,6 +3241,16 @@ function renderDraw(t) {
   }
   return html + `</div>`;
 }
+// a list of games: one compact line per game once every game is finished, the full cards while any is still to play
+function gameList(t, rm) {
+  if (rm.length && rm.every(m => m.done)) return `<div class="rlist">${rm.map(m => resultRow(t, m)).join("")}</div>`;
+  return `<div class="mlist">${rm.map(m => matchCard(t, m)).join("")}</div>`;
+}
+function resultRow(t, m) {
+  if (m.bye || !m.b) return `<div class="rrow ro"><span class="rr-a win" data-notr>${esc(sideName(t, m.a) || "")}</span><span class="rr-sc rr-bye">Bye</span><span></span></div>`;
+  const ro = !canScore(), aw = aWon(m), tag = ro ? "div" : "button";
+  return `<${tag} class="rrow ${ro ? "ro" : ""}" ${ro ? "" : `type="button" data-match="${m.id}"`}><span class="rr-a ${aw ? "win" : ""}" data-notr>${esc(sideName(t, m.a))}</span><span class="rr-sc">${m.sa}–${m.sb}</span><span class="rr-b ${aw ? "" : "win"}" data-notr>${esc(sideName(t, m.b))}</span></${tag}>`;
+}
 function poolCard(t, p, ms, rk) {
   const pm = ms.filter(m => m.pool === p.id).sort(byOrder);
   return `<div class="panel stack" style="gap:10px">
@@ -3208,7 +3258,7 @@ function poolCard(t, p, ms, rk) {
     <div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th><th class="n" title="Points for">For</th><th class="n" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
       ${rk.rows.map((s, i) => `<tr class="${!s.unplaced && i < getPlan(t).brackets[0].to && i >= getPlan(t).brackets[0].from - 1 && rk.complete ? "q" : ""}"><td>${s.unplaced ? "–" : i + 1}</td><td class="wrap">${esc(entName(t, s.id))}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td><td class="n">${s.pf}</td><td class="n">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`).join("")}
     </tbody></table></div>
-    <div class="stack" style="gap:8px">${pm.map(m => matchCard(t, m)).join("")}</div>
+    ${pm.length && pm.every(m => m.done) ? gameList(t, pm) : `<div class="stack" style="gap:8px">${pm.map(m => matchCard(t, m)).join("")}</div>`}
   </div>`;
 }
 const SHORT = (R, r) => { const left = R - r; return left === 0 ? "Final" : left === 1 ? "SF" : left === 2 ? "QF" : `R${2 ** (left + 1)}`; };
@@ -3490,6 +3540,7 @@ document.addEventListener("click", async e => {
   if (lg) { S.langMenu = false; I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
   const tab = e.target.closest("[data-tab]");
   if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); render(); return; }
+  if (e.target.closest(".ko-plan > summary")) { const kp = e.target.closest(".ko-plan"); setTimeout(() => { S.koPlan = kp.open; }, 0); }
   if (e.target.closest(".day-plan > summary")) { const dp = e.target.closest(".day-plan"); setTimeout(() => { S.dayPlan = dp.open; }, 0); }
   const sc = e.target.closest("[data-shoot]");
   if (sc) { openMatch(sc.dataset.shoot); return; }
@@ -3591,6 +3642,7 @@ document.addEventListener("click", async e => {
     case "assign": { const n = await guard(assignCourts); toast(n ? `${n} game(s) sent to pistes.` : "No free piste or no game ready."); render(); break; }
     case "start-kos": await guard(startKnockouts); break;
     case "club-day2": await guard(() => addDraw(drawClubDay2(t, MS()))); break;
+    case "draw-sel": S.drawSel[t.id] = { v: a.dataset.v, sig: t.draws.length + "/" + (t.brackets || []).length }; render(); break;
     case "club-sel": { const v = a.dataset.v; S.clubSel[t.id] = v === "grid" || v === "all" ? v : +v; render(); break; }
     case "fx-toggle": S.fxOpen[t.id + ":" + a.dataset.fx] = a.getAttribute("aria-expanded") !== "true"; render(); break;
     case "fx-go": { const f = clubFixtures(t).find(x => x.id === a.dataset.fx); if (!f) break; S.clubSel[t.id] = f.day; S.fxOpen[t.id + ":" + f.id] = true; S.tab = "draw"; render();
