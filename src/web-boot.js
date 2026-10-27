@@ -520,6 +520,173 @@ function creators(all) {
   let n = 0; list.forEach(c => { c.label = ADM.names[c.uid] || (c.uid === AUTH.user?.uid ? "You (admin)" : c.uid === "unknown" ? "Unknown" : `Visitor ${++n}`); });
   return list;
 }
+/* ---------------- admin: usage and limits (Google Cloud Monitoring, read with the admin's own Google sign-in) ---------------- */
+// The site runs on Firebase's free Spark plan: nothing is ever charged, but if a daily limit is reached the database stops
+// answering until the limits reset at midnight Pacific time. This panel shows today's use against those limits, the last
+// seven days, how many devices are connected, and which competitions hold the most games. Figures come from Google's own
+// monitoring (2–4 minutes behind) and need a short-lived "view monitoring data" permission granted at the click of a button.
+const FREE = { reads: 50000, writes: 20000, deletes: 20000, storage: 1024 ** 3 };
+const MON_SCOPE = "https://www.googleapis.com/auth/monitoring.read";
+const MON = {
+  reads: ["firestore.googleapis.com/document/read_ops_count", "firestore.googleapis.com/document/read_count"],
+  writes: ["firestore.googleapis.com/document/write_ops_count", "firestore.googleapis.com/document/write_count"],
+  deletes: ["firestore.googleapis.com/document/delete_ops_count", "firestore.googleapis.com/document/delete_count"],
+  live: ["firestore.googleapis.com/network/active_connections"],
+};
+const USAGE = { token: null, exp: 0, today: null, days: null, live: null, storage: null, at: 0, err: null, busy: false, timer: null, histAt: 0, types: {},
+  games: null, counting: "", estimate: null };
+// start of the Pacific-time day containing d (Firestore's free limits reset then)
+function ptMidnight(d = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" })
+    .formatToParts(d).map(x => [x.type, x.value]));
+  const off = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(d.getTime() / 1000) * 1000;
+  return new Date(Date.UTC(+p.year, +p.month - 1, +p.day) - off);
+}
+const usageLive = () => !!USAGE.token && USAGE.exp > Date.now();
+async function monGet(path, params) {
+  const u = new URL(`https://monitoring.googleapis.com/v3/projects/${firebaseConfig.projectId}/${path}`);
+  Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, v));
+  const r = await fetch(u, { headers: { Authorization: "Bearer " + USAGE.token } });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const det = (j.error && j.error.details) || []; const reason = (det.find(d => d.reason) || {}).reason || (j.error && j.error.status) || "";
+    throw Object.assign(new Error((j.error && j.error.message) || r.statusText || "request failed"), { status: r.status, reason });
+  }
+  return j;
+}
+// one metric, summed over all its series, as [{ t (end of each period), v }]
+async function monSeries(kind, start, end, period, gauge) {
+  const tries = USAGE.types[kind] ? [USAGE.types[kind]] : MON[kind];
+  for (const type of tries) {
+    const j = await monGet("timeSeries", { filter: `metric.type="${type}"`, "interval.startTime": start.toISOString(), "interval.endTime": end.toISOString(),
+      "aggregation.alignmentPeriod": period + "s", "aggregation.perSeriesAligner": gauge ? "ALIGN_MEAN" : "ALIGN_SUM", "aggregation.crossSeriesReducer": "REDUCE_SUM" });
+    const pts = (j.timeSeries || []).flatMap(ts => ts.points || []).map(p => ({ t: Date.parse(p.interval.endTime), v: +(p.value.int64Value ?? p.value.doubleValue ?? 0) }));
+    if (pts.length || type === tries[tries.length - 1]) { if (pts.length) USAGE.types[kind] = type; return pts; }
+  }
+  return [];
+}
+// stored data: Google lists no storage metric for every project, so look for one once and otherwise estimate it
+async function monStorage() {
+  if (USAGE.types.storage === undefined) {
+    const j = await monGet("metricDescriptors", { filter: 'metric.type = starts_with("firestore.googleapis.com/")' }).catch(() => ({}));
+    const d = (j.metricDescriptors || []).find(m => /storage|bytes/i.test(m.type) && m.metricKind === "GAUGE" && /^(By|bytes)$/i.test(m.unit || ""));
+    USAGE.types.storage = d ? d.type : null;
+  }
+  if (!USAGE.types.storage) return null;
+  const now = new Date(); const j = await monGet("timeSeries", { filter: `metric.type="${USAGE.types.storage}"`, "interval.startTime": new Date(now - 6 * 3600e3).toISOString(), "interval.endTime": now.toISOString(),
+    "aggregation.alignmentPeriod": "3600s", "aggregation.perSeriesAligner": "ALIGN_MAX", "aggregation.crossSeriesReducer": "REDUCE_SUM" });
+  const pts = (j.timeSeries || []).flatMap(ts => ts.points || []).map(p => +(p.value.int64Value ?? p.value.doubleValue ?? 0));
+  return pts.length ? pts[0] : null;
+}
+async function usageRefresh(full) {
+  if (!usageLive() || USAGE.busy) return; USAGE.busy = true;
+  try {
+    const now = new Date(), today = ptMidnight(now);
+    const sum = pts => pts.reduce((a, p) => a + p.v, 0);
+    const [r, w, d, live] = await Promise.all([
+      monSeries("reads", today, now, 60), monSeries("writes", today, now, 60), monSeries("deletes", today, now, 60),
+      monSeries("live", new Date(now - 15 * 60e3), now, 60, true).catch(() => [])]);
+    USAGE.today = { reads: sum(r), writes: sum(w), deletes: sum(d) };
+    USAGE.live = live.length ? Math.round(live.sort((a, b) => b.t - a.t)[0].v) : null;
+    if (full || !USAGE.days || Date.now() - USAGE.histAt > 10 * 60e3) {
+      const from = new Date(today.getTime() - 6 * 86400e3);
+      const [hr, hw, hd] = await Promise.all(["reads", "writes", "deletes"].map(k => monSeries(k, from, today, 3600)));
+      const days = Array.from({ length: 7 }, (_, i) => { const st = i < 6 ? ptMidnight(new Date(from.getTime() + i * 86400e3 + 12 * 3600e3)) : today; return { start: st, reads: 0, writes: 0, deletes: 0 }; });
+      const put = (pts, k) => pts.forEach(p => { const day = ptMidnight(new Date(p.t - 1)).getTime(); const row = days.find(x => x.start.getTime() === day); if (row) row[k] += p.v; });
+      put(hr, "reads"); put(hw, "writes"); put(hd, "deletes");
+      days[6] = Object.assign(days[6], USAGE.today);
+      USAGE.days = days; USAGE.histAt = Date.now();
+      USAGE.storage = await monStorage().catch(() => null);
+    }
+    USAGE.at = Date.now(); USAGE.err = null;
+  } catch (e) {
+    console.error(e);
+    USAGE.err = e.status === 401 ? "expired" : /SERVICE_DISABLED|has not been used|is disabled/i.test(e.reason + " " + e.message) ? "api-off" : e.status === 403 ? "denied" : "failed";
+    if (USAGE.err === "expired") USAGE.token = null;
+  } finally { USAGE.busy = false; }
+  if (S.overlayView) render();
+}
+function usageTimer(on) {
+  clearInterval(USAGE.timer); USAGE.timer = null;
+  if (on) USAGE.timer = setInterval(() => {
+    if (!S.overlayView || !usageLive()) { if (!usageLive() && USAGE.token) { USAGE.token = null; USAGE.err = "expired"; if (S.overlayView) render(); } return; }
+    if (document.visibilityState === "visible") usageRefresh();
+  }, 60000);
+}
+async function usageConnect() {
+  if (window.__testUsageToken) { USAGE.token = window.__testUsageToken; USAGE.exp = Date.now() + 55 * 60e3; }
+  else {
+    const p = new GoogleAuthProvider(); p.addScope(MON_SCOPE); p.setCustomParameters({ login_hint: AUTH.user.email });
+    let res; try { res = await reauthenticateWithPopup(AUTH.user, p); }
+    catch (e) { if (!/popup-closed|cancelled-popup/.test(e?.code || "")) toast(e?.code === "auth/user-mismatch" ? "Choose the admin Google account to see usage." : "That didn't complete. Allow pop-ups for this site and try again."); return; }
+    const cred = GoogleAuthProvider.credentialFromResult(res);
+    if (!cred || !cred.accessToken) { toast("Google didn't grant access to the usage figures."); return; }
+    USAGE.token = cred.accessToken; USAGE.exp = Date.now() + 55 * 60e3; // Google's access tokens last an hour
+  }
+  USAGE.err = null; render(); await usageRefresh(true); usageTimer(true);
+}
+// which competitions hold the most games: one count query per competition (about one read each)
+async function usageCount() {
+  const list = Object.values(S.tournaments); const out = []; let i = 0;
+  const one = async t => { let n = null; try { n = (await getCountFromServer(collection(FB.db, "tournaments", t.id, "matches"))).data().count; } catch (e) { console.error(e); } out.push({ t, games: n }); USAGE.counting = `Counting… ${out.length} of ${list.length}`; if (S.overlayView) render(); };
+  USAGE.counting = `Counting… 0 of ${list.length}`; render();
+  const next = async () => { while (i < list.length) await one(list[i++]); };
+  await Promise.all([next(), next(), next(), next()]);
+  USAGE.games = out.sort((a, b) => (b.games || 0) - (a.games || 0)); USAGE.counting = "";
+  // a rough size: competition records as stored, each game about 1.5 KB with its index entries, logos about 20 KB
+  const comp = list.reduce((a, t) => a + JSON.stringify(t).length * 2, 0), games = out.reduce((a, x) => a + (x.games || 0), 0);
+  USAGE.estimate = comp + games * 1500 + Object.keys(S.brand || {}).length * 20000;
+  render();
+}
+const fmtN = n => n == null ? "–" : n.toLocaleString("en-GB");
+const fmtB = b => b == null ? "–" : b < 1024 ** 2 ? `${Math.max(1, Math.round(b / 1024))} KB` : b < 1024 ** 3 ? `${(b / 1024 ** 2).toFixed(1)} MB` : `${(b / 1024 ** 3).toFixed(2)} GB`;
+function meter(label, used, limit, note, fmt = fmtN) {
+  const pct = used == null ? 0 : used / limit; const lvl = pct >= 0.8 ? ["danger", "Near the limit"] : pct >= 0.5 ? ["warn", "Getting close"] : ["ok", "Fine"];
+  return `<div class="use-row"><div class="spread"><b>${label}</b><span class="small"><b>${fmt(used)}</b> of ${fmt(limit)}${note ? ` <span class="muted">· ${note}</span>` : ""}</span></div>
+    <div class="use-bar" role="meter" aria-label="${label}" aria-valuemin="0" aria-valuemax="${limit}" aria-valuenow="${used || 0}"><i class="use-${lvl[0]}" style="width:${Math.min(100, Math.max(used ? 1 : 0, pct * 100)).toFixed(1)}%"></i></div>
+    <span class="small use-lvl use-${lvl[0]}-t">${used == null ? "" : `${Math.round(pct * 100)}% · ${lvl[1]}`}</span></div>`;
+}
+function usagePanel() {
+  const resetAt = new Date(ptMidnight().getTime() + 86400e3).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const fixed = `<details class="use-fixed"><summary><b>What else runs the site</b></summary><ul class="small">
+      <li><b>Firebase</b> (database and sign-in): free Spark plan, no card on file, so nothing can be charged. Daily limits: ${fmtN(FREE.reads)} reads, ${fmtN(FREE.writes)} writes, ${fmtN(FREE.deletes)} deletes; 1 GB stored.</li>
+      <li><b>GitHub Pages</b> (hosting snpetanque.com): free; site up to 1 GB, soft limit of 100 GB of downloads a month.</li>
+      <li><b>GitHub Actions</b> (tests and publishing): free for a public repository.</li>
+      <li><b>snpetanque.com</b>: domain name, paid yearly at GoDaddy (renewal date in your GoDaddy account).</li>
+      <li>Fonts and the QR code generator are part of the site itself: no outside service, no cost.</li></ul></details>`;
+  const head = `<div class="spread"><h3>Usage and limits</h3>${usageLive() && USAGE.at ? `<span class="pill playing">Live</span>` : ""}</div>`;
+  if (!usageLive()) {
+    const why = USAGE.err === "expired" ? `<div class="notice">The hour's access ran out. Show live usage again to carry on.</div>` : "";
+    return `<div class="panel stack" id="adm-usage">${head}${why}
+      <p class="muted">See today's database reads, writes and deletes against the free daily limits, the last 7 days, and how many devices are connected now. The figures come from Google and run 2–4 minutes behind. Google asks you once an hour to let this page view the project's monitoring data.</p>
+      <div><button class="btn primary" data-act="adm-usage-connect">Show live usage</button></div>${fixed}</div>`;
+  }
+  if (USAGE.err === "api-off") return `<div class="panel stack" id="adm-usage">${head}
+      <div class="notice stack" style="gap:8px"><b>One switch to turn on first</b><span>Google's monitoring service (Cloud Monitoring API) is off for this project. Turn it on once, wait a minute, then try again. It's free to use for these figures.</span>
+      <div class="row"><a class="btn sm primary" href="https://console.cloud.google.com/apis/library/monitoring.googleapis.com?project=${esc(firebaseConfig.projectId)}" target="_blank" rel="noopener">Open Google Cloud to turn it on</a><button class="btn sm" data-act="adm-usage-refresh">Try again</button></div></div>${fixed}</div>`;
+  if (USAGE.err === "denied" || USAGE.err === "failed") return `<div class="panel stack" id="adm-usage">${head}
+      <div class="notice">${USAGE.err === "denied" ? "Google refused access to the usage figures for this account." : "The usage figures couldn't be fetched just now."} <button class="btn sm" data-act="adm-usage-refresh">Try again</button></div>${fixed}</div>`;
+  const T0 = USAGE.today || {}; const days = USAGE.days || [];
+  const wd = d => d.start.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", timeZone: "America/Los_Angeles" });
+  const cell = (v, lim) => `<td class="n"><span class="use-cell"><span>${fmtN(v)}</span><b title="${Math.round((v || 0) / lim * 100)}% of the free daily limit"><i style="width:${Math.min(100, (v || 0) / lim * 100).toFixed(1)}%"></i></b></span></td>`;
+  const stored = USAGE.storage != null ? { v: USAGE.storage, note: "" } : USAGE.estimate != null ? { v: USAGE.estimate, note: "rough estimate" } : null;
+  return `<div class="panel stack" id="adm-usage">${head}
+    <p class="small muted">Today so far (the limits reset at ${resetAt} your time). ${USAGE.at ? `Updated ${new Date(USAGE.at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}; Google's figures run 2–4 minutes behind.` : "Loading…"}${USAGE.live != null ? ` <b>${fmtN(USAGE.live)}</b> device${USAGE.live === 1 ? "" : "s"} connected now.` : ""}</p>
+    ${meter("Reads", T0.reads, FREE.reads)}${meter("Writes", T0.writes, FREE.writes)}${meter("Deletes", T0.deletes, FREE.deletes)}
+    ${stored ? meter("Stored data", stored.v, FREE.storage, stored.note, fmtB) : ""}
+    ${days.length ? `<div class="tw"><table class="use-days"><caption class="small muted" style="text-align:left">Last 7 days (Pacific-time days, as Google counts them); each bar is the share of that day's free limit</caption>
+      <thead><tr><th>Day</th><th class="n">Reads</th><th class="n">Writes</th><th class="n">Deletes</th></tr></thead>
+      <tbody>${days.map((d, i) => `<tr><td>${i === 6 ? "Today" : wd(d)}</td>${cell(d.reads, FREE.reads)}${cell(d.writes, FREE.writes)}${cell(d.deletes, FREE.deletes)}</tr>`).join("")}</tbody></table></div>` : ""}
+    <div class="row"><button class="btn sm" data-act="adm-usage-refresh" ${USAGE.busy ? "disabled" : ""}>Refresh now</button>
+      <a class="btn sm" href="https://console.firebase.google.com/project/${esc(firebaseConfig.projectId)}/firestore/usage" target="_blank" rel="noopener">Firebase usage page</a></div>
+    <div class="stack" style="gap:6px"><b>Biggest competitions</b>
+      ${USAGE.games ? `<div class="tw"><table class="use-days"><thead><tr><th>Competition</th><th class="n">Games</th><th class="n">Entries</th><th>Made</th></tr></thead><tbody>
+        ${USAGE.games.slice(0, 10).map(x => `<tr><td data-notr>${esc(x.t.name || "Untitled")}${x.t.listed ? ` <span class="pill">Example</span>` : ""}</td><td class="n">${fmtN(x.games)}</td><td class="n">${fmtN(entriesOf(x.t))}</td><td class="small">${x.t.created ? new Date(x.t.created).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""}</td></tr>`).join("")}</tbody></table></div>
+        <span class="small muted">${USAGE.games.length} competition${USAGE.games.length === 1 ? "" : "s"}, ${fmtN(USAGE.games.reduce((a, x) => a + (x.games || 0), 0))} game${USAGE.games.reduce((a, x) => a + (x.games || 0), 0) === 1 ? "" : "s"} in all.</span>`
+      : `<span class="small muted">Counts the games in every competition: about one read each (${fmtN(Object.keys(S.tournaments).length)} reads now).</span>`}
+      <div>${USAGE.counting ? `<span class="small muted">${esc(USAGE.counting)}</span>` : `<button class="btn sm" data-act="adm-usage-count">${USAGE.games ? "Count again" : "Count games"}</button>`}</div></div>
+    ${fixed}</div>`;
+}
 function adminView() {
   if (isAdmin()) watchNames();
   const all = Object.values(S.tournaments);
@@ -552,6 +719,7 @@ function adminView() {
       <p class="muted">The Stream tab (stand-alone streams: type two team names, get the overlay and live desk) is open to everyone. This switch adds the competition's own games to that tab, with overlays and live desks fed by the competition's scores. ${SITE.streaming === true ? "Currently on for every organiser." : SITE.streaming === "admin" ? "Currently only you see it." : "Currently hidden, and the rules refuse live-score writes on competition games."}</p>
       <div class="seg" role="group" aria-label="Streaming">${[["off", "Off"], ["admin", "Admin only"], ["all", "Everyone"]].map(([m, l]) => `<button type="button" data-act="streaming-mode" data-mode="${m}" aria-pressed="${(SITE.streaming === true ? "all" : SITE.streaming === "admin" ? "admin" : "off") === m}">${l}</button>`).join("")}</div>
     </div>
+    ${usagePanel()}
     <div class="panel stack" style="gap:6px" id="adm-creators">
       <h3>Who's creating <span class="muted small">${cs.length}</span></h3>
       <p class="small muted">Visitors don't sign in, so each device is one creator. Give them a nickname once you know who they are. Nicknames are only visible to you.</p>
@@ -589,6 +757,9 @@ function adminView() {
   </div>`;
 }
 async function adminAction(act, a) {
+  if (act === "adm-usage-connect") { await usageConnect(); return true; }
+  if (act === "adm-usage-refresh") { USAGE.err = USAGE.err === "expired" ? USAGE.err : null; await usageRefresh(true); return true; }
+  if (act === "adm-usage-count") { await usageCount(); return true; }
   if (act === "adm-filter") { ADM.filter = a.dataset.k; ADM.sel.clear(); ADM.confirm = null; render(); return true; }
   if (act === "adm-creator") { ADM.creator = ADM.creator === a.dataset.uid ? null : a.dataset.uid; ADM.sel.clear(); ADM.confirm = null; render(); return true; }
   if (act === "adm-sel") { a.checked ? ADM.sel.add(a.dataset.id) : ADM.sel.delete(a.dataset.id); ADM.confirm = null; render(); return true; }
