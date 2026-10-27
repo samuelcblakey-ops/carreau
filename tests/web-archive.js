@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
   const A = await mk('A'); await A.goto(process.env.WEB_URL+''); await w(3500);
   await A.click('[data-act="new-t"]'); await w(2500);
   const tid = await A.evaluate(()=>location.hash.slice(1));
+  await A.click('[data-act="wiz-skip"]'); await w(800); await A.click('[data-tab="entries"]'); await w(400); // a new competition opens on the quick setup
   await A.fill('#bulk', 'One\nTwo\nThree\nFour'); await A.click('#bulk-form button[type=submit]'); await w(1000);
   await A.click('[data-act="checkin-all"]'); await w(800);
   await A.click('[data-tab="draw"]'); await w(300); await A.click('[data-act="first-draw"]'); await w(1500);

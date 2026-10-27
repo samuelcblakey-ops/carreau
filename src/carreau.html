@@ -40,7 +40,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 header.app{background:var(--surface);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px}
 .brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;margin-right:auto}
-.brand svg{flex:none}
+.brand svg{flex:none}.brand .home{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none;border-radius:6px}
 .brand-txt{display:flex;flex-direction:column;line-height:1}.brand-name{white-space:nowrap}
 .memorial{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .site-foot{font-size:12px;color:var(--muted);text-align:center;padding:12px 16px 24px}.site-foot a{color:inherit}
@@ -68,8 +68,8 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
   .bar{gap:8px;padding-block:10px}
   .brand{font-size:20px}.brand small{font-size:10.5px}
   .tsel{width:100%;flex-wrap:nowrap}.tsel .picker-wrap{flex:1 1 auto;min-width:0}.picker-btn{min-width:0}
-  .tsel .pill,.hide-sm{display:none}
-  .new-t{font-size:20px;padding:6px 12px;line-height:1}
+  .tsel .pill,.hide-sm{display:none}span.show-sm{display:inline}
+  .new-t{font-size:15px;font-weight:700;padding:7px 12px;line-height:1;white-space:nowrap}
   nav.tabs{position:fixed;z-index:30;left:0;right:0;bottom:0;gap:0;background:var(--surface);border-top:1px solid var(--line);
     padding:4px max(4px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px));box-shadow:0 -4px 16px rgba(0,0,0,.06)}
   nav.tabs button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-bottom:0;border-radius:10px;font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:0}
@@ -285,6 +285,17 @@ details.day1-table>summary{cursor:pointer;list-style-position:inside}details.day
 .rr-a{text-align:right}.rr-a,.rr-b{min-width:0;overflow-wrap:anywhere;color:var(--muted)}.rr-a.win,.rr-b.win{color:var(--ink);font-weight:700}
 .rr-sc{font-family:var(--display);font-size:18px;font-weight:700;white-space:nowrap;text-align:center;min-width:52px}.rr-sc.rr-bye{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted)}
 .ko-plan > summary{cursor:pointer;list-style-position:inside;padding:2px 0}.ko-plan[open] > summary{margin-bottom:10px}
+.show-sm{display:none}
+.start{max-width:960px;gap:22px}.start-hero h1{font-family:var(--display);font-size:clamp(28px,6vw,42px);line-height:1.05;margin:4px 0 8px}.start-hero p{max-width:640px}.start p{margin:0}
+.start-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.start-card{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;text-decoration:none}
+.start-card b{font-family:var(--display);font-size:20px}.start-card span{color:var(--muted);font-size:14px}
+button.start-card,a.start-card{cursor:pointer}button.start-card:hover,a.start-card:hover{border-color:var(--accent)}
+.start-card.info{background:transparent;border-style:dashed}.start-card.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.start-card.go span{color:var(--accent-ink);opacity:.85}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px}
+.ex-card{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-width:0}
+.ex-card:hover{border-color:var(--accent)}.ex-card b{overflow-wrap:anywhere}
+.wiz-page{max-width:640px;margin:0 auto}.wiz-page .wiz{margin-bottom:0!important}
 .fx{font-size:17px}.day-plan summary{cursor:pointer;list-style-position:inside}.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:4px 0;border-top:1px solid var(--line)}.dp-row:first-child{border-top:0}.dp-fx{font-weight:600}.dp-days{flex-wrap:wrap}.dp-days button{min-width:44px}.fx-score{font-family:var(--display);font-size:22px;font-weight:700;color:var(--accent);padding:0 6px}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
 @media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
@@ -443,8 +454,8 @@ body.desk header.app{display:none}
   <div class="wrap">
     <div class="bar">
       <div class="brand">
-        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="10" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 11.5c3.5 1.5 7.5 1.5 11 0M4.5 16.5c3.5-1.5 7.5-1.5 11 0" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="21" cy="6" r="3" fill="var(--jack)"/></svg>
-        <span class="brand-txt"><span class="brand-name">SN Pétanque <small>Competition desk</small></span></span>
+        <a class="home" href="./" aria-label="SN Pétanque: start screen"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="10" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 11.5c3.5 1.5 7.5 1.5 11 0M4.5 16.5c3.5-1.5 7.5-1.5 11 0" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="21" cy="6" r="3" fill="var(--jack)"/></svg>
+        <span class="brand-txt"><span class="brand-name">SN Pétanque <small>Competition desk</small></span></span></a>
         <span id="netdot" class="netdot" hidden role="status"></span>
       </div>
       <div class="tsel" id="tsel"></div>
@@ -850,6 +861,27 @@ Object.assign(LANG_TEXT.de, {"Barrages": "Barragen", "Fixtures drawn": "Begegnun
 Object.assign(LANG_TEXT.nl, {"Barrages": "Barrages", "Fixtures drawn": "Ontmoetingen geloot", "Schedule drawn": "Schema geloot", "Plan the knockouts": "Knock-outs plannen", "Who goes into each knockout": "Wie in welke knock-out komt"});
 Object.assign(LANG_TEXT.pt, {"Barrages": "Barragens", "Fixtures drawn": "Encontros sorteados", "Schedule drawn": "Calendário sorteado", "Plan the knockouts": "Planear os quadros", "Who goes into each knockout": "Quem entra em cada quadro"});
 Object.assign(LANG_TEXT.th, {"Barrages": "รอบบาราจ", "Fixtures drawn": "จับสลากคู่แข่งแล้ว", "Schedule drawn": "จับสลากตารางแข่งแล้ว", "Plan the knockouts": "วางแผนรอบน็อกเอาต์", "Who goes into each knockout": "ใครเข้ารอบน็อกเอาต์ไหน"});
+Object.assign(FR_TEXT, {"Pétanque competitions, run from your phone": "Des concours de pétanque, gérés depuis votre téléphone", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Tirages, terrains, scores en direct et classements pour le suisse, les poules, les ligues, les tableaux, la mêlée, l'inter-clubs et le tir de précision. Les joueurs suivent sur leur propre téléphone.", "Run a competition": "Organiser un concours", "Set it up in four quick steps": "En quatre étapes rapides", "Follow a competition": "Suivre un concours", "Open the link or scan the QR code the organiser shares": "Ouvrez le lien ou scannez le QR code que partage l'organisateur", "Stream a game": "Diffuser une partie", "A live score overlay for Facebook Live or YouTube": "Un affichage du score en direct pour Facebook Live ou YouTube", "Look around a competition in each format. Nothing can be changed.": "Découvrez un concours dans chaque format. Rien ne peut être modifié.", "New": "Nouveau"});
+Object.assign(LANG_TEXT.es, {"Pétanque competitions, run from your phone": "Competiciones de petanca, gestionadas desde tu móvil", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Sorteos, pistas, resultados en directo y clasificaciones para suizo, barrage, ligas, cuadros, mêlée, interclubes y tiro de precisión. Los jugadores lo siguen desde su propio móvil.", "Run a competition": "Organizar una competición", "Set it up in four quick steps": "Lista en cuatro pasos rápidos", "Follow a competition": "Seguir una competición", "Open the link or scan the QR code the organiser shares": "Abre el enlace o escanea el código QR que comparte el organizador", "Stream a game": "Retransmitir una partida", "A live score overlay for Facebook Live or YouTube": "Un marcador en directo para Facebook Live o YouTube", "Look around a competition in each format. Nothing can be changed.": "Echa un vistazo a una competición de cada formato. No se puede cambiar nada.", "New": "Nueva"});
+Object.assign(LANG_TEXT.it, {"Pétanque competitions, run from your phone": "Gare di bocce, gestite dal tuo telefono", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Sorteggi, campi, punteggi in diretta e classifiche per svizzero, barrage, leghe, tabelloni, mêlée, interclub e tiro di precisione. I giocatori seguono dal proprio telefono.", "Run a competition": "Organizza una gara", "Set it up in four quick steps": "Pronta in quattro passi rapidi", "Follow a competition": "Segui una gara", "Open the link or scan the QR code the organiser shares": "Apri il link o inquadra il codice QR condiviso dall'organizzatore", "Stream a game": "Trasmetti una partita", "A live score overlay for Facebook Live or YouTube": "Un punteggio in sovrimpressione per Facebook Live o YouTube", "Look around a competition in each format. Nothing can be changed.": "Dai un'occhiata a una gara per ogni formato. Non si può modificare nulla.", "New": "Nuova"});
+Object.assign(LANG_TEXT.de, {"Pétanque competitions, run from your phone": "Pétanque-Turniere, vom Handy aus geleitet", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Auslosungen, Bahnen, Live-Ergebnisse und Tabellen für Schweizer System, Barrage, Ligen, K.-o.-Runden, Mêlée, Vereinsvergleich und Präzisionsschießen. Spieler verfolgen alles auf dem eigenen Handy.", "Run a competition": "Ein Turnier leiten", "Set it up in four quick steps": "In vier kurzen Schritten eingerichtet", "Follow a competition": "Einem Turnier folgen", "Open the link or scan the QR code the organiser shares": "Öffne den Link oder scanne den QR-Code der Turnierleitung", "Stream a game": "Ein Spiel streamen", "A live score overlay for Facebook Live or YouTube": "Eine Live-Spielstandsanzeige für Facebook Live oder YouTube", "Look around a competition in each format. Nothing can be changed.": "Sieh dir in jedem Format ein Turnier an. Nichts kann geändert werden.", "New": "Neu"});
+Object.assign(LANG_TEXT.nl, {"Pétanque competitions, run from your phone": "Petanquetoernooien, geregeld vanaf je telefoon", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Lotingen, banen, live uitslagen en standen voor Zwitsers systeem, barrage, competities, knock-outs, mêlée, interclub en precisieschieten. Spelers volgen alles op hun eigen telefoon.", "Run a competition": "Een toernooi organiseren", "Set it up in four quick steps": "Klaar in vier korte stappen", "Follow a competition": "Een toernooi volgen", "Open the link or scan the QR code the organiser shares": "Open de link of scan de QR-code die de organisator deelt", "Stream a game": "Een partij streamen", "A live score overlay for Facebook Live or YouTube": "Een live scorebalk voor Facebook Live of YouTube", "Look around a competition in each format. Nothing can be changed.": "Bekijk een toernooi in elk formaat. Er kan niets worden gewijzigd.", "New": "Nieuw"});
+Object.assign(LANG_TEXT.pt, {"Pétanque competitions, run from your phone": "Competições de petanca, geridas a partir do telemóvel", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Sorteios, campos, resultados em direto e classificações para suíço, barrage, ligas, quadros, mêlée, interclubes e tiro de precisão. Os jogadores acompanham no próprio telemóvel.", "Run a competition": "Organizar uma competição", "Set it up in four quick steps": "Pronta em quatro passos rápidos", "Follow a competition": "Seguir uma competição", "Open the link or scan the QR code the organiser shares": "Abra a ligação ou leia o código QR que o organizador partilha", "Stream a game": "Transmitir um jogo", "A live score overlay for Facebook Live or YouTube": "Um marcador em direto para Facebook Live ou YouTube", "Look around a competition in each format. Nothing can be changed.": "Veja uma competição em cada formato. Nada pode ser alterado.", "New": "Nova"});
+Object.assign(LANG_TEXT.th, {"Pétanque competitions, run from your phone": "จัดการแข่งขันเปตองได้จากมือถือ", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "จับสลาก จัดสนาม ผลสด และตารางคะแนน สำหรับระบบสวิส บาราจ ลีก น็อกเอาต์ เมเล่ อินเตอร์คลับ และการยิงแม่นยำ ผู้เล่นติดตามได้จากมือถือของตัวเอง", "Run a competition": "จัดการแข่งขัน", "Set it up in four quick steps": "ตั้งค่าเสร็จใน 4 ขั้นตอน", "Follow a competition": "ติดตามการแข่งขัน", "Open the link or scan the QR code the organiser shares": "เปิดลิงก์หรือสแกน QR โค้ดที่ผู้จัดแชร์", "Stream a game": "ถ่ายทอดสดเกม", "A live score overlay for Facebook Live or YouTube": "แถบคะแนนสดสำหรับ Facebook Live หรือ YouTube", "Look around a competition in each format. Nothing can be changed.": "ดูการแข่งขันตัวอย่างในแต่ละรูปแบบ แก้ไขอะไรไม่ได้", "New": "ใหม่"});
+Object.assign(FR_TEXT, {"SN Pétanque: start screen": "SN Pétanque : écran d'accueil"});
+Object.assign(LANG_TEXT.es, {"SN Pétanque: start screen": "SN Pétanque: pantalla de inicio"});
+Object.assign(LANG_TEXT.it, {"SN Pétanque: start screen": "SN Pétanque: schermata iniziale"});
+Object.assign(LANG_TEXT.de, {"SN Pétanque: start screen": "SN Pétanque: Startseite"});
+Object.assign(LANG_TEXT.nl, {"SN Pétanque: start screen": "SN Pétanque: startscherm"});
+Object.assign(LANG_TEXT.pt, {"SN Pétanque: start screen": "SN Pétanque: ecrã inicial"});
+Object.assign(LANG_TEXT.th, {"SN Pétanque: start screen": "SN Pétanque: หน้าแรก"});
+Object.assign(FR_TEXT, {"Log in with your organiser code": "Connectez-vous avec votre code organisateur"});
+Object.assign(LANG_TEXT.es, {"Log in with your organiser code": "Inicia sesión con tu código de organizador", "Organiser login": "Acceso de organizador", "Log in": "Iniciar sesión", "Log out": "Cerrar sesión"});
+Object.assign(LANG_TEXT.it, {"Log in with your organiser code": "Accedi con il tuo codice organizzatore", "Organiser login": "Accesso organizzatore", "Log in": "Accedi", "Log out": "Esci"});
+Object.assign(LANG_TEXT.de, {"Log in with your organiser code": "Mit deinem Organisator-Code anmelden", "Organiser login": "Organisator-Login", "Log in": "Anmelden", "Log out": "Abmelden"});
+Object.assign(LANG_TEXT.nl, {"Log in with your organiser code": "Log in met je organisatorcode", "Organiser login": "Inloggen als organisator", "Log in": "Inloggen", "Log out": "Uitloggen"});
+Object.assign(LANG_TEXT.pt, {"Log in with your organiser code": "Inicie sessão com o seu código de organizador", "Organiser login": "Acesso de organizador", "Log in": "Iniciar sessão", "Log out": "Terminar sessão"});
+Object.assign(LANG_TEXT.th, {"Log in with your organiser code": "เข้าสู่ระบบด้วยรหัสผู้จัดของคุณ", "Organiser login": "เข้าสู่ระบบผู้จัด", "Log in": "เข้าสู่ระบบ", "Log out": "ออกจากระบบ"});
 Object.assign(FR_TEXT, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Touchez le score de l'équipe perdante. Le vainqueur marque {1} et c'est enregistré tout de suite.", "Score if they lost": "Score s'ils ont perdu"});
 Object.assign(LANG_TEXT.es, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Toca el resultado del equipo perdedor. El ganador se queda con {1} y se guarda al momento.", "Score if they lost": "Resultado si perdieron"});
 Object.assign(LANG_TEXT.it, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Tocca il punteggio della squadra che ha perso. Il vincitore prende {1} e si salva subito.", "Score if they lost": "Punteggio se hanno perso"});
@@ -2775,7 +2807,7 @@ function renderPicker(list) {
   </div>`;
 }
 function pickCompetition(id) {
-  S.picker = false; if (id === S.tid) { render(); return; }
+  S.picker = false; S.home = false; if (id === S.tid) { render(); return; }
   S.tid = id; lsSet("carreau-tid", S.tid); S.matches = {}; leaveLive(); S.onSelect?.(); watchMatches(); render();
 }
 // connection light (website only): Live, Saving…, or Offline with changes waiting to sync
@@ -2801,19 +2833,29 @@ function renderHeader() {
       <div class="theme-menu" role="listbox" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" role="option" data-theme-pick="${v}" aria-selected="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
     <div class="lang-wrap" data-notr><div class="seg" role="group" aria-label="Language"><button type="button" class="lang-btn" data-act="lang-menu" aria-haspopup="listbox" aria-expanded="${!!S.langMenu}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
       <div class="lang-menu" role="listbox" ${S.langMenu ? "" : "hidden"}>${LANGS.map(([c, n]) => `<button type="button" role="option" data-lang="${c}" aria-selected="${I18N.lang === c}"><b>${c.toUpperCase()}</b><span>${n}</span></button>`).join("")}</div></div>
-    ${S.canCreate() ? `<button class="btn sm new-t" data-act="new-t" aria-label="New competition">+<span class="hide-sm"> New competition</span></button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
+    ${S.canCreate() ? `<button class="btn sm new-t" data-act="new-t" aria-label="New competition"><span aria-hidden="true">+</span><span class="hide-sm"> New competition</span><span class="show-sm"> New</span></button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
   const t = T();
   const SPECTATOR_TABS = ["draw", "standings", "stream", "display"]; // players and spectators: draw & results, standings, stream (and the big screen behind it)
   if (t && !canScore() && !viewAll(t) && !SPECTATOR_TABS.includes(S.tab)) S.tab = "draw";
   $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
 }
+// the start screen: first visit, or the logo tapped. Run, follow or stream, then your competitions and the examples.
 function renderWelcome() {
-  return `<div class="panel stack" style="max-width:640px">
-    <h2>No competitions yet</h2>
-    <p class="muted">Set up a competition, add teams or players, then draw rounds, a barrage, leagues or a knockout. Pistes are allocated as games finish and scores go live for everyone with the link.</p>
-    ${S.canCreate() ? `<div><button class="btn primary" data-act="new-t">Create a competition</button></div>` : S.welcomeExtra ? S.welcomeExtra() : `<p class="muted">The organiser hasn't created a competition yet.</p>`}
-    ${S.canCreate() ? `<p class="small muted">Just filming one game? <a href="#streams">Stream a game</a> without a competition.</p>` : ""}
+  const all = Object.values(S.tournaments).filter(t => !t.archived), isEx = t => t.listed || t.example;
+  const byNew = (a, b) => (b.created || 0) - (a.created || 0);
+  const mine = all.filter(t => !isEx(t)).sort(byNew), ex = all.filter(isEx).sort(byNew);
+  const card = t => `<button type="button" class="ex-card" data-act="pick-t" data-id="${t.id}"><b data-notr>${esc(t.name)}</b><span class="small muted">${esc(compMeta(t))}</span></button>`;
+  return `<div class="start stack">
+    <section class="start-hero"><h1>Pétanque competitions, run from your phone</h1>
+      <p class="muted">Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.</p></section>
+    <div class="start-actions">
+      ${S.canCreate() ? `<button type="button" class="start-card go" data-act="new-t"><b>Run a competition</b><span>Set it up in four quick steps</span></button>` : S.startLogin?.() || ""}
+      <div class="start-card info"><b>Follow a competition</b><span>Open the link or scan the QR code the organiser shares</span></div>
+      <a class="start-card" href="#streams"><b>Stream a game</b><span>A live score overlay for Facebook Live or YouTube</span></a>
+    </div>
+    ${mine.length ? `<section class="stack" style="gap:10px"><h2>Your competitions</h2><div class="ex-grid">${mine.map(card).join("")}</div></section>` : ""}
+    ${ex.length ? `<section class="stack" style="gap:10px"><h2>Examples</h2><p class="small muted">Look around a competition in each format. Nothing can be changed.</p><div class="ex-grid">${ex.map(card).join("")}</div></section>` : ""}
   </div>`;
 }
 function newTournament() {
@@ -3000,7 +3042,9 @@ function renderEntries(t) {
   const pct = entered.length ? Math.round(100 * here.length / entered.length) : 0;
   const q = (S.regFilter || "").toLowerCase();
   const match = e => !q || [entName(t, e.id), ...(e.players || []), e.club || "", e.name || ""].join(" ").toLowerCase().includes(q);
-  return wizPanel(t) + `<div class="stack">
+  // a new competition: the quick setup on its own; once entries exist (imported, or added after leaving it) it sits above the list
+  const wz = wizPanel(t); if (wz && !list.length) return `<div class="wiz-page">${wz}</div>`;
+  return wz + `<div class="stack">
     <div class="spread"><h2>Registration</h2><span class="muted small">${FORMAT_LABEL[t.format]} · ${t.meleeDrawn ? "Mêlée, teams drawn once · " + SYSTEM_LABEL[t.system] : melee ? "Mêlée" : SYSTEM_LABEL[t.system]}</span></div>
     ${t.meleeDrawn && !t.draws.length && canEdit() ? `<div class="notice spread"><span>These teams were drawn at random from ${t.players.filter(p => p.active !== false && (!t.checkin || p.checkedIn)).length} players. Happy with them? Make the draw on Draw & results.</span><span class="row"><button class="btn sm" data-act="melee-redraw">Redraw teams</button><button class="btn sm ghost" data-act="melee-unteam">Back to players</button></span></div>` : ""}
     <div class="panel stack">
@@ -3546,6 +3590,7 @@ document.addEventListener("click", async e => {
   const pk = e.target.closest('[data-act="picker"], [data-act="pick-t"]');
   if (pk) { if (pk.dataset.act === "picker") { S.picker = !S.picker; renderHeader(); localize($("header.app")); if (S.picker) setTimeout(() => { $(".pick-row.on")?.scrollIntoView({ block: "nearest" }); if (!matchMedia("(pointer: coarse)").matches) $("#picker-q")?.focus(); }, 0); } else pickCompetition(pk.dataset.id); return; }
   if (S.picker && !e.target.closest(".picker")) { S.picker = false; renderHeader(); localize($("header.app")); }
+  if (e.target.closest("header .brand .home")) { e.preventDefault(); if (S.liveRoute) return; S.home = true; S.picker = false; S.tid = null; lsSet("carreau-tid", ""); S.matches = {}; watchMatches(); S.onHome?.(); render(); window.scrollTo(0, 0); return; }
   const bz = e.target.closest('[data-act="bk-zoom"]');
   if (bz) {
     const key = S.tid + ":" + bz.dataset.b; const cur = bkZoomFor({ id: bz.dataset.b }); const z = bz.dataset.z;
@@ -3585,7 +3630,7 @@ document.addEventListener("click", async e => {
     case "logo-remove": { try { await S.store.setBrand(t.id, null); setBrandLocal(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
     case "lv-links": S.lvLinks = S.lvLinks === a.dataset.id ? null : a.dataset.id; render(); break;
     case "copy": { const el = document.getElementById(a.dataset.target); if (!el) break; try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } break; }
-    case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; leaveLive(); await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
+    case "new-t": { S.home = false; const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; leaveLive(); await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
     case "use-template": {
       const src = clone(t); const nt = newTournament();
       const keep = ["entry", "format", "system", "checkin", "target", "byeScore", "swissRounds", "poolSize", "poolStyle", "qualify", "bBracket", "consolante", "seeding", "randomCourts", "courts", "teams", "players", "shootFormat", "shootFinal", "shootTie", "shootOutAt", "shootOutDist", "koThird", "koPlan", "venue", "timeLimit", "tiebreaks"];
@@ -3785,7 +3830,9 @@ function startWatching() {
   S.store.watchTournaments(list => {
     S.tournaments = {}; list.filter(t => !t.archived || S.canSeeArchived()).forEach(t => S.tournaments[t.id] = t);
     S.loaded = true;
-    if (!S.tid || !S.tournaments[S.tid]) { const first = list.sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
+    // on load (or when the open competition goes away): the newest of this person's own competitions (not a half-written
+    // one still waiting on the server); none → the start screen
+    if ((!S.tid || !S.tournaments[S.tid]) && !S.home) { const first = list.filter(t => !t.archived && !(t.listed || t.example) && Array.isArray(t.teams) && (!S.menuFilter || S.menuFilter(t))).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
     if (T() && !canEdit() && !viewAll(T()) && (S.tab === "setup" || S.tab === "entries")) S.tab = canScore() ? "courts" : "draw";
     S.onTournaments?.();
     render();
