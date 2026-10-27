@@ -11,14 +11,14 @@ const fs = require('fs'), path = require('path');
   const bg = () => ev(() => getComputedStyle(document.body).backgroundColor);
   // 1. device theme
   await ev(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('[data-act="new-t"]').click(); await w(80); });
-  await p.click('[data-act="lang-menu"]'); await p.waitForTimeout(80);
+  await p.click('[data-act="theme-menu"]'); await p.waitForTimeout(80);
   L.push('menu: ' + await ev(() => [...document.querySelectorAll('[data-theme-pick]')].map(x => x.dataset.themePick + (x.getAttribute('aria-selected') === 'true' ? '*' : '')).join(',')));
   const light = await bg();
   await p.click('[data-theme-pick="dark"]'); await p.waitForTimeout(80);
   L.push(`dark: attr ${await ev(() => document.documentElement.dataset.theme)} | background changed ${light !== await bg()} | saved ${await ev(() => localStorage.getItem('carreau-theme'))}`);
   await p.reload(); await p.waitForTimeout(300);
   L.push('dark after reload: ' + await ev(() => document.documentElement.dataset.theme));
-  await p.click('[data-act="lang-menu"]'); await p.click('[data-theme-pick="auto"]'); await p.waitForTimeout(80);
+  await p.click('[data-act="theme-menu"]'); await p.click('[data-theme-pick="auto"]'); await p.waitForTimeout(80);
   L.push('auto: attr ' + (await ev(() => document.documentElement.dataset.theme) === undefined));
   // 2. competition colour
   await p.click('[data-tab="setup"]'); await p.waitForTimeout(80);
@@ -55,7 +55,7 @@ const fs = require('fs'), path = require('path');
   L.push('desk: ' + await ev(() => [...document.querySelectorAll('.dk-team')].map(e => getComputedStyle(e).backgroundColor + '/' + getComputedStyle(e).color).join(' | ')));
   // 5. French
   await ev(() => { location.hash = ''; }); await p.click('[data-act="lang-menu"]'); await p.click('[data-lang="fr"]'); await p.waitForTimeout(80);
-  await p.click('[data-act="lang-menu"]'); await p.waitForTimeout(60);
-  L.push('french: ' + await ev(() => [document.querySelector('.menu-h').textContent, ...[...document.querySelectorAll('[data-theme-pick] span')].map(e => e.textContent)].join(' / ')));
+  await p.click('[data-act="theme-menu"]'); await p.waitForTimeout(60);
+  L.push('french: ' + await ev(() => [document.querySelector('.theme-menu .menu-h').textContent, ...[...document.querySelectorAll('[data-theme-pick] span')].map(e => e.textContent)].join(' / ')));
   console.log(L.join('\n')); console.log('errs', errs); await b.close();
 })();
