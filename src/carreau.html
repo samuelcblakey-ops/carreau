@@ -455,6 +455,7 @@ body.desk header.app{display:none}
 <main class="wrap" id="main"><div class="empty">Loading competitions…</div></main>
 <footer class="wrap site-foot" id="foot"></footer>
 <div id="modal"></div>
+<input type="file" id="logo-file" accept="image/*" hidden aria-hidden="true" tabindex="-1">
 <div id="roundalert" hidden class="roundalert" role="status" aria-live="polite"></div>
 <div id="toast" hidden class="toast"></div>
 
@@ -2678,18 +2679,26 @@ const copyRowCore = (id, label, value, note) => `<div class="stack" style="gap:4
 // the logo lives in its own small document (tournaments/{id}/brand/logo) so the competition itself stays light
 const logoOk = v => typeof v === "string" && /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/.test(v) && v.length < 150000;
 const logoSrc = tid => { const b = S.brand?.[tid]; return b && logoOk(b.logo) ? b.logo : ""; };
-function brandWatch() {
+function brandWatch(retry) {
   const tid = S.liveRoute && !S.liveRoute.tid ? null : S.tid;
-  if (S.brandKey === tid) return; S.unsubB?.(); S.unsubB = null; S.brandKey = tid; if (!tid || !S.store.watchBrand) return;
-  S.unsubB = S.store.watchBrand(tid, b => { if (S.brandKey !== tid) return; S.brand = S.brand || {}; S.brand[tid] = b || null; render(); }, () => {});
+  if (S.brandKey === tid && !retry) return; S.unsubB?.(); S.unsubB = null; S.brandKey = tid; if (!tid || !S.store.watchBrand) return;
+  const tries = retry ? S.brandTries || 0 : 0; S.brandTries = tries;
+  S.unsubB = S.store.watchBrand(tid, b => { if (S.brandKey !== tid) return; S.brand = S.brand || {}; S.brand[tid] = b || null; render(); }, () => {
+    // a competition made a moment ago isn't on the server yet, so the first listen can be refused: listen again shortly
+    if (S.brandKey !== tid || tries >= 6) return;
+    S.brandTries = tries + 1; setTimeout(() => { if (S.brandKey === tid) brandWatch(true); }, 1500 * (tries + 1));
+  });
 }
+// show a logo change straight away on this screen; the listener confirms it
+const setBrandLocal = (tid, b) => { S.brand = S.brand || {}; S.brand[tid] = b; render(); };
 // shrink an image file to fit 256 x 256 and encode it small enough to store (WebP, else PNG/JPEG)
 async function logoFromFile(file) {
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
-    const sc = Math.min(1, 256 / Math.max(img.naturalWidth, img.naturalHeight)); const cv = document.createElement("canvas");
-    cv.width = Math.max(1, Math.round(img.naturalWidth * sc)); cv.height = Math.max(1, Math.round(img.naturalHeight * sc));
+    const W = img.naturalWidth || 256, H = img.naturalHeight || 256; // an SVG without a size: draw it at 256
+    const sc = Math.min(1, 256 / Math.max(W, H)); const cv = document.createElement("canvas");
+    cv.width = Math.max(1, Math.round(W * sc)); cv.height = Math.max(1, Math.round(H * sc));
     cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
     for (const [type, q] of [["image/webp", .85], ["image/png"], ["image/webp", .6], ["image/jpeg", .75]]) { const d = cv.toDataURL(type, q); if (d.startsWith("data:" + type) && d.length < 120000) return d; }
     return null;
@@ -2704,7 +2713,7 @@ function lookPanel(t) {
       <label class="swatch custom" title="Choose any colour"><input type="color" data-field="accent" value="${cur || "#1d6a54"}" aria-label="Choose any colour"></label>
       ${cur && cur !== "#1d6a54" ? `<button type="button" class="btn sm ghost" data-set="accent" data-val="">Default</button>` : ""}</div></div>
     <div class="f"><span>Club logo</span><div class="row" style="align-items:center;gap:12px">${logo ? `<img class="logo-prev" src="${esc(logo)}" alt="Club logo">` : `<span class="small muted">No logo yet</span>`}
-      <label class="btn sm"><input type="file" id="logo-file" accept="image/png,image/jpeg,image/webp" hidden>${logo ? "Change logo" : "Add a logo"}</label>${logo ? `<button type="button" class="btn sm ghost" data-act="logo-remove">Remove</button>` : ""}</div>
+      <button type="button" class="btn sm" data-act="logo-pick">${logo ? "Change logo" : "Add a logo"}</button>${logo ? `<button type="button" class="btn sm ghost" data-act="logo-remove">Remove</button>` : ""}</div>
       <p class="small muted">A square PNG or JPEG works best. It's shrunk to a small size before it's saved.</p></div>
   </div>`;
 }
@@ -3533,6 +3542,7 @@ function renderDisplay(t) {
 
 /* ---------------- events ---------------- */
 document.addEventListener("click", async e => {
+  if (e.target.closest('[data-act="logo-pick"]')) { if (canEdit()) $("#logo-file").click(); return; }
   const pk = e.target.closest('[data-act="picker"], [data-act="pick-t"]');
   if (pk) { if (pk.dataset.act === "picker") { S.picker = !S.picker; renderHeader(); localize($("header.app")); if (S.picker) setTimeout(() => { $(".pick-row.on")?.scrollIntoView({ block: "nearest" }); if (!matchMedia("(pointer: coarse)").matches) $("#picker-q")?.focus(); }, 0); } else pickCompetition(pk.dataset.id); return; }
   if (S.picker && !e.target.closest(".picker")) { S.picker = false; renderHeader(); localize($("header.app")); }
@@ -3572,7 +3582,7 @@ document.addEventListener("click", async e => {
   if (act.startsWith("lv-") && act !== "lv-links") { await deskAction(act, a); return; }
   if (act.startsWith("strm-")) { await streamAction(act, a); return; }
   switch (act) {
-    case "logo-remove": { try { await S.store.setBrand(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
+    case "logo-remove": { try { await S.store.setBrand(t.id, null); setBrandLocal(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
     case "lv-links": S.lvLinks = S.lvLinks === a.dataset.id ? null : a.dataset.id; render(); break;
     case "copy": { const el = document.getElementById(a.dataset.target); if (!el) break; try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } break; }
     case "new-t": { const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; leaveLive(); await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
@@ -3684,7 +3694,8 @@ document.addEventListener("change", async e => {
   if (el.dataset.sfield !== undefined && await streamField(el)) return;
   if (el.id === "logo-file") { const t0 = T(); const f = el.files && el.files[0]; el.value = ""; if (!f || !t0 || !canEdit()) return;
     const d = await logoFromFile(f).catch(() => null); if (!d) { toast("That image couldn't be used. Try a smaller PNG or JPEG."); return; }
-    try { await S.store.setBrand(t0.id, { logo: d, at: Date.now() }); toast("Logo saved."); } catch (err) { handleWriteError(err); } return; }
+    const b = { logo: d, at: Date.now() };
+    try { await S.store.setBrand(t0.id, b); setBrandLocal(t0.id, b); toast("Logo saved."); } catch (err) { handleWriteError(err); } return; }
   if (S.overlayView && S.overlayChange && await S.overlayChange(el)) return;
   if (!canEdit() || !T()) return;
   if (el.closest("#modal")) return;
