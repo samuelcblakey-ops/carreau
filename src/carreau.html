@@ -228,6 +228,13 @@ button.bkm:hover{border-color:var(--muted)}
 [hidden]{display:none!important}
 fieldset.ro-view{border:0;padding:0;margin:0;min-width:0}fieldset.ro-view :is(input,select,textarea,button){cursor:not-allowed}
 .erow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+/* admin: usage and limits */
+.use-row{display:grid;gap:4px}.use-bar{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden}.use-bar i{display:block;height:100%;border-radius:999px}
+.use-ok{background:var(--accent)}.use-warn{background:var(--jack)}.use-danger{background:var(--danger)}
+.use-ok-t{color:var(--muted)}.use-warn-t{color:var(--jack-ink)}.use-danger-t{color:var(--danger);font-weight:700}
+.use-days{width:100%;border-collapse:collapse;font-size:14px}.use-days th,.use-days td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}.use-days .n{text-align:right;font-variant-numeric:tabular-nums}
+.use-cell{display:grid;gap:3px;justify-items:end}.use-cell b{display:block;width:100%;max-width:120px;height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}.use-cell i{display:block;height:100%;background:var(--accent)}
+.use-fixed ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}#adm-usage a.btn{color:inherit;text-decoration:none}
 .erow .num{font-family:var(--display);font-weight:700;color:var(--muted);width:2.5ch;text-align:right;font-variant-numeric:tabular-nums}
 .erow .who{flex:1;min-width:0}
 .erow .who b{display:block}
