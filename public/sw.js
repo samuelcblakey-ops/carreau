@@ -2,7 +2,7 @@
 // Live data (scores, draws) always comes from Firebase, which keeps its own offline queue.
 const VERSION = "__VERSION__";
 const CACHE = "carreau-" + VERSION;
-const SHELL = ["./", "./index.html", "./firebase-config.js", "./manifest.webmanifest", "./qr.js", "./privacy.html", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-32.png"];
+const SHELL = ["./", "./index.html", "./firebase-config.js", "./manifest.webmanifest", "./qr.js", "./privacy.html", "./how-it-works.html", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-32.png"];
 const FONTS = ["barlow-400", "barlow-500", "barlow-600", "barlowcondensed-500", "barlowcondensed-600", "barlowcondensed-700"].flatMap(n => [`./fonts/${n}-latin.woff2`, `./fonts/${n}-latin-ext.woff2`]);
 const LIBS = ["firebase-app", "firebase-firestore", "firebase-auth"].map(n => `https://www.gstatic.com/firebasejs/__FBV__/${n}.js`).concat(FONTS);
 // the Firebase libraries and fonts are fetched up front (best effort) so the app opens with no signal even on the second visit
