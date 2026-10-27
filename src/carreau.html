@@ -216,6 +216,8 @@ button.bkm:hover{border-color:var(--muted)}
 .bk-champ b{font-family:var(--display);font-size:22px;line-height:1.1;overflow-wrap:anywhere}
 .bk-champ.tbc{border-style:dashed;border-color:var(--wire);background:none}
 .bk-third{display:flex;justify-content:flex-end}
+.bk-list{display:flex;flex-direction:column;gap:12px}.bk-list h4{font-family:var(--display);font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0}
+.bk-li{display:flex;flex-direction:column;gap:4px}.bk-no{font-size:12px;font-weight:600;color:var(--muted)}.bk-li .bkm{width:100%}
 .bk-third>div{width:230px;max-width:100%}
 .bk-third h4{font-family:var(--display);font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0}
 /* pools */
@@ -916,6 +918,13 @@ Object.assign(LANG_TEXT.de, {"Tap a team to see its players.": "Tippe auf ein Te
 Object.assign(LANG_TEXT.nl, {"Tap a team to see its players.": "Tik op een team om de spelers te zien.", "Tap a team to see its club.": "Tik op een team om de club te zien."});
 Object.assign(LANG_TEXT.pt, {"Tap a team to see its players.": "Toque numa equipa para ver os jogadores.", "Tap a team to see its club.": "Toque numa equipa para ver o clube."});
 Object.assign(LANG_TEXT.th, {"Tap a team to see its players.": "แตะที่ทีมเพื่อดูผู้เล่น", "Tap a team to see its club.": "แตะที่ทีมเพื่อดูสโมสร"});
+Object.assign(FR_TEXT, {"Whole bracket": "Tableau complet", "SF": "1/2", "QF": "1/4", "R16": "1/8", "R32": "1/16", "R64": "1/32", "R128": "1/64"});
+Object.assign(LANG_TEXT.es, {"Whole bracket": "Cuadro completo", "SF": "Semis", "QF": "Cuartos", "R16": "Octavos", "R32": "Dieciseisavos", "R64": "R64", "R128": "R128"});
+Object.assign(LANG_TEXT.it, {"Whole bracket": "Tabellone completo", "SF": "Semi", "QF": "Quarti", "R16": "Ottavi", "R32": "Sedicesimi", "R64": "R64", "R128": "R128"});
+Object.assign(LANG_TEXT.de, {"Whole bracket": "Ganzer Turnierbaum", "SF": "HF", "QF": "VF", "R16": "AF", "R32": "R32", "R64": "R64", "R128": "R128"});
+Object.assign(LANG_TEXT.nl, {"Whole bracket": "Volledig schema", "SF": "1/2", "QF": "1/4", "R16": "1/8", "R32": "1/16", "R64": "1/32", "R128": "1/64"});
+Object.assign(LANG_TEXT.pt, {"Whole bracket": "Quadro completo", "SF": "Meias", "QF": "Quartos", "R16": "Oitavos", "R32": "R32", "R64": "R64", "R128": "R128"});
+Object.assign(LANG_TEXT.th, {"Whole bracket": "ผังทั้งหมด", "SF": "รอบ 4", "QF": "รอบ 8", "R16": "รอบ 16", "R32": "รอบ 32", "R64": "รอบ 64", "R128": "รอบ 128"});
 Object.assign(FR_TEXT, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Touchez le score de l'équipe perdante. Le vainqueur marque {1} et c'est enregistré tout de suite.", "Score if they lost": "Score s'ils ont perdu"});
 Object.assign(LANG_TEXT.es, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Toca el resultado del equipo perdedor. El ganador se queda con {1} y se guarda al momento.", "Score if they lost": "Resultado si perdieron"});
 Object.assign(LANG_TEXT.it, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Tocca il punteggio della squadra che ha perso. Il vincitore prende {1} e si salva subito.", "Score if they lost": "Punteggio se hanno perso"});
@@ -3434,7 +3443,26 @@ function renderBracket(t, b, ms) {
   const canUndo = canEdit() && !bm.some(m => m.done && !m.bye);
   return `<section class="panel stack" style="gap:12px"><div class="spread"><h3>${esc(b.name)} <span class="muted small">${b.entrants} ${isIndiv(t) ? "players" : "teams"}${b.seeds ? " · seeded" : b.seeds === null ? " · random draw" : ""}</span></h3>
     <div class="row">${champ ? `<span class="pill done wrap">Winner: ${esc(champ)}</span>` : ""}${canUndo ? `<button class="btn danger sm" data-act="undo" data-id="${b.id}">Undo bracket</button>` : ""}</div></div>
-    ${bracketGrid(t, b, ms)}</section>`;
+    ${phoneView() ? bracketRounds(t, b, ms) : bracketGrid(t, b, ms)}</section>`;
+}
+// phones: a knockout one round at a time. Chips for each round (short names, the full name on hover), the third-place
+// game and the whole bracket; it opens on the round being played and moves on when that round is finished.
+const PHONE_MQ = matchMedia("(max-width: 640px)"), phoneView = () => PHONE_MQ.matches;
+PHONE_MQ.addEventListener?.("change", () => render());
+function bracketRounds(t, b, ms) {
+  const bm = ms.filter(m => m.bracket === b.id), tp = bm.find(m => m.third);
+  const games = r => bm.filter(m => m.round === r && !m.third).sort((x, y) => x.order - y.order);
+  const rs = Array.from({ length: b.rounds }, (_, i) => i + 1);
+  const cur = String(rs.find(r => games(r).some(m => !m.done && !m.bye)) ?? (tp && !tp.done ? "third" : b.rounds));
+  const saved = (S.bkRound ||= {})[S.tid + ":" + b.id];
+  const pick = saved && saved.sig === cur ? saved.v : cur;
+  const st = list => !list.length ? "" : list.every(m => m.done) ? "done" : list.some(m => m.done || m.court) ? "live" : "";
+  const chip = (v, label, list, title) => `<button type="button" class="rchip txt ${st(list)}${v === cur ? " now" : ""}" data-act="bk-round" data-b="${b.id}" data-v="${v}" data-sig="${cur}" aria-pressed="${pick === v}" ${title ? `title="${esc(title)}"` : ""}>${esc(label)}</button>`;
+  const bar = `<div class="round-bar bk-bar" role="group" aria-label="Rounds"><span class="rb-group">${rs.map(r => chip(String(r), SHORT(b.rounds, r), games(r), roundLabel(b.rounds, r))).join("")}${tp ? chip("third", "Third place", [tp]) : ""}${chip("grid", "Whole bracket", [])}</span></div>`;
+  if (pick === "grid") return bar + bracketGrid(t, b, ms);
+  const list = pick === "third" ? [tp].filter(Boolean) : games(+pick);
+  const no = m => pick === "third" || list.length < 2 ? "" : `${tr(SHORT(b.rounds, m.round))} ${m.order + 1}`;
+  return bar + `<div class="bk-list"><h4>${pick === "third" ? "Third place" : roundLabel(b.rounds, +pick)}</h4>${list.map(m => `<div class="bk-li">${no(m) ? `<span class="bk-no" data-notr>${esc(no(m))}</span>` : ""}${bkCard(t, b, m)}</div>`).join("")}</div>`;
 }
 
 /* courts */
@@ -3642,6 +3670,8 @@ document.addEventListener("click", async e => {
   const sr = e.target.closest(".tw.st tr[data-st]");
   if (sr) { const id = sr.dataset.st, set = S.stOpen ||= new Set(); set.has(id) ? set.delete(id) : set.add(id); sr.classList.toggle("open", set.has(id)); sr.querySelector(".st-name")?.setAttribute("aria-expanded", String(set.has(id))); return; }
   if (e.target.closest("header .brand .home")) { e.preventDefault(); if (S.liveRoute) return; S.home = true; S.picker = false; S.tid = null; lsSet("carreau-tid", ""); S.matches = {}; watchMatches(); S.onHome?.(); render(); window.scrollTo(0, 0); return; }
+  const br = e.target.closest('[data-act="bk-round"]');
+  if (br) { (S.bkRound ||= {})[S.tid + ":" + br.dataset.b] = { v: br.dataset.v, sig: br.dataset.sig }; render(); return; }
   const bz = e.target.closest('[data-act="bk-zoom"]');
   if (bz) {
     const key = S.tid + ":" + bz.dataset.b; const cur = bkZoomFor({ id: bz.dataset.b }); const z = bz.dataset.z;
