@@ -220,6 +220,10 @@ const SUITES = {
       /video files: 200 video\/mp4 true \| 200 video\/mp4 true/, /player: Running a shooting competition \| videos\/shooting-competition\.mp4 \| controls true \| long (true|n\/a)/,
       /escape closes: true/, /click outside closes: true/, /wizard step 1: first/, /step 2 triples: -/, /step 2 shooting: shooting/, /step 3 shooting: shooting/,
       /wizard opens: videos\/shooting-competition\.mp4 \| wizard kept: true/, /french: Guides \| De courtes vidéos .* \| Les vidéos sont en anglais\./, /errs \[\]/],
+    'web-lang.js': [/page: \d+KB \| French in page false \| lists files true/, /english: Pétanque competitions, run from your phone \| files none/,
+      /french: Des concours de pétanque, gérés depuis votre téléphone \| files fr \| first drawn Des concours de pétanque/,
+      /to german: Pétanque-Turniere, vom Handy aus geleitet \| files fr,de$/m, /back to french: Des concours de pétanque, gérés depuis votre téléphone \| files fr,de$/m,
+      /to english: Pétanque competitions, run from your phone \| files fr,de$/m, /missing file: Pétanque competitions, run from your phone/, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
       /admin page \(signed in\):.*Open testingOn/, /B tabs \(testing off\): Draw & results\|Standings\|Stream/,

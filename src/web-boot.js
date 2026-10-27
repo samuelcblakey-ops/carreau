@@ -721,5 +721,5 @@ function boot() {
     await handleHash();
   });
 }
-render();
-boot();
+// the page's language first (its own small file), so nothing shows in English and then switches
+loadLang(I18N.lang).finally(() => { render(); boot(); });
