@@ -41,7 +41,7 @@ const { chromium } = require('playwright');
     for (let r = 1; r <= A.rounds; r++) for (const m of C.MS().filter(m => m.bracket === 'A' && m.round === r && !m.third && m.a && m.b)) { const aw = sd(m.a[0]) < sd(m.b[0]); await C.recordResult(m.id, aw ? 13 : 5, aw ? 5 : 13, true); await w(30); }
     const rd = r => C.MS().filter(m => m.bracket === 'A' && m.round === r && !m.third).sort((x, y) => x.order - y.order).map(pair).join(' ');
     L.push(`favourites win: semis ${rd(2)} | final ${rd(3)}`);
-    q('[data-tab="draw"]').click(); await w(80);
+    q('[data-tab="draw"]').click(); await w(80); q('[data-act="draw-sel"][data-v="ko-A"]')?.click(); await w(60);
     const col = [...document.querySelectorAll('.bk .bk-col')][0], rows = col ? [...col.querySelectorAll('.bkm-row')] : [];
     const line = r => r ? [...r.children].map(c => c.textContent.trim()).filter(Boolean).join(' ') : '';
     L.push(`drawn: top line ${line(rows[0])} | bottom line ${line(rows[rows.length - 1])}`);

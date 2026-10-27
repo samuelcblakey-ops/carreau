@@ -38,6 +38,7 @@ const { chromium } = require('playwright');
     document.querySelector('[data-act="first-draw"]').click(); await w(400); await play(); await w(200);
     document.querySelector('[data-act="next-round"]').click(); await w(100);
     document.querySelector('[data-tab="draw"]').click(); await w(40);
+    document.querySelector('[data-act="draw-sel"][data-v="r-R1"]').click(); await w(40); // round 1 is a chip away once round 2 is drawn
     await modalSave('R1-m1', 9, 13); log.push('swiss R1 edit: corrected='+!!C.MS().find(m=>m.id==='R1-m1').corrected+' modal closed='+!document.querySelector('#modal .modal'));
     // 4. Shooting KO 8 with 10 shooters
     await mk({entry:'shooting', system:'knockout', shootFormat:'ko8', name:'Shoot KO', koThird:true}, 10, true);

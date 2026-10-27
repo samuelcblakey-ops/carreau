@@ -32,6 +32,8 @@ const { chromium } = require('playwright');
     const A = t.pools[0]; const am = C.MS().filter(m => m.pool === A.id).sort((x, y) => x.round - y.round || x.order - y.order);
     for (const m of am) { const ia = +m.a[0].slice(1), ib = +m.b[0].slice(1); await C.recordResult(m.id, ia < ib ? 13 : 7, ia < ib ? 7 : 13, true); }
     await w(60); C.render(); await w(40);
+    L.push('league chips: ' + [...document.querySelectorAll('.draw-bar .rchip')].map(b => b.textContent + (b.getAttribute('aria-pressed') === 'true' ? '*' : '')).join(','));
+    q('[data-act="draw-sel"][data-v="all"]').click(); await w(40);
     const rows = [...document.querySelectorAll('.pools .panel')][0].querySelectorAll('tbody tr');
     L.push('league A table: ' + [...rows].map(r => txt(r)).join(' | '));
     // league B: everyone 1-1, split by points difference; league C: equal wins, fewest losses first
