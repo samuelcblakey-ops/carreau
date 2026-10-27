@@ -160,6 +160,21 @@ tr.q td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .court .cn{font-family:var(--display);font-size:28px;font-weight:700;line-height:1;display:flex;justify-content:space-between;align-items:center}
 .court.free{background:var(--surface-2);border-style:dashed}
 .court.off{opacity:.5}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px}
+.ptile{display:flex;flex-direction:column;gap:3px;min-width:0;padding:9px 11px 10px;border:1px solid var(--jack);box-shadow:inset 3px 0 0 var(--jack);border-radius:var(--r);background:var(--surface);color:var(--ink);font:inherit;text-align:left}
+button.ptile{cursor:pointer}button.ptile:hover{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.ptile.me{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent),0 0 0 1px var(--accent)}
+.pt-h{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.pt-n{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
+.pt-ctx{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+.pt-s{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
+.pt-s .nm{min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.25}
+.pt-s .sc{font-family:var(--display);font-size:18px;font-weight:700}
+.ptile.free{flex-direction:row;align-items:center;justify-content:space-between;border:1px dashed var(--line);box-shadow:none;background:var(--surface-2);color:var(--muted)}
+.ptile.free .pt-n{color:var(--ink)}.pt-free{font-size:13px;font-weight:600}
+.nxrow{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left}
+.nxrow:first-child{border-top:0}button.nxrow{cursor:pointer}button.nxrow:hover{background:var(--surface-2)}.nxrow.me{background:var(--accent-soft)}
+.nx-m{display:flex;flex-direction:column;gap:1px;min-width:0;overflow-wrap:anywhere}
 /* bracket */
 /* bracket: every round column is the same height and each match sits in an equal share of it,
    so a match always lines up halfway between the two games that feed it; wires are drawn with borders */
@@ -326,7 +341,9 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
 .st-more{display:none}
 /* phones: standings tables fit the screen so the +/- column is never cut off (names wrap instead) */
 @media (max-width:640px){.tw.st:not(.all) td.wrap{min-width:0;overflow-wrap:anywhere}.tw.st:not(.all) td,.tw.st:not(.all) th{padding:7px 5px}.tw.st:not(.all) td:first-child,.tw.st:not(.all) th:first-child{padding-left:2px}.tw.st:not(.all) td:last-child,.tw.st:not(.all) th:last-child{padding-right:2px}.panel>.tw.st,.draw-table .tw.st{margin-inline:-4px}}
-@media (max-width:640px){.tw.st:not(.all) .x{display:none}.tw.st:not(.all){overflow:visible}.tw.st:not(.all) thead th{position:sticky;top:0;background:var(--surface);z-index:1}.st-more{display:block;margin-top:6px}}
+@media (max-width:640px){.tw.st:not(.all) .x{display:none}.tw.st:not(.all){overflow:visible}.tw.st:not(.all) thead th{position:sticky;top:0;background:var(--surface);z-index:1}.st-more{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+  .tw.st:not(.all) .st-sub{display:none}.tw.st:not(.all) tr.open .st-sub{display:block}.tw.st:not(.all) tr[data-st]{cursor:pointer}}
+.st-name{display:block;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;border-radius:4px}.st-hint{flex:1}
 .netdot{display:inline-flex;align-items:center;gap:6px;font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0;text-transform:none}
 .netdot[hidden]{display:none}.netdot::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
 .netdot.sync::before{background:var(--jack);animation:netpulse 1s ease-in-out infinite}.netdot.off::before{background:var(--danger)}.netdot.off{color:var(--danger)}
@@ -882,6 +899,13 @@ Object.assign(LANG_TEXT.de, {"Log in with your organiser code": "Mit deinem Orga
 Object.assign(LANG_TEXT.nl, {"Log in with your organiser code": "Log in met je organisatorcode", "Organiser login": "Inloggen als organisator", "Log in": "Inloggen", "Log out": "Uitloggen"});
 Object.assign(LANG_TEXT.pt, {"Log in with your organiser code": "Inicie sessão com o seu código de organizador", "Organiser login": "Acesso de organizador", "Log in": "Iniciar sessão", "Log out": "Terminar sessão"});
 Object.assign(LANG_TEXT.th, {"Log in with your organiser code": "เข้าสู่ระบบด้วยรหัสผู้จัดของคุณ", "Organiser login": "เข้าสู่ระบบผู้จัด", "Log in": "เข้าสู่ระบบ", "Log out": "ออกจากระบบ"});
+Object.assign(FR_TEXT, {"Tap a team to see its players.": "Touchez une équipe pour voir ses joueurs.", "Tap a team to see its club.": "Touchez une équipe pour voir son club."});
+Object.assign(LANG_TEXT.es, {"Tap a team to see its players.": "Toca un equipo para ver sus jugadores.", "Tap a team to see its club.": "Toca un equipo para ver su club."});
+Object.assign(LANG_TEXT.it, {"Tap a team to see its players.": "Tocca una squadra per vederne i giocatori.", "Tap a team to see its club.": "Tocca una squadra per vederne il club."});
+Object.assign(LANG_TEXT.de, {"Tap a team to see its players.": "Tippe auf ein Team, um seine Spieler zu sehen.", "Tap a team to see its club.": "Tippe auf ein Team, um seinen Verein zu sehen."});
+Object.assign(LANG_TEXT.nl, {"Tap a team to see its players.": "Tik op een team om de spelers te zien.", "Tap a team to see its club.": "Tik op een team om de club te zien."});
+Object.assign(LANG_TEXT.pt, {"Tap a team to see its players.": "Toque numa equipa para ver os jogadores.", "Tap a team to see its club.": "Toque numa equipa para ver o clube."});
+Object.assign(LANG_TEXT.th, {"Tap a team to see its players.": "แตะที่ทีมเพื่อดูผู้เล่น", "Tap a team to see its club.": "แตะที่ทีมเพื่อดูสโมสร"});
 Object.assign(FR_TEXT, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Touchez le score de l'équipe perdante. Le vainqueur marque {1} et c'est enregistré tout de suite.", "Score if they lost": "Score s'ils ont perdu"});
 Object.assign(LANG_TEXT.es, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Toca el resultado del equipo perdedor. El ganador se queda con {1} y se guarda al momento.", "Score if they lost": "Resultado si perdieron"});
 Object.assign(LANG_TEXT.it, {"Tap the losing team's score. The winner gets {n} and it saves straight away.": "Tocca il punteggio della squadra che ha perso. Il vincitore prende {1} e si salva subito.", "Score if they lost": "Punteggio se hanno perso"});
@@ -3399,20 +3423,27 @@ function renderBracket(t, b, ms) {
 }
 
 /* courts */
+// Pistes: every piste as a small tile (game, live score), then the games next in line for a piste
 function renderCourts(t) {
-  const ms = MS();
+  const ms = MS(), me = myPick(t), ro = !canScore(), tag = ro ? "div" : "button";
   const live = ms.filter(m => !m.done && m.court);
   const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder);
+  const on = t.courts.filter(c => c.active !== false), off = t.courts.filter(c => c.active === false);
+  const mine = m => me && ents(m).includes(me) ? "me" : "";
+  const tile = c => {
+    const m = live.find(x => x.court === c.id);
+    if (!m) return `<div class="ptile free"><span class="pt-n" data-notr>${esc(c.name)}</span><span class="pt-free">Free</span></div>`;
+    const side = k => `<div class="pt-s"><span class="nm" data-notr>${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? ""}</span></div>`;
+    return `<${tag} class="ptile ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}>
+      <div class="pt-h"><span class="pt-n" data-notr>${esc(c.name)}</span>${timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pt-ctx">${esc(matchContext(t, m))}</span>`}</div>${side("a")}${side("b")}</${tag}>`;
+  };
+  const next = m => `<${tag} class="nxrow ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}><span class="nx-m"><span><b data-notr>${esc(sideName(t, m.a))}</b> v <b data-notr>${esc(sideName(t, m.b))}</b></span><span class="small muted">${esc(matchContext(t, m))}</span></span></${tag}>`;
   return `<div class="stack">
     <div class="spread"><h2>Pistes</h2><div class="row"><span class="muted small">${live.length} playing · ${waiting.length} waiting</span>${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}</div></div>
-    <div class="courts">${t.courts.map(c => {
-      const m = live.find(x => x.court === c.id);
-      if (c.active === false) return `<div class="court off"><div class="cn">${esc(c.name)}<span class="pill">Not in use</span></div></div>`;
-      if (!m) return `<div class="court free"><div class="cn">${esc(c.name)}<span class="pill">Free</span></div><span class="muted small">No game on this piste.</span></div>`;
-      return `<div class="court"><div class="cn">${esc(c.name)}<span class="pill playing"><span class="dot"></span>Playing</span></div>${matchCard(t, m, { ctx: true })}</div>`;
-    }).join("")}</div>
-    <section class="stack" style="gap:10px"><h3>Waiting for a piste</h3>
-      ${waiting.length ? `<div class="mlist">${waiting.map(m => matchCard(t, m, { ctx: true })).join("")}</div>` : `<div class="empty">No games waiting.</div>`}
+    <div class="pgrid">${on.map(tile).join("")}</div>
+    ${off.length ? `<p class="small muted"><span>Not in use</span>: <span data-notr>${off.map(c => esc(c.name)).join(", ")}</span></p>` : ""}
+    <section class="stack" style="gap:10px"><h3>Next up</h3>
+      ${waiting.length ? `<div class="rlist">${waiting.map(next).join("")}</div>` : `<div class="empty">No games waiting.</div>`}
     </section>
   </div>`;
 }
@@ -3426,10 +3457,13 @@ function overallTable(t, stage) {
 }
 function standingsTable(t, rows, opts = {}) {
   const useB = opts.buch; const podium = !!opts.podium && rows.some(s => s.p > 0); // gold, silver and bronze once games are in
-  const me = myPick(t);
+  const me = myPick(t), stOpen = S.stOpen ||= new Set();
+  // phones show team names only (one line per team); tapping a team shows its players (or its club)
+  const subOf = id => { const v = opts.club ? clubOfTeam(t, id) : !isIndiv(t) ? teamPlayers(t, id) : ""; return v && v !== entName(t, id) ? v : ""; };
+  const hint = !S.allCols && rows.some(s => subOf(s.id)) ? `<span class="small muted st-hint">${opts.club ? "Tap a team to see its club." : "Tap a team to see its players."}</span>` : "";
   return `<div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n x" title="Played">Pld</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n x" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n ${useB ? "x" : ""}" title="Points for">For</th><th class="n ${useB ? "x" : ""}" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
-    ${rows.map((s, i) => { const pod = podium && i < 3 && !s.unplaced; return `<tr class="${[s.id === me ? "me" : "", pod ? "pod" + (i + 1) : ""].filter(Boolean).join(" ")}"><td class="rank">${pod ? `<span class="medal m${i + 1}">${i + 1}</span>` : i + 1}</td><td class="wrap"><b>${esc(entName(t, s.id))}</b>${opts.club ? `<div class="small muted">${esc(clubOfTeam(t, s.id))}</div>` : !isIndiv(t) ? `<div class="small muted">${esc(teamPlayers(t, s.id))}</div>` : ""}</td><td class="n x">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n x">${s.fbuch}</td>` : ""}<td class="n ${useB ? "x" : ""}">${s.pf}</td><td class="n ${useB ? "x" : ""}">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`; }).join("")}
-  </tbody></table></div><div class="st-more"><button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`;
+    ${rows.map((s, i) => { const pod = podium && i < 3 && !s.unplaced, sub = subOf(s.id), open = !!sub && stOpen.has(s.id); return `<tr class="${[s.id === me ? "me" : "", pod ? "pod" + (i + 1) : "", open ? "open" : ""].filter(Boolean).join(" ")}" ${sub ? `data-st="${s.id}"` : ""}><td class="rank">${pod ? `<span class="medal m${i + 1}">${i + 1}</span>` : i + 1}</td><td class="wrap">${sub ? `<button type="button" class="st-name" aria-expanded="${open}"><b>${esc(entName(t, s.id))}</b></button><div class="small muted st-sub">${esc(sub)}</div>` : `<b>${esc(entName(t, s.id))}</b>`}</td><td class="n x">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n x">${s.fbuch}</td>` : ""}<td class="n ${useB ? "x" : ""}">${s.pf}</td><td class="n ${useB ? "x" : ""}">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`; }).join("")}
+  </tbody></table></div><div class="st-more">${hint}<button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`;
 }
 // inter-club: big events show one round at a time (4 or more days/rounds); the round still being played comes first
 const clubCompact = t => clubDaysShown(t) >= 4;
@@ -3590,6 +3624,8 @@ document.addEventListener("click", async e => {
   const pk = e.target.closest('[data-act="picker"], [data-act="pick-t"]');
   if (pk) { if (pk.dataset.act === "picker") { S.picker = !S.picker; renderHeader(); localize($("header.app")); if (S.picker) setTimeout(() => { $(".pick-row.on")?.scrollIntoView({ block: "nearest" }); if (!matchMedia("(pointer: coarse)").matches) $("#picker-q")?.focus(); }, 0); } else pickCompetition(pk.dataset.id); return; }
   if (S.picker && !e.target.closest(".picker")) { S.picker = false; renderHeader(); localize($("header.app")); }
+  const sr = e.target.closest(".tw.st tr[data-st]");
+  if (sr) { const id = sr.dataset.st, set = S.stOpen ||= new Set(); set.has(id) ? set.delete(id) : set.add(id); sr.classList.toggle("open", set.has(id)); sr.querySelector(".st-name")?.setAttribute("aria-expanded", String(set.has(id))); return; }
   if (e.target.closest("header .brand .home")) { e.preventDefault(); if (S.liveRoute) return; S.home = true; S.picker = false; S.tid = null; lsSet("carreau-tid", ""); S.matches = {}; watchMatches(); S.onHome?.(); render(); window.scrollTo(0, 0); return; }
   const bz = e.target.closest('[data-act="bk-zoom"]');
   if (bz) {
