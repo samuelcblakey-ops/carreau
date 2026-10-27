@@ -216,6 +216,12 @@ fieldset.ro-view{border:0;padding:0;margin:0;min-width:0}fieldset.ro-view :is(in
 .erow.out{opacity:.5}
 .erow.here .num{color:var(--accent)}
 .btn.checked{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+/* check-in: a clear outlined button per entry, filled once checked in; "Check in everyone" is a full-size primary button */
+.btn.ci{min-height:44px;min-width:132px;justify-content:center;border:2px solid var(--accent);background:var(--surface);color:var(--accent);font-weight:700;font-size:14px;padding:6px 14px}
+.btn.ci:hover{background:var(--accent-soft);border-color:var(--accent)}
+.btn.ci.checked{background:var(--accent);color:var(--accent-ink)}
+.btn.ci-all{min-height:44px;padding:10px 18px;font-size:15px}
+.btn .ic{flex:none}
 .reg-count{font-family:var(--display);font-size:22px}.reg-count b{font-size:30px}
 .meter{height:8px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
 .meter span{display:block;height:100%;background:var(--accent);transition:width .2s}
@@ -2111,7 +2117,7 @@ function renderShooting(t) {
   let html = `<div class="stack"><div class="spread"><h2>Draw & results</h2><span class="muted small">Precision shooting · ${fmt === "final" ? `Qualifying → final (top ${t.shootFinal || 4})` : `Qualifying → top ${fmt === "ko16" ? 16 : 8} knockout`}</span></div>`;
   if (!t.draws.length) {
     return html + `<div class="panel stack"><p>${n} shooters ${t.checkin ? "checked in" : "entered"}</p>
-      ${n < 2 ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least 2 shooters on Registration first.</p>` : wr ? `<div><button class="btn primary" data-act="first-draw">Start the qualifying round</button></div>` : `<p class="muted">Waiting for the organiser to start.</p>`}</div></div>`;
+      ${n < 2 ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least 2 shooters on Registration first.</p>${checkinAllBtn(t) ? `<div>${checkinAllBtn(t)}</div>` : ""}` : wr ? `<div><button class="btn primary" data-act="first-draw">Start the qualifying round</button></div>` : `<p class="muted">Waiting for the organiser to start.</p>`}</div></div>`;
   }
   const table = (ph, title, cut) => {
     const rows = shootRanking(t, ph); const doneN = rows.filter(r => r.done).length;
@@ -2943,6 +2949,11 @@ async function wizFinish(t) {
   nt.wizard = false; S.wiz = null; S.tab = "entries"; await guard(() => saveT(nt)); render();
   toast(nt.entry === "teams" ? "All set. Now add your teams." : nt.entry === "shooting" ? "All set. Now add your shooters." : "All set. Now add your players.");
 }
+// check-in icons (no text, so translations are untouched)
+const CI_TICK = `<svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+const CI_RING = `<svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>`;
+// "Check in everyone", offered wherever someone could get stuck because entries haven't checked in yet
+const checkinAllBtn = t => t.checkin && canEdit() && !t.draws.length && enteredIds(t).length > activeIds(t).length ? `<button type="button" class="btn primary ci-all" data-act="checkin-all">${CI_TICK}Check in everyone</button>` : "";
 function renderEntries(t) {
   const melee = isIndiv(t); const size = SIZE[t.format]; const noun = melee ? "players" : "teams";
   const list = entities(t);
@@ -2958,7 +2969,7 @@ function renderEntries(t) {
     ${t.meleeDrawn && !t.draws.length && canEdit() ? `<div class="notice spread"><span>These teams were drawn at random from ${t.players.filter(p => p.active !== false && (!t.checkin || p.checkedIn)).length} players. Happy with them? Make the draw on Draw & results.</span><span class="row"><button class="btn sm" data-act="melee-redraw">Redraw teams</button><button class="btn sm ghost" data-act="melee-unteam">Back to players</button></span></div>` : ""}
     <div class="panel stack">
       ${t.checkin ? `<div class="spread"><div><div class="eyebrow">Checked in on the day</div><div class="reg-count"><b>${here.length}</b> of ${entered.length} ${noun}</div></div>
-        ${canEdit() && !drawn ? `<div class="row"><button class="btn sm" data-act="checkin-all">Check in everyone</button>${here.length ? `<button class="btn sm ghost" data-act="checkin-clear">Clear check-ins</button>` : ""}</div>` : ""}</div>
+        ${canEdit() && !drawn ? `<div class="row">${checkinAllBtn(t)}${here.length ? `<button class="btn sm ghost" data-act="checkin-clear">Clear check-ins</button>` : ""}</div>` : ""}</div>
         <div class="meter" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
         <p class="small muted">Only checked-in ${noun} go into the draw, so the format and the number of games are worked out from who has actually turned up. ${entered.length - here.length ? `<b>${entered.length - here.length} not checked in yet.</b>` : ""}</p>`
       : `<div class="spread"><div><div class="eyebrow">Entries</div><div class="reg-count"><b>${entered.length}</b> ${noun}</div></div></div><p class="small muted">Check-in is off, so every entered ${melee ? "player" : "team"} goes into the draw.</p>`}
@@ -2989,7 +3000,7 @@ function renderEntries(t) {
       ${list.length ? `<div class="elist">${list.map((e, i) => `<div class="erow ${e.active === false ? "out" : ""} ${t.checkin && e.checkedIn && e.active !== false ? "here" : ""}" data-row="${e.id}" ${match(e) ? "" : "hidden"} data-text="${esc([entName(t, e.id), ...(e.players || []), e.club || ""].join(" ").toLowerCase())}">
         <span class="num">${i + 1}</span>
         <div class="who">${melee ? `<b>${esc(e.name)}</b>` : `<b>${esc(entName(t, e.id))}</b><span class="small muted">${esc((e.players || []).filter(Boolean).join(", "))}${e.club ? " · " + esc(e.club) : ""}</span>`}</div>
-        ${e.active === false ? `<span class="pill">Withdrawn</span>` : t.checkin ? (canEdit() ? `<button class="btn sm ${e.checkedIn ? "checked" : ""}" data-act="checkin" data-id="${e.id}" aria-pressed="${!!e.checkedIn}">${e.checkedIn ? "✓ Checked in" : "Check in"}</button>` : e.checkedIn ? `<span class="pill done">Checked in</span>` : `<span class="pill">Not here yet</span>`) : ""}
+        ${e.active === false ? `<span class="pill">Withdrawn</span>` : t.checkin ? (canEdit() ? `<button class="btn ci ${e.checkedIn ? "checked" : ""}" data-act="checkin" data-id="${e.id}" aria-pressed="${!!e.checkedIn}">${e.checkedIn ? "✓ Checked in" : `${CI_RING}Check in`}</button>` : e.checkedIn ? `<span class="pill done">Checked in</span>` : `<span class="pill">Not here yet</span>`) : ""}
         ${canEdit() ? `<div class="row">
           ${(t.seeding === "entry" || isClubs(t)) && !drawn ? `<button class="btn sm ghost" data-act="up" data-id="${e.id}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button>` : ""}
           <button class="btn sm ghost" data-act="toggle-e" data-id="${e.id}">${e.active === false ? "Reinstate" : "Withdraw"}</button>
@@ -3068,12 +3079,12 @@ function renderDraw(t) {
   const minNeeded = sys === "melee" || isMeleeOnce(t) ? SIZE[t.format] * 2 : 2;
   if (isMeleeOnce(t)) return `<div class="stack"><h2>Draw & results</h2><div class="panel stack">
       <p>${n} players ${t.checkin ? "checked in" : "entered"} · teams drawn once, then ${SYSTEM_LABEL[t.system]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
-      ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} players on Registration first.</p>` : wr ? `<div><button class="btn primary" data-act="melee-teams">Draw the teams</button></div><p class="small muted">Players are shuffled into ${FORMAT_LABEL[t.format].toLowerCase()} (with a few ${t.format === "triples" ? "doubles" : "triples"} if the numbers don't divide evenly). You can redraw before the first game.</p>` : `<p class="muted">Waiting for the organiser to draw the teams.</p>`}
+      ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} players on Registration first.</p>${checkinAllBtn(t) ? `<div>${checkinAllBtn(t)}</div>` : ""}` : wr ? `<div><button class="btn primary" data-act="melee-teams">Draw the teams</button></div><p class="small muted">Players are shuffled into ${FORMAT_LABEL[t.format].toLowerCase()} (with a few ${t.format === "triples" ? "doubles" : "triples"} if the numbers don't divide evenly). You can redraw before the first game.</p>` : `<p class="muted">Waiting for the organiser to draw the teams.</p>`}
     </div></div>`;
   if (!t.draws.length) {
     return `<div class="stack"><h2>Draw & results</h2><div class="panel stack">
       <p>${n} ${isIndiv(t) ? "players" : "teams"} ${t.checkin ? "checked in" : "entered"}${isClubs(t) ? ` · ${clubsOf(t).length} clubs → ${clubFixtureCount(clubsOf(t).length)} fixtures` : ""} · ${SYSTEM_LABEL[sys]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
-      ${t.checkin && enteredIds(t).length > n ? `<div class="notice">${enteredIds(t).length - n} entered ${isIndiv(t) ? "player" : "team"}${enteredIds(t).length - n === 1 ? " hasn't" : "s haven't"} checked in and won't be in the draw. <button class="btn sm ghost" data-tab="entries">Go to Registration</button></div>` : ""}
+      ${t.checkin && enteredIds(t).length > n ? `<div class="notice stack" style="gap:8px"><span>${enteredIds(t).length - n} entered ${isIndiv(t) ? "player" : "team"}${enteredIds(t).length - n === 1 ? " hasn't" : "s haven't"} checked in and won't be in the draw.</span><div class="row">${checkinAllBtn(t)}<button class="btn sm ghost" data-tab="entries">Go to Registration</button></div></div>` : ""}
       ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} ${isIndiv(t) ? "players" : "teams"} on Registration before drawing.</p>` :
       isClubs(t) && !clubsReady(t).ok ? `<div class="notice stack" style="gap:4px"><b>Not ready to draw yet</b>${clubsReady(t).problems.map(x => `<span>${esc(x)}</span>`).join("")}<span><button class="btn sm ghost" data-tab="entries">Go to Registration</button></span></div>` :
       wr ? `<div><button class="btn primary" data-act="first-draw">${{ swiss: "Draw round 1", melee: "Draw round 1", roundrobin: "Generate round robin schedule", snake: "Draw snake rounds", pools: "Draw the barrage", leagues: "Draw the leagues", clubs: "Draw the fixtures", knockout: "Draw knockout bracket" }[sys]}</button></div>` : `<p class="muted">Waiting for the organiser to make the draw.</p>`}
