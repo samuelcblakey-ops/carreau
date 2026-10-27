@@ -549,6 +549,8 @@ function applyCompTheme(t) {
   el.textContent = `:root{${light}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${dark}}}:root[data-theme="dark"]{${dark}}`;
 }
 
+/* @@I18N-DATA-START: the translations. The website build moves everything between these markers into one file per
+   language (dist/lang/) and loads only the one in use; keep code (functions, other constants) outside them. */
 /* ---------------- French translation ----------------
    Keys are the English text as it appears on screen. {n} matches a number and {x} any text
    (a team name, say); in the French, {1}, {2}… refer to those matches in order. */
@@ -795,11 +797,6 @@ const FR_TEXT = {
   "Couldn't connect. Check your internet connection and reload.": "Connexion impossible. Vérifiez votre connexion internet et rechargez la page.",
   "Firebase isn't set up yet, so this is saving on this device only.": "Firebase n'est pas encore configuré : les données sont enregistrées sur cet appareil uniquement."
 };
-// Rounds with their own French names
-const FR_LAST = n => n === 16 ? "Huitièmes de finale" : n === 32 ? "Seizièmes de finale" : n === 64 ? "Trente-deuxièmes de finale" : `Tour des ${n}`;
-const FR_FN = [
-  [/^Last (\d+)$/, m => FR_LAST(+m[1])]
-];
 Object.assign(FR_TEXT, {
   "Scorers open this once on their phone and can then enter scores and move games between pistes. Scorer code": "Les marqueurs l'ouvrent une fois sur leur téléphone, puis peuvent saisir les scores et déplacer les parties entre les pistes. Code marqueur",
   "Gives full control, including registration, setup, draws and scores. Keep it to your organising team, and keep a copy for yourself in case you change device. Organiser code": "Donne le contrôle total : inscriptions, paramètres, tirages et scores. Réservez-le à votre équipe d'organisation et gardez-en une copie au cas où vous changeriez d'appareil. Code organisateur"
@@ -960,8 +957,6 @@ Object.assign(LANG_TEXT.de, {"All rights reserved": "Alle Rechte vorbehalten"});
 Object.assign(LANG_TEXT.nl, {"All rights reserved": "Alle rechten voorbehouden"});
 Object.assign(LANG_TEXT.pt, {"All rights reserved": "Todos os direitos reservados"});
 Object.assign(LANG_TEXT.th, {"All rights reserved": "สงวนลิขสิทธิ์"});
-const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
-const LOCALES = { en: undefined, fr: "fr-FR", es: "es-ES", it: "it-IT", de: "de-DE", nl: "nl-NL", pt: "pt-PT", th: "th-TH" };
 // live streaming: overlay and live desk
 Object.assign(FR_TEXT, {
   "End": "Mène", "End {n}": "Mène {1}", "Final score": "Final", "End {n} · {x}": "Mène {1} · {2}", "Holding": "Tient le point", "Holding the point": "Tient le point", "Boule thrown · {n} left": "Boule jouée · {1} à jouer",
@@ -992,9 +987,27 @@ Object.assign(FR_TEXT, {
   "Filming a game? Type the two team names and you get a transparent score overlay for your phone's streaming app (score, ends, boules left, who holds the point) and a live desk to tap it all in. It works for any game, in a competition or not.": "Vous filmez une partie ? Saisissez les deux noms d'équipe et vous obtenez un affichage de score transparent pour l'appli de diffusion de votre téléphone (score, mènes, boules restantes, qui tient le point) et une table en direct pour tout saisir. Ça marche pour n'importe quelle partie, en concours ou non.", "Couldn't create the stream. Check your connection and try again.": "Impossible de créer la diffusion. Vérifiez votre connexion et réessayez."
 });
 
+/* @@I18N-DATA-END */
+
+const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
+const LOCALES = { en: undefined, fr: "fr-FR", es: "es-ES", it: "it-IT", de: "de-DE", nl: "nl-NL", pt: "pt-PT", th: "th-TH" };
+// Rounds with their own French names
+const FR_LAST = n => n === 16 ? "Huitièmes de finale" : n === 32 ? "Seizièmes de finale" : n === 64 ? "Trente-deuxièmes de finale" : `Tour des ${n}`;
+const FR_FN = [
+  [/^Last (\d+)$/, m => FR_LAST(+m[1])]
+];
+
 /* translation engine: applied to the rendered page, so the app logic stays in English */
 const savedLang = lsGet("carreau-lang");
-const I18N = { lang: LANGS.some(l => l[0] === savedLang) ? savedLang : "en", cache: {}, exact: null, re: [] };
+const I18N = { lang: LANGS.some(l => l[0] === savedLang) ? savedLang : "en", cache: {}, exact: null, re: [], loaded: {} };
+// the website build swaps this for { fr: "fr-<hash>.json", … }: each language is its own file, fetched when it's chosen.
+// In one file (the Claude artifact, the app tests) every language is built in and this stays null.
+const I18N_FILES = /* @@I18N-FILES */ null;
+async function loadLang(l) {
+  if (!I18N_FILES?.[l] || I18N.loaded[l]) return;
+  try { const r = await fetch("lang/" + I18N_FILES[l]); if (!r.ok) throw new Error(r.status); Object.assign(l === "fr" ? FR_TEXT : LANG_TEXT[l], await r.json()); I18N.loaded[l] = true; delete I18N.cache[l]; }
+  catch (e) { console.warn("Couldn't load the " + l + " text", e); }
+}
 function frCompile() {
   const c = I18N.cache[I18N.lang];
   if (c) { I18N.exact = c.exact; I18N.re = c.re; return; }
@@ -3708,7 +3721,7 @@ document.addEventListener("click", async e => {
   if (S.themeMenu && !e.target.closest(".theme-wrap")) { S.themeMenu = false; renderHeader(); }
   const th = e.target.closest("[data-theme-pick]");
   if (th) { lsSet("carreau-theme", th.dataset.themePick); applyTheme(); S.langMenu = false; S.themeMenu = false; render(); return; }
-  if (lg) { S.langMenu = false; I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
+  if (lg) { S.langMenu = false; await loadLang(lg.dataset.lang); I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
   const tab = e.target.closest("[data-tab]");
   if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); render(); return; }
   if (e.target.closest(".ko-plan > summary")) { const kp = e.target.closest(".ko-plan"); setTimeout(() => { S.koPlan = kp.open; }, 0); }

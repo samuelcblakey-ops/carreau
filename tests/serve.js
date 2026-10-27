@@ -4,7 +4,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const DIST = path.join(__dirname, '..', 'dist');
 const FB_LOCAL = process.env.FB_LOCAL; // optional folder with firebase-*.js (for machines without internet)
 const DEMO = 'export const firebaseConfig = { apiKey: "demo-key", authDomain: "demo-carreau.firebaseapp.com", projectId: "demo-carreau", appId: "1:1:web:1" };';
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.webmanifest': 'application/manifest+json', '.mp4': 'video/mp4', '.jpg': 'image/jpeg' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.webmanifest': 'application/manifest+json', '.mp4': 'video/mp4', '.jpg': 'image/jpeg' };
 module.exports = (port) => new Promise(res => {
   const srv = http.createServer((req, rsp) => {
     let u = decodeURIComponent(req.url.split('?')[0]); if (u === '/') u = '/index.html';
