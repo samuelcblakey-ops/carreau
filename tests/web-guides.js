@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
   await p.goto(process.env.WEB_URL); await p.waitForFunction(() => window.__carreau && window.__carreau.S.loaded, null, { timeout: 20000 }); await w(1500);
   // the welcome card shows when there's nothing to follow; earlier tests may have left competitions, so show it directly
   log('welcome link:', await p.evaluate(() => { const C = window.__carreau, S = C.S; const keep = [S.tournaments, S.tid]; S.tournaments = {}; S.tid = null; C.render();
-    const t = document.querySelector('#main [data-act="guide-play"][data-id="first"]')?.textContent.trim() || ('NONE ' + document.querySelector('#main').innerText.slice(0, 200) + ' ' + !!S.guideLink); [S.tournaments, S.tid] = keep; C.render(); return t; }));
+    const t = document.querySelector('#main [data-act="guide-play"][data-id="first"]')?.innerText.replace(/\s+/g, ' ').trim() || ('NONE ' + document.querySelector('#main').innerText.slice(0, 200) + ' ' + !!S.guideLink); [S.tournaments, S.tid] = keep; C.render(); return t; }));
   log('footer link:', await p.evaluate(() => !!document.querySelector('#foot a[href="#guides"]')));
   await p.click('#foot a[href="#guides"]'); await w(800);
   const page = await p.evaluate(async () => { const cards = [...document.querySelectorAll('.guide-card')];

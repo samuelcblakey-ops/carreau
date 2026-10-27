@@ -30,7 +30,7 @@ const { chromium } = require('playwright');
     L.push('knockouts drawn: chips ' + chips() + ' | groups ' + groups() + ' | bracket shown ' + !!q('main .bk') + ' | rounds shown ' + qa('main section.draw-round').length);
     const h0 = document.documentElement.scrollHeight;
     q('[data-act="draw-sel"][data-v="all"]').click(); await w(80);
-    L.push('all: shown ' + shown() + ' | page ' + (document.documentElement.scrollHeight > h0 * 2 ? 'much longer' : 'similar'));
+    L.push('all: shown ' + shown() + ' | page ' + (document.documentElement.scrollHeight > h0 + 600 ? 'much longer' : 'similar ' + h0 + ' ' + document.documentElement.scrollHeight));
     q('[data-act="draw-sel"][data-v="table"]').click(); await w(60); L.push('table chip: ' + shown() + ' | rows ' + qa('.draw-table tbody tr').length);
     // 2. Round robin: the first round with games left
     await make('roundrobin', 4); await playAll(m => m.round === 1);

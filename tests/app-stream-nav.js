@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(process.env.APP_URL); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(300);
   const out = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s); const L = []; try {
-    const where = () => `${location.hash || '(none)'} | ${q('main h2')?.textContent.trim()} | stream page ${!!S.liveRoute}`;
+    const where = () => `${location.hash || '(none)'} | ${q('main h2')?.textContent.trim() || (q('main .wiz') ? 'Quick setup' : '')} | stream page ${!!S.liveRoute}`;
     q('[data-act="new-t"]').click(); await w(100); const t = JSON.parse(JSON.stringify(C.T())); Object.assign(t, { name: 'Club day', wizard: false }); await S.store.setTournament(t); S.tournaments[t.id] = t; await w(60);
     const tid = t.id;
     // into a new stream from the competition's Stream tab

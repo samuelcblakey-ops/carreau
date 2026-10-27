@@ -8,6 +8,7 @@ const { chromium } = require('playwright');
   log('footer exists:', !!(await A.$('#site-foot [data-act="admin-in"]')));
   await A.click('[data-act="new-t"]'); await w(2500);
   const tid = await A.evaluate(()=>location.hash.slice(1));
+  await A.click('[data-act="wiz-skip"]'); await w(800); await A.click('[data-tab="entries"]'); await w(400); // a new competition opens on the quick setup
   await A.fill('#bulk', 'One\nTwo\nThree\nFour'); await A.click('#bulk-form button[type=submit]'); await w(1200);
   await A.click('[data-tab="setup"]'); await w(1500);
   log('A sharing (test mode):', (await A.textContent('.panel')).replace(/\s+/g,' ').slice(0,160));

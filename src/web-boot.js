@@ -234,7 +234,8 @@ S.headerExtra = () => {
   if (p.score) return `<span class="pill done">Scorer</span>`;
   return `<button class="btn sm ghost" data-act="enter-code">Organiser code</button>`;
 };
-S.welcomeExtra = () => `<p class="muted">Following a competition? Open the link the organiser sent you.</p>${loginMode() ? `<p class="muted">Running one? <button class="btn sm" data-act="org-page">Organiser login</button></p>` : ""}`;
+// start screen when this visitor can't create: with organiser login on, running a competition starts by logging in
+S.startLogin = () => loginMode() ? `<button type="button" class="start-card go" data-act="org-page"><b>Run a competition</b><span>Log in with your organiser code</span></button>` : "";
 const copyRow = (id, label, value, note) => `<div class="stack" style="gap:6px"><div class="eyebrow">${label}</div>
   <div class="row" style="flex-wrap:nowrap"><input type="text" id="${id}" readonly value="${esc(value)}" aria-label="${label}"><button class="btn" data-act="copy" data-target="${id}">Copy</button></div>
   <p class="small muted">${note}</p></div>`;
@@ -639,6 +640,7 @@ function watchSite() {
   }, () => { SITE.loaded = true; });
 }
 S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
+S.onHome = () => history.replaceState(null, "", location.pathname); // the start screen has no competition in the address
 S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); };
 
 // links look like #<competition id> or #<competition id>.<code>; stream overlays and live desks: #<competition id>.stream.<game> / .desk.<game>[.<stream code>]
@@ -657,6 +659,7 @@ async function handleHash() {
   if (tid === "guides") { S.overlayView = guidesView; render(); return; }
   if (tid === "login") { if (code) { ORG.prefill = code; history.replaceState(null, "", "#login"); if (AUTH.user && loginMode() && !orgActive()) await orgLogin(code); } S.overlayView = loginView; render(); return; }
   if (!tid) { render(); return; }
+  S.home = false;
   if (tid !== S.tid) { S.tid = tid; S.matches = {}; restart(); }
   liveWatch(); render();
   if (code && AUTH.user) { history.replaceState(null, "", "#" + tid); await joinWithCode(tid, code); }

@@ -12,6 +12,7 @@ const { chromium } = require('playwright');
   // off: nothing shows and nothing can be written
   const V = await mk('visitor'); await V.goto(base); await w(3500);
   await V.click('[data-act="new-t"]'); await w(2500); const tid = await V.evaluate(() => location.hash.slice(1));
+  await V.click('[data-act="wiz-skip"]'); await w(800); await V.click('[data-tab="entries"]'); await w(400); // a new competition opens on the quick setup
   await V.fill('#bulk', 'Club Pins\nCarreau Vents\nGravier Collines\nMistral Lions'); await V.click('#bulk-form button[type=submit]'); await w(1200);
   await V.click('[data-act="checkin-all"]'); await w(800); await V.click('[data-tab="draw"]'); await w(300); await V.click('[data-act="first-draw"]'); await w(2500);
   await V.click('[data-tab="stream"]'); await w(800);
