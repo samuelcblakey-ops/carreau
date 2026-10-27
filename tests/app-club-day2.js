@@ -23,7 +23,7 @@ const IR = require('./fixtures/ir2026-div1.js');
     // 2. Day 1 draw, then put each fixture in its 2026 round
     await tab('draw'); q('[data-act="first-draw"]').click(); await w(300);
     const cid = name => C.T().clubs.find(c => c.name === name).id;
-    L.push('day 1 drawn: fixtures ' + C.T().clubFix.length + ' | rounds ' + C.T().clubDays + ' | headings ' + qa('main h2.club-day-h').map(h => h.textContent).join(',') + ' | first ' + txt(q('main section h3')));
+    L.push('day 1 drawn: fixtures ' + C.T().clubFix.length + ' | rounds ' + C.T().clubDays + ' | chips ' + qa('.round-bar .rchip').map(b => b.textContent).join(',') + ' | groups ' + qa('.round-bar .rb-group .eyebrow').map(e => e.textContent).join(',') + ' | shown ' + qa('main section.club-round h3').map(h => h.textContent).join(',') + ' | picked ' + q('.rchip[aria-pressed="true"]').textContent);
     const nt = JSON.parse(JSON.stringify(C.T()));
     IR.rounds.slice(0, 7).forEach((rd, r) => rd.forEach(fx => { const A = cid(IR.regions[fx.a]), B = cid(IR.regions[fx.b]); const f = nt.clubFix.find(f => (f.a === A && f.b === B) || (f.a === B && f.b === A)); f.day = r + 1; }));
     await S.store.setTournament(nt); S.tournaments[nt.id] = nt;
@@ -52,7 +52,7 @@ const IR = require('./fixtures/ir2026-div1.js');
     if (drawn !== published) L.push('drawn: ' + drawn + '\npublished: ' + published);
     const g = C.MS().filter(m => m.group === 'CL2' && m.round === 8 && m.ca === cid('Chiltern')).sort((x, y) => x.order - y.order).map(m => m.a[0].split('t')[1] + 'v' + m.b[0].split('t')[1]).join(' ');
     L.push('crossed: ' + g);
-    L.push('page: headings ' + qa('main h2.club-day-h').map(h => h.textContent).join(',') + ' | round 8 ' + txt(qa('main section h3').find(h => h.textContent === 'Round 8')) + ' | undo offered ' + !!q('[data-act="undo"][data-id="CL2"]') + ' | panel ' + txt(q('.day2-panel b')));
+    L.push('page: groups ' + qa('.round-bar .rb-group .eyebrow').map(e => e.textContent).join(',') + ' | shown ' + qa('main section.club-round').map(x => txt(x.querySelector('.eyebrow')) + ' ' + txt(x.querySelector('h3'))).join(',') + ' | undo offered ' + !!q('[data-act="undo"][data-id="CL2"]') + ' | panel ' + txt(q('.day2-panel b')));
     L.push('context: ' + C.matchContext(C.T(), C.MS().find(m => m.group === 'CL2' && m.round === 12)));
     // rematches are separate fixtures: day 1 Chiltern v Suffolk Coastal keeps its own 8 games
     const sc = C.T().clubFix.filter(f => [f.a, f.b].includes(cid('Chiltern')) && [f.a, f.b].includes(cid('Suffolk Coastal')));
@@ -67,18 +67,45 @@ const IR = require('./fixtures/ir2026-div1.js');
     await tab('standings');
     L.push('final table matches: ' + (rows(table()).join(' | ') === pub(IR.final)) + ' | headings ' + qa('main .panel h3').map(h => h.textContent).slice(0, 3).join(','));
     if (rows(table()).join(' | ') !== pub(IR.final)) L.push('ours: ' + rows(table()).join(' | '));
-    L.push('podium: clubs ' + [...qa('main .panel')[0].querySelectorAll('tbody tr')].slice(0, 4).map(r => r.className + ':' + (r.querySelector('.medal')?.className || '-')).join(' ') + ' | day 1 table plain ' + !qa('main .panel')[1].querySelector('.medal') + ' | teams top ' + qa('main .panel').find(p => p.querySelector('h3')?.textContent === 'Teams').querySelector('tbody tr').className + ' | facts before teams ' + (qa('main .panel').indexOf(q('.facts-panel')) < qa('main .panel').findIndex(p => p.querySelector('h3')?.textContent === 'Teams')));
+    L.push('podium: clubs ' + [...qa('main .panel')[0].querySelectorAll('tbody tr')].slice(0, 4).map(r => r.className + ':' + (r.querySelector('.medal')?.className || '-')).join(' ') + ' | day 1 table plain ' + !q('details.day1-table .medal') + ' folded ' + !q('details.day1-table').open + ' | teams top ' + qa('main .panel').find(p => p.querySelector('h3')?.textContent === 'Teams').querySelector('tbody tr').className + ' | facts before teams ' + (qa('main .panel').indexOf(q('.facts-panel')) < qa('main .panel').findIndex(p => p.querySelector('h3')?.textContent === 'Teams')));
     L.push('facts: ' + qa('.facts .fact').map(f => txt(f.querySelector('.eyebrow')) + ' = ' + txt(f.querySelector('.fact-v')) + ' (' + txt(f.querySelector('.small')) + ')').join(' ; '));
-    L.push('day 1 panel still matches: ' + (rows(qa('main .panel')[1].querySelectorAll('tbody tr')).join(' | ') === pub(IR.day1)));
+    L.push('day 1 panel still matches: ' + (rows(q('details.day1-table').querySelectorAll('tbody tr')).join(' | ') === pub(IR.day1)));
+    // results grid on Standings: table order, each cell the row club's games won – lost; Chiltern v Suffolk Coastal met on both days (7–1 twice)
+    const grid = q('.results-grid .cgrid');
+    L.push('grid: columns ' + [...grid.querySelectorAll('thead th.g-col')].map(th => th.textContent).join(',') + ' | rows ' + [...grid.querySelectorAll('tbody th.g-name')].map(th => th.textContent.trim()).slice(0, 3).join(',') + ' | self cells ' + grid.querySelectorAll('td.g-self').length + ' | results ' + grid.querySelectorAll('.g-res').length);
+    const rowOf = n => [...grid.querySelectorAll('tbody tr')].find(tr => tr.querySelector('.g-full').textContent.trim() === n);
+    const colOf = n => [...grid.querySelectorAll('thead th')].findIndex(th => th.title === n);
+    const cellText = (r, c) => [...rowOf(r).children[colOf(c)].querySelectorAll('.g-res')].map(b => b.textContent + ':' + b.className.replace('g-res ', '')).join(' ');
+    L.push('cells: Chiltern v Suffolk Coastal ' + cellText('Chiltern', 'Suffolk Coastal') + ' | Suffolk Coastal v Chiltern ' + cellText('Suffolk Coastal', 'Chiltern') + ' | wins column ' + txt(rowOf('Chiltern').querySelector('.g-tot')));
+    // tapping a score opens that fixture on Draw & results, in its round
+    rowOf('Chiltern').children[colOf('Suffolk Coastal')].querySelector('.g-res').click(); await w(150);
+    const box = q('.fixture.open');
+    L.push('jump: tab ' + S.tab + ' | round ' + q('.rchip[aria-pressed="true"]').textContent + ' | open fixture ' + txt(box.querySelector('.fx-sum')).replace(/\s+/g, ' ') + ' | games shown ' + box.querySelectorAll('.match').length + ' | other fixtures closed ' + qa('.fixture.compact:not(.open)').length);
+    // finished fixtures are one line each until opened; dots show who won each game
+    q('.fixture.open .fx-sum').click(); await w(80);
+    L.push('closed again: cards ' + qa('main section.club-round .match').length + ' | dots ' + q('.fixture .fx-dots').children.length + ' (' + [...q('.fixture .fx-dots').children].map(i => i.className.slice(2)).join('') + ')');
+    q('[data-act="club-sel"][data-v="grid"]').click(); await w(80);
+    L.push('grid chip: ' + !!q('main .results-grid .cgrid') + ' | sections ' + qa('main section.club-round').length);
+    q('[data-act="club-sel"][data-v="all"]').click(); await w(80);
+    L.push('all chip: sections ' + qa('main section.club-round').length + ' | headings ' + qa('main h2.club-day-h').map(h => h.textContent).join(','));
+    q('[data-act="club-sel"][data-v="5"]').click(); await w(80);
+    L.push('round 5 chip: ' + qa('main section.club-round h3').map(h => h.textContent).join(',') + ' | fixtures ' + qa('.fixture').length);
+    await tab('standings');
     // 4. French
     q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80); await tab('draw');
-    L.push('french: ' + txt(q('.day2-panel')).slice(0, 60) + ' | ' + txt(qa('main section h3').find(h => /12/.test(h.textContent))));
+    L.push('french: ' + txt(q('.day2-panel')).slice(0, 60) + ' | ' + txt(qa('main section h3').find(h => /5/.test(h.textContent))));
     q('[data-lang="en"]')?.click(); await w(40);
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); } return L; }, IR);
   console.log(out.join('\n'));
   // screenshots of the finished Standings (light and dark, desktop and phone) for a visual check
   await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('[data-act="lang-menu"]')?.click(); await w(40); document.querySelector('[data-lang="en"]')?.click(); await w(60); document.querySelector('[data-tab="standings"]').click(); await w(200); });
   await p.screenshot({ path: process.env.OUT + '/club-day2-standings.png', fullPage: true });
+  await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('[data-tab="draw"]').click(); await w(150); document.querySelector('[data-act="club-sel"][data-v="12"]').click(); await w(150); document.querySelector('.fixture .fx-sum').click(); await w(150); });
+  await p.screenshot({ path: process.env.OUT + '/club-day2-draw.png', fullPage: true });
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
+  await p.screenshot({ path: process.env.OUT + '/club-day2-draw-phone.png', fullPage: true });
+  await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('[data-tab="standings"]').click(); await w(200); });
+  await p.setViewportSize({ width: 1100, height: 900 });
   await p.evaluate(() => { document.documentElement.dataset.theme = 'dark'; }); await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
   await p.screenshot({ path: process.env.OUT + '/club-day2-standings-phone-dark.png', fullPage: true });
   console.log('errs', errs); await b.close();
