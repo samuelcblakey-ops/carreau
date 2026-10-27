@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How it works · SN Pétanque Competition Desk</title>
+<meta name="description" content="How SN Pétanque draws the games, fills the pistes and ranks teams in each competition format.">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<style>
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-latin.woff2) format('woff2')}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-600-latin.woff2) format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlowcondensed-700-latin.woff2) format('woff2')}
+:root{--bg:#eceeea;--surface:#fff;--surface-2:#f5f6f3;--ink:#1a2320;--muted:#5d6a64;--line:#d3d9d5;--accent:#1d6a54;--accent-soft:#dcebe5}
+@media (prefers-color-scheme:dark){:root{--bg:#111614;--surface:#1a211e;--surface-2:#202825;--ink:#e5ebe8;--muted:#97a49e;--line:#2d3833;--accent:#5fc19d;--accent-soft:#1f3a30;color-scheme:dark}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:24px 16px 48px}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;font-weight:700;letter-spacing:.01em;margin:0}
+h1{font-size:34px;margin-bottom:6px}h2{font-size:24px;margin:28px 0 10px}h3{font-size:21px}
+p{margin:0 0 10px}ul{margin:0;padding-left:20px}li{margin:0 0 6px}
+a{color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.muted{color:var(--muted)}.small{font-size:13px}
+.back{display:inline-block;margin-bottom:16px}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+.jump li{margin:0}
+.jump a{display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--ink);text-decoration:none;font-weight:600;font-size:14px}
+.jump a:hover{border-color:var(--accent)}
+.formats{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:14px}
+.fmt{scroll-margin-top:16px}
+.fmt .what{color:var(--muted);margin:4px 0 12px}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 12px}
+dt{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);padding-top:3px}
+dd{margin:0}
+@media (max-width:420px){dl{grid-template-columns:1fr;gap:2px}dd{margin-bottom:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← Back to the competition desk</a>
+
+  <div class="card">
+    <div class="eyebrow">SN Pétanque Competition Desk</div>
+    <h1>How it works</h1>
+    <p class="muted">How the games are drawn, how pistes are filled and how teams are ranked, format by format.</p>
+    <ul class="jump" aria-label="Formats">
+      <li><a href="#swiss">Swiss</a></li><li><a href="#snake">Snake</a></li><li><a href="#barrage">Barrage</a></li>
+      <li><a href="#leagues">Leagues</a></li><li><a href="#round-robin">Round robin</a></li><li><a href="#knockout">Knockout</a></li>
+      <li><a href="#inter-club">Inter-club</a></li><li><a href="#melee">Mêlée</a></li><li><a href="#shooting">Precision shooting</a></li>
+      <li><a href="#knockouts">Afternoon knockouts</a></li>
+    </ul>
+  </div>
+
+  <h2>Every competition</h2>
+  <div class="card">
+    <ul>
+      <li>Only teams that are <b>checked in</b> go into the draw. In Swiss and mêlée, late arrivals join the next round.</li>
+      <li><b>Pistes fill themselves</b> as games finish. A team is never on two pistes at once.</li>
+      <li>The winner reaches the <b>points to win</b> (13 by default). There are no draws; "Ended on time" allows a lower winning score.</li>
+      <li>A <b>bye</b> counts as a win, 13–7 by default.</li>
+      <li>Standings are worked out from the results every time. The last tie-break is a <b>drawn lot</b>, fixed for each team.</li>
+    </ul>
+  </div>
+
+  <h2>Formats</h2>
+  <div class="formats">
+    <section class="card fmt" id="swiss">
+      <h3>Swiss</h3>
+      <p class="what">Everyone plays every round, against teams with the same record.</p>
+      <dl>
+        <dt>Draw</dt><dd>Round 1 is random. After that, teams on the same number of wins meet, closest in the table first, with no rematches.</dd>
+        <dt>Ties</dt><dd>Wins, then the order you choose in Setup. Default: points difference, Buchholz, fine Buchholz, points for.</dd>
+        <dt>Then</dt><dd>Afternoon knockouts.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="snake">
+      <h3>Snake</h3>
+      <p class="what">Every round drawn in advance, with no repeat games.</p>
+      <dl>
+        <dt>Draw</dt><dd>Teams stand in two lines and one line moves along a place each round, so team 2 plays whoever team 1 just played.</dd>
+        <dt>Ties</dt><dd>Wins, points difference, Buchholz, fine Buchholz, points for.</dd>
+        <dt>Then</dt><dd>Afternoon knockouts.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="barrage">
+      <h3>Barrage</h3>
+      <p class="what">Small groups in the morning, knockouts by group place in the afternoon.</p>
+      <dl>
+        <dt>Draw</dt><dd>Groups of 4 (or the size you set). A group of 4 can play a French poule: winners play winners, losers play losers, then a play-off for 2nd. Other groups play everyone in the group.</dd>
+        <dt>Ties</dt><dd>Wins, points difference, points for, then the games between the tied teams.</dd>
+        <dt>Then</dt><dd>Knockouts by group place, such as 1st and 2nd into the A, 3rd and 4th into the B.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="leagues">
+      <h3>Leagues</h3>
+      <p class="what">A few leagues, each with its own table.</p>
+      <dl>
+        <dt>Draw</dt><dd>You choose how many leagues. Teams are dealt in at random and play everyone in their league.</dd>
+        <dt>Ties</dt><dd>Wins, fewest losses, points difference, points for, then the games between the tied teams.</dd>
+        <dt>Then</dt><dd>Knockouts by league place.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="round-robin">
+      <h3>Round robin</h3>
+      <p class="what">Everyone plays everyone once.</p>
+      <dl>
+        <dt>Draw</dt><dd>The whole schedule is drawn at the start.</dd>
+        <dt>Ties</dt><dd>Wins, points difference, points for, then the games between the tied teams.</dd>
+        <dt>Then</dt><dd>Afternoon knockouts.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="knockout">
+      <h3>Knockout</h3>
+      <p class="what">Lose and you're out.</p>
+      <dl>
+        <dt>Draw</dt><dd>One bracket, drawn at random or seeded in entry order. Top seeds get byes when the numbers don't fit, and seeds 1 and 2 can only meet in the final.</dd>
+        <dt>Then</dt><dd>An optional consolante for teams that lose their first game, and an optional third-place game.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="inter-club">
+      <h3>Inter-club</h3>
+      <p class="what">Clubs enter several teams and play club against club.</p>
+      <dl>
+        <dt>Draw</dt><dd>Every club plays every other club, spread over the days you set. In each fixture the teams meet like for like, in rotation, or everyone against everyone. A team never plays its own club.</dd>
+        <dt>Ties</dt><dd>Clubs: games won by their teams, points difference, points for.</dd>
+        <dt>Then</dt><dd>An optional day 2 for 8 clubs, seeded from the day 1 table.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="melee">
+      <h3>Mêlée</h3>
+      <p class="what">Players enter on their own and are drawn into teams.</p>
+      <dl>
+        <dt>Draw</dt><dd>New teams every round, or all rounds drawn in advance, avoiding repeat partners and opponents. Or teams drawn once, then any format.</dd>
+        <dt>Ties</dt><dd>Players are ranked on their own: wins, points difference, points for.</dd>
+        <dt>Then</dt><dd>Teams drawn once can go on to afternoon knockouts.</dd>
+      </dl>
+    </section>
+    <section class="card fmt" id="shooting">
+      <h3>Precision shooting</h3>
+      <p class="what">Tir de précision to FIPJP rules.</p>
+      <dl>
+        <dt>Draw</dt><dd>Everyone shoots a qualifying scorecard: 5 ateliers from 6 to 9 m, each shot worth 0, 1, 3 or 5, out of 100.</dd>
+        <dt>Ties</dt><dd>Count-back (most 5s, then most 3s), then a shoot-out. Only settled when it decides something.</dd>
+        <dt>Then</dt><dd>A top 8 or top 16 knockout of duels, or a final.</dd>
+      </dl>
+    </section>
+  </div>
+
+  <h2 id="knockouts">Afternoon knockouts</h2>
+  <div class="card">
+    <ul>
+      <li>You choose which places go into which knockout, such as the top 8 into the Main and 9th to 16th into the Plate. A <b>Silver</b> knockout can take everyone else.</li>
+      <li>Teams are seeded from the table (1 v 8, 2 v 7), or drawn at random. Teams from the same group are kept apart in the first round.</li>
+      <li>Withdrawn teams are left out and the next team moves up. Each knockout can have a third-place game.</li>
+    </ul>
+  </div>
+
+  <p class="small muted" style="margin-top:20px;text-align:center">SN Pétanque · In loving memory of Steve Noel<br>© 2026 Sam Blakey · SN Pétanque Competition Desk. All rights reserved.</p>
+</div>
+</body>
+</html>
