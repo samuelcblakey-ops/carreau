@@ -1,5 +1,5 @@
-// Odd and awkward numbers. Swiss: teams meet teams with the same results in the same order (WWL v WWL), closest on points
-// difference; cross-overs only where a group is odd, flagged, spread across teams; no rematches, no second bye while
+// Odd and awkward numbers. Swiss: teams meet teams on the same number of wins (WWL can meet LWW), closest in the
+// standings; cross-overs only where a group is odd, flagged, spread across teams; no rematches, no second bye while
 // others wait, the leaders never get the bye. Knockout consolante: every team that loses its first real game, byes
 // included, and no crash when too few lose. Barrages: never a barrage of 2. Mêlée: no repeat partners where there's room.
 const { chromium } = require('playwright');
@@ -8,6 +8,8 @@ const { chromium } = require('playwright');
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(process.env.APP_URL); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(300);
   const out = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s); const L = []; try {
+    // the same "random" results every run, so the counts below are exact
+    let sd = 20261027; Math.random = () => (sd = (sd * 1664525 + 1013904223) % 4294967296) / 4294967296;
     q('[data-act="new-t"]').click(); await w(80); const base = JSON.parse(JSON.stringify(C.T()));
     const W = s => (s.match(/W/g) || []).length;
     // play a Swiss competition through drawSwissRound; stronger teams usually win
@@ -16,32 +18,40 @@ const { chromium } = require('playwright');
       for (let i = 0; i < N; i++) t.teams.push({ id: 'T' + String(i).padStart(2, '0'), name: 'T' + i, players: ['x'], active: true });
       const str = Object.fromEntries(t.teams.map((x, i) => [x.id, Math.random() * 2 + (N - i) / N]));
       const seq = Object.fromEntries(t.teams.map(x => [x.id, ''])), diff = Object.fromEntries(t.teams.map(x => [x.id, 0]));
-      const r = { crosses: [], flagWrong: 0, rematches: 0, byes: {}, byeWhileWaiting: 0, byeToLeader: 0, gap2: 0, adjacent: true, notes: [], ctx: '' }; let ms = []; const played = new Set();
+      const r = { crosses: [], needed: [], flagWrong: 0, rematches: 0, byes: {}, byeWhileWaiting: 0, byeToLeader: 0, gap2: 0, close: 0, games: 0, mixedOrder: 0, notes: [], ctx: '' }; let ms = []; const played = new Set();
       for (let n = 1; n <= R; n++) {
         const d = C.drawSwissRound(t, ms); t.draws.push(d.draw); if (d.note) r.notes.push(d.note); const pre = { ...diff };
         const wv = Object.values(seq).map(W), top = Math.max(...wv), low = Math.min(...wv); let cr = 0; const res = {};
+        // cross-overs needed: groups (by wins) left odd once the bye is taken out, two per cross-over
+        const byeId = (d.matches.find(m => !m.b) || {}).a?.[0]; const cnt = {}; Object.keys(seq).filter(id => id !== byeId).forEach(id => cnt[W(seq[id])] = (cnt[W(seq[id])] || 0) + 1);
+        r.needed.push(Object.values(cnt).filter(v => v % 2).length / 2);
         for (const m of d.matches) {
           if (!m.b) { const id = m.a[0]; if (Object.keys(seq).some(x => x !== id && !r.byes[x]) && r.byes[id]) r.byeWhileWaiting++; r.byes[id] = (r.byes[id] || 0) + 1;
             if (top > low && W(seq[id]) === top) r.byeToLeader++; res[id] = 'W'; diff[id] += 6; continue; }
           const a = m.a[0], bb = m.b[0]; if (played.has(a + bb)) r.rematches++; played.add(a + bb); played.add(bb + a);
-          const x = seq[a] !== seq[bb]; if (x !== !!m.cross) r.flagWrong++; if (x) { cr++; if (Math.abs(W(seq[a]) - W(seq[bb])) >= 2) r.gap2++; if (!r.ctx) r.ctx = C.matchContext(t, m); }
+          const x = W(seq[a]) !== W(seq[bb]); if (x !== !!m.cross) r.flagWrong++; if (x) { cr++; if (Math.abs(W(seq[a]) - W(seq[bb])) >= 2) r.gap2++; if (!r.ctx) r.ctx = C.matchContext(t, m); }
+          else if (seq[a] !== seq[bb]) r.mixedOrder++;
           const aw = Math.random() < str[a] / (str[a] + str[bb]), ls = Math.floor(Math.random() * 12);
           Object.assign(m, { done: true, sa: aw ? 13 : ls, sb: aw ? ls : 13 }); res[a] = aw ? 'W' : 'L'; res[bb] = aw ? 'L' : 'W'; diff[a] += aw ? 13 - ls : ls - 13; diff[bb] -= aw ? 13 - ls : ls - 13;
         }
-        // inside a group, teams closest on points difference meet: 1st v 2nd, 3rd v 4th
-        if (check) { const grp = {}; d.matches.filter(m => m.b && !m.cross).forEach(m => (grp[seq[m.a[0]]] = grp[seq[m.a[0]]] || []).push(m));
+        // inside a group (same wins), the teams closest in the standings meet: 1st v 2nd, 3rd v 4th (default ranking order:
+        // points difference after wins). A pairing that isn't closest must be dodging a rematch with the neighbour.
+        if (check) { const grp = {}; d.matches.filter(m => m.b && !m.cross).forEach(m => (grp[W(seq[m.a[0]])] = grp[W(seq[m.a[0]])] || []).push(m));
           for (const g of Object.values(grp)) { const ids = g.flatMap(m => [m.a[0], m.b[0]]).sort((x, y) => pre[y] - pre[x]); const pos = Object.fromEntries(ids.map((id, i) => [id, i]));
-            if (!g.every(m => Math.floor(pos[m.a[0]] / 2) === Math.floor(pos[m.b[0]] / 2) || pre[m.a[0]] === pre[ids[pos[m.a[0]] ^ 1]] || pre[m.b[0]] === pre[ids[pos[m.b[0]] ^ 1]])) r.adjacent = false; } }
+            const near = id => ids[pos[id] ^ 1]; const prior = new Set(ms.filter(m => m.b).map(m => m.a[0] + m.b[0]));
+            for (const m of g) { r.games++; const a = m.a[0], bb = m.b[0];
+              if (Math.floor(pos[a] / 2) === Math.floor(pos[bb] / 2) || pre[a] === pre[near(a)] || pre[bb] === pre[near(bb)] || [a, bb].some(x => near(x) && (prior.has(x + near(x)) || prior.has(near(x) + x)))) r.close++; } } }
         for (const id in seq) seq[id] += res[id] || 'L'; r.crosses.push(cr); ms = ms.concat(d.matches);
       }
       return r;
     };
-    const s8 = swiss(8, 4, true); L.push(`swiss 8 teams: crosses per round ${s8.crosses.join(',')} | flagged right ${s8.flagWrong === 0} | rematches ${s8.rematches} | closest on points ${s8.adjacent} | context ${s8.ctx}`);
-    const s32 = swiss(32, 5, true); L.push(`swiss 32 teams: crosses per round ${s32.crosses.join(',')} | rematches ${s32.rematches} | closest on points ${s32.adjacent}`);
+    const s8 = swiss(8, 4, true); L.push(`swiss 8 teams: crosses per round ${s8.crosses.join(',')} | needed ${s8.needed.join(',')} | flagged right ${s8.flagWrong === 0} | rematches ${s8.rematches} | closest in standings ${s8.close}/${s8.games} | context ${s8.ctx}`);
+    const s32 = swiss(32, 5, true); L.push(`swiss 32 teams: crosses per round ${s32.crosses.join(',')} | needed ${s32.needed.join(',')} | rematches ${s32.rematches} | closest in standings ${s32.close}/${s32.games} | same wins, different order ${s32.mixedOrder > 0}`);
     let agg = { flag: 0, rem: 0, wait: 0, lead: 0, rep: 0, gap2: 0, notes: 0 };
     for (const [N, R] of [[9, 5], [11, 5], [13, 5], [17, 5], [21, 5]]) for (let i = 0; i < 6; i++) { const r = swiss(N, R);
-      agg.flag += r.flagWrong; agg.rem += r.rematches; agg.wait += r.byeWhileWaiting; agg.lead += r.byeToLeader; agg.rep += Object.values(r.byes).filter(v => v > 1).length; agg.gap2 += r.gap2; agg.notes += r.notes.filter(x => /cross-over game\(s\)/.test(x)).length; }
-    L.push(`swiss odd fields: flag wrong ${agg.flag} | rematches ${agg.rem} | second bye while others waited ${agg.wait} | bye to leaders ${agg.lead} | repeat byes ${agg.rep} | cross-over notes ${agg.notes > 0}`);
+      agg.flag += r.flagWrong; agg.rem += r.rematches; agg.wait += r.byeWhileWaiting; agg.lead += r.byeToLeader; agg.rep += Object.values(r.byes).filter(v => v > 1).length; agg.gap2 += r.gap2; agg.notes += r.notes.filter(x => /cross-over game\(s\)/.test(x)).length;
+      agg.extra = (agg.extra || 0) + r.crosses.reduce((a, c, i) => a + Math.max(0, c - r.needed[i]), 0); }
+    L.push(`swiss odd fields: flag wrong ${agg.flag} | rematches ${agg.rem} | second bye while others waited ${agg.wait} | bye to leaders ${agg.lead} | repeat byes ${agg.rep} | cross-over notes ${agg.notes > 0} | 2-win cross-overs ${agg.gap2} | extra cross-overs ${agg.extra}`);
     // consolante: 9 teams, 16 bracket, 7 byes. Seeds win; 8 v 9 is the only first-round game
     const t = JSON.parse(JSON.stringify(base)); Object.assign(t, { system: 'knockout', consolante: true, seeding: 'entry', name: 'Cons', checkin: false, wizard: false });
     for (let i = 1; i <= 9; i++) t.teams.push({ id: 'k' + i, name: 'Seed ' + i, players: ['a'], active: true }); await S.store.setTournament(t); S.tournaments[t.id] = t; await w(40);
