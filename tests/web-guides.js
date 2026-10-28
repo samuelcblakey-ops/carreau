@@ -16,7 +16,7 @@ const { chromium } = require('playwright');
     await Promise.all([...document.querySelectorAll('.guide-card img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
     return { h: document.querySelector('main h2')?.textContent, cards: cards.map(c => c.querySelector('b').textContent), imgs: [...document.querySelectorAll('.guide-card img')].every(i => i.naturalWidth > 0) }; });
   log(`guides page: ${page.h} | ${page.cards.join(' / ')} | posters ${page.imgs}`);
-  const files = await p.evaluate(async () => Promise.all(['videos/first-competition.mp4', 'videos/shooting-competition.mp4'].map(async u => { const r = await fetch(u); const n = (await r.arrayBuffer()).byteLength; return `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`; })));
+  const files = await p.evaluate(async () => Promise.all(['videos/first-competition.mp4', 'videos/shooting-competition.mp4', 'videos/team-scores.mp4'].map(async u => { const r = await fetch(u); const n = (await r.arrayBuffer()).byteLength; return `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`; })));
   log('video files:', files.join(' | '));
   await p.click('.guide-card [data-act="guide-play"][data-id="shooting"]'); await w(800);
   const modal = await p.evaluate(async () => { const v = document.querySelector('#guide-modal video'); if (!v) return null;
