@@ -13,7 +13,7 @@ const { chromium } = require('playwright');
     const icon = () => btn().querySelector('path')?.getAttribute('d')?.slice(0, 6);
     const autoIcon = icon();
     btn().click(); await w(60);
-    const m = q('.theme-menu'); L.push(`menu open: ${!m.hidden} | options ${qa('.theme-menu [data-theme-pick]').map(x => x.dataset.themePick + (x.getAttribute('aria-selected') === 'true' ? '*' : '')).join(',')} | on screen ${r(m).left >= 0 && r(m).right <= innerWidth}`);
+    const m = q('.theme-menu'); L.push(`menu open: ${!m.hidden} | options ${qa('.theme-menu [data-theme-pick]').map(x => x.dataset.themePick + (x.getAttribute('aria-pressed') === 'true' ? '*' : '')).join(',')} | on screen ${r(m).left >= 0 && r(m).right <= innerWidth}`);
     q('[data-act="lang-menu"]').click(); await w(60); L.push(`one menu at a time: theme ${q('.theme-menu').hidden} lang ${!q('.lang-menu').hidden}`);
     btn().click(); await w(60); L.push(`and back: theme ${!q('.theme-menu').hidden} lang ${q('.lang-menu').hidden}`);
     q('[data-theme-pick="dark"]').click(); await w(80);

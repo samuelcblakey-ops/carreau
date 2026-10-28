@@ -78,6 +78,7 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
   main{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   .site-foot{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
   body .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  html{scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))} /* Tab never leaves a control hidden under the tab bar */
   main .seg{display:flex;width:100%}main .seg button{flex:1 1 auto;padding:9px 10px}
   header .seg{flex:none;flex-wrap:nowrap}header .seg button{padding:7px 10px}
   .btn{min-height:40px}.btn.sm{min-height:34px}
@@ -107,6 +108,12 @@ h3{font-size:19px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.sm{padding:5px 10px;font-size:13px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* read out by screen readers, not shown */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* keyboard users: the first Tab shows a link straight to the page's content */
+.skip{position:absolute;left:8px;top:8px;z-index:100;transform:translateY(-200%);background:var(--surface);color:var(--ink);border:2px solid var(--accent);border-radius:10px;padding:10px 14px;font-weight:700;text-decoration:none}
+.skip:focus{transform:none}body.stream .skip{display:none}
+#main:focus,.modal:focus{outline:none}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
 label.f>span{text-transform:uppercase;letter-spacing:.06em;font-size:11px}
 input[type=text],input[type=number],input[type=date],select,textarea{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0;width:100%;color:var(--ink)}
@@ -330,10 +337,10 @@ button.start-card,a.start-card{cursor:pointer}button.start-card:hover,a.start-ca
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px}
 .ex-card{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-width:0}
 .ex-card:hover{border-color:var(--accent)}.ex-card b{overflow-wrap:anywhere}
-.wiz-page{max-width:640px;margin:0 auto}.wiz-page .wiz{margin-bottom:0!important}
+.wiz-page{max-width:640px;margin:0 auto}.wiz h2{font-size:19px}.wiz-page .wiz{margin-bottom:0!important}
 .fx{font-size:17px}.day-plan summary{cursor:pointer;list-style-position:inside}.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:4px 0;border-top:1px solid var(--line)}.dp-row:first-child{border-top:0}.dp-fx{font-weight:600}.dp-days{flex-wrap:wrap}.dp-days button{min-width:44px}.fx-score{font-family:var(--display);font-size:22px;font-weight:700;color:var(--accent);padding:0 6px}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
-@media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
+@media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner,.skip{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
   .draw-table,.find-panel{display:none!important}.draw-round~.draw-round{break-before:page}.draw-round .mlist{grid-template-columns:repeat(2,1fr)}.draw-round .match{break-inside:avoid}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
 .toast[hidden]{display:none}
@@ -378,10 +385,10 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
 .menu-h.first{border-top:0;margin-top:0;padding-top:6px}
 :is(.lang-menu,.theme-menu){position:absolute;right:0;top:calc(100% + 6px);z-index:55;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:6px;display:flex;flex-direction:column;min-width:180px}
 :is(.lang-menu,.theme-menu)[hidden]{display:none}:is(.lang-menu,.theme-menu) button{display:flex;gap:10px;align-items:center;background:none;border:0;border-radius:8px;padding:10px 12px;min-height:44px;cursor:pointer;color:var(--ink);font-size:15px;text-align:left}
-:is(.lang-menu,.theme-menu) button b{width:26px;color:var(--muted);font-size:13px;display:inline-flex;align-items:center}:is(.lang-menu,.theme-menu) button:hover{background:var(--surface-2)}:is(.lang-menu,.theme-menu) button[aria-selected="true"]{background:var(--accent-soft)}:is(.lang-menu,.theme-menu) button[aria-selected="true"] b{color:var(--accent)}
+:is(.lang-menu,.theme-menu) button b{width:26px;color:var(--muted);font-size:13px;display:inline-flex;align-items:center}:is(.lang-menu,.theme-menu) button:hover{background:var(--surface-2)}:is(.lang-menu,.theme-menu) button[aria-pressed="true"]{background:var(--accent-soft)}:is(.lang-menu,.theme-menu) button[aria-pressed="true"] b{color:var(--accent)}
 .tb-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .tb-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--line);min-height:52px}.tb-row:first-child{border-top:0}
-.tb-row.fixed{background:var(--surface-2)}.tb-row.off .tb-name{opacity:.55}
+.tb-row.fixed{background:var(--surface-2)}.tb-row.off .tb-name{color:var(--muted)}.tb-row.off .tb-name b{font-weight:600}
 .tb-n{width:22px;text-align:center;font-family:var(--display);font-weight:700;font-size:18px;color:var(--accent)}.tb-row.off .tb-n{color:var(--muted)}
 .tb-name{flex:1;display:flex;flex-direction:column;min-width:0}.tb-row .btn.sm{min-width:36px;padding:5px 8px;font-size:16px}
 .tb-sw{width:46px;height:28px;border-radius:14px;border:0;background:var(--line);position:relative;cursor:pointer;flex:none;padding:0}
@@ -487,6 +494,7 @@ body.desk header.app{display:none}
 @media (prefers-reduced-motion:no-preference){.match,.btn{transition:border-color .12s}}
 </style>
 
+<a class="skip" href="#main">Skip to content</a>
 <header class="app">
   <div class="wrap">
     <div class="bar">
@@ -504,8 +512,11 @@ body.desk header.app{display:none}
 <footer class="wrap site-foot" id="foot"></footer>
 <div id="modal"></div>
 <input type="file" id="logo-file" accept="image/*" hidden aria-hidden="true" tabindex="-1">
-<div id="roundalert" hidden class="roundalert" role="status" aria-live="polite"></div>
+<section class="notes" aria-label="Notifications">
+<div id="roundalert" hidden class="roundalert"></div>
 <div id="toast" hidden class="toast"></div>
+<div id="sr-live" class="sr-only" role="status" aria-live="polite"></div>
+</section>
 
 <script>
 (() => {
@@ -996,6 +1007,14 @@ Object.assign(FR_TEXT, {
   "Filming a game? Type the two team names and you get a transparent score overlay for your phone's streaming app (score, ends, boules left, who holds the point) and a live desk to tap it all in. It works for any game, in a competition or not.": "Vous filmez une partie ? Saisissez les deux noms d'équipe et vous obtenez un affichage de score transparent pour l'appli de diffusion de votre téléphone (score, mènes, boules restantes, qui tient le point) et une table en direct pour tout saisir. Ça marche pour n'importe quelle partie, en concours ou non.", "Couldn't create the stream. Check your connection and try again.": "Impossible de créer la diffusion. Vérifiez votre connexion et réessayez."
 });
 
+Object.assign(FR_TEXT, {"Skip to content": "Aller au contenu", "Notifications": "Notifications"});
+Object.assign(LANG_TEXT.es, {"Skip to content": "Saltar al contenido", "Notifications": "Notificaciones"});
+Object.assign(LANG_TEXT.it, {"Skip to content": "Vai al contenuto", "Notifications": "Notifiche"});
+Object.assign(LANG_TEXT.de, {"Skip to content": "Zum Inhalt springen", "Notifications": "Benachrichtigungen"});
+Object.assign(LANG_TEXT.nl, {"Skip to content": "Naar de inhoud", "Notifications": "Meldingen"});
+Object.assign(LANG_TEXT.pt, {"Skip to content": "Saltar para o conteúdo", "Notifications": "Notificações"});
+Object.assign(LANG_TEXT.th, {"Skip to content": "ข้ามไปที่เนื้อหา", "Notifications": "การแจ้งเตือน"});
+
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1301,12 +1320,16 @@ function checkNewRound(t) {
 }
 function renderAlert() {
   const el = $("#roundalert"); if (!el) return; const t = T(); const a = S.alert;
-  if (!a || !t || a.tid !== t.id) { el.hidden = true; el.innerHTML = ""; return; }
+  if (!a || !t || a.tid !== t.id) { el.hidden = true; el.innerHTML = ""; delete el.dataset.sig; return; }
   const me = myPick(t); let mine = "";
   if (me) { const cur = MS().filter(m => inMatch(m, me) && !m.done && m.a && m.b && !m.bye).sort(byOrder)[0];
     if (cur) mine = ` · ${cur.court ? `you're on Piste ${esc(courtName(t, cur.court))}` : "you're waiting for a piste"} v ${esc(sideName(t, (cur.a || []).includes(me) ? cur.b : cur.a))}`; }
-  el.innerHTML = `<span><b>${esc(a.label)}</b>${mine}</span><button type="button" class="btn sm" data-act="alert-view">View</button><button type="button" class="btn sm ghost" data-act="alert-close" aria-label="Close">✕</button>`;
-  el.hidden = false; localize(el);
+  const html = `<span><b>${esc(a.label)}</b>${mine}</span><button type="button" class="btn sm" data-act="alert-view">View</button><button type="button" class="btn sm ghost" data-act="alert-close" aria-label="Close">✕</button>`;
+  // drawn again on every change: only touch it (and tell screen readers) when it says something new
+  const sig = I18N.lang + html; if (!el.hidden && el.dataset.sig === sig) return;
+  const fresh = el.hidden || el.dataset.label !== a.label;
+  el.innerHTML = html; el.dataset.sig = sig; el.dataset.label = a.label; el.hidden = false; localize(el);
+  if (fresh) announce(el.querySelector("span").textContent);
 }
 function checkPanel(t) {
   if (!teamScoring(t) || !canEdit() || myTeam(t)) return "";
@@ -1873,7 +1896,7 @@ function renderPlanEditor(t, { locked, compact } = {}) {
   return `<div class="stack" style="gap:12px">
     ${!locked && canEdit() ? `<div class="stack" style="gap:6px"><div class="eyebrow">Quick set-ups</div><div class="row" style="gap:6px">${planPresets(t).map(([l], i) => `<button class="btn sm" data-act="plan-preset" data-i="${i}">${esc(l)}</button>`).join("")}</div></div>` : ""}
     <div class="stack" style="gap:6px"><div class="eyebrow">Draw for the knockouts</div>${seg("plan-seeding", plan.seeding, [["seeded", isLeagues(t) ? "Seeded (league winners kept apart)" : t.system === "pools" ? "Seeded (barrage winners kept apart)" : "Seeded by standings (1 v 8, 2 v 7…)"], ["random", "Random draw (tirage au sort)"]], locked || !canEdit())}</div>
-    <div class="tw"><table class="plan"><thead><tr><th>Knockout</th><th>${unit}</th><th>3rd-place game</th><th></th></tr></thead><tbody>
+    <div class="tw"><table class="plan"><thead><tr><th>Knockout</th><th>${unit}</th><th>3rd-place game</th><th><span class="sr-only">Remove</span></th></tr></thead><tbody>
     ${plan.brackets.map((b, i) => `<tr>
       <td class="wrap"><input type="text" id="pl-name-${i}" data-plan="name" data-i="${i}" value="${esc(b.name)}" ${dis} aria-label="Knockout name"><div class="small muted" style="margin-top:4px">${bracketShape(count(b))}</div></td>
       <td>${b.silver ? `<span class="muted">${isGroups(t) ? "Every place" : "Everyone"} from ${b.from} down</span>` : `<div class="row" style="flex-wrap:nowrap;gap:6px"><input type="number" min="1" id="pl-from-${i}" data-plan="from" data-i="${i}" value="${b.from}" style="width:64px" ${dis} aria-label="From"><span>to</span><input type="number" min="1" id="pl-to-${i}" data-plan="to" data-i="${i}" value="${b.to}" style="width:64px" ${dis} aria-label="To"></div>`}</td>
@@ -2182,7 +2205,7 @@ function renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, tie }) {
   const md = S.modal; const nx = liveNext(md, duel); const cur = nx ? SHOT_SEQ.findIndex(x => x.k === nx.k && x.di === nx.di) : -1;
   const name = side => esc(sideName(t, side === "a" ? m.a : m.b));
   const card = (side, sh, tot) => `<div class="stack" style="gap:4px"><div class="spread"><b>${name(side)}</b><span class="pill ${shotComplete(sh) ? "done" : ""}">${tot} pts · ${shotCount(sh)}/20</span></div>${shotStrip(sh, nx && nx.side === side ? cur : -1)}</div>`;
-  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Live shooting scorer">
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Live scorer">
     <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>Live scorer</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
     ${md.saved ? `<div class="notice small">${esc(md.saved)}</div>` : ""}
     ${nx ? `<div class="live-shot">
@@ -2272,7 +2295,7 @@ function renderShooting(t) {
     const up = rows.filter(r => !r.done).sort((x, y) => x.m.order - y.m.order)[0];
     return `<section class="panel stack" style="gap:8px"><div class="spread"><h3>${title}</h3><span class="pill ${doneN === rows.length ? "done" : ""}">${doneN}/${rows.length} scorecards</span></div>
       ${up ? `<div class="spread notice"><span>Next up on the piste: <b>${esc(entName(t, up.id))}</b> <span class="small muted">(shooter ${up.m.order + 1} of ${rows.length})</span></span>${canScore() ? `<button class="btn primary sm" data-shoot="${up.m.id}">${shotCount(up.shots) ? "Continue" : "Score now"}</button>` : ""}</div>` : ""}
-      <div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th></th></tr></thead><tbody>
+      <div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th><span class="sr-only">Shooting scorecard</span></th></tr></thead><tbody>
       ${rows.map((r, i) => `<tr class="${cut && r.done && i < cut ? "q" : ""}"><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${r.m.corrected ? ` <span class="pill">Corrected</span>` : ""}${soMark(r)}</td>
         ${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
         <td class="n"><b>${shotCount(r.shots) ? r.total : "–"}</b></td>
@@ -2327,11 +2350,26 @@ function overrideBox(list) {
 }
 
 /* ---------------- toast & modal ---------------- */
-let toastTimer;
+let toastTimer, liveTimer;
+// screen readers: say a message once, politely (a region that's always there, so nothing is missed or repeated)
+function announce(msg) {
+  const el = $("#sr-live"); if (!el || !msg) return;
+  el.textContent = ""; clearTimeout(liveTimer); liveTimer = setTimeout(() => { el.textContent = msg; }, 60);
+}
+// the toast goes after a few seconds, but not while a mouse pointer is on it or its Undo button has focus
+let toastHover = false;
+$("#toast")?.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") toastHover = true; });
+$("#toast")?.addEventListener("pointerleave", () => { toastHover = false; });
+function toastLater(ms) {
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { const el = $("#toast");
+    if (el.contains(document.activeElement) || toastHover) { toastLater(1500); return; }
+    el.hidden = true; S.undo = null; toastHover = false; }, ms);
+}
 function toast(msg, undo) {
-  const el = $("#toast"); S.undo = undo || null;
-  el.innerHTML = `<span>${esc(tr(msg))}</span>${undo ? ` <button type="button" class="toast-undo" data-act="toast-undo">${esc(tr("Undo"))}</button>` : ""}`;
-  el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; S.undo = null; }, undo ? 6000 : 3200);
+  const el = $("#toast"); S.undo = undo || null; const text = tr(msg); toastHover = toastHover && !el.hidden;
+  el.innerHTML = `<span>${esc(text)}</span>${undo ? ` <button type="button" class="toast-undo" data-act="toast-undo">${esc(tr("Undo"))}</button>` : ""}`;
+  el.hidden = false; announce(text); toastLater(undo ? 6000 : 3200);
 }
 
 function openMatch(id) {
@@ -2340,7 +2378,50 @@ function openMatch(id) {
   if (m.stage === "shoot" || m.shoot) { const duel = !!m.b; S.modal.live = !m.done && canScore(); S.modal.shotsA = fullShots(duel ? m.shotsA : m.shots); if (duel) S.modal.shotsB = fullShots(m.shotsB); S.modal.soVals = duel ? { a: [...(m.soA || [])], b: [...(m.soB || [])] } : {}; }
   renderModal();
 }
+// Focus, for keyboards and screen readers. Pages and dialogs are redrawn from scratch, so a control is found again by
+// what it does (its id or data-* attributes) rather than by the element itself.
+function elKey(el) {
+  if (!el || el === document.body || el === document.documentElement || !el.isConnected) return null;
+  if (el.id) return "#" + CSS.escape(el.id);
+  const parts = ["data-act", "data-match", "data-shoot", "data-tab", "data-id", "data-k", "data-n", "data-mode", "data-v", "data-b", "data-i", "data-ph", "data-g", "data-lang", "data-theme-pick", "data-set", "data-val", "data-st", "href"]
+    .filter(n => el.hasAttribute(n)).map(n => `[${n}="${CSS.escape(el.getAttribute(n))}"]`);
+  return parts.length ? el.tagName.toLowerCase() + parts.join("") : null;
+}
+function canFocus(n) { return !!n && !n.disabled && !n.closest("[inert], [hidden]") && n.getClientRects().length > 0; }
+// run a redraw; if it took away the focus, put it back on the same control
+function keepFocus(fn) {
+  const ae = document.activeElement, k = elKey(ae);
+  fn();
+  if (k && (!document.activeElement || document.activeElement === document.body)) { const n = document.querySelector(k); if (canFocus(n)) n.focus({ preventScroll: true }); }
+}
+// tables wider than the screen scroll sideways: keyboards can reach them and screen readers hear what they are
+function markScrollers(root) {
+  root.querySelectorAll(".tw").forEach(w => {
+    if (w.scrollWidth > w.clientWidth + 1) {
+      const h = w.closest("section, .panel, .modal")?.querySelector("h2, h3") || $("#main h2");
+      w.tabIndex = 0; w.setAttribute("role", "region"); w.setAttribute("aria-label", (h?.textContent || tr("Table")).trim());
+    } else if (w.hasAttribute("role")) { w.removeAttribute("tabindex"); w.removeAttribute("role"); w.removeAttribute("aria-label"); }
+  });
+}
+// dialogs: focus moves into the dialog as it opens and stays there (Tab goes round, the page behind can't be reached);
+// after each change it's back on the same control, and when the dialog closes it returns to whatever opened it
+let modalBack = null, lastTap = null;
 function renderModal() {
+  const box = $("#modal"), was = !!box.querySelector(".modal"), ae = document.activeElement;
+  const inKey = was && box.contains(ae) ? elKey(ae) : null;
+  if (!was && S.modal) modalBack = elKey(ae && ae !== document.body && !box.contains(ae) ? ae : lastTap); // phones don't focus what's tapped
+  drawModal();
+  const dlg = box.querySelector(".modal");
+  document.querySelectorAll(".skip, header.app, #main, #foot").forEach(n => { n.inert = !!dlg; });
+  if (dlg) {
+    dlg.tabIndex = -1; markScrollers(box);
+    if (!box.contains(document.activeElement)) { const n = inKey && box.querySelector(inKey); (canFocus(n) ? n : dlg).focus({ preventScroll: true }); }
+  } else if (was) {
+    const n = modalBack && document.querySelector(modalBack); modalBack = null;
+    if ((!document.activeElement || document.activeElement === document.body) && canFocus(n)) n.focus({ preventScroll: true });
+  }
+}
+function drawModal() {
   const el = $("#modal"); const t = T();
   if (!S.modal || !t) { el.innerHTML = ""; return; }
   if (S.modal.so) { renderSoModal(t, el); return; }
@@ -2855,6 +2936,21 @@ const TAB_ICON = {
 };
 const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["stream", "Stream"]];
 function render() {
+  keepFocus(drawPage);
+  if (!S.pendingRender) pageMeta();
+}
+// every page has one main heading (out of sight where the page's look has none) and the browser tab says where you are
+function pageMeta() {
+  const main = $("#main"), t = T(), brand = "SN Pétanque";
+  let where = "", comp = "";
+  if (S.liveRoute || S.overlayView) where = main.querySelector("h2, h3")?.textContent.trim() || "";
+  else if (t) { where = tr((TABS.find(([k]) => k === S.tab) || [0, S.tab === "display" ? "Big screen" : "Draw & results"])[1]); comp = t.name || ""; }
+  if (where && !main.querySelector("h1")) { const h = document.createElement("h1"); h.className = "sr-only"; h.dataset.notr = ""; h.tabIndex = -1; h.textContent = comp ? `${comp} · ${where}` : where; main.prepend(h); }
+  document.title = where || comp ? [where, comp, brand].filter(Boolean).join(" · ") : `${brand} · ${tr("Competition desk")}`;
+  markScrollers(main);
+}
+const pageHeading = () => $("#main h1");
+function drawPage() {
   const ae = document.activeElement;
   if (ae && $("#main").contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName) && ae.type !== "checkbox") { S.pendingRender = true; checkNewRound(T()); renderAlert(); return; }
   S.pendingRender = false;
@@ -2888,10 +2984,10 @@ function compMeta(t) {
 function renderPicker(list) {
   const ex = t => t.listed || t.example;
   const groups = [["Your competitions", list.filter(t => !ex(t) && !t.archived)], ["Examples", list.filter(t => ex(t) && !t.archived)], ["Archived", list.filter(t => t.archived)]].filter(g => g[1].length);
-  return `<div class="picker" role="dialog" aria-label="Choose a competition">
+  return `<div class="picker" role="group" aria-label="Choose a competition">
     ${list.length > 6 ? `<input id="picker-q" type="search" placeholder="Search competitions" autocomplete="off">` : ""}
-    <div class="picker-list" role="listbox">${groups.map(([label, ts]) => `<div class="pick-group"><div class="eyebrow">${label} <span class="muted">${ts.length}</span></div>
-      ${ts.map(t => `<button type="button" role="option" aria-selected="${t.id === S.tid}" class="pick-row ${t.id === S.tid ? "on" : ""}" data-act="pick-t" data-id="${t.id}" data-name="${esc((t.name || "").toLowerCase())}">
+    <div class="picker-list">${groups.map(([label, ts]) => `<div class="pick-group"><div class="eyebrow">${label} <span class="muted">${ts.length}</span></div>
+      ${ts.map(t => `<button type="button" ${t.id === S.tid ? 'aria-current="true" ' : ""}class="pick-row ${t.id === S.tid ? "on" : ""}" data-act="pick-t" data-id="${t.id}" data-name="${esc((t.name || "").toLowerCase())}">
         <span class="pr-main"><b data-notr>${esc(t.name)}</b><span class="small muted">${esc(compMeta(t))}</span></span>${t.id === S.tid ? `<span class="pr-tick" aria-hidden="true">✓</span>` : ""}</button>`).join("")}</div>`).join("")}
       <p class="muted small pick-none" hidden>No competitions match.</p></div>
     ${S.pickerFooter ? S.pickerFooter() : ""}
@@ -2905,10 +3001,13 @@ function pickCompetition(id) {
 function renderNet() {
   const el = $("#netdot"); if (!el) return; const st = S.connState && S.connState();
   if (!st) { el.hidden = true; return; }
-  el.hidden = false; el.className = "netdot " + st.k; el.title = tr(st.label); el.innerHTML = `<span class="nl">${esc(tr(st.label))}</span>`;
+  const label = tr(st.label); if (!el.hidden && el.className === "netdot " + st.k && el.title === label) return;
+  el.hidden = false; el.className = "netdot " + st.k; el.title = label; el.innerHTML = `<span class="nl">${esc(label)}</span>`;
 }
-function renderHeader() {
+function renderHeader() { keepFocus(drawHeader); }
+function drawHeader() {
   renderNet();
+  const skip = $(".skip"); if (skip) skip.textContent = tr("Skip to content"); $("section.notes")?.setAttribute("aria-label", tr("Notifications"));
   // the brand line is static markup: reset it to English so the current language is applied afresh
   const sub = $(".brand-name small"); if (sub) sub.textContent = "Competition desk";
   // the dedication to Steve Noel sits at the foot of every page, above the copyright line
@@ -2917,13 +3016,13 @@ function renderHeader() {
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();
-  $("#tsel").innerHTML = `${list.length ? `<div class="picker-wrap"><button type="button" class="picker-btn" data-act="picker" aria-haspopup="listbox" aria-expanded="${!!S.picker}" data-notr>
+  $("#tsel").innerHTML = `${list.length ? `<div class="picker-wrap"><button type="button" class="picker-btn" data-act="picker" aria-expanded="${!!S.picker}" data-notr>
       ${cur && logoSrc(cur.id) ? `<img class="pb-logo" src="${esc(logoSrc(cur.id))}" alt="">` : ""}<span class="pb-name">${esc(cur?.name || "Choose a competition")}</span><span class="pb-chev" aria-hidden="true">▾</span></button>
       ${S.picker ? renderPicker(list) : ""}</div>` : ""}
-    <div class="theme-wrap" data-notr><div class="seg" role="group"><button type="button" class="theme-btn" data-act="theme-menu" aria-haspopup="listbox" aria-expanded="${!!S.themeMenu}" aria-label="${esc(tr("Appearance"))}" title="${esc(tr("Appearance"))}">${THEME_ICON[themePref()]}</button></div>
-      <div class="theme-menu" role="listbox" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" role="option" data-theme-pick="${v}" aria-selected="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
-    <div class="lang-wrap" data-notr><div class="seg" role="group" aria-label="Language"><button type="button" class="lang-btn" data-act="lang-menu" aria-haspopup="listbox" aria-expanded="${!!S.langMenu}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
-      <div class="lang-menu" role="listbox" ${S.langMenu ? "" : "hidden"}>${LANGS.map(([c, n]) => `<button type="button" role="option" data-lang="${c}" aria-selected="${I18N.lang === c}"><b>${c.toUpperCase()}</b><span>${n}</span></button>`).join("")}</div></div>
+    <div class="theme-wrap" data-notr><div class="seg"><button type="button" class="theme-btn" data-act="theme-menu" aria-expanded="${!!S.themeMenu}" aria-label="${esc(tr("Appearance"))}" title="${esc(tr("Appearance"))}">${THEME_ICON[themePref()]}</button></div>
+      <div class="theme-menu" role="group" aria-label="${esc(tr("Appearance"))}" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" data-theme-pick="${v}" aria-pressed="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
+    <div class="lang-wrap" data-notr><div class="seg"><button type="button" class="lang-btn" data-act="lang-menu" aria-expanded="${!!S.langMenu}" aria-label="${esc(tr("Language"))}: ${I18N.lang.toUpperCase()}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
+      <div class="lang-menu" role="group" aria-label="${esc(tr("Language"))}" ${S.langMenu ? "" : "hidden"}>${LANGS.map(([c, n]) => `<button type="button" data-lang="${c}" lang="${c}" aria-pressed="${I18N.lang === c}"><b aria-hidden="true">${c.toUpperCase()}</b><span>${n}</span></button>`).join("")}</div></div>
     ${S.canCreate() ? `<button class="btn sm new-t" data-act="new-t" aria-label="New competition"><span aria-hidden="true">+</span><span class="hide-sm"> New competition</span><span class="show-sm"> New</span></button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
   const t = T();
@@ -3102,7 +3201,7 @@ function wizPanel(t) {
   if (st === 3) body = `<div class="fields"><label class="f"><span>Number of pistes</span><input id="wz-courts" data-wz="courts" type="number" min="1" max="200" value="${d.courts}"></label>
     ${d.kind === "shooting" ? "" : `<label class="f"><span>Points to win</span><input id="wz-target" data-wz="target" type="number" min="1" max="21" value="${d.target}"></label><label class="f"><span>Time limit (minutes, 0 = none)</span><input id="wz-time" data-wz="timeLimit" type="number" min="0" max="240" value="${d.timeLimit}"></label>`}</div>`;
   return `<div class="panel stack wiz" style="gap:12px;margin-bottom:16px;border-color:var(--accent)">
-    <div class="spread"><div><div class="eyebrow">Quick setup · step ${st + 1} of ${WIZ_STEPS.length}</div><h3>${WIZ_STEPS[st]}</h3></div><button type="button" class="btn sm ghost" data-act="wiz-skip">Skip, I'll use Setup</button></div>
+    <div class="spread"><div><div class="eyebrow">Quick setup · step ${st + 1} of ${WIZ_STEPS.length}</div><h2>${WIZ_STEPS[st]}</h2></div><button type="button" class="btn sm ghost" data-act="wiz-skip">Skip, I'll use Setup</button></div>
     <div class="wiz-dots" aria-hidden="true">${WIZ_STEPS.map((_, i) => `<span class="${i <= st ? "on" : ""}"></span>`).join("")}</div>
     ${body}
     ${S.guideLink && st === 0 ? `<div>${S.guideLink("first")}</div>` : ""}${S.guideLink && (st === 1 || st === 2) && d.kind === "shooting" ? `<div>${S.guideLink("shooting")}</div>` : ""}
@@ -3143,7 +3242,7 @@ function renderEntries(t) {
     <div class="panel stack">
       ${t.checkin ? `<div class="spread"><div><div class="eyebrow">Checked in on the day</div><div class="reg-count"><b>${here.length}</b> of ${entered.length} ${noun}</div></div>
         ${canEdit() && !drawn ? `<div class="row">${checkinAllBtn(t)}${here.length ? `<button class="btn sm ghost" data-act="checkin-clear">Clear check-ins</button>` : ""}</div>` : ""}</div>
-        <div class="meter" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
+        <div class="meter" role="progressbar" aria-label="Checked in on the day" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
         <p class="small muted">Only checked-in ${noun} go into the draw, so the format and the number of games are worked out from who has actually turned up. ${entered.length - here.length ? `<b>${entered.length - here.length} not checked in yet.</b>` : ""}</p>`
       : `<div class="spread"><div><div class="eyebrow">Entries</div><div class="reg-count"><b>${entered.length}</b> ${noun}</div></div></div><p class="small muted">Check-in is off, so every entered ${melee ? "player" : "team"} goes into the draw.</p>`}
       ${canEdit() ? `<label class="chk"><input type="checkbox" data-check="checkin" ${t.checkin ? "checked" : ""}> Teams must check in on the day before they're included in the draw</label>` : ""}
@@ -3458,7 +3557,7 @@ function fitBrackets() {
     const zv = el.parentElement.previousElementSibling?.querySelector(".zv"); if (zv) zv.textContent = Math.round(f * 100) + "%";
   });
 }
-window.addEventListener("resize", () => { clearTimeout(S.fitTimer); S.fitTimer = setTimeout(fitBrackets, 150); });
+window.addEventListener("resize", () => { clearTimeout(S.fitTimer); S.fitTimer = setTimeout(() => { fitBrackets(); markScrollers(document); }, 150); });
 function bracketGrid(t, b, ms) {
   const bm = ms.filter(m => m.bracket === b.id);
   const final = bm.find(m => m.round === b.rounds && !m.third);
@@ -3571,7 +3670,7 @@ function clubGridHtml(t, ms) {
       const cls = !won && !lost ? (live ? "g-live" : "g-wait") : !done ? "g-live" : won > lost ? "g-w" : won < lost ? "g-l" : "g-d";
       return `<button type="button" class="g-res ${cls}" data-act="fx-go" data-fx="${f.id}" title="${esc(clubName(t, r))} v ${esc(clubName(t, c))} · ${R ? "Round" : "Day"} ${f.day}">${won || lost ? `${won}–${lost}` : `${R ? "R" : "D"}${f.day}`}</button>`; }).join("") || `<span class="muted">·</span>`}</td>`;
   };
-  return `<div class="tw cgrid-wrap"><table class="cgrid"><thead><tr><th class="g-corner"></th>${rows.map(r => `<th class="g-col" title="${esc(r.name)}" data-notr>${esc(ab(r.name))}</th>`).join("")}<th class="g-col" title="Wins">W</th></tr></thead><tbody>
+  return `<div class="tw cgrid-wrap"><table class="cgrid"><thead><tr><th class="g-corner"><span class="sr-only">Club</span></th>${rows.map(r => `<th class="g-col" title="${esc(r.name)}" data-notr>${esc(ab(r.name))}</th>`).join("")}<th class="g-col" title="Wins">W</th></tr></thead><tbody>
     ${rows.map((r, i) => `<tr><th class="g-name" scope="row" title="${esc(r.name)}"><span class="g-rank">${i + 1}</span> <span class="g-full" data-notr>${esc(r.name)}</span><span class="g-ab" data-notr>${esc(ab(r.name))}</span></th>${rows.map(c => cell(r.id, c.id)).join("")}<td class="g-tot"><b>${r.w}</b></td></tr>`).join("")}
   </tbody></table></div>
   <div class="g-key small muted"><span class="g-res g-w">Won</span><span class="g-res g-d">Level</span><span class="g-res g-l">Lost</span><span class="g-res g-live">In play</span><span>Each cell is games won – lost by the club on the left. Tap a score to see its games.</span></div>`;
@@ -3708,9 +3807,12 @@ function renderDisplay(t) {
 
 /* ---------------- events ---------------- */
 document.addEventListener("click", async e => {
+  lastTap = e.target.closest("button, a[href], [data-act], [data-match], [data-shoot]") || lastTap;
+  if (e.target.closest(".skip")) { e.preventDefault(); const m = $("#main"); m.tabIndex = -1; m.focus(); return; }
   if (e.target.closest('[data-act="logo-pick"]')) { if (canEdit()) $("#logo-file").click(); return; }
   const pk = e.target.closest('[data-act="picker"], [data-act="pick-t"]');
-  if (pk) { if (pk.dataset.act === "picker") { S.picker = !S.picker; renderHeader(); localize($("header.app")); if (S.picker) setTimeout(() => { $(".pick-row.on")?.scrollIntoView({ block: "nearest" }); if (!matchMedia("(pointer: coarse)").matches) $("#picker-q")?.focus(); }, 0); } else pickCompetition(pk.dataset.id); return; }
+  if (pk) { if (pk.dataset.act === "picker") { S.picker = !S.picker; renderHeader(); localize($("header.app")); if (S.picker) setTimeout(() => { $(".pick-row.on")?.scrollIntoView({ block: "nearest" }); if (!matchMedia("(pointer: coarse)").matches) $("#picker-q")?.focus(); }, 0); }
+    else { const kb = document.activeElement === pk, inMenu = !!pk.closest(".picker"); pickCompetition(pk.dataset.id); if (kb) (inMenu ? $(".picker-btn") : pageHeading())?.focus(); } return; }
   if (S.picker && !e.target.closest(".picker")) { S.picker = false; renderHeader(); localize($("header.app")); }
   const sr = e.target.closest(".tw.st tr[data-st]");
   if (sr) { const id = sr.dataset.st, set = S.stOpen ||= new Set(); set.has(id) ? set.delete(id) : set.add(id); sr.classList.toggle("open", set.has(id)); sr.querySelector(".st-name")?.setAttribute("aria-expanded", String(set.has(id))); return; }
@@ -3729,8 +3831,9 @@ document.addEventListener("click", async e => {
   if (S.langMenu && !e.target.closest(".lang-wrap")) { S.langMenu = false; renderHeader(); }
   if (S.themeMenu && !e.target.closest(".theme-wrap")) { S.themeMenu = false; renderHeader(); }
   const th = e.target.closest("[data-theme-pick]");
-  if (th) { lsSet("carreau-theme", th.dataset.themePick); applyTheme(); S.langMenu = false; S.themeMenu = false; render(); return; }
-  if (lg) { S.langMenu = false; await loadLang(lg.dataset.lang); I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
+  // picked with the keyboard: focus goes back to the menu's button as the menu closes
+  if (th) { const kb = document.activeElement === th; lsSet("carreau-theme", th.dataset.themePick); applyTheme(); S.langMenu = false; S.themeMenu = false; render(); if (kb) $(".theme-btn")?.focus(); return; }
+  if (lg) { const kb = document.activeElement === lg; S.langMenu = false; await loadLang(lg.dataset.lang); I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); if (kb) $(".lang-btn")?.focus(); return; }
   const tab = e.target.closest("[data-tab]");
   if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); render(); return; }
   if (e.target.closest(".ko-plan > summary")) { const kp = e.target.closest(".ko-plan"); setTimeout(() => { S.koPlan = kp.open; }, 0); }
@@ -3936,6 +4039,12 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && S.picker) { S.picker = false; renderHeader(); localize($("header.app")); $(".picker-btn")?.focus(); return; }
   if (e.key === "Enter" && e.target.id === "picker-q") { const first = [...document.querySelectorAll(".pick-row")].find(r => !r.hidden); if (first) pickCompetition(first.dataset.id); return; }
   if (e.key === "Escape" && S.modal) { S.modal = null; renderModal(); }
+  if (e.key === "Tab") { const dlg = $("#guide-modal .modal") || (S.modal ? $("#modal .modal") : null); if (!dlg) return;
+    const f = [...dlg.querySelectorAll('a[href], button, input, select, textarea, video[controls], [tabindex]:not([tabindex="-1"])')].filter(canFocus), ae = document.activeElement;
+    if (!f.length) { e.preventDefault(); dlg.focus(); return; }
+    if (!dlg.contains(ae)) { e.preventDefault(); (e.shiftKey ? f[f.length - 1] : f[0]).focus(); return; }
+    if (e.shiftKey && (ae === f[0] || ae === dlg)) { e.preventDefault(); f[f.length - 1].focus(); return; }
+    if (!e.shiftKey && ae === f[f.length - 1]) { e.preventDefault(); f[0].focus(); } }
 });
 
 async function exportCsv() {
