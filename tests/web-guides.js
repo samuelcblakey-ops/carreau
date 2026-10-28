@@ -24,7 +24,9 @@ const { chromium } = require('playwright');
     if (can) { await new Promise(r => { if (v.readyState >= 1) r(); else { v.onloadedmetadata = r; setTimeout(r, 8000); } }); dur = Math.round(v.duration) > 60; }
     return { title: document.querySelector('#guide-modal h3').textContent, src: v.getAttribute('src'), controls: v.controls, long: dur }; });
   log(`player: ${modal?.title} | ${modal?.src} | controls ${modal?.controls} | long ${modal?.long}`);
+  log('player focus: inside ' + await p.evaluate(() => !!document.activeElement?.closest('#guide-modal')) + ' | page behind inert ' + await p.evaluate(() => document.querySelector('#main').inert && document.querySelector('header.app').inert));
   await p.keyboard.press('Escape'); await w(300); log('escape closes:', await p.evaluate(() => !document.getElementById('guide-modal')));
+  log('after the player: focus back ' + await p.evaluate(() => document.activeElement?.matches('[data-act="guide-play"][data-id="shooting"]')) + ' | page inert ' + await p.evaluate(() => document.querySelector('#main').inert));
   await p.click('.guide-card [data-act="guide-play"][data-id="first"]'); await w(500);
   await p.mouse.click(15, 450); await w(300); log('click outside closes:', await p.evaluate(() => !document.getElementById('guide-modal')));
   await p.click('[data-act="org-back"]'); await w(500);

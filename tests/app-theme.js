@@ -12,7 +12,7 @@ const fs = require('fs'), path = require('path');
   // 1. device theme
   await ev(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('[data-act="new-t"]').click(); await w(80); });
   await p.click('[data-act="theme-menu"]'); await p.waitForTimeout(80);
-  L.push('menu: ' + await ev(() => [...document.querySelectorAll('[data-theme-pick]')].map(x => x.dataset.themePick + (x.getAttribute('aria-selected') === 'true' ? '*' : '')).join(',')));
+  L.push('menu: ' + await ev(() => [...document.querySelectorAll('[data-theme-pick]')].map(x => x.dataset.themePick + (x.getAttribute('aria-pressed') === 'true' ? '*' : '')).join(',')));
   const light = await bg();
   await p.click('[data-theme-pick="dark"]'); await p.waitForTimeout(80);
   L.push(`dark: attr ${await ev(() => document.documentElement.dataset.theme)} | background changed ${light !== await bg()} | saved ${await ev(() => localStorage.getItem('carreau-theme'))}`);
