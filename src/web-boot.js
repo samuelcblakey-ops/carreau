@@ -913,6 +913,10 @@ function boot() {
     window.__testUid = () => AUTH.user?.uid;
   }
   S.store = fbStore();
+  // competitions, games and site settings can be read without signing in: a link to one competition (or a stream)
+  // starts loading it now, alongside the sign-in, instead of after it. The person's own competitions join once signed in.
+  S.roleKnown = () => AUTH.ready;
+  if (S.tid) { watchSite(); startWatching(); render(); }
   onAuthStateChanged(FB.auth, async u => {
     if (!u) { try { await signInAnonymously(FB.auth); } catch (e) { console.error(e); toast("Couldn't connect. Check your internet connection and reload."); } return; }
     AUTH.user = u; AUTH.ready = true; watchSite(); watchOrg(); restart(); render();

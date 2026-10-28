@@ -243,6 +243,8 @@ const SUITES = {
       /over the allowance: true/, /cost over: today \$0\.03 \| month matches days so far true \| day column (\$0\.0[1-3]\D){6}\$0\.03/,
       /billing: true \| blaze true \| link true \| google said true/,
       /api off: true \| link true/, /expired: true \| connect again true/, /errs \[\]/],
+    'web-early-load.js': [/spectator before sign-in: Early Bird Open \| signed in yet false/, /spectator after sign-in: true Early Bird Open$/m,
+      /organiser during sign-in tab: setup/, /organiser after sign-in: setup \| Early Bird Open \| setup tab true/, /no link lands on: Early Bird Open \| home false/, /errs \[\]/],
     'web-theme.js': [/organiser colour: #b3261e/, /organiser logo: WROTE/, /bad logo refused: permission-denied/, /follower sees: #b3261e \| logo true/, /follower writes logo: permission-denied/, /follower has no look panel: true/, /errs \[\]/],
     'web-offline.js': [/online light: live Live/, /offline light: off Offline/, /offline save closes at once: true \| score shown: true 13-5/, /waiting light: off Offline · \d+ waiting to sync/,
       /offline reopen: New competition \| score kept: true 13-5/, /back online light: live Live/, /other device sees it: true 13-5/, /errs \[\]/],
