@@ -174,12 +174,13 @@ button.ptile{cursor:pointer}button.ptile:hover{border-color:var(--accent);box-sh
 .ptile.me{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent),0 0 0 1px var(--accent)}
 .pt-h{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
 .pt-n{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
-.pt-ctx{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+.pt-ctx{min-width:0;font-size:12px;line-height:1.25;color:var(--muted);text-align:right;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .pt-s{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
 .pt-s .nm{min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.25}
 .pt-s .sc{font-family:var(--display);font-size:18px;font-weight:700}
-.ptile.free{flex-direction:row;align-items:center;justify-content:space-between;border:1px dashed var(--line);box-shadow:none;background:var(--surface-2);color:var(--muted)}
-.ptile.free .pt-n{color:var(--ink)}.pt-free{font-size:13px;font-weight:600}
+.pt-free{font-size:13px;font-weight:600}
+.pfree{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border:1px dashed var(--line);border-radius:var(--r);background:var(--surface-2);color:var(--muted)}
+.pfree [data-notr]{font-family:var(--display);font-size:19px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}
 .nxrow{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left}
 .nxrow:first-child{border-top:0}button.nxrow{cursor:pointer}button.nxrow:hover{background:var(--surface-2)}.nxrow.me{background:var(--accent-soft)}
 .nx-m{display:flex;flex-direction:column;gap:1px;min-width:0;overflow-wrap:anywhere}
@@ -337,13 +338,18 @@ button.start-card,a.start-card{cursor:pointer}button.start-card:hover,a.start-ca
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px}
 .ex-card{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-width:0}
 .ex-card:hover{border-color:var(--accent)}.ex-card b{overflow-wrap:anywhere}
+details.add-more{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}details.add-more>summary{cursor:pointer;padding:12px 14px;list-style-position:inside}details.add-more>summary .small{margin-left:6px}
+details.add-more[open]>summary{border-bottom:1px solid var(--line)}details.add-more>.grid2{padding:4px 14px 14px}details.add-more>.grid2>.panel{border:0;background:none;padding:10px 0 0;box-shadow:none}
 .wiz-page{max-width:640px;margin:0 auto}.wiz h2{font-size:19px}.wiz-page .wiz{margin-bottom:0!important}
 .fx{font-size:17px}.day-plan summary{cursor:pointer;list-style-position:inside}.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:4px 0;border-top:1px solid var(--line)}.dp-row:first-child{border-top:0}.dp-fx{font-weight:600}.dp-days{flex-wrap:wrap}.dp-days button{min-width:44px}.fx-score{font-family:var(--display);font-size:22px;font-weight:700;color:var(--accent);padding:0 6px}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
 @media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner,.skip{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
   .draw-table,.find-panel{display:none!important}.draw-round~.draw-round{break-before:page}.draw-round .mlist{grid-template-columns:repeat(2,1fr)}.draw-round .match{break-inside:avoid}}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;width:max-content;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
 .toast[hidden]{display:none}
+/* a toast never sits over a dialog's buttons: with a dialog open it drops to the bottom edge and the dialog moves up clear of it */
+body:has(#modal .modal) .toast{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+body:has(#modal .modal):has(#toast:not([hidden])) .scrim{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .toast-undo{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;min-height:36px}
 .modeseg{display:flex;width:100%;margin-bottom:4px}.modeseg button{flex:1}
 .quick{display:grid;gap:8px}.quick .qbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:16px}
@@ -984,6 +990,13 @@ Object.assign(LANG_TEXT.de, {"All rights reserved": "Alle Rechte vorbehalten"});
 Object.assign(LANG_TEXT.nl, {"All rights reserved": "Alle rechten voorbehouden"});
 Object.assign(LANG_TEXT.pt, {"All rights reserved": "Todos os direitos reservados"});
 Object.assign(LANG_TEXT.th, {"All rights reserved": "สงวนลิขสิทธิ์"});
+Object.assign(FR_TEXT, {"Add teams": "Ajouter des équipes", "Add players": "Ajouter des joueurs", "One at a time, or paste a list": "Individuellement, ou collez une liste"});
+Object.assign(LANG_TEXT.es, {"Add teams": "Añadir equipos", "Add players": "Añadir jugadores", "One at a time, or paste a list": "Uno a uno, o pega una lista"});
+Object.assign(LANG_TEXT.it, {"Add teams": "Aggiungi squadre", "Add players": "Aggiungi giocatori", "One at a time, or paste a list": "Singolarmente, o incolla un elenco"});
+Object.assign(LANG_TEXT.de, {"Add teams": "Teams hinzufügen", "Add players": "Spieler hinzufügen", "One at a time, or paste a list": "Einzeln oder als Liste einfügen"});
+Object.assign(LANG_TEXT.nl, {"Add teams": "Teams toevoegen", "Add players": "Spelers toevoegen", "One at a time, or paste a list": "Een voor een, of plak een lijst"});
+Object.assign(LANG_TEXT.pt, {"Add teams": "Adicionar equipas", "Add players": "Adicionar jogadores", "One at a time, or paste a list": "Individualmente, ou cole uma lista"});
+Object.assign(LANG_TEXT.th, {"Add teams": "เพิ่มทีม", "Add players": "เพิ่มผู้เล่น", "One at a time, or paste a list": "ทีละรายการ หรือวางรายชื่อ"});
 // live streaming: overlay and live desk
 Object.assign(FR_TEXT, {
   "End": "Mène", "End {n}": "Mène {1}", "Final score": "Final", "End {n} · {x}": "Mène {1} · {2}", "Holding": "Tient le point", "Holding the point": "Tient le point", "Boule thrown · {n} left": "Boule jouée · {1} à jouer",
@@ -2297,17 +2310,18 @@ function renderShooting(t) {
     return html + `<div class="panel stack"><p>${n} shooters ${t.checkin ? "checked in" : "entered"}</p>
       ${n < 2 ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least 2 shooters on Registration first.</p>${checkinAllBtn(t) ? `<div>${checkinAllBtn(t)}</div>` : ""}` : wr ? `<div><button class="btn primary" data-act="first-draw">Start the qualifying round</button></div>` : `<p class="muted">Waiting for the organiser to start.</p>`}</div></div>`;
   }
+  let bar = true; // the "Show all columns" bar goes under the first table only
   const table = (ph, title, cut) => {
     const rows = shootRanking(t, ph); const doneN = rows.filter(r => r.done).length;
     const up = rows.filter(r => !r.done).sort((x, y) => x.m.order - y.m.order)[0];
     return `<section class="panel stack" style="gap:8px"><div class="spread"><h3>${title}</h3><span class="pill ${doneN === rows.length ? "done" : ""}">${doneN}/${rows.length} scorecards</span></div>
       ${up ? `<div class="spread notice"><span>Next up on the piste: <b>${esc(entName(t, up.id))}</b> <span class="small muted">(shooter ${up.m.order + 1} of ${rows.length})</span></span>${canScore() ? `<button class="btn primary sm" data-shoot="${up.m.id}">${shotCount(up.shots) ? "Continue" : "Score now"}</button>` : ""}</div>` : ""}
-      <div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th><span class="sr-only">Shooting scorecard</span></th></tr></thead><tbody>
+      <div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n x" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th><span class="sr-only">Shooting scorecard</span></th></tr></thead><tbody>
       ${rows.map((r, i) => `<tr class="${cut && r.done && i < cut ? "q" : ""}"><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${r.m.corrected ? ` <span class="pill">Corrected</span>` : ""}${soMark(r)}</td>
-        ${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
+        ${ATELIERS.map(([k]) => `<td class="n x">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
         <td class="n"><b>${shotCount(r.shots) ? r.total : "–"}</b></td>
         <td>${canScore() ? `<button class="btn sm" data-shoot="${r.m.id}">${r.done ? "View" : shotCount(r.shots) ? "Continue" : "Score"}</button>` : r.done ? `<span class="pill done">Done</span>` : shotCount(r.shots) ? `<span class="pill playing">Shooting</span>` : ""}</td></tr>`).join("")}
-      </tbody></table></div></section>`;
+      </tbody></table></div>${bar ? (bar = false, colsBar("")) : ""}</section>`;
   };
   const tieAlert = (ph, cut) => shootTies(t, ph, cut).map(g => `<div class="notice spread so-alert"><span><b>Shoot-out needed</b> · <span data-notr>${g.rows.map(r => esc(entName(t, r.id))).join(", ")}</span> · <span>${t.shootTie === "shootout" ? "Level on {n} pts.".replace("{n}", g.rows[0].total) : "Level on {n} pts with the same number of 5s and 3s.".replace("{n}", g.rows[0].total)}</span></span>
     ${canScore() ? `<button class="btn primary sm" data-act="so-open" data-ph="${ph}" data-g="${g.start}">Score the shoot-out</button>` : ""}</div>`).join("");
@@ -2329,9 +2343,9 @@ function shootStandings(t) {
   if (f.length) html += `<div class="panel stack" style="gap:6px"><h3>Final</h3>${f.every(r => r.done) ? `<div>${MEDAL[1]}<span class="eyebrow">Winner</span> <b>${esc(entName(t, f[0].id))}</b> · ${f[0].total} pts</div>${f[1] ? `<div>${MEDAL[2]}<span class="eyebrow">Runner-up</span> ${esc(entName(t, f[1].id))} · ${f[1].total} pts</div>` : ""}${f[2] ? `<div>${MEDAL[3]}<span class="eyebrow">Third</span> ${esc(entName(t, f[2].id))} · ${f[2].total} pts</div>` : ""}` : `<span class="muted">In progress.</span>`}</div>`;
   const q = shootRanking(t, "Q");
   if (!q.length) return html + `<div class="empty">Standings appear once the qualifying round starts.</div>`;
-  return html + `<div class="panel"><div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
-    ${q.map((r, i) => `<tr><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${soMark(r)}</td>${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</td>`).join("")}<td class="n"><b>${r.total}</b></td></tr>`).join("")}
-  </tbody></table></div></div><p class="small muted">Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.</p><p class="small muted">${t.shootTie === "shootout" ? "Shooters level on points go to a shoot-out." : "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out."}</p>`;
+  return html + `<div class="panel"><div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n x" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
+    ${q.map((r, i) => `<tr><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${soMark(r)}</td>${ATELIERS.map(([k]) => `<td class="n x">${(r.shots?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</td>`).join("")}<td class="n"><b>${r.total}</b></td></tr>`).join("")}
+  </tbody></table></div>${colsBar("")}</div><p class="small muted">Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.</p><p class="small muted">${t.shootTie === "shootout" ? "Shooters level on points go to a shoot-out." : "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out."}</p>`;
 }
 
 /* ---------------- archive ---------------- */
@@ -2805,6 +2819,11 @@ function streamPanel(t) {
 const myStreams = () => Object.values(S.streams).filter(st => S.streamMine ? S.streamMine(st) : true).sort((x, y) => (y.created || 0) - (x.created || 0));
 // leaving a stream page (a stream's set-up, the streams list) for the open competition: drop the stream route so the
 // tabs, the picker and the back buttons work again. The browser's back button still returns to the stream page.
+// a tab tapped on the guides or login page goes back to the competition
+function leaveOverlay() {
+  if (!S.overlayView) return;
+  S.overlayView = null; history.pushState(null, "", S.tid ? "#" + S.tid : location.pathname + location.search);
+}
 function leaveLive() {
   if (!S.liveRoute) return;
   S.liveRoute = null; liveWatch();
@@ -3037,7 +3056,8 @@ function drawHeader() {
   const t = T();
   const SPECTATOR_TABS = ["draw", "standings", "stream", "display"]; // players and spectators: draw & results, standings, stream (and the big screen behind it)
   if (t && !canScore() && !viewAll(t) && !SPECTATOR_TABS.includes(S.tab)) S.tab = "draw";
-  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
+  const onTab = S.overlayView || S.liveRoute ? null : S.tab; // guides, login and the streams page aren't one of the tabs
+  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
 }
 // the start screen: first visit, or the logo tapped. Run, follow or stream, then your competitions and the examples.
 function renderWelcome() {
@@ -3096,15 +3116,9 @@ function seg(name, cur, opts, locked) { return `<div class="seg" role="group">${
 function renderSetup(t) {
   const locked = t.draws.length > 0;
   const sys = sysOf(t);
+  // the competition itself first (details, entries, system, knockouts, pistes); then who scores, sharing, colours and logo
   return `<div class="stack">
   <div class="spread"><h2>Setup</h2>${locked ? `<span class="pill">Format locked after the first draw</span>` : canEdit() ? `<button type="button" class="btn sm" data-act="wiz-again">Quick setup</button>` : ""}</div>
-  ${S.setupExtra ? S.setupExtra(t) : ""}
-  ${lookPanel(t)}
-  ${S.teamScoringSetup && S.teamScoringSetup(t) && !isIndiv(t) ? `<div class="panel stack"><h3>Score entry</h3>
-    ${seg("scoreMode", t.scoreMode || "organiser", [["organiser", "Organisers only"], ["teams", "Teams enter, other team confirms"], ["teams-auto", "Teams enter, auto-confirm"]], false)}
-    <p class="small muted">${{ organiser: "Only organisers and scorers enter scores.", teams: "Each team gets its own link (see Team links above). When a game ends, either team enters the score on their phone and the other team confirms it. Disputes come to you on Draw & results. Keep an organiser's screen open: it publishes confirmed scores.", "teams-auto": "As above, but a score the other team hasn't answered counts automatically after the wait below." }[t.scoreMode || "organiser"]}</p>
-    ${t.scoreMode === "teams-auto" ? `<label class="f" style="max-width:220px"><span>Auto-confirm after (minutes)</span><input type="number" min="1" max="60" data-field="autoConfirmMin" data-num value="${t.autoConfirmMin || 10}"></label>` : ""}
-  </div>` : ""}
   <div class="panel stack">
     <div class="fields">
       <label class="f"><span>Competition name</span><input type="text" id="f-name" data-field="name" value="${esc(t.name)}"></label>
@@ -3177,6 +3191,13 @@ function renderSetup(t) {
     </div>
     <label class="chk"><input type="checkbox" data-check="randomCourts" ${t.randomCourts ? "checked" : ""}> Allocate pistes at random (otherwise lowest free piste first)</label>
   </div>
+  ${S.teamScoringSetup && S.teamScoringSetup(t) && !isIndiv(t) ? `<div class="panel stack"><h3>Score entry</h3>
+    ${seg("scoreMode", t.scoreMode || "organiser", [["organiser", "Organisers only"], ["teams", "Teams enter, other team confirms"], ["teams-auto", "Teams enter, auto-confirm"]], false)}
+    <p class="small muted">${{ organiser: "Only organisers and scorers enter scores.", teams: "Each team gets its own link (see Team links below). When a game ends, either team enters the score on their phone and the other team confirms it. Disputes come to you on Draw & results. Keep an organiser's screen open: it publishes confirmed scores.", "teams-auto": "As above, but a score the other team hasn't answered counts automatically after the wait below." }[t.scoreMode || "organiser"]}</p>
+    ${t.scoreMode === "teams-auto" ? `<label class="f" style="max-width:220px"><span>Auto-confirm after (minutes)</span><input type="number" min="1" max="60" data-field="autoConfirmMin" data-num value="${t.autoConfirmMin || 10}"></label>` : ""}
+  </div>` : ""}
+  ${S.setupExtra ? S.setupExtra(t) : ""}
+  ${lookPanel(t)}
   ${canEdit() ? `<div class="panel spread">
     <div><h3>${t.archived ? "Archived" : "Archive competition"}</h3><p class="small muted">${t.archived ? "Only the site admin can see this competition. Restore it to make it visible again." : `Once the competition has finished, archive it to hide it from everyone except the site admin.${MS().some(m => !m.done && m.a && (m.b || m.stage === "shoot")) ? " Some games aren't finished yet." : ""}`}</p></div>
     ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">Archive “${esc(t.name)}”? Only the admin will be able to see it.</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
@@ -3258,7 +3279,7 @@ function renderEntries(t) {
     </div>
     ${isClubs(t) ? clubsPanel(t, drawn) : ""}
     ${drawn ? `<div class="notice">${rolling && t.checkin ? `The draw has started. Anyone checked in now joins from the next round.` : rolling ? `The draw has started. New entries join from the next round.` : `The draw has been made, so new entries and check-ins won't be included. Withdrawn ${noun} stay in the draw already made.`}</div>` : ""}
-    ${canEdit() ? `<div class="grid2">
+    ${canEdit() ? addFold(t, list, `<div class="grid2">
       <form class="panel stack" id="add-form">
         <h3>Add ${melee ? "a player" : "a team"}</h3>
         ${melee ? `<label class="f"><span>Player name</span><input type="text" id="np-name" required></label>` :
@@ -3275,7 +3296,7 @@ function renderEntries(t) {
         <textarea id="bulk" placeholder="${melee ? "Marie Dubois&#10;Tom Hart" : "Les Pointeurs: Marie Dubois, Tom Hart, Ana Silva&#10;Jo Bell, Raj Patel, Lee Chen"}"></textarea>
         <div><button class="btn" type="submit">Add all</button></div>
       </form>
-    </div>` : ""}
+    </div>`) : ""}
     <div class="panel stack" style="gap:8px">
       <div class="spread"><h3>${melee ? "Players" : "Teams"}</h3>${list.length > 6 ? `<input type="search" id="reg-search" placeholder="Find a ${melee ? "player" : "team or player"}" value="${esc(S.regFilter || "")}" style="max-width:260px" aria-label="Search entries">` : ""}</div>
       ${list.length ? `<div class="elist">${list.map((e, i) => `<div class="erow ${e.active === false ? "out" : ""} ${t.checkin && e.checkedIn && e.active !== false ? "here" : ""}" data-row="${e.id}" ${match(e) ? "" : "hidden"} data-text="${esc([entName(t, e.id), ...(e.players || []), e.club || ""].join(" ").toLowerCase())}">
@@ -3290,6 +3311,12 @@ function renderEntries(t) {
       </div>`).join("")}</div>` : `<div class="empty">No ${noun} yet. Add them above or paste a list.</div>`}
     </div>
   </div>`;
+}
+// once there are entries the day is spent on the list: adding more folds into one line above it (and stays open once opened)
+function addFold(t, list, forms) {
+  const open = S.addOpen ||= {};
+  if (!list.length) { open[t.id] = true; return forms; } // started from an empty list: it stays open while they're being typed in
+  return `<details class="add-more" ${open[t.id] ? "open" : ""}><summary><b>${isIndiv(t) ? "Add players" : "Add teams"}</b> <span class="small muted">One at a time, or paste a list</span></summary>${forms}</details>`;
 }
 const usedInDraw = id => MS().some(m => ents(m).includes(id));
 // Inter-club: the clubs come from the Club written on each team
@@ -3620,15 +3647,23 @@ function bracketRounds(t, b, ms) {
 
 /* courts */
 // Pistes: every piste as a small tile (game, live score), then the games next in line for a piste
+// piste names in order, with runs of three or more numbers shortened: 1, 3, 6–16
+function pisteRuns(cs) {
+  const out = []; let run = [];
+  const flush = () => { if (run.length) out.push(run.length > 2 ? `${run[0].name}–${run[run.length - 1].name}` : run.map(c => c.name).join(", ")); run = []; };
+  cs.forEach(c => { const prev = run[run.length - 1]; if (prev && /^\d+$/.test(prev.name) && /^\d+$/.test(c.name) && +c.name === +prev.name + 1) run.push(c); else { flush(); run = [c]; } });
+  flush(); return out.map(esc).join(", ");
+}
 function renderCourts(t) {
   const ms = MS(), me = myPick(t), ro = !canScore(), tag = ro ? "div" : "button";
   const live = ms.filter(m => !m.done && m.court);
   const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder);
   const on = t.courts.filter(c => c.active !== false), off = t.courts.filter(c => c.active === false);
+  const free = on.filter(c => !live.some(m => m.court === c.id)); // the free ones go on one line, not a tile each
   const mine = m => me && ents(m).includes(me) ? "me" : "";
   const tile = c => {
     const m = live.find(x => x.court === c.id);
-    if (!m) return `<div class="ptile free"><span class="pt-n" data-notr>${esc(c.name)}</span><span class="pt-free">Free</span></div>`;
+    if (!m) return "";
     const side = k => `<div class="pt-s"><span class="nm" data-notr>${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? ""}</span></div>`;
     return `<${tag} class="ptile ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}>
       <div class="pt-h"><span class="pt-n" data-notr>${esc(c.name)}</span>${timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pt-ctx">${esc(matchContext(t, m))}</span>`}</div>${side("a")}${side("b")}</${tag}>`;
@@ -3636,7 +3671,8 @@ function renderCourts(t) {
   const next = m => `<${tag} class="nxrow ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}><span class="nx-m"><span><b data-notr>${esc(sideName(t, m.a))}</b> v <b data-notr>${esc(sideName(t, m.b))}</b></span><span class="small muted">${esc(matchContext(t, m))}</span></span></${tag}>`;
   return `<div class="stack">
     <div class="spread"><h2>Pistes</h2><div class="row"><span class="muted small">${live.length} playing · ${waiting.length} waiting</span>${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}</div></div>
-    <div class="pgrid">${on.map(tile).join("")}</div>
+    ${live.length ? `<div class="pgrid">${on.map(tile).join("")}</div>` : ""}
+    ${free.length ? `<div class="pfree"><span class="pt-free">Free</span><span data-notr>${pisteRuns(free)}</span></div>` : ""}
     ${off.length ? `<p class="small muted"><span>Not in use</span>: <span data-notr>${off.map(c => esc(c.name)).join(", ")}</span></p>` : ""}
     <section class="stack" style="gap:10px"><h3>Next up</h3>
       ${waiting.length ? `<div class="rlist">${waiting.map(next).join("")}</div>` : `<div class="empty">No games waiting.</div>`}
@@ -3651,16 +3687,20 @@ function overallTable(t, stage) {
   const st = computeStats(t, ms, ids); const useB = stage === "swiss" || stage === "snake";
   return rankStats(t, st, useB, false, ms);
 }
+// what a tap on a team in a phone table shows: its players (or its club), unless that's just its name again
+function stSub(t, id, club) { const v = club ? clubOfTeam(t, id) : !isIndiv(t) ? teamPlayers(t, id) : ""; return v && v !== entName(t, id) ? v : ""; }
 function standingsTable(t, rows, opts = {}) {
   const useB = opts.buch; const podium = !!opts.podium && rows.some(s => s.p > 0); // gold, silver and bronze once games are in
   const me = myPick(t), stOpen = S.stOpen ||= new Set();
   // phones show team names only (one line per team); tapping a team shows its players (or its club)
-  const subOf = id => { const v = opts.club ? clubOfTeam(t, id) : !isIndiv(t) ? teamPlayers(t, id) : ""; return v && v !== entName(t, id) ? v : ""; };
+  const subOf = id => stSub(t, id, opts.club);
   const hint = !S.allCols && rows.some(s => subOf(s.id)) ? `<span class="small muted st-hint">${opts.club ? "Tap a team to see its club." : "Tap a team to see its players."}</span>` : "";
   return `<div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n x" title="Played">Pld</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n x" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n ${useB ? "x" : ""}" title="Points for">For</th><th class="n ${useB ? "x" : ""}" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
     ${rows.map((s, i) => { const pod = podium && i < 3 && !s.unplaced, sub = subOf(s.id), open = !!sub && stOpen.has(s.id); return `<tr class="${[s.id === me ? "me" : "", pod ? "pod" + (i + 1) : "", open ? "open" : ""].filter(Boolean).join(" ")}" ${sub ? `data-st="${s.id}"` : ""}><td class="rank">${pod ? `<span class="medal m${i + 1}">${i + 1}</span>` : i + 1}</td><td class="wrap">${sub ? `<button type="button" class="st-name" aria-expanded="${open}"><b>${esc(entName(t, s.id))}</b></button><div class="small muted st-sub">${esc(sub)}</div>` : `<b>${esc(entName(t, s.id))}</b>`}</td><td class="n x">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n x">${s.fbuch}</td>` : ""}<td class="n ${useB ? "x" : ""}">${s.pf}</td><td class="n ${useB ? "x" : ""}">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`; }).join("")}
-  </tbody></table></div><div class="st-more">${hint}<button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`;
+  </tbody></table></div>${opts.bar === false ? "" : colsBar(hint)}`;
 }
+// phones: tables show the main columns; this bar shows the rest (and says when a tap on a team shows more)
+function colsBar(hint) { return `<div class="st-more">${hint}<button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`; }
 // inter-club: big events show one round at a time (4 or more days/rounds); the round still being played comes first
 const clubCompact = t => clubDaysShown(t) >= 4;
 function clubNow(t, ms) {
@@ -3782,8 +3822,9 @@ function renderStandings(t) {
     else html += `<div class="panel">${standingsTable(t, overallTable(t, "rr"), { podium: true })}</div><p class="small muted">Ranked by wins, then points difference, then points for. Teams still level (two, three or more) are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added.</p>`;
   } else if (isGroups(t)) {
     if (!(t.pools || []).length) html += `<div class="empty">${isLeagues(t) ? "League tables appear once the leagues are drawn." : "Barrage tables appear once the barrage is drawn."}</div>`;
-    else html += `<div class="pools">${t.pools.map(p => { const rk = poolRanking(t, p, ms); return `<div class="panel stack" style="gap:8px"><h3>${esc(p.name)}</h3>${standingsTable(t, rk.rows)}</div>`; }).join("")}</div>
-      <p class="small muted">${isLeagues(t) ? "Ranked by wins, then fewest losses, then points difference, then points for. Teams still level are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added." : "Ranked by wins, then points difference, then points for. Teams still level (two, three or more) are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added."}</p>`;
+    else { const rks = t.pools.map(p => poolRanking(t, p, ms)); const tap = !S.allCols && rks.some(rk => rk.rows.some(r => stSub(t, r.id)));
+      html += `${colsBar(tap ? `<span class="small muted st-hint">Tap a team to see its players.</span>` : "")}<div class="pools">${t.pools.map((p, i) => `<div class="panel stack" style="gap:8px"><h3>${esc(p.name)}</h3>${standingsTable(t, rks[i].rows, { bar: false })}</div>`).join("")}</div>
+      <p class="small muted">${isLeagues(t) ? "Ranked by wins, then fewest losses, then points difference, then points for. Teams still level are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added." : "Ranked by wins, then points difference, then points for. Teams still level (two, three or more) are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added."}</p>`; }
   } else if (sys === "shooting") html += shootStandings(t);
   else if (isClubs(t)) html += clubStandings(t);
   else if (!(t.brackets || []).length) html += `<div class="empty">Results appear once the bracket is drawn.</div>`;
@@ -3844,9 +3885,10 @@ document.addEventListener("click", async e => {
   if (th) { const kb = document.activeElement === th; lsSet("carreau-theme", th.dataset.themePick); applyTheme(); S.langMenu = false; S.themeMenu = false; render(); if (kb) $(".theme-btn")?.focus(); return; }
   if (lg) { const kb = document.activeElement === lg; S.langMenu = false; await loadLang(lg.dataset.lang); I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); if (kb) $(".lang-btn")?.focus(); return; }
   const tab = e.target.closest("[data-tab]");
-  if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); render(); return; }
+  if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); leaveOverlay(); render(); return; }
   if (e.target.closest(".ko-plan > summary")) { const kp = e.target.closest(".ko-plan"); setTimeout(() => { S.koPlan = kp.open; }, 0); }
   if (e.target.closest(".day-plan > summary")) { const dp = e.target.closest(".day-plan"); setTimeout(() => { S.dayPlan = dp.open; }, 0); }
+  if (e.target.closest(".add-more > summary")) { const am = e.target.closest(".add-more"), id = S.tid; setTimeout(() => { (S.addOpen ||= {})[id] = am.open; }, 0); }
   const sc = e.target.closest("[data-shoot]");
   if (sc) { openMatch(sc.dataset.shoot); return; }
   const mc = e.target.closest("[data-match]");
@@ -4106,6 +4148,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
 })();
 </script>
