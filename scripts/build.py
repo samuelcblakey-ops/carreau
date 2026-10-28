@@ -49,6 +49,13 @@ html = f"""<!doctype html>
 <meta name="description" content="Run petanque competitions live: draws, courts and scores for everyone.">
 <meta name="theme-color" content="#1d6a54">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/{V}/firebase-app.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/{V}/firebase-firestore.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/{V}/firebase-auth.js">
+<link rel="modulepreload" href="firebase-config.js">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
