@@ -378,17 +378,23 @@ function guidesView() {
     ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}
   </div>`;
 }
+// the video plays in a dialog: the page behind can't be reached until it closes, then focus goes back to the button that opened it
+let guideBack = null;
 function openGuide(id) {
-  const g = guideOf(id); if (!g) return; closeGuide();
+  const g = guideOf(id); if (!g) return; closeGuide(); guideBack = `[data-act="guide-play"][data-id="${id}"]`;
   const el = document.createElement("div"); el.id = "guide-modal";
   el.innerHTML = `<div class="scrim"><div class="modal guide stack" role="dialog" aria-modal="true" aria-label="${esc(g.title)}" style="gap:10px">
     <div class="spread"><h3>${g.title}</h3><button type="button" class="btn ghost" data-act="guide-close" aria-label="Close">✕</button></div>
     <video class="guide-video" src="${g.file}.mp4" poster="${g.file}.jpg" controls autoplay playsinline preload="metadata"></video>
     ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}</div></div>`;
   el.addEventListener("click", e => { if (e.target.classList.contains("scrim")) closeGuide(); });
-  document.body.appendChild(el); localize(el); el.querySelector('[data-act="guide-close"]').focus();
+  document.body.appendChild(el); localize(el); guideInert(true); el.querySelector('[data-act="guide-close"]').focus();
 }
-function closeGuide() { const el = document.getElementById("guide-modal"); if (!el) return; el.querySelector("video")?.pause(); el.remove(); }
+const guideInert = on => document.querySelectorAll(".skip, header.app, #main, #foot").forEach(n => { n.inert = on; });
+function closeGuide() {
+  const el = document.getElementById("guide-modal"); if (!el) return; el.querySelector("video")?.pause(); el.remove(); guideInert(false);
+  const back = guideBack && document.querySelector(guideBack); guideBack = null; if (back && back.getClientRects().length) back.focus({ preventScroll: true });
+}
 document.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("guide-modal")) closeGuide(); });
 
 /* ---------- organiser login ---------- */
