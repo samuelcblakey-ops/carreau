@@ -19,6 +19,25 @@ const { chromium } = require('playwright');
     const t = C.T(); L.push(`saved: ${t.name} | ${t.venue} | ${t.entry} ${t.format} ${t.system} | pistes ${t.courts.length} | time ${t.timeLimit} | wizard ${t.wizard}`);
     L.push('wizard gone: ' + !q('.wiz') + ' | toast: ' + q('#toast').textContent + ' | on registration: ' + (S.tab === 'entries'));
     q('[data-tab="setup"]').click(); await w(60); L.push('setup offers quick setup: ' + !!q('[data-act="wiz-again"]'));
+    // every format Setup offers is in the quick setup
+    const runWiz = async (kind, pick) => { q('[data-act="new-t"]').click(); await w(150); q('#wz-name').value = 'V ' + kind; q('[data-act="wiz-next"]').click(); await w(50);
+      q(`[data-act="wiz-set"][data-k="kind"][data-v="${kind}"]`).click(); await w(40); q('[data-act="wiz-next"]').click(); await w(50); await pick();
+      q('[data-act="wiz-next"]').click(); await w(50); q('[data-act="wiz-next"]').click(); await w(200); return C.T(); };
+    const sel = (k, v) => q(`[data-act="wiz-set"][data-k="${k}"][data-v="${v}"]`);
+    let sysOpts = '';
+    let tt = await runWiz('triples', async () => { sysOpts = [...document.querySelectorAll('[data-k="system"]')].map(b => b.dataset.v).join(',');
+      sel('system', 'snake').click(); await w(40); q('#wz-snrounds').value = '4'; L.push('snake note: ' + /afternoon knockouts/.test(q('.wiz').textContent)); });
+    L.push('team systems: ' + sysOpts);
+    L.push(`snake: ${tt.entry} ${tt.format} ${tt.system} rounds ${tt.snakeRounds}`);
+    q('[data-tab="setup"]').click(); await w(80); L.push('setup shows afternoon knockouts: ' + /Afternoon knockouts/.test(document.querySelector('main').textContent)); q('[data-tab="entries"]').click(); await w(40);
+    tt = await runWiz('melee', async () => { L.push('melee styles: ' + [...document.querySelectorAll('[data-k="meleeMode"]')].map(b => b.dataset.v).join(','));
+      sel('meleeMode', 'once').click(); await w(40); L.push('once systems: ' + [...document.querySelectorAll('[data-k="system"]')].map(b => b.dataset.v).join(','));
+      sel('format', 'doubles').click(); await w(40); sel('system', 'pools').click(); await w(40); });
+    L.push(`melee once: ${tt.entry} ${tt.meleeMode} ${tt.format} ${tt.system}`);
+    tt = await runWiz('melee', async () => { sel('meleeMode', 'advance').click(); await w(40); q('#wz-rounds').value = '3'; });
+    L.push(`melee advance: ${tt.entry} ${tt.meleeMode} ${tt.system} rounds ${tt.swissRounds}`);
+    tt = await runWiz('shooting', async () => { sel('shootFormat', 'final').click(); await w(40); q('#wz-sfinal').value = '6'; });
+    L.push(`shooting: ${tt.entry} ${tt.shootFormat} final ${tt.shootFinal}`);
     // skip path
     q('[data-act="new-t"]').click(); await w(150); q('[data-act="wiz-skip"]').click(); await w(150);
     L.push('skip goes to setup: ' + (S.tab === 'setup') + ' wizard ' + C.T().wizard);
