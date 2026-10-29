@@ -78,6 +78,7 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
   main{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   .site-foot{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
   body .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  html{scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))} /* Tab never leaves a control hidden under the tab bar */
   main .seg{display:flex;width:100%}main .seg button{flex:1 1 auto;padding:9px 10px}
   header .seg{flex:none;flex-wrap:nowrap}header .seg button{padding:7px 10px}
   .btn{min-height:40px}.btn.sm{min-height:34px}
@@ -107,6 +108,12 @@ h3{font-size:19px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.sm{padding:5px 10px;font-size:13px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* read out by screen readers, not shown */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* keyboard users: the first Tab shows a link straight to the page's content */
+.skip{position:absolute;left:8px;top:8px;z-index:100;transform:translateY(-200%);background:var(--surface);color:var(--ink);border:2px solid var(--accent);border-radius:10px;padding:10px 14px;font-weight:700;text-decoration:none}
+.skip:focus{transform:none}body.stream .skip{display:none}
+#main:focus,.modal:focus{outline:none}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
 label.f>span{text-transform:uppercase;letter-spacing:.06em;font-size:11px}
 input[type=text],input[type=number],input[type=date],select,textarea{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0;width:100%;color:var(--ink)}
@@ -167,12 +174,13 @@ button.ptile{cursor:pointer}button.ptile:hover{border-color:var(--accent);box-sh
 .ptile.me{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent),0 0 0 1px var(--accent)}
 .pt-h{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
 .pt-n{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
-.pt-ctx{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+.pt-ctx{min-width:0;font-size:12px;line-height:1.25;color:var(--muted);text-align:right;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .pt-s{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
 .pt-s .nm{min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.25}
 .pt-s .sc{font-family:var(--display);font-size:18px;font-weight:700}
-.ptile.free{flex-direction:row;align-items:center;justify-content:space-between;border:1px dashed var(--line);box-shadow:none;background:var(--surface-2);color:var(--muted)}
-.ptile.free .pt-n{color:var(--ink)}.pt-free{font-size:13px;font-weight:600}
+.pt-free{font-size:13px;font-weight:600}
+.pfree{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border:1px dashed var(--line);border-radius:var(--r);background:var(--surface-2);color:var(--muted)}
+.pfree [data-notr]{font-family:var(--display);font-size:19px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}
 .nxrow{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left}
 .nxrow:first-child{border-top:0}button.nxrow{cursor:pointer}button.nxrow:hover{background:var(--surface-2)}.nxrow.me{background:var(--accent-soft)}
 .nx-m{display:flex;flex-direction:column;gap:1px;min-width:0;overflow-wrap:anywhere}
@@ -234,6 +242,7 @@ fieldset.ro-view{border:0;padding:0;margin:0;min-width:0}fieldset.ro-view :is(in
 .use-ok-t{color:var(--muted)}.use-warn-t{color:var(--jack-ink)}.use-danger-t{color:var(--danger);font-weight:700}
 .use-days{width:100%;border-collapse:collapse;font-size:14px}.use-days th,.use-days td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}.use-days .n{text-align:right;font-variant-numeric:tabular-nums}
 .use-cell{display:grid;gap:3px;justify-items:end}.use-cell b{display:block;width:100%;max-width:120px;height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}.use-cell i{display:block;height:100%;background:var(--accent)}
+.use-cost{flex-wrap:wrap;gap:4px 12px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .use-fixed ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}#adm-usage a.btn{color:inherit;text-decoration:none}
 .erow .num{font-family:var(--display);font-weight:700;color:var(--muted);width:2.5ch;text-align:right;font-variant-numeric:tabular-nums}
 .erow .who{flex:1;min-width:0}
@@ -330,13 +339,18 @@ button.start-card,a.start-card{cursor:pointer}button.start-card:hover,a.start-ca
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px}
 .ex-card{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-width:0}
 .ex-card:hover{border-color:var(--accent)}.ex-card b{overflow-wrap:anywhere}
-.wiz-page{max-width:640px;margin:0 auto}.wiz-page .wiz{margin-bottom:0!important}
+details.add-more{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}details.add-more>summary{cursor:pointer;padding:12px 14px;list-style-position:inside}details.add-more>summary .small{margin-left:6px}
+details.add-more[open]>summary{border-bottom:1px solid var(--line)}details.add-more>.grid2{padding:4px 14px 14px}details.add-more>.grid2>.panel{border:0;background:none;padding:10px 0 0;box-shadow:none}
+.wiz-page{max-width:640px;margin:0 auto}.wiz h2{font-size:19px}.wiz-page .wiz{margin-bottom:0!important}
 .fx{font-size:17px}.day-plan summary{cursor:pointer;list-style-position:inside}.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:4px 0;border-top:1px solid var(--line)}.dp-row:first-child{border-top:0}.dp-fx{font-weight:600}.dp-days{flex-wrap:wrap}.dp-days button{min-width:44px}.fx-score{font-family:var(--display);font-size:22px;font-weight:700;color:var(--accent);padding:0 6px}
 .shotcell.v{color:var(--ink);background:var(--surface)}.shotcell.sel{outline:3px solid var(--accent);outline-offset:1px;color:var(--ink)}
-@media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
+@media print{header.app,nav.tabs,.toast,#modal,.btn,.install-banner,.skip{display:none!important}body{background:#fff}main{padding:0!important}.panel{break-inside:avoid;border-color:#bbb}
   .draw-table,.find-panel{display:none!important}.draw-round~.draw-round{break-before:page}.draw-round .mlist{grid-template-columns:repeat(2,1fr)}.draw-round .match{break-inside:avoid}}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-weight:600;width:max-content;max-width:calc(100% - 32px);display:flex;align-items:center;gap:12px}
 .toast[hidden]{display:none}
+/* a toast never sits over a dialog's buttons: with a dialog open it drops to the bottom edge and the dialog moves up clear of it */
+body:has(#modal .modal) .toast{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+body:has(#modal .modal):has(#toast:not([hidden])) .scrim{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .toast-undo{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;min-height:36px}
 .modeseg{display:flex;width:100%;margin-bottom:4px}.modeseg button{flex:1}
 .quick{display:grid;gap:8px}.quick .qbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:16px}
@@ -378,10 +392,10 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
 .menu-h.first{border-top:0;margin-top:0;padding-top:6px}
 :is(.lang-menu,.theme-menu){position:absolute;right:0;top:calc(100% + 6px);z-index:55;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:6px;display:flex;flex-direction:column;min-width:180px}
 :is(.lang-menu,.theme-menu)[hidden]{display:none}:is(.lang-menu,.theme-menu) button{display:flex;gap:10px;align-items:center;background:none;border:0;border-radius:8px;padding:10px 12px;min-height:44px;cursor:pointer;color:var(--ink);font-size:15px;text-align:left}
-:is(.lang-menu,.theme-menu) button b{width:26px;color:var(--muted);font-size:13px;display:inline-flex;align-items:center}:is(.lang-menu,.theme-menu) button:hover{background:var(--surface-2)}:is(.lang-menu,.theme-menu) button[aria-selected="true"]{background:var(--accent-soft)}:is(.lang-menu,.theme-menu) button[aria-selected="true"] b{color:var(--accent)}
+:is(.lang-menu,.theme-menu) button b{width:26px;color:var(--muted);font-size:13px;display:inline-flex;align-items:center}:is(.lang-menu,.theme-menu) button:hover{background:var(--surface-2)}:is(.lang-menu,.theme-menu) button[aria-pressed="true"]{background:var(--accent-soft)}:is(.lang-menu,.theme-menu) button[aria-pressed="true"] b{color:var(--accent)}
 .tb-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .tb-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--line);min-height:52px}.tb-row:first-child{border-top:0}
-.tb-row.fixed{background:var(--surface-2)}.tb-row.off .tb-name{opacity:.55}
+.tb-row.fixed{background:var(--surface-2)}.tb-row.off .tb-name{color:var(--muted)}.tb-row.off .tb-name b{font-weight:600}
 .tb-n{width:22px;text-align:center;font-family:var(--display);font-weight:700;font-size:18px;color:var(--accent)}.tb-row.off .tb-n{color:var(--muted)}
 .tb-name{flex:1;display:flex;flex-direction:column;min-width:0}.tb-row .btn.sm{min-width:36px;padding:5px 8px;font-size:16px}
 .tb-sw{width:46px;height:28px;border-radius:14px;border:0;background:var(--line);position:relative;cursor:pointer;flex:none;padding:0}
@@ -487,6 +501,7 @@ body.desk header.app{display:none}
 @media (prefers-reduced-motion:no-preference){.match,.btn{transition:border-color .12s}}
 </style>
 
+<a class="skip" href="#main">Skip to content</a>
 <header class="app">
   <div class="wrap">
     <div class="bar">
@@ -504,8 +519,11 @@ body.desk header.app{display:none}
 <footer class="wrap site-foot" id="foot"></footer>
 <div id="modal"></div>
 <input type="file" id="logo-file" accept="image/*" hidden aria-hidden="true" tabindex="-1">
-<div id="roundalert" hidden class="roundalert" role="status" aria-live="polite"></div>
+<section class="notes" aria-label="Notifications">
+<div id="roundalert" hidden class="roundalert"></div>
 <div id="toast" hidden class="toast"></div>
+<div id="sr-live" class="sr-only" role="status" aria-live="polite"></div>
+</section>
 
 <script>
 (() => {
@@ -839,6 +857,16 @@ Object.entries({
   pt: { "Mêlée, teams drawn once": "Mêlée, equipas sorteadas uma vez", "Just filming one game?": "Vai filmar só um jogo?" },
   th: { "Mêlée, teams drawn once": "Mêlée จับทีมครั้งเดียว", "Just filming one game?": "ถ่ายแค่เกมเดียว?" },
 }).forEach(([k, v]) => Object.assign(LANG_TEXT[k], v));
+// team score entry guide
+Object.assign(FR_TEXT, { "Teams enter their own scores": "Les équipes saisissent leurs scores", "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.": "Liens et QR codes d'équipe : une équipe saisit le score sur son téléphone, l'autre le confirme, et la partie suivante passe sur la piste libre.", "Teams entering scores? Watch how it works (1 min).": "Les équipes saisissent les scores ? Voyez comment ça marche (1 min)." });
+Object.entries({
+  es: { "Teams enter their own scores": "Los equipos introducen sus resultados", "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.": "Enlaces y códigos QR de equipo: un equipo introduce el resultado en su móvil, el otro lo confirma y la siguiente partida pasa a la pista libre.", "Teams entering scores? Watch how it works (1 min).": "¿Los equipos introducen los resultados? Mira cómo funciona (1 min)." },
+  it: { "Teams enter their own scores": "Le squadre inseriscono i punteggi", "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.": "Link e codici QR delle squadre: una squadra inserisce il punteggio sul telefono, l'altra lo conferma e la partita successiva va sul campo libero.", "Teams entering scores? Watch how it works (1 min).": "Le squadre inseriscono i punteggi? Guarda come funziona (1 min)." },
+  de: { "Teams enter their own scores": "Teams geben ihre Ergebnisse selbst ein", "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.": "Team-Links und QR-Codes: Ein Team gibt das Ergebnis am Handy ein, das andere bestätigt, und das nächste Spiel kommt auf die freie Bahn.", "Teams entering scores? Watch how it works (1 min).": "Teams geben Ergebnisse ein? So funktioniert's (1 Min.)." },
+  nl: { "Teams enter their own scores": "Teams voeren zelf hun score in", "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.": "Teamlinks en QR-codes: één team voert de score in op de telefoon, het andere bevestigt, en de volgende partij gaat naar de vrije baan.", "Teams entering scores? Watch how it works (1 min).": "Voeren teams de score in? Bekijk hoe het werkt (1 min)." },
+  pt: { "Teams enter their own scores": "As equipas introduzem os próprios resultados", "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.": "Links e códigos QR das equipas: uma equipa introduz o resultado no telemóvel, a outra confirma e o jogo seguinte passa para a pista livre.", "Teams entering scores? Watch how it works (1 min).": "As equipas introduzem os resultados? Veja como funciona (1 min)." },
+  th: { "Teams enter their own scores": "ทีมกรอกคะแนนเอง", "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.": "ลิงก์และคิวอาร์โค้ดของทีม ทีมหนึ่งกรอกคะแนนในโทรศัพท์ อีกทีมยืนยัน แล้วเกมถัดไปจะลงสนามที่ว่าง", "Teams entering scores? Watch how it works (1 min).": "ให้ทีมกรอกคะแนนเอง? ดูวิธีใช้งาน (1 นาที)" },
+}).forEach(([k, v]) => Object.assign(LANG_TEXT[k], v));
 /* Swiss ranking-order strings */
 Object.assign(FR_TEXT, {"Round 1 is random. After that, teams play teams on the same number of wins, and within a group the teams closest in the standings play each other (1st v 2nd, 3rd v 4th). When a group has an odd number of teams, one team crosses over to the next group; a team that has already crossed over is passed over where possible, and never crosses in back-to-back rounds unless there is no other way. Rematches are avoided, nobody gets a second bye while others are still waiting for one, and the leaders never get the bye. Places in the standings, and so the pairings, follow the ranking order below.": "La partie 1 est tirée au sort. Ensuite, les équipes rencontrent des équipes au même nombre de victoires, et dans un groupe les équipes les plus proches au classement se rencontrent (1re contre 2e, 3e contre 4e). Quand un groupe compte un nombre impair d'équipes, une équipe passe dans le groupe suivant ; une équipe qui a déjà changé de groupe est évitée autant que possible, et jamais deux parties de suite sauf s'il n'y a pas d'autre solution. On évite de rejouer le même adversaire, personne n'est exempt deux fois tant que d'autres attendent encore, et les équipes en tête ne sont jamais exemptes. Le classement, et donc les appariements, suivent l'ordre de classement ci-dessous.", "Ranking order": "Ordre de classement", "Points difference first": "Goal-average d'abord", "Buchholz first": "Buchholz d'abord", "Wins": "Victoires", "Points difference": "Goal-average", "Buchholz": "Buchholz", "Fine Buchholz": "Buchholz fin", "Points for": "Points marqués", "Fewest points against": "Moins de points encaissés", "Drawn lot": "Tirage au sort", "Opponents' total wins": "Total des victoires des adversaires", "Opponents' Buchholz added up": "Somme des Buchholz des adversaires", "Anything still level": "En cas d'égalité persistante", "Switch tie-breaks on or off and move them up or down. Changes apply straight away to the standings and to the next round's pairings.": "Activez ou désactivez les critères et changez leur ordre. Les changements s'appliquent tout de suite au classement et aux appariements de la partie suivante.", "Byes count as a {n}–{n} win.": "Un exempt compte comme une victoire {1}–{2}.", "Move up": "Monter", "Move down": "Descendre"});
 Object.assign(LANG_TEXT.es, {"Round 1 is random. After that, teams play teams on the same number of wins, and within a group the teams closest in the standings play each other (1st v 2nd, 3rd v 4th). When a group has an odd number of teams, one team crosses over to the next group; a team that has already crossed over is passed over where possible, and never crosses in back-to-back rounds unless there is no other way. Rematches are avoided, nobody gets a second bye while others are still waiting for one, and the leaders never get the bye. Places in the standings, and so the pairings, follow the ranking order below.": "La ronda 1 es por sorteo. Después, cada equipo juega con equipos que tienen el mismo número de victorias, y dentro de cada grupo se enfrentan los equipos más cercanos en la clasificación (1.º contra 2.º, 3.º contra 4.º). Si un grupo tiene un número impar de equipos, uno pasa al grupo siguiente; se evita que un equipo que ya cambió de grupo vuelva a hacerlo, y nunca en dos rondas seguidas salvo que no haya otra opción. Se evitan las revanchas, nadie descansa dos veces mientras otros esperan y los líderes nunca descansan. La clasificación, y por tanto los emparejamientos, siguen el orden de clasificación de abajo.", "Ranking order": "Orden de clasificación", "Points difference first": "Diferencia de puntos primero", "Buchholz first": "Buchholz primero", "Wins": "Victorias", "Points difference": "Diferencia de puntos", "Buchholz": "Buchholz", "Fine Buchholz": "Buchholz fino", "Points for": "Puntos a favor", "Fewest points against": "Menos puntos en contra", "Drawn lot": "Sorteo", "Opponents' total wins": "Victorias totales de los rivales", "Opponents' Buchholz added up": "Suma del Buchholz de los rivales", "Anything still level": "Si sigue el empate", "Switch tie-breaks on or off and move them up or down. Changes apply straight away to the standings and to the next round's pairings.": "Activa o desactiva los desempates y cambia su orden. Los cambios se aplican al momento a la clasificación y a los emparejamientos de la siguiente ronda.", "Byes count as a {n}–{n} win.": "Un descanso cuenta como victoria por {1}–{2}.", "Move up": "Subir", "Move down": "Bajar"});
@@ -945,6 +973,13 @@ Object.assign(LANG_TEXT.de, {"Tap a team to see its players.": "Tippe auf ein Te
 Object.assign(LANG_TEXT.nl, {"Tap a team to see its players.": "Tik op een team om de spelers te zien.", "Tap a team to see its club.": "Tik op een team om de club te zien."});
 Object.assign(LANG_TEXT.pt, {"Tap a team to see its players.": "Toque numa equipa para ver os jogadores.", "Tap a team to see its club.": "Toque numa equipa para ver o clube."});
 Object.assign(LANG_TEXT.th, {"Tap a team to see its players.": "แตะที่ทีมเพื่อดูผู้เล่น", "Tap a team to see its club.": "แตะที่ทีมเพื่อดูสโมสร"});
+Object.assign(FR_TEXT, {"That game isn't in the draw any more.": "Cette partie ne fait plus partie du tirage."});
+Object.assign(LANG_TEXT.es, {"That game isn't in the draw any more.": "Esa partida ya no está en el sorteo."});
+Object.assign(LANG_TEXT.it, {"That game isn't in the draw any more.": "Questa partita non è più nel sorteggio."});
+Object.assign(LANG_TEXT.de, {"That game isn't in the draw any more.": "Dieses Spiel ist nicht mehr in der Auslosung."});
+Object.assign(LANG_TEXT.nl, {"That game isn't in the draw any more.": "Die partij zit niet meer in de loting."});
+Object.assign(LANG_TEXT.pt, {"That game isn't in the draw any more.": "Esse jogo já não está no sorteio."});
+Object.assign(LANG_TEXT.th, {"That game isn't in the draw any more.": "เกมนี้ไม่อยู่ในการจับสลากแล้ว"});
 Object.assign(FR_TEXT, {"Whole bracket": "Tableau complet", "SF": "1/2", "QF": "1/4", "R16": "1/8", "R32": "1/16", "R64": "1/32", "R128": "1/64"});
 Object.assign(LANG_TEXT.es, {"Whole bracket": "Cuadro completo", "SF": "Semis", "QF": "Cuartos", "R16": "Octavos", "R32": "Dieciseisavos", "R64": "R64", "R128": "R128"});
 Object.assign(LANG_TEXT.it, {"Whole bracket": "Tabellone completo", "SF": "Semi", "QF": "Quarti", "R16": "Ottavi", "R32": "Sedicesimi", "R64": "R64", "R128": "R128"});
@@ -966,6 +1001,13 @@ Object.assign(LANG_TEXT.de, {"All rights reserved": "Alle Rechte vorbehalten"});
 Object.assign(LANG_TEXT.nl, {"All rights reserved": "Alle rechten voorbehouden"});
 Object.assign(LANG_TEXT.pt, {"All rights reserved": "Todos os direitos reservados"});
 Object.assign(LANG_TEXT.th, {"All rights reserved": "สงวนลิขสิทธิ์"});
+Object.assign(FR_TEXT, {"Add teams": "Ajouter des équipes", "Add players": "Ajouter des joueurs", "One at a time, or paste a list": "Individuellement, ou collez une liste"});
+Object.assign(LANG_TEXT.es, {"Add teams": "Añadir equipos", "Add players": "Añadir jugadores", "One at a time, or paste a list": "Uno a uno, o pega una lista"});
+Object.assign(LANG_TEXT.it, {"Add teams": "Aggiungi squadre", "Add players": "Aggiungi giocatori", "One at a time, or paste a list": "Singolarmente, o incolla un elenco"});
+Object.assign(LANG_TEXT.de, {"Add teams": "Teams hinzufügen", "Add players": "Spieler hinzufügen", "One at a time, or paste a list": "Einzeln oder als Liste einfügen"});
+Object.assign(LANG_TEXT.nl, {"Add teams": "Teams toevoegen", "Add players": "Spelers toevoegen", "One at a time, or paste a list": "Een voor een, of plak een lijst"});
+Object.assign(LANG_TEXT.pt, {"Add teams": "Adicionar equipas", "Add players": "Adicionar jogadores", "One at a time, or paste a list": "Individualmente, ou cole uma lista"});
+Object.assign(LANG_TEXT.th, {"Add teams": "เพิ่มทีม", "Add players": "เพิ่มผู้เล่น", "One at a time, or paste a list": "ทีละรายการ หรือวางรายชื่อ"});
 // live streaming: overlay and live desk
 Object.assign(FR_TEXT, {
   "End": "Mène", "End {n}": "Mène {1}", "Final score": "Final", "End {n} · {x}": "Mène {1} · {2}", "Holding": "Tient le point", "Holding the point": "Tient le point", "Boule thrown · {n} left": "Boule jouée · {1} à jouer",
@@ -995,6 +1037,14 @@ Object.assign(FR_TEXT, {
   "Game over. Press Finish game when the handshake's done.": "Partie terminée. Touchez Terminer la partie après la poignée de main.", "Stream": "Diffusion", "Appearance": "Apparence", "Automatic": "Automatique", "Light": "Clair", "Dark": "Sombre", "Language and appearance": "Langue et apparence", "Language": "Langue", "Colours and logo": "Couleurs et logo", "Your club colour and logo show to everyone following this competition, the big screen included. Each person can still choose light or dark for their own phone with the sun and moon button at the top.": "La couleur et le logo de votre club s'affichent pour tous ceux qui suivent ce concours, grand écran compris. Chacun peut toujours choisir clair ou sombre pour son téléphone avec le bouton soleil et lune en haut.", "Colour": "Couleur", "Choose any colour": "Choisir une couleur", "Default": "Par défaut", "Club logo": "Logo du club", "No logo yet": "Pas encore de logo", "Change logo": "Changer le logo", "Add a logo": "Ajouter un logo", "A square PNG or JPEG works best. It's shrunk to a small size before it's saved.": "Un PNG ou JPEG carré convient le mieux. Il est réduit avant d'être enregistré.", "Logo saved.": "Logo enregistré.", "Logo removed.": "Logo supprimé.", "That image couldn't be used. Try a smaller PNG or JPEG.": "Cette image ne peut pas être utilisée. Essayez un PNG ou JPEG plus petit.", "Colour on the stream": "Couleur sur le direct", "Green": "Vert", "Blue": "Bleu", "Navy": "Marine", "Red": "Rouge", "Claret": "Bordeaux", "Purple": "Violet", "Orange": "Orange", "Black": "Noir", "Amber": "Ambre", "Sky blue": "Bleu ciel", "White": "Blanc", "Ranked by wins, then points difference, then points for. Teams still level (two, three or more) are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added.": "Classement aux victoires, puis à la différence de points, puis aux points marqués. Les équipes encore à égalité (deux, trois ou plus) sont départagées par un mini-classement des parties jouées entre elles : victoires, puis différence de points, puis points marqués dans ces parties. S'il reste une égalité, un tirage au sort fait à l'inscription de chaque équipe tranche.", "Ranked by wins, then fewest losses, then points difference, then points for. Teams still level are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added.": "Classement aux victoires, puis au moins de défaites, puis à la différence de points, puis aux points marqués. Les équipes encore à égalité sont départagées par un mini-classement des parties jouées entre elles : victoires, puis différence de points, puis points marqués dans ces parties. S'il reste une égalité, un tirage au sort fait à l'inscription de chaque équipe tranche.", "Morning table": "Classement du matin", "Full standings": "Classement complet", "This competition's games": "Les parties de ce concours", "Every game on a piste has its own overlay and live desk, with the team names and the running score taken from the competition.": "Chaque partie sur une piste a son propre affichage et sa table en direct, avec les noms des équipes et le score pris dans le concours.",
   "Filming a game? Type the two team names and you get a transparent score overlay for your phone's streaming app (score, ends, boules left, who holds the point) and a live desk to tap it all in. It works for any game, in a competition or not.": "Vous filmez une partie ? Saisissez les deux noms d'équipe et vous obtenez un affichage de score transparent pour l'appli de diffusion de votre téléphone (score, mènes, boules restantes, qui tient le point) et une table en direct pour tout saisir. Ça marche pour n'importe quelle partie, en concours ou non.", "Couldn't create the stream. Check your connection and try again.": "Impossible de créer la diffusion. Vérifiez votre connexion et réessayez."
 });
+
+Object.assign(FR_TEXT, {"Skip to content": "Aller au contenu", "Notifications": "Notifications"});
+Object.assign(LANG_TEXT.es, {"Skip to content": "Saltar al contenido", "Notifications": "Notificaciones"});
+Object.assign(LANG_TEXT.it, {"Skip to content": "Vai al contenuto", "Notifications": "Notifiche"});
+Object.assign(LANG_TEXT.de, {"Skip to content": "Zum Inhalt springen", "Notifications": "Benachrichtigungen"});
+Object.assign(LANG_TEXT.nl, {"Skip to content": "Naar de inhoud", "Notifications": "Meldingen"});
+Object.assign(LANG_TEXT.pt, {"Skip to content": "Saltar para o conteúdo", "Notifications": "Notificações"});
+Object.assign(LANG_TEXT.th, {"Skip to content": "ข้ามไปที่เนื้อหา", "Notifications": "การแจ้งเตือน"});
 
 // quick setup: every competition format
 Object.assign(FR_TEXT, {"Two lines; one moves along a place each round, no repeat games": "Deux lignes ; l'une avance d'une place à chaque partie, sans revanche", "Drawn one round at a time": "Tirées une partie à la fois", "Print the whole draw before play": "Imprimez tout le tirage avant de jouer", "The teams then play together all day": "Les équipes jouent ensuite ensemble toute la journée", "After these games the top teams can play afternoon knockouts. Choose who goes through in Setup.": "Après ces parties, les meilleures équipes peuvent jouer les tableaux de l'après-midi. Choisissez qui se qualifie dans Paramètres.", "Everyone shoots a qualifying scorecard, then:": "Chacun tire d'abord une carte de qualification, puis :"});
@@ -1309,12 +1359,16 @@ function checkNewRound(t) {
 }
 function renderAlert() {
   const el = $("#roundalert"); if (!el) return; const t = T(); const a = S.alert;
-  if (!a || !t || a.tid !== t.id) { el.hidden = true; el.innerHTML = ""; return; }
+  if (!a || !t || a.tid !== t.id) { el.hidden = true; el.innerHTML = ""; delete el.dataset.sig; return; }
   const me = myPick(t); let mine = "";
   if (me) { const cur = MS().filter(m => inMatch(m, me) && !m.done && m.a && m.b && !m.bye).sort(byOrder)[0];
     if (cur) mine = ` · ${cur.court ? `you're on Piste ${esc(courtName(t, cur.court))}` : "you're waiting for a piste"} v ${esc(sideName(t, (cur.a || []).includes(me) ? cur.b : cur.a))}`; }
-  el.innerHTML = `<span><b>${esc(a.label)}</b>${mine}</span><button type="button" class="btn sm" data-act="alert-view">View</button><button type="button" class="btn sm ghost" data-act="alert-close" aria-label="Close">✕</button>`;
-  el.hidden = false; localize(el);
+  const html = `<span><b>${esc(a.label)}</b>${mine}</span><button type="button" class="btn sm" data-act="alert-view">View</button><button type="button" class="btn sm ghost" data-act="alert-close" aria-label="Close">✕</button>`;
+  // drawn again on every change: only touch it (and tell screen readers) when it says something new
+  const sig = I18N.lang + html; if (!el.hidden && el.dataset.sig === sig) return;
+  const fresh = el.hidden || el.dataset.label !== a.label;
+  el.innerHTML = html; el.dataset.sig = sig; el.dataset.label = a.label; el.hidden = false; localize(el);
+  if (fresh) announce(el.querySelector("span").textContent);
 }
 function checkPanel(t) {
   if (!teamScoring(t) || !canEdit() || myTeam(t)) return "";
@@ -1881,7 +1935,7 @@ function renderPlanEditor(t, { locked, compact } = {}) {
   return `<div class="stack" style="gap:12px">
     ${!locked && canEdit() ? `<div class="stack" style="gap:6px"><div class="eyebrow">Quick set-ups</div><div class="row" style="gap:6px">${planPresets(t).map(([l], i) => `<button class="btn sm" data-act="plan-preset" data-i="${i}">${esc(l)}</button>`).join("")}</div></div>` : ""}
     <div class="stack" style="gap:6px"><div class="eyebrow">Draw for the knockouts</div>${seg("plan-seeding", plan.seeding, [["seeded", isLeagues(t) ? "Seeded (league winners kept apart)" : t.system === "pools" ? "Seeded (barrage winners kept apart)" : "Seeded by standings (1 v 8, 2 v 7…)"], ["random", "Random draw (tirage au sort)"]], locked || !canEdit())}</div>
-    <div class="tw"><table class="plan"><thead><tr><th>Knockout</th><th>${unit}</th><th>3rd-place game</th><th></th></tr></thead><tbody>
+    <div class="tw"><table class="plan"><thead><tr><th>Knockout</th><th>${unit}</th><th>3rd-place game</th><th><span class="sr-only">Remove</span></th></tr></thead><tbody>
     ${plan.brackets.map((b, i) => `<tr>
       <td class="wrap"><input type="text" id="pl-name-${i}" data-plan="name" data-i="${i}" value="${esc(b.name)}" ${dis} aria-label="Knockout name"><div class="small muted" style="margin-top:4px">${bracketShape(count(b))}</div></td>
       <td>${b.silver ? `<span class="muted">${isGroups(t) ? "Every place" : "Everyone"} from ${b.from} down</span>` : `<div class="row" style="flex-wrap:nowrap;gap:6px"><input type="number" min="1" id="pl-from-${i}" data-plan="from" data-i="${i}" value="${b.from}" style="width:64px" ${dis} aria-label="From"><span>to</span><input type="number" min="1" id="pl-to-${i}" data-plan="to" data-i="${i}" value="${b.to}" style="width:64px" ${dis} aria-label="To"></div>`}</td>
@@ -2190,7 +2244,7 @@ function renderLiveShooter(t, m, el, { duel, shA, shB, tA, tB, tie }) {
   const md = S.modal; const nx = liveNext(md, duel); const cur = nx ? SHOT_SEQ.findIndex(x => x.k === nx.k && x.di === nx.di) : -1;
   const name = side => esc(sideName(t, side === "a" ? m.a : m.b));
   const card = (side, sh, tot) => `<div class="stack" style="gap:4px"><div class="spread"><b>${name(side)}</b><span class="pill ${shotComplete(sh) ? "done" : ""}">${tot} pts · ${shotCount(sh)}/20</span></div>${shotStrip(sh, nx && nx.side === side ? cur : -1)}</div>`;
-  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Live shooting scorer">
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Live scorer">
     <div class="spread"><div><div class="eyebrow">${esc(matchContext(t, m))}</div><h3>Live scorer</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
     ${md.saved ? `<div class="notice small">${esc(md.saved)}</div>` : ""}
     ${nx ? `<div class="live-shot">
@@ -2275,17 +2329,18 @@ function renderShooting(t) {
     return html + `<div class="panel stack"><p>${n} shooters ${t.checkin ? "checked in" : "entered"}</p>
       ${n < 2 ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least 2 shooters on Registration first.</p>${checkinAllBtn(t) ? `<div>${checkinAllBtn(t)}</div>` : ""}` : wr ? `<div><button class="btn primary" data-act="first-draw">Start the qualifying round</button></div>` : `<p class="muted">Waiting for the organiser to start.</p>`}</div></div>`;
   }
+  let bar = true; // the "Show all columns" bar goes under the first table only
   const table = (ph, title, cut) => {
     const rows = shootRanking(t, ph); const doneN = rows.filter(r => r.done).length;
     const up = rows.filter(r => !r.done).sort((x, y) => x.m.order - y.m.order)[0];
     return `<section class="panel stack" style="gap:8px"><div class="spread"><h3>${title}</h3><span class="pill ${doneN === rows.length ? "done" : ""}">${doneN}/${rows.length} scorecards</span></div>
       ${up ? `<div class="spread notice"><span>Next up on the piste: <b>${esc(entName(t, up.id))}</b> <span class="small muted">(shooter ${up.m.order + 1} of ${rows.length})</span></span>${canScore() ? `<button class="btn primary sm" data-shoot="${up.m.id}">${shotCount(up.shots) ? "Continue" : "Score now"}</button>` : ""}</div>` : ""}
-      <div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th></th></tr></thead><tbody>
+      <div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n x" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th><th><span class="sr-only">Shooting scorecard</span></th></tr></thead><tbody>
       ${rows.map((r, i) => `<tr class="${cut && r.done && i < cut ? "q" : ""}"><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${r.m.corrected ? ` <span class="pill">Corrected</span>` : ""}${soMark(r)}</td>
-        ${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
+        ${ATELIERS.map(([k]) => `<td class="n x">${(r.shots?.[k] || []).some(v => v != null) ? (r.shots[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0) : "–"}</td>`).join("")}
         <td class="n"><b>${shotCount(r.shots) ? r.total : "–"}</b></td>
         <td>${canScore() ? `<button class="btn sm" data-shoot="${r.m.id}">${r.done ? "View" : shotCount(r.shots) ? "Continue" : "Score"}</button>` : r.done ? `<span class="pill done">Done</span>` : shotCount(r.shots) ? `<span class="pill playing">Shooting</span>` : ""}</td></tr>`).join("")}
-      </tbody></table></div></section>`;
+      </tbody></table></div>${bar ? (bar = false, colsBar("")) : ""}</section>`;
   };
   const tieAlert = (ph, cut) => shootTies(t, ph, cut).map(g => `<div class="notice spread so-alert"><span><b>Shoot-out needed</b> · <span data-notr>${g.rows.map(r => esc(entName(t, r.id))).join(", ")}</span> · <span>${t.shootTie === "shootout" ? "Level on {n} pts.".replace("{n}", g.rows[0].total) : "Level on {n} pts with the same number of 5s and 3s.".replace("{n}", g.rows[0].total)}</span></span>
     ${canScore() ? `<button class="btn primary sm" data-act="so-open" data-ph="${ph}" data-g="${g.start}">Score the shoot-out</button>` : ""}</div>`).join("");
@@ -2307,9 +2362,9 @@ function shootStandings(t) {
   if (f.length) html += `<div class="panel stack" style="gap:6px"><h3>Final</h3>${f.every(r => r.done) ? `<div>${MEDAL[1]}<span class="eyebrow">Winner</span> <b>${esc(entName(t, f[0].id))}</b> · ${f[0].total} pts</div>${f[1] ? `<div>${MEDAL[2]}<span class="eyebrow">Runner-up</span> ${esc(entName(t, f[1].id))} · ${f[1].total} pts</div>` : ""}${f[2] ? `<div>${MEDAL[3]}<span class="eyebrow">Third</span> ${esc(entName(t, f[2].id))} · ${f[2].total} pts</div>` : ""}` : `<span class="muted">In progress.</span>`}</div>`;
   const q = shootRanking(t, "Q");
   if (!q.length) return html + `<div class="empty">Standings appear once the qualifying round starts.</div>`;
-  return html + `<div class="panel"><div class="tw"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
-    ${q.map((r, i) => `<tr><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${soMark(r)}</td>${ATELIERS.map(([k]) => `<td class="n">${(r.shots?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</td>`).join("")}<td class="n"><b>${r.total}</b></td></tr>`).join("")}
-  </tbody></table></div></div><p class="small muted">Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.</p><p class="small muted">${t.shootTie === "shootout" ? "Shooters level on points go to a shoot-out." : "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out."}</p>`;
+  return html + `<div class="panel"><div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n x" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
+    ${q.map((r, i) => `<tr><td class="rank">${r.done ? i + 1 : "–"}</td><td class="wrap"><b>${esc(entName(t, r.id))}</b>${soMark(r)}</td>${ATELIERS.map(([k]) => `<td class="n x">${(r.shots?.[k] || []).reduce((a, v) => a + (v == null ? 0 : +v), 0)}</td>`).join("")}<td class="n"><b>${r.total}</b></td></tr>`).join("")}
+  </tbody></table></div>${colsBar("")}</div><p class="small muted">Qualifying round. A1 lone boule, A2 boule behind the jack, A3 boule between two boules, A4 boule behind an obstacle, A5 the jack.</p><p class="small muted">${t.shootTie === "shootout" ? "Shooters level on points go to a shoot-out." : "Shooters level on points are split by the most 5s, then the most 3s, then a shoot-out."}</p>`;
 }
 
 /* ---------------- archive ---------------- */
@@ -2335,11 +2390,26 @@ function overrideBox(list) {
 }
 
 /* ---------------- toast & modal ---------------- */
-let toastTimer;
+let toastTimer, liveTimer;
+// screen readers: say a message once, politely (a region that's always there, so nothing is missed or repeated)
+function announce(msg) {
+  const el = $("#sr-live"); if (!el || !msg) return;
+  el.textContent = ""; clearTimeout(liveTimer); liveTimer = setTimeout(() => { el.textContent = msg; }, 60);
+}
+// the toast goes after a few seconds, but not while a mouse pointer is on it or its Undo button has focus
+let toastHover = false;
+$("#toast")?.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") toastHover = true; });
+$("#toast")?.addEventListener("pointerleave", () => { toastHover = false; });
+function toastLater(ms) {
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { const el = $("#toast");
+    if (el.contains(document.activeElement) || toastHover) { toastLater(1500); return; }
+    el.hidden = true; S.undo = null; toastHover = false; }, ms);
+}
 function toast(msg, undo) {
-  const el = $("#toast"); S.undo = undo || null;
-  el.innerHTML = `<span>${esc(tr(msg))}</span>${undo ? ` <button type="button" class="toast-undo" data-act="toast-undo">${esc(tr("Undo"))}</button>` : ""}`;
-  el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; S.undo = null; }, undo ? 6000 : 3200);
+  const el = $("#toast"); S.undo = undo || null; const text = tr(msg); toastHover = toastHover && !el.hidden;
+  el.innerHTML = `<span>${esc(text)}</span>${undo ? ` <button type="button" class="toast-undo" data-act="toast-undo">${esc(tr("Undo"))}</button>` : ""}`;
+  el.hidden = false; announce(text); toastLater(undo ? 6000 : 3200);
 }
 
 function openMatch(id) {
@@ -2348,7 +2418,50 @@ function openMatch(id) {
   if (m.stage === "shoot" || m.shoot) { const duel = !!m.b; S.modal.live = !m.done && canScore(); S.modal.shotsA = fullShots(duel ? m.shotsA : m.shots); if (duel) S.modal.shotsB = fullShots(m.shotsB); S.modal.soVals = duel ? { a: [...(m.soA || [])], b: [...(m.soB || [])] } : {}; }
   renderModal();
 }
+// Focus, for keyboards and screen readers. Pages and dialogs are redrawn from scratch, so a control is found again by
+// what it does (its id or data-* attributes) rather than by the element itself.
+function elKey(el) {
+  if (!el || el === document.body || el === document.documentElement || !el.isConnected) return null;
+  if (el.id) return "#" + CSS.escape(el.id);
+  const parts = ["data-act", "data-match", "data-shoot", "data-tab", "data-id", "data-k", "data-n", "data-mode", "data-v", "data-b", "data-i", "data-ph", "data-g", "data-lang", "data-theme-pick", "data-set", "data-val", "data-st", "href"]
+    .filter(n => el.hasAttribute(n)).map(n => `[${n}="${CSS.escape(el.getAttribute(n))}"]`);
+  return parts.length ? el.tagName.toLowerCase() + parts.join("") : null;
+}
+function canFocus(n) { return !!n && !n.disabled && !n.closest("[inert], [hidden]") && n.getClientRects().length > 0; }
+// run a redraw; if it took away the focus, put it back on the same control
+function keepFocus(fn) {
+  const ae = document.activeElement, k = elKey(ae);
+  fn();
+  if (k && (!document.activeElement || document.activeElement === document.body)) { const n = document.querySelector(k); if (canFocus(n)) n.focus({ preventScroll: true }); }
+}
+// tables wider than the screen scroll sideways: keyboards can reach them and screen readers hear what they are
+function markScrollers(root) {
+  root.querySelectorAll(".tw").forEach(w => {
+    if (w.scrollWidth > w.clientWidth + 1) {
+      const h = w.closest("section, .panel, .modal")?.querySelector("h2, h3") || $("#main h2");
+      w.tabIndex = 0; w.setAttribute("role", "region"); w.setAttribute("aria-label", (h?.textContent || tr("Table")).trim());
+    } else if (w.hasAttribute("role")) { w.removeAttribute("tabindex"); w.removeAttribute("role"); w.removeAttribute("aria-label"); }
+  });
+}
+// dialogs: focus moves into the dialog as it opens and stays there (Tab goes round, the page behind can't be reached);
+// after each change it's back on the same control, and when the dialog closes it returns to whatever opened it
+let modalBack = null, lastTap = null;
 function renderModal() {
+  const box = $("#modal"), was = !!box.querySelector(".modal"), ae = document.activeElement;
+  const inKey = was && box.contains(ae) ? elKey(ae) : null;
+  if (!was && S.modal) modalBack = elKey(ae && ae !== document.body && !box.contains(ae) ? ae : lastTap); // phones don't focus what's tapped
+  drawModal();
+  const dlg = box.querySelector(".modal");
+  document.querySelectorAll(".skip, header.app, #main, #foot").forEach(n => { n.inert = !!dlg; });
+  if (dlg) {
+    dlg.tabIndex = -1; markScrollers(box);
+    if (!box.contains(document.activeElement)) { const n = inKey && box.querySelector(inKey); (canFocus(n) ? n : dlg).focus({ preventScroll: true }); }
+  } else if (was) {
+    const n = modalBack && document.querySelector(modalBack); modalBack = null;
+    if ((!document.activeElement || document.activeElement === document.body) && canFocus(n)) n.focus({ preventScroll: true });
+  }
+}
+function drawModal() {
   const el = $("#modal"); const t = T();
   if (!S.modal || !t) { el.innerHTML = ""; return; }
   if (S.modal.so) { renderSoModal(t, el); return; }
@@ -2403,6 +2516,8 @@ function readModalScores() {
 async function modalAction(act, k, a) {
   const t = T(); const md = S.modal; if (!md) return;
   if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
+  // the game went while its dialog was open (a draw undone on another phone, say): close it rather than save into nothing
+  if (!t || (md.id && !S.matches[md.id]) || (md.so && (md.ids || []).some(id => !S.matches[id]))) { S.modal = null; renderModal(); toast("That game isn't in the draw any more."); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
   if (act === "so-cell") { md.socell = { key: a.dataset.key, i: +a.dataset.i }; renderModal(); return; }
   if (act === "so-pick") { const c = md.socell; if (!c) return; const arr = md.soVals[c.key] ||= [];
@@ -2723,6 +2838,11 @@ function streamPanel(t) {
 const myStreams = () => Object.values(S.streams).filter(st => S.streamMine ? S.streamMine(st) : true).sort((x, y) => (y.created || 0) - (x.created || 0));
 // leaving a stream page (a stream's set-up, the streams list) for the open competition: drop the stream route so the
 // tabs, the picker and the back buttons work again. The browser's back button still returns to the stream page.
+// a tab tapped on the guides or login page goes back to the competition
+function leaveOverlay() {
+  if (!S.overlayView) return;
+  S.overlayView = null; history.pushState(null, "", S.tid ? "#" + S.tid : location.pathname + location.search);
+}
 function leaveLive() {
   if (!S.liveRoute) return;
   S.liveRoute = null; liveWatch();
@@ -2863,6 +2983,21 @@ const TAB_ICON = {
 };
 const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["stream", "Stream"]];
 function render() {
+  keepFocus(drawPage);
+  if (!S.pendingRender) pageMeta();
+}
+// every page has one main heading (out of sight where the page's look has none) and the browser tab says where you are
+function pageMeta() {
+  const main = $("#main"), t = T(), brand = "SN Pétanque";
+  let where = "", comp = "";
+  if (S.liveRoute || S.overlayView) where = main.querySelector("h2, h3")?.textContent.trim() || "";
+  else if (t) { where = tr((TABS.find(([k]) => k === S.tab) || [0, S.tab === "display" ? "Big screen" : "Draw & results"])[1]); comp = t.name || ""; }
+  if (where && !main.querySelector("h1")) { const h = document.createElement("h1"); h.className = "sr-only"; h.dataset.notr = ""; h.tabIndex = -1; h.textContent = comp ? `${comp} · ${where}` : where; main.prepend(h); }
+  document.title = where || comp ? [where, comp, brand].filter(Boolean).join(" · ") : `${brand} · ${tr("Competition desk")}`;
+  markScrollers(main);
+}
+const pageHeading = () => $("#main h1");
+function drawPage() {
   const ae = document.activeElement;
   if (ae && $("#main").contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName) && ae.type !== "checkbox") { S.pendingRender = true; checkNewRound(T()); renderAlert(); return; }
   S.pendingRender = false;
@@ -2896,10 +3031,10 @@ function compMeta(t) {
 function renderPicker(list) {
   const ex = t => t.listed || t.example;
   const groups = [["Your competitions", list.filter(t => !ex(t) && !t.archived)], ["Examples", list.filter(t => ex(t) && !t.archived)], ["Archived", list.filter(t => t.archived)]].filter(g => g[1].length);
-  return `<div class="picker" role="dialog" aria-label="Choose a competition">
+  return `<div class="picker" role="group" aria-label="Choose a competition">
     ${list.length > 6 ? `<input id="picker-q" type="search" placeholder="Search competitions" autocomplete="off">` : ""}
-    <div class="picker-list" role="listbox">${groups.map(([label, ts]) => `<div class="pick-group"><div class="eyebrow">${label} <span class="muted">${ts.length}</span></div>
-      ${ts.map(t => `<button type="button" role="option" aria-selected="${t.id === S.tid}" class="pick-row ${t.id === S.tid ? "on" : ""}" data-act="pick-t" data-id="${t.id}" data-name="${esc((t.name || "").toLowerCase())}">
+    <div class="picker-list">${groups.map(([label, ts]) => `<div class="pick-group"><div class="eyebrow">${label} <span class="muted">${ts.length}</span></div>
+      ${ts.map(t => `<button type="button" ${t.id === S.tid ? 'aria-current="true" ' : ""}class="pick-row ${t.id === S.tid ? "on" : ""}" data-act="pick-t" data-id="${t.id}" data-name="${esc((t.name || "").toLowerCase())}">
         <span class="pr-main"><b data-notr>${esc(t.name)}</b><span class="small muted">${esc(compMeta(t))}</span></span>${t.id === S.tid ? `<span class="pr-tick" aria-hidden="true">✓</span>` : ""}</button>`).join("")}</div>`).join("")}
       <p class="muted small pick-none" hidden>No competitions match.</p></div>
     ${S.pickerFooter ? S.pickerFooter() : ""}
@@ -2913,10 +3048,13 @@ function pickCompetition(id) {
 function renderNet() {
   const el = $("#netdot"); if (!el) return; const st = S.connState && S.connState();
   if (!st) { el.hidden = true; return; }
-  el.hidden = false; el.className = "netdot " + st.k; el.title = tr(st.label); el.innerHTML = `<span class="nl">${esc(tr(st.label))}</span>`;
+  const label = tr(st.label); if (!el.hidden && el.className === "netdot " + st.k && el.title === label) return;
+  el.hidden = false; el.className = "netdot " + st.k; el.title = label; el.innerHTML = `<span class="nl">${esc(label)}</span>`;
 }
-function renderHeader() {
+function renderHeader() { keepFocus(drawHeader); }
+function drawHeader() {
   renderNet();
+  const skip = $(".skip"); if (skip) skip.textContent = tr("Skip to content"); $("section.notes")?.setAttribute("aria-label", tr("Notifications"));
   // the brand line is static markup: reset it to English so the current language is applied afresh
   const sub = $(".brand-name small"); if (sub) sub.textContent = "Competition desk";
   // the dedication to Steve Noel sits at the foot of every page, above the copyright line
@@ -2925,19 +3063,20 @@ function renderHeader() {
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();
-  $("#tsel").innerHTML = `${list.length ? `<div class="picker-wrap"><button type="button" class="picker-btn" data-act="picker" aria-haspopup="listbox" aria-expanded="${!!S.picker}" data-notr>
+  $("#tsel").innerHTML = `${list.length ? `<div class="picker-wrap"><button type="button" class="picker-btn" data-act="picker" aria-expanded="${!!S.picker}" data-notr>
       ${cur && logoSrc(cur.id) ? `<img class="pb-logo" src="${esc(logoSrc(cur.id))}" alt="">` : ""}<span class="pb-name">${esc(cur?.name || "Choose a competition")}</span><span class="pb-chev" aria-hidden="true">▾</span></button>
       ${S.picker ? renderPicker(list) : ""}</div>` : ""}
-    <div class="theme-wrap" data-notr><div class="seg" role="group"><button type="button" class="theme-btn" data-act="theme-menu" aria-haspopup="listbox" aria-expanded="${!!S.themeMenu}" aria-label="${esc(tr("Appearance"))}" title="${esc(tr("Appearance"))}">${THEME_ICON[themePref()]}</button></div>
-      <div class="theme-menu" role="listbox" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" role="option" data-theme-pick="${v}" aria-selected="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
-    <div class="lang-wrap" data-notr><div class="seg" role="group" aria-label="Language"><button type="button" class="lang-btn" data-act="lang-menu" aria-haspopup="listbox" aria-expanded="${!!S.langMenu}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
-      <div class="lang-menu" role="listbox" ${S.langMenu ? "" : "hidden"}>${LANGS.map(([c, n]) => `<button type="button" role="option" data-lang="${c}" aria-selected="${I18N.lang === c}"><b>${c.toUpperCase()}</b><span>${n}</span></button>`).join("")}</div></div>
+    <div class="theme-wrap" data-notr><div class="seg"><button type="button" class="theme-btn" data-act="theme-menu" aria-expanded="${!!S.themeMenu}" aria-label="${esc(tr("Appearance"))}" title="${esc(tr("Appearance"))}">${THEME_ICON[themePref()]}</button></div>
+      <div class="theme-menu" role="group" aria-label="${esc(tr("Appearance"))}" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" data-theme-pick="${v}" aria-pressed="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
+    <div class="lang-wrap" data-notr><div class="seg"><button type="button" class="lang-btn" data-act="lang-menu" aria-expanded="${!!S.langMenu}" aria-label="${esc(tr("Language"))}: ${I18N.lang.toUpperCase()}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
+      <div class="lang-menu" role="group" aria-label="${esc(tr("Language"))}" ${S.langMenu ? "" : "hidden"}>${LANGS.map(([c, n]) => `<button type="button" data-lang="${c}" lang="${c}" aria-pressed="${I18N.lang === c}"><b aria-hidden="true">${c.toUpperCase()}</b><span>${n}</span></button>`).join("")}</div></div>
     ${S.canCreate() ? `<button class="btn sm new-t" data-act="new-t" aria-label="New competition"><span aria-hidden="true">+</span><span class="hide-sm"> New competition</span><span class="show-sm"> New</span></button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
   const t = T();
   const SPECTATOR_TABS = ["draw", "standings", "stream", "display"]; // players and spectators: draw & results, standings, stream (and the big screen behind it)
   if (t && !canScore() && !viewAll(t) && !SPECTATOR_TABS.includes(S.tab)) S.tab = "draw";
-  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${S.tab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
+  const onTab = S.overlayView || S.liveRoute ? null : S.tab; // guides, login and the streams page aren't one of the tabs
+  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
 }
 // the start screen: first visit, or the logo tapped. Run, follow or stream, then your competitions and the examples.
 function renderWelcome() {
@@ -2996,15 +3135,9 @@ function seg(name, cur, opts, locked) { return `<div class="seg" role="group">${
 function renderSetup(t) {
   const locked = t.draws.length > 0;
   const sys = sysOf(t);
+  // the competition itself first (details, entries, system, knockouts, pistes); then who scores, sharing, colours and logo
   return `<div class="stack">
   <div class="spread"><h2>Setup</h2>${locked ? `<span class="pill">Format locked after the first draw</span>` : canEdit() ? `<button type="button" class="btn sm" data-act="wiz-again">Quick setup</button>` : ""}</div>
-  ${S.setupExtra ? S.setupExtra(t) : ""}
-  ${lookPanel(t)}
-  ${S.teamScoringSetup && S.teamScoringSetup(t) && !isIndiv(t) ? `<div class="panel stack"><h3>Score entry</h3>
-    ${seg("scoreMode", t.scoreMode || "organiser", [["organiser", "Organisers only"], ["teams", "Teams enter, other team confirms"], ["teams-auto", "Teams enter, auto-confirm"]], false)}
-    <p class="small muted">${{ organiser: "Only organisers and scorers enter scores.", teams: "Each team gets its own link (see Team links above). When a game ends, either team enters the score on their phone and the other team confirms it. Disputes come to you on Draw & results. Keep an organiser's screen open: it publishes confirmed scores.", "teams-auto": "As above, but a score the other team hasn't answered counts automatically after the wait below." }[t.scoreMode || "organiser"]}</p>
-    ${t.scoreMode === "teams-auto" ? `<label class="f" style="max-width:220px"><span>Auto-confirm after (minutes)</span><input type="number" min="1" max="60" data-field="autoConfirmMin" data-num value="${t.autoConfirmMin || 10}"></label>` : ""}
-  </div>` : ""}
   <div class="panel stack">
     <div class="fields">
       <label class="f"><span>Competition name</span><input type="text" id="f-name" data-field="name" value="${esc(t.name)}"></label>
@@ -3077,6 +3210,13 @@ function renderSetup(t) {
     </div>
     <label class="chk"><input type="checkbox" data-check="randomCourts" ${t.randomCourts ? "checked" : ""}> Allocate pistes at random (otherwise lowest free piste first)</label>
   </div>
+  ${S.teamScoringSetup && S.teamScoringSetup(t) && !isIndiv(t) ? `<div class="panel stack"><div class="spread"><h3>Score entry</h3>${S.guideLink ? S.guideLink("team-scores") : ""}</div>
+    ${seg("scoreMode", t.scoreMode || "organiser", [["organiser", "Organisers only"], ["teams", "Teams enter, other team confirms"], ["teams-auto", "Teams enter, auto-confirm"]], false)}
+    <p class="small muted">${{ organiser: "Only organisers and scorers enter scores.", teams: "Each team gets its own link (see Team links below). When a game ends, either team enters the score on their phone and the other team confirms it. Disputes come to you on Draw & results. Keep an organiser's screen open: it publishes confirmed scores.", "teams-auto": "As above, but a score the other team hasn't answered counts automatically after the wait below." }[t.scoreMode || "organiser"]}</p>
+    ${t.scoreMode === "teams-auto" ? `<label class="f" style="max-width:220px"><span>Auto-confirm after (minutes)</span><input type="number" min="1" max="60" data-field="autoConfirmMin" data-num value="${t.autoConfirmMin || 10}"></label>` : ""}
+  </div>` : ""}
+  ${S.setupExtra ? S.setupExtra(t) : ""}
+  ${lookPanel(t)}
   ${canEdit() ? `<div class="panel spread">
     <div><h3>${t.archived ? "Archived" : "Archive competition"}</h3><p class="small muted">${t.archived ? "Only the site admin can see this competition. Restore it to make it visible again." : `Once the competition has finished, archive it to hide it from everyone except the site admin.${MS().some(m => !m.done && m.a && (m.b || m.stage === "shoot")) ? " Some games aren't finished yet." : ""}`}</p></div>
     ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">Archive “${esc(t.name)}”? Only the admin will be able to see it.</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
@@ -3117,7 +3257,7 @@ function wizPanel(t) {
   if (st === 3) body = `<div class="fields"><label class="f"><span>Number of pistes</span><input id="wz-courts" data-wz="courts" type="number" min="1" max="200" value="${d.courts}"></label>
     ${d.kind === "shooting" ? "" : `<label class="f"><span>Points to win</span><input id="wz-target" data-wz="target" type="number" min="1" max="21" value="${d.target}"></label><label class="f"><span>Time limit (minutes, 0 = none)</span><input id="wz-time" data-wz="timeLimit" type="number" min="0" max="240" value="${d.timeLimit}"></label>`}</div>`;
   return `<div class="panel stack wiz" style="gap:12px;margin-bottom:16px;border-color:var(--accent)">
-    <div class="spread"><div><div class="eyebrow">Quick setup · step ${st + 1} of ${WIZ_STEPS.length}</div><h3>${WIZ_STEPS[st]}</h3></div><button type="button" class="btn sm ghost" data-act="wiz-skip">Skip, I'll use Setup</button></div>
+    <div class="spread"><div><div class="eyebrow">Quick setup · step ${st + 1} of ${WIZ_STEPS.length}</div><h2>${WIZ_STEPS[st]}</h2></div><button type="button" class="btn sm ghost" data-act="wiz-skip">Skip, I'll use Setup</button></div>
     <div class="wiz-dots" aria-hidden="true">${WIZ_STEPS.map((_, i) => `<span class="${i <= st ? "on" : ""}"></span>`).join("")}</div>
     ${body}
     ${S.guideLink && st === 0 ? `<div>${S.guideLink("first")}</div>` : ""}${S.guideLink && (st === 1 || st === 2) && d.kind === "shooting" ? `<div>${S.guideLink("shooting")}</div>` : ""}
@@ -3162,14 +3302,14 @@ function renderEntries(t) {
     <div class="panel stack">
       ${t.checkin ? `<div class="spread"><div><div class="eyebrow">Checked in on the day</div><div class="reg-count"><b>${here.length}</b> of ${entered.length} ${noun}</div></div>
         ${canEdit() && !drawn ? `<div class="row">${checkinAllBtn(t)}${here.length ? `<button class="btn sm ghost" data-act="checkin-clear">Clear check-ins</button>` : ""}</div>` : ""}</div>
-        <div class="meter" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
+        <div class="meter" role="progressbar" aria-label="Checked in on the day" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
         <p class="small muted">Only checked-in ${noun} go into the draw, so the format and the number of games are worked out from who has actually turned up. ${entered.length - here.length ? `<b>${entered.length - here.length} not checked in yet.</b>` : ""}</p>`
       : `<div class="spread"><div><div class="eyebrow">Entries</div><div class="reg-count"><b>${entered.length}</b> ${noun}</div></div></div><p class="small muted">Check-in is off, so every entered ${melee ? "player" : "team"} goes into the draw.</p>`}
       ${canEdit() ? `<label class="chk"><input type="checkbox" data-check="checkin" ${t.checkin ? "checked" : ""}> Teams must check in on the day before they're included in the draw</label>` : ""}
     </div>
     ${isClubs(t) ? clubsPanel(t, drawn) : ""}
     ${drawn ? `<div class="notice">${rolling && t.checkin ? `The draw has started. Anyone checked in now joins from the next round.` : rolling ? `The draw has started. New entries join from the next round.` : `The draw has been made, so new entries and check-ins won't be included. Withdrawn ${noun} stay in the draw already made.`}</div>` : ""}
-    ${canEdit() ? `<div class="grid2">
+    ${canEdit() ? addFold(t, list, `<div class="grid2">
       <form class="panel stack" id="add-form">
         <h3>Add ${melee ? "a player" : "a team"}</h3>
         ${melee ? `<label class="f"><span>Player name</span><input type="text" id="np-name" required></label>` :
@@ -3186,7 +3326,7 @@ function renderEntries(t) {
         <textarea id="bulk" placeholder="${melee ? "Marie Dubois&#10;Tom Hart" : "Les Pointeurs: Marie Dubois, Tom Hart, Ana Silva&#10;Jo Bell, Raj Patel, Lee Chen"}"></textarea>
         <div><button class="btn" type="submit">Add all</button></div>
       </form>
-    </div>` : ""}
+    </div>`) : ""}
     <div class="panel stack" style="gap:8px">
       <div class="spread"><h3>${melee ? "Players" : "Teams"}</h3>${list.length > 6 ? `<input type="search" id="reg-search" placeholder="Find a ${melee ? "player" : "team or player"}" value="${esc(S.regFilter || "")}" style="max-width:260px" aria-label="Search entries">` : ""}</div>
       ${list.length ? `<div class="elist">${list.map((e, i) => `<div class="erow ${e.active === false ? "out" : ""} ${t.checkin && e.checkedIn && e.active !== false ? "here" : ""}" data-row="${e.id}" ${match(e) ? "" : "hidden"} data-text="${esc([entName(t, e.id), ...(e.players || []), e.club || ""].join(" ").toLowerCase())}">
@@ -3201,6 +3341,12 @@ function renderEntries(t) {
       </div>`).join("")}</div>` : `<div class="empty">No ${noun} yet. Add them above or paste a list.</div>`}
     </div>
   </div>`;
+}
+// once there are entries the day is spent on the list: adding more folds into one line above it (and stays open once opened)
+function addFold(t, list, forms) {
+  const open = S.addOpen ||= {};
+  if (!list.length) { open[t.id] = true; return forms; } // started from an empty list: it stays open while they're being typed in
+  return `<details class="add-more" ${open[t.id] ? "open" : ""}><summary><b>${isIndiv(t) ? "Add players" : "Add teams"}</b> <span class="small muted">One at a time, or paste a list</span></summary>${forms}</details>`;
 }
 const usedInDraw = id => MS().some(m => ents(m).includes(id));
 // Inter-club: the clubs come from the Club written on each team
@@ -3477,7 +3623,7 @@ function fitBrackets() {
     const zv = el.parentElement.previousElementSibling?.querySelector(".zv"); if (zv) zv.textContent = Math.round(f * 100) + "%";
   });
 }
-window.addEventListener("resize", () => { clearTimeout(S.fitTimer); S.fitTimer = setTimeout(fitBrackets, 150); });
+window.addEventListener("resize", () => { clearTimeout(S.fitTimer); S.fitTimer = setTimeout(() => { fitBrackets(); markScrollers(document); }, 150); });
 function bracketGrid(t, b, ms) {
   const bm = ms.filter(m => m.bracket === b.id);
   const final = bm.find(m => m.round === b.rounds && !m.third);
@@ -3531,15 +3677,23 @@ function bracketRounds(t, b, ms) {
 
 /* courts */
 // Pistes: every piste as a small tile (game, live score), then the games next in line for a piste
+// piste names in order, with runs of three or more numbers shortened: 1, 3, 6–16
+function pisteRuns(cs) {
+  const out = []; let run = [];
+  const flush = () => { if (run.length) out.push(run.length > 2 ? `${run[0].name}–${run[run.length - 1].name}` : run.map(c => c.name).join(", ")); run = []; };
+  cs.forEach(c => { const prev = run[run.length - 1]; if (prev && /^\d+$/.test(prev.name) && /^\d+$/.test(c.name) && +c.name === +prev.name + 1) run.push(c); else { flush(); run = [c]; } });
+  flush(); return out.map(esc).join(", ");
+}
 function renderCourts(t) {
   const ms = MS(), me = myPick(t), ro = !canScore(), tag = ro ? "div" : "button";
   const live = ms.filter(m => !m.done && m.court);
   const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder);
   const on = t.courts.filter(c => c.active !== false), off = t.courts.filter(c => c.active === false);
+  const free = on.filter(c => !live.some(m => m.court === c.id)); // the free ones go on one line, not a tile each
   const mine = m => me && ents(m).includes(me) ? "me" : "";
   const tile = c => {
     const m = live.find(x => x.court === c.id);
-    if (!m) return `<div class="ptile free"><span class="pt-n" data-notr>${esc(c.name)}</span><span class="pt-free">Free</span></div>`;
+    if (!m) return "";
     const side = k => `<div class="pt-s"><span class="nm" data-notr>${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? ""}</span></div>`;
     return `<${tag} class="ptile ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}>
       <div class="pt-h"><span class="pt-n" data-notr>${esc(c.name)}</span>${timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pt-ctx">${esc(matchContext(t, m))}</span>`}</div>${side("a")}${side("b")}</${tag}>`;
@@ -3547,7 +3701,8 @@ function renderCourts(t) {
   const next = m => `<${tag} class="nxrow ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}><span class="nx-m"><span><b data-notr>${esc(sideName(t, m.a))}</b> v <b data-notr>${esc(sideName(t, m.b))}</b></span><span class="small muted">${esc(matchContext(t, m))}</span></span></${tag}>`;
   return `<div class="stack">
     <div class="spread"><h2>Pistes</h2><div class="row"><span class="muted small">${live.length} playing · ${waiting.length} waiting</span>${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}</div></div>
-    <div class="pgrid">${on.map(tile).join("")}</div>
+    ${live.length ? `<div class="pgrid">${on.map(tile).join("")}</div>` : ""}
+    ${free.length ? `<div class="pfree"><span class="pt-free">Free</span><span data-notr>${pisteRuns(free)}</span></div>` : ""}
     ${off.length ? `<p class="small muted"><span>Not in use</span>: <span data-notr>${off.map(c => esc(c.name)).join(", ")}</span></p>` : ""}
     <section class="stack" style="gap:10px"><h3>Next up</h3>
       ${waiting.length ? `<div class="rlist">${waiting.map(next).join("")}</div>` : `<div class="empty">No games waiting.</div>`}
@@ -3562,16 +3717,20 @@ function overallTable(t, stage) {
   const st = computeStats(t, ms, ids); const useB = stage === "swiss" || stage === "snake";
   return rankStats(t, st, useB, false, ms);
 }
+// what a tap on a team in a phone table shows: its players (or its club), unless that's just its name again
+function stSub(t, id, club) { const v = club ? clubOfTeam(t, id) : !isIndiv(t) ? teamPlayers(t, id) : ""; return v && v !== entName(t, id) ? v : ""; }
 function standingsTable(t, rows, opts = {}) {
   const useB = opts.buch; const podium = !!opts.podium && rows.some(s => s.p > 0); // gold, silver and bronze once games are in
   const me = myPick(t), stOpen = S.stOpen ||= new Set();
   // phones show team names only (one line per team); tapping a team shows its players (or its club)
-  const subOf = id => { const v = opts.club ? clubOfTeam(t, id) : !isIndiv(t) ? teamPlayers(t, id) : ""; return v && v !== entName(t, id) ? v : ""; };
+  const subOf = id => stSub(t, id, opts.club);
   const hint = !S.allCols && rows.some(s => subOf(s.id)) ? `<span class="small muted st-hint">${opts.club ? "Tap a team to see its club." : "Tap a team to see its players."}</span>` : "";
   return `<div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n x" title="Played">Pld</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th>${useB ? `<th class="n" title="Buchholz: opponents' total wins">Buch</th><th class="n x" title="Fine Buchholz: opponents' total Buchholz">Fine</th>` : ""}<th class="n ${useB ? "x" : ""}" title="Points for">For</th><th class="n ${useB ? "x" : ""}" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
     ${rows.map((s, i) => { const pod = podium && i < 3 && !s.unplaced, sub = subOf(s.id), open = !!sub && stOpen.has(s.id); return `<tr class="${[s.id === me ? "me" : "", pod ? "pod" + (i + 1) : "", open ? "open" : ""].filter(Boolean).join(" ")}" ${sub ? `data-st="${s.id}"` : ""}><td class="rank">${pod ? `<span class="medal m${i + 1}">${i + 1}</span>` : i + 1}</td><td class="wrap">${sub ? `<button type="button" class="st-name" aria-expanded="${open}"><b>${esc(entName(t, s.id))}</b></button><div class="small muted st-sub">${esc(sub)}</div>` : `<b>${esc(entName(t, s.id))}</b>`}</td><td class="n x">${s.p}</td><td class="n"><b>${s.w}</b></td><td class="n">${s.l}</td>${useB ? `<td class="n">${s.buch}</td><td class="n x">${s.fbuch}</td>` : ""}<td class="n ${useB ? "x" : ""}">${s.pf}</td><td class="n ${useB ? "x" : ""}">${s.pa}</td><td class="n">${s.diff > 0 ? "+" : ""}${s.diff}</td></tr>`; }).join("")}
-  </tbody></table></div><div class="st-more">${hint}<button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`;
+  </tbody></table></div>${opts.bar === false ? "" : colsBar(hint)}`;
 }
+// phones: tables show the main columns; this bar shows the rest (and says when a tap on a team shows more)
+function colsBar(hint) { return `<div class="st-more">${hint}<button type="button" class="btn sm ghost" data-act="st-cols">${S.allCols ? "Fewer columns" : "Show all columns"}</button></div>`; }
 // inter-club: big events show one round at a time (4 or more days/rounds); the round still being played comes first
 const clubCompact = t => clubDaysShown(t) >= 4;
 function clubNow(t, ms) {
@@ -3590,7 +3749,7 @@ function clubGridHtml(t, ms) {
       const cls = !won && !lost ? (live ? "g-live" : "g-wait") : !done ? "g-live" : won > lost ? "g-w" : won < lost ? "g-l" : "g-d";
       return `<button type="button" class="g-res ${cls}" data-act="fx-go" data-fx="${f.id}" title="${esc(clubName(t, r))} v ${esc(clubName(t, c))} · ${R ? "Round" : "Day"} ${f.day}">${won || lost ? `${won}–${lost}` : `${R ? "R" : "D"}${f.day}`}</button>`; }).join("") || `<span class="muted">·</span>`}</td>`;
   };
-  return `<div class="tw cgrid-wrap"><table class="cgrid"><thead><tr><th class="g-corner"></th>${rows.map(r => `<th class="g-col" title="${esc(r.name)}" data-notr>${esc(ab(r.name))}</th>`).join("")}<th class="g-col" title="Wins">W</th></tr></thead><tbody>
+  return `<div class="tw cgrid-wrap"><table class="cgrid"><thead><tr><th class="g-corner"><span class="sr-only">Club</span></th>${rows.map(r => `<th class="g-col" title="${esc(r.name)}" data-notr>${esc(ab(r.name))}</th>`).join("")}<th class="g-col" title="Wins">W</th></tr></thead><tbody>
     ${rows.map((r, i) => `<tr><th class="g-name" scope="row" title="${esc(r.name)}"><span class="g-rank">${i + 1}</span> <span class="g-full" data-notr>${esc(r.name)}</span><span class="g-ab" data-notr>${esc(ab(r.name))}</span></th>${rows.map(c => cell(r.id, c.id)).join("")}<td class="g-tot"><b>${r.w}</b></td></tr>`).join("")}
   </tbody></table></div>
   <div class="g-key small muted"><span class="g-res g-w">Won</span><span class="g-res g-d">Level</span><span class="g-res g-l">Lost</span><span class="g-res g-live">In play</span><span>Each cell is games won – lost by the club on the left. Tap a score to see its games.</span></div>`;
@@ -3693,8 +3852,9 @@ function renderStandings(t) {
     else html += `<div class="panel">${standingsTable(t, overallTable(t, "rr"), { podium: true })}</div><p class="small muted">Ranked by wins, then points difference, then points for. Teams still level (two, three or more) are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added.</p>`;
   } else if (isGroups(t)) {
     if (!(t.pools || []).length) html += `<div class="empty">${isLeagues(t) ? "League tables appear once the leagues are drawn." : "Barrage tables appear once the barrage is drawn."}</div>`;
-    else html += `<div class="pools">${t.pools.map(p => { const rk = poolRanking(t, p, ms); return `<div class="panel stack" style="gap:8px"><h3>${esc(p.name)}</h3>${standingsTable(t, rk.rows)}</div>`; }).join("")}</div>
-      <p class="small muted">${isLeagues(t) ? "Ranked by wins, then fewest losses, then points difference, then points for. Teams still level are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added." : "Ranked by wins, then points difference, then points for. Teams still level (two, three or more) are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added."}</p>`;
+    else { const rks = t.pools.map(p => poolRanking(t, p, ms)); const tap = !S.allCols && rks.some(rk => rk.rows.some(r => stSub(t, r.id)));
+      html += `${colsBar(tap ? `<span class="small muted st-hint">Tap a team to see its players.</span>` : "")}<div class="pools">${t.pools.map((p, i) => `<div class="panel stack" style="gap:8px"><h3>${esc(p.name)}</h3>${standingsTable(t, rks[i].rows, { bar: false })}</div>`).join("")}</div>
+      <p class="small muted">${isLeagues(t) ? "Ranked by wins, then fewest losses, then points difference, then points for. Teams still level are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added." : "Ranked by wins, then points difference, then points for. Teams still level (two, three or more) are split by a mini-league of the games between them: wins, then points difference, then points for in those games. Anything still level after that is split by a lot drawn for each entry when it was added."}</p>`; }
   } else if (sys === "shooting") html += shootStandings(t);
   else if (isClubs(t)) html += clubStandings(t);
   else if (!(t.brackets || []).length) html += `<div class="empty">Results appear once the bracket is drawn.</div>`;
@@ -3727,9 +3887,12 @@ function renderDisplay(t) {
 
 /* ---------------- events ---------------- */
 document.addEventListener("click", async e => {
+  lastTap = e.target.closest("button, a[href], [data-act], [data-match], [data-shoot]") || lastTap;
+  if (e.target.closest(".skip")) { e.preventDefault(); const m = $("#main"); m.tabIndex = -1; m.focus(); return; }
   if (e.target.closest('[data-act="logo-pick"]')) { if (canEdit()) $("#logo-file").click(); return; }
   const pk = e.target.closest('[data-act="picker"], [data-act="pick-t"]');
-  if (pk) { if (pk.dataset.act === "picker") { S.picker = !S.picker; renderHeader(); localize($("header.app")); if (S.picker) setTimeout(() => { $(".pick-row.on")?.scrollIntoView({ block: "nearest" }); if (!matchMedia("(pointer: coarse)").matches) $("#picker-q")?.focus(); }, 0); } else pickCompetition(pk.dataset.id); return; }
+  if (pk) { if (pk.dataset.act === "picker") { S.picker = !S.picker; renderHeader(); localize($("header.app")); if (S.picker) setTimeout(() => { $(".pick-row.on")?.scrollIntoView({ block: "nearest" }); if (!matchMedia("(pointer: coarse)").matches) $("#picker-q")?.focus(); }, 0); }
+    else { const kb = document.activeElement === pk, inMenu = !!pk.closest(".picker"); pickCompetition(pk.dataset.id); if (kb) (inMenu ? $(".picker-btn") : pageHeading())?.focus(); } return; }
   if (S.picker && !e.target.closest(".picker")) { S.picker = false; renderHeader(); localize($("header.app")); }
   const sr = e.target.closest(".tw.st tr[data-st]");
   if (sr) { const id = sr.dataset.st, set = S.stOpen ||= new Set(); set.has(id) ? set.delete(id) : set.add(id); sr.classList.toggle("open", set.has(id)); sr.querySelector(".st-name")?.setAttribute("aria-expanded", String(set.has(id))); return; }
@@ -3748,12 +3911,14 @@ document.addEventListener("click", async e => {
   if (S.langMenu && !e.target.closest(".lang-wrap")) { S.langMenu = false; renderHeader(); }
   if (S.themeMenu && !e.target.closest(".theme-wrap")) { S.themeMenu = false; renderHeader(); }
   const th = e.target.closest("[data-theme-pick]");
-  if (th) { lsSet("carreau-theme", th.dataset.themePick); applyTheme(); S.langMenu = false; S.themeMenu = false; render(); return; }
-  if (lg) { S.langMenu = false; await loadLang(lg.dataset.lang); I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); return; }
+  // picked with the keyboard: focus goes back to the menu's button as the menu closes
+  if (th) { const kb = document.activeElement === th; lsSet("carreau-theme", th.dataset.themePick); applyTheme(); S.langMenu = false; S.themeMenu = false; render(); if (kb) $(".theme-btn")?.focus(); return; }
+  if (lg) { const kb = document.activeElement === lg; S.langMenu = false; await loadLang(lg.dataset.lang); I18N.lang = lg.dataset.lang; lsSet("carreau-lang", I18N.lang); document.documentElement.lang = I18N.lang; render(); if (S.modal) renderModal(); if (kb) $(".lang-btn")?.focus(); return; }
   const tab = e.target.closest("[data-tab]");
-  if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); render(); return; }
+  if (tab) { S.tab = tab.dataset.tab; lsSet("carreau-tab", S.tab); leaveLive(); leaveOverlay(); render(); return; }
   if (e.target.closest(".ko-plan > summary")) { const kp = e.target.closest(".ko-plan"); setTimeout(() => { S.koPlan = kp.open; }, 0); }
   if (e.target.closest(".day-plan > summary")) { const dp = e.target.closest(".day-plan"); setTimeout(() => { S.dayPlan = dp.open; }, 0); }
+  if (e.target.closest(".add-more > summary")) { const am = e.target.closest(".add-more"), id = S.tid; setTimeout(() => { (S.addOpen ||= {})[id] = am.open; }, 0); }
   const sc = e.target.closest("[data-shoot]");
   if (sc) { openMatch(sc.dataset.shoot); return; }
   const mc = e.target.closest("[data-match]");
@@ -3868,12 +4033,13 @@ document.addEventListener("click", async e => {
       if (!ready || losers.length < 2) { toast("Not enough teams lost their first game to make a consolante."); break; }
       await guard(() => addDraw(createBracket(t, "B", "Consolante", losers, { third: t.koThird }))); break;
     }
-    case "checkin": { const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); e2.checkedIn = !e2.checkedIn; e2.checkedInAt = e2.checkedIn ? Date.now() : null; await guard(() => saveT(nt)); break; }
+    // a tap on a row that has gone (removed on another phone, say) does nothing
+    case "checkin": { if (!t) break; const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); if (!e2) break; e2.checkedIn = !e2.checkedIn; e2.checkedInAt = e2.checkedIn ? Date.now() : null; await guard(() => saveT(nt)); break; }
     case "checkin-all": { const nt = clone(t); entities(nt).forEach(x => { if (x.active !== false && !x.checkedIn) { x.checkedIn = true; x.checkedInAt = Date.now(); } }); await guard(() => saveT(nt)); toast("Everyone is checked in."); break; }
     case "checkin-clear": { if (!S.confirmClear) { S.confirmClear = true; toast("Tap Clear check-ins again to confirm."); setTimeout(() => S.confirmClear = false, 4000); break; } S.confirmClear = false; const nt = clone(t); entities(nt).forEach(x => { x.checkedIn = false; x.checkedInAt = null; }); await guard(() => saveT(nt)); toast("Check-ins cleared."); break; }
-    case "toggle-e": { const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); e2.active = e2.active === false; await guard(() => saveT(nt)); break; }
-    case "del-e": { const nt = clone(t); if (isIndiv(nt)) nt.players = nt.players.filter(x => x.id !== a.dataset.id); else nt.teams = nt.teams.filter(x => x.id !== a.dataset.id); await guard(() => saveT(nt)); break; }
-    case "up": { const nt = clone(t); const arr = entities(nt); const i = arr.findIndex(x => x.id === a.dataset.id); if (i > 0) [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; await guard(() => saveT(nt)); break; }
+    case "toggle-e": { if (!t) break; const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); if (!e2) break; e2.active = e2.active === false; await guard(() => saveT(nt)); break; }
+    case "del-e": { if (!t || !entities(t).some(x => x.id === a.dataset.id) || usedInDraw(a.dataset.id)) break; const nt = clone(t); if (isIndiv(nt)) nt.players = nt.players.filter(x => x.id !== a.dataset.id); else nt.teams = nt.teams.filter(x => x.id !== a.dataset.id); await guard(() => saveT(nt)); break; }
+    case "up": { if (!t) break; const nt = clone(t); const arr = entities(nt); const i = arr.findIndex(x => x.id === a.dataset.id); if (i < 1) break; [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; await guard(() => saveT(nt)); break; }
     case "fullscreen": { try { await document.documentElement.requestFullscreen(); } catch { toast("Full screen isn't available here."); } break; }
     case "export": exportCsv(); break;
     default: if (S.extraAction) await S.extraAction(act, a);
@@ -3955,6 +4121,12 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && S.picker) { S.picker = false; renderHeader(); localize($("header.app")); $(".picker-btn")?.focus(); return; }
   if (e.key === "Enter" && e.target.id === "picker-q") { const first = [...document.querySelectorAll(".pick-row")].find(r => !r.hidden); if (first) pickCompetition(first.dataset.id); return; }
   if (e.key === "Escape" && S.modal) { S.modal = null; renderModal(); }
+  if (e.key === "Tab") { const dlg = $("#guide-modal .modal") || (S.modal ? $("#modal .modal") : null); if (!dlg) return;
+    const f = [...dlg.querySelectorAll('a[href], button, input, select, textarea, video[controls], [tabindex]:not([tabindex="-1"])')].filter(canFocus), ae = document.activeElement;
+    if (!f.length) { e.preventDefault(); dlg.focus(); return; }
+    if (!dlg.contains(ae)) { e.preventDefault(); (e.shiftKey ? f[f.length - 1] : f[0]).focus(); return; }
+    if (e.shiftKey && (ae === f[0] || ae === dlg)) { e.preventDefault(); f[f.length - 1].focus(); return; }
+    if (!e.shiftKey && ae === f[f.length - 1]) { e.preventDefault(); f[0].focus(); } }
 });
 
 async function exportCsv() {
@@ -4006,6 +4178,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
 })();
 </script>

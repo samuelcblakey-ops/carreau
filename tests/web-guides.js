@@ -16,7 +16,7 @@ const { chromium } = require('playwright');
     await Promise.all([...document.querySelectorAll('.guide-card img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
     return { h: document.querySelector('main h2')?.textContent, cards: cards.map(c => c.querySelector('b').textContent), imgs: [...document.querySelectorAll('.guide-card img')].every(i => i.naturalWidth > 0) }; });
   log(`guides page: ${page.h} | ${page.cards.join(' / ')} | posters ${page.imgs}`);
-  const files = await p.evaluate(async () => Promise.all(['videos/first-competition.mp4', 'videos/shooting-competition.mp4'].map(async u => { const r = await fetch(u); const n = (await r.arrayBuffer()).byteLength; return `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`; })));
+  const files = await p.evaluate(async () => Promise.all(['videos/first-competition.mp4', 'videos/shooting-competition.mp4', 'videos/team-scores.mp4'].map(async u => { const r = await fetch(u); const n = (await r.arrayBuffer()).byteLength; return `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`; })));
   log('video files:', files.join(' | '));
   await p.click('.guide-card [data-act="guide-play"][data-id="shooting"]'); await w(800);
   const modal = await p.evaluate(async () => { const v = document.querySelector('#guide-modal video'); if (!v) return null;
@@ -24,7 +24,9 @@ const { chromium } = require('playwright');
     if (can) { await new Promise(r => { if (v.readyState >= 1) r(); else { v.onloadedmetadata = r; setTimeout(r, 8000); } }); dur = Math.round(v.duration) > 60; }
     return { title: document.querySelector('#guide-modal h3').textContent, src: v.getAttribute('src'), controls: v.controls, long: dur }; });
   log(`player: ${modal?.title} | ${modal?.src} | controls ${modal?.controls} | long ${modal?.long}`);
+  log('player focus: inside ' + await p.evaluate(() => !!document.activeElement?.closest('#guide-modal')) + ' | page behind inert ' + await p.evaluate(() => document.querySelector('#main').inert && document.querySelector('header.app').inert));
   await p.keyboard.press('Escape'); await w(300); log('escape closes:', await p.evaluate(() => !document.getElementById('guide-modal')));
+  log('after the player: focus back ' + await p.evaluate(() => document.activeElement?.matches('[data-act="guide-play"][data-id="shooting"]')) + ' | page inert ' + await p.evaluate(() => document.querySelector('#main').inert));
   await p.click('.guide-card [data-act="guide-play"][data-id="first"]'); await w(500);
   await p.mouse.click(15, 450); await w(300); log('click outside closes:', await p.evaluate(() => !document.getElementById('guide-modal')));
   await p.click('[data-act="org-back"]'); await w(500);

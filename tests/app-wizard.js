@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
     L.push('wizard shown: ' + !!q('.wiz') + ' | step: ' + q('.wiz .eyebrow').textContent);
     q('[data-act="wiz-next"]').click(); await w(60); L.push('name required: ' + q('#toast').textContent);
     q('#wz-name').value = 'Spring Doubles'; q('#wz-venue').value = 'Riverside'; q('[data-act="wiz-next"]').click(); await w(60);
-    L.push('step 2: ' + q('.wiz h3').textContent + ' options ' + document.querySelectorAll('.wiz-opt').length);
+    L.push('step 2: ' + q('.wiz h2').textContent + ' options ' + document.querySelectorAll('.wiz-opt').length);
     q('[data-act="wiz-set"][data-k="kind"][data-v="doubles"]').click(); await w(40); q('[data-act="wiz-next"]').click(); await w(60);
     q('[data-act="wiz-set"][data-k="system"][data-v="pools"]').click(); await w(40);
     L.push('swiss rounds hidden for pools: ' + !q('#wz-rounds'));

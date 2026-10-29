@@ -49,7 +49,7 @@ const { chromium } = require('playwright');
     q('[data-act="st-cols"]').click(); await w(60);
     // 3. singles: nothing to open
     await make('singles', 8, [true, true, true, true, true, true]); await tab('courts');
-    L.push('free pistes: ' + qa('.pgrid .ptile.free').map(x => txt(x)).join(',') + ' | playing ' + qa('.pgrid .ptile:not(.free)').length + ' | next up ' + txt(q('main section .empty')));
+    L.push('free pistes: ' + txt(q('.pfree')) + ' | tiles ' + qa('.pgrid .ptile.free').length + ' | playing ' + qa('.pgrid .ptile:not(.free)').length + ' | next up ' + txt(q('main section .empty')));
     await play(4); await tab('standings');
     L.push('singles: tappable ' + qa('main .tw.st tr[data-st]').length + ' | hint ' + !!q('.st-hint'));
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); } return L; });

@@ -21,6 +21,7 @@ const { chromium } = require('playwright');
   log('admin mode, organiser sees no choice:', !(await has(A, '[data-set="scoreMode"]')));
   await AD.evaluate(id => { location.hash = id; }, tid); await w(2500); await AD.click('[data-tab="setup"]'); await w(800);
   log('admin mode, admin sees choice:', await has(AD, '[data-set="scoreMode"]'));
+  log('score entry guide link:', await AD.evaluate(() => document.querySelector('[data-set="scoreMode"]')?.closest('.panel')?.querySelector('[data-act="guide-play"]')?.dataset.id));
   await AD.click('[data-set="scoreMode"][data-val="teams"]'); await w(2500);
   log('competition registered:', await A.evaluate(() => window.__carreau.S.teamScoringOn(window.__carreau.T())), '| organiser still no choice:', !(await has(A, '[data-set="scoreMode"]')));
   await AD.click('[data-act="team-links-make"]'); await w(1500);
@@ -61,6 +62,8 @@ const { chromium } = require('playwright');
   const T4 = await mk('teamD', 390); await T4.goto(links[g2.b]); await w(4500);
   await T4.click('[data-act="team-dispute"]'); await w(2500);
   log('organiser sees dispute:', (await A.textContent('.check-panel')).includes('Disputed'), '| not published:', await A.evaluate(id => !window.__carreau.S.matches[id].done, g2.id));
+  log('dispute views:', JSON.stringify({ desk: (await A.textContent('.check-panel')).replace(/\s+/g, ' ').trim(), sender: (await T3.textContent('.team-panel')).replace(/\s+/g, ' ').trim(), disputer: (await T4.textContent('.team-panel')).replace(/\s+/g, ' ').trim() }));
+  if (process.env.OUT) { await A.click('[data-tab="draw"]').catch(() => {}); await w(500); await A.screenshot({ path: process.env.OUT + '/dispute-desk.png' }); await T3.screenshot({ path: process.env.OUT + '/dispute-sender.png' }); await T4.screenshot({ path: process.env.OUT + '/dispute-other.png' }); }
   await A.click(`[data-act="check-accept"][data-id="${g2.id}"]`); await w(2000);
   log('organiser settled:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb; }, g2.id));
   // registration gate: the field alone isn't enough, the admin must have switched this competition on

@@ -366,6 +366,9 @@ const GUIDES = [
   { id: "shooting", title: "Running a shooting competition", len: "3 min", file: "videos/shooting-competition",
     desc: "Tir de précision: qualifying scorecards with the live scorer, then a knockout to the final and the podium.",
     cta: "Running a shooting day? Watch how it works (3 min)." },
+  { id: "team-scores", title: "Teams enter their own scores", len: "1 min", file: "videos/team-scores",
+    desc: "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.",
+    cta: "Teams entering scores? Watch how it works (1 min)." },
 ];
 const guideOf = id => GUIDES.find(g => g.id === id);
 S.guideLink = id => { const g = guideOf(id); return g ? `<button type="button" class="btn sm ghost guide-btn" data-act="guide-play" data-id="${g.id}"><span class="gi" aria-hidden="true">▶</span><span>${g.cta}</span></button>` : ""; };
@@ -378,17 +381,23 @@ function guidesView() {
     ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}
   </div>`;
 }
+// the video plays in a dialog: the page behind can't be reached until it closes, then focus goes back to the button that opened it
+let guideBack = null;
 function openGuide(id) {
-  const g = guideOf(id); if (!g) return; closeGuide();
+  const g = guideOf(id); if (!g) return; closeGuide(); guideBack = `[data-act="guide-play"][data-id="${id}"]`;
   const el = document.createElement("div"); el.id = "guide-modal";
   el.innerHTML = `<div class="scrim"><div class="modal guide stack" role="dialog" aria-modal="true" aria-label="${esc(g.title)}" style="gap:10px">
     <div class="spread"><h3>${g.title}</h3><button type="button" class="btn ghost" data-act="guide-close" aria-label="Close">✕</button></div>
     <video class="guide-video" src="${g.file}.mp4" poster="${g.file}.jpg" controls autoplay playsinline preload="metadata"></video>
     ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}</div></div>`;
   el.addEventListener("click", e => { if (e.target.classList.contains("scrim")) closeGuide(); });
-  document.body.appendChild(el); localize(el); el.querySelector('[data-act="guide-close"]').focus();
+  document.body.appendChild(el); localize(el); guideInert(true); el.querySelector('[data-act="guide-close"]').focus();
 }
-function closeGuide() { const el = document.getElementById("guide-modal"); if (!el) return; el.querySelector("video")?.pause(); el.remove(); }
+const guideInert = on => document.querySelectorAll(".skip, header.app, #main, #foot").forEach(n => { n.inert = on; });
+function closeGuide() {
+  const el = document.getElementById("guide-modal"); if (!el) return; el.querySelector("video")?.pause(); el.remove(); guideInert(false);
+  const back = guideBack && document.querySelector(guideBack); guideBack = null; if (back && back.getClientRects().length) back.focus({ preventScroll: true });
+}
 document.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("guide-modal")) closeGuide(); });
 
 /* ---------- organiser login ---------- */
@@ -521,11 +530,17 @@ function creators(all) {
   return list;
 }
 /* ---------------- admin: usage and limits (Google Cloud Monitoring, read with the admin's own Google sign-in) ---------------- */
-// The site runs on Firebase's free Spark plan: nothing is ever charged, but if a daily limit is reached the database stops
-// answering until the limits reset at midnight Pacific time. This panel shows today's use against those limits, the last
-// seven days, how many devices are connected, and which competitions hold the most games. Figures come from Google's own
-// monitoring (2–4 minutes behind) and need a short-lived "view monitoring data" permission granted at the click of a button.
+// Google only shares these figures with projects that have billing switched on (the Blaze plan). Blaze keeps the same free
+// daily allowance; use above it is charged instead of the database stopping, so the panel also estimates the charge.
+// It shows today's use against the free allowance, the last seven days, this month's estimated charge, how many devices are
+// connected, and which competitions hold the most games. Figures come from Google's own monitoring (2–4 minutes behind) and
+// need a short-lived "view monitoring data" permission granted at the click of a button.
 const FREE = { reads: 50000, writes: 20000, deletes: 20000, storage: 1024 ** 3 };
+// Google's standard list prices (US$ per 100,000 above the free allowance); the London region can differ slightly and the
+// billing page has the exact amount
+const PRICE = { reads: 0.03, writes: 0.09, deletes: 0.01 };
+const dayCost = d => ["reads", "writes", "deletes"].reduce((a, k) => a + Math.max(0, (d[k] || 0) - FREE[k]) / 1e5 * PRICE[k], 0);
+const fmtUsd = v => v == null ? "–" : `$${v < 0.005 ? "0.00" : v.toFixed(2)}`;
 const MON_SCOPE = "https://www.googleapis.com/auth/monitoring.read";
 const MON = {
   reads: ["firestore.googleapis.com/document/read_ops_count", "firestore.googleapis.com/document/read_count"],
@@ -534,7 +549,7 @@ const MON = {
   live: ["firestore.googleapis.com/network/active_connections"],
 };
 const USAGE = { token: null, exp: 0, today: null, days: null, live: null, storage: null, at: 0, err: null, busy: false, timer: null, histAt: 0, types: {},
-  games: null, counting: "", estimate: null };
+  games: null, counting: "", estimate: null, hist: null, monthStart: null, cost: null, errMsg: "" };
 // start of the Pacific-time day containing d (Firestore's free limits reset then)
 function ptMidnight(d = new Date()) {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" })
@@ -588,20 +603,27 @@ async function usageRefresh(full) {
       monSeries("live", new Date(now - 15 * 60e3), now, 60, true).catch(() => [])]);
     USAGE.today = { reads: sum(r), writes: sum(w), deletes: sum(d) };
     USAGE.live = live.length ? Math.round(live.sort((a, b) => b.t - a.t)[0].v) : null;
-    if (full || !USAGE.days || Date.now() - USAGE.histAt > 10 * 60e3) {
-      const from = new Date(today.getTime() - 6 * 86400e3);
-      const [hr, hw, hd] = await Promise.all(["reads", "writes", "deletes"].map(k => monSeries(k, from, today, 3600)));
-      const days = Array.from({ length: 7 }, (_, i) => { const st = i < 6 ? ptMidnight(new Date(from.getTime() + i * 86400e3 + 12 * 3600e3)) : today; return { start: st, reads: 0, writes: 0, deletes: 0 }; });
-      const put = (pts, k) => pts.forEach(p => { const day = ptMidnight(new Date(p.t - 1)).getTime(); const row = days.find(x => x.start.getTime() === day); if (row) row[k] += p.v; });
+    if (full || !USAGE.hist || Date.now() - USAGE.histAt > 10 * 60e3) {
+      // every Pacific-time day back to the first of this month (or a week, whichever is longer), hour by hour
+      const pt = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit" }).formatToParts(now).map(x => [x.type, x.value]));
+      const monthStart = ptMidnight(new Date(Date.UTC(+pt.year, +pt.month - 1, 1, 20)));
+      const from = ptMidnight(new Date(Math.min(today.getTime() - 6 * 86400e3, monthStart.getTime()) + 12 * 3600e3));
+      const [hr, hw, hd] = await Promise.all(["reads", "writes", "deletes"].map(k => from < today ? monSeries(k, from, today, 3600) : []));
+      const hist = []; for (let st = from; st < today; st = ptMidnight(new Date(st.getTime() + 36 * 3600e3))) hist.push({ start: st, reads: 0, writes: 0, deletes: 0 });
+      const put = (pts, k) => pts.forEach(p => { const day = ptMidnight(new Date(p.t - 1)).getTime(); const row = hist.find(x => x.start.getTime() === day); if (row) row[k] += p.v; });
       put(hr, "reads"); put(hw, "writes"); put(hd, "deletes");
-      days[6] = Object.assign(days[6], USAGE.today);
-      USAGE.days = days; USAGE.histAt = Date.now();
+      USAGE.hist = hist; USAGE.monthStart = monthStart; USAGE.histAt = Date.now();
       USAGE.storage = await monStorage().catch(() => null);
     }
+    const all = [...USAGE.hist, Object.assign({ start: today }, USAGE.today)];
+    USAGE.days = all.slice(-7);
+    USAGE.cost = { today: dayCost(USAGE.today), month: all.filter(d => d.start >= USAGE.monthStart).reduce((a, d) => a + dayCost(d), 0) };
     USAGE.at = Date.now(); USAGE.err = null;
   } catch (e) {
     console.error(e);
-    USAGE.err = e.status === 401 ? "expired" : /SERVICE_DISABLED|has not been used|is disabled/i.test(e.reason + " " + e.message) ? "api-off" : e.status === 403 ? "denied" : "failed";
+    USAGE.err = e.status === 401 ? "expired" : /requires billing|BILLING_DISABLED/i.test(e.reason + " " + e.message) ? "billing"
+      : /SERVICE_DISABLED|has not been used|is disabled/i.test(e.reason + " " + e.message) ? "api-off" : e.status === 403 ? "denied" : "failed";
+    USAGE.errMsg = e.message || "";
     if (USAGE.err === "expired") USAGE.token = null;
   } finally { USAGE.busy = false; }
   if (S.overlayView) render();
@@ -641,51 +663,56 @@ async function usageCount() {
 const fmtN = n => n == null ? "–" : n.toLocaleString("en-GB");
 const fmtB = b => b == null ? "–" : b < 1024 ** 2 ? `${Math.max(1, Math.round(b / 1024))} KB` : b < 1024 ** 3 ? `${(b / 1024 ** 2).toFixed(1)} MB` : `${(b / 1024 ** 3).toFixed(2)} GB`;
 function meter(label, used, limit, note, fmt = fmtN) {
-  const pct = used == null ? 0 : used / limit; const lvl = pct >= 0.8 ? ["danger", "Near the limit"] : pct >= 0.5 ? ["warn", "Getting close"] : ["ok", "Fine"];
+  const pct = used == null ? 0 : used / limit; const lvl = pct > 1 ? ["danger", "Above the free allowance, so the extra is charged"] : pct >= 0.8 ? ["danger", "Near the free allowance"] : pct >= 0.5 ? ["warn", "Getting close"] : ["ok", "Fine"];
   return `<div class="use-row"><div class="spread"><b>${label}</b><span class="small"><b>${fmt(used)}</b> of ${fmt(limit)}${note ? ` <span class="muted">· ${note}</span>` : ""}</span></div>
     <div class="use-bar" role="meter" aria-label="${label}" aria-valuemin="0" aria-valuemax="${limit}" aria-valuenow="${used || 0}"><i class="use-${lvl[0]}" style="width:${Math.min(100, Math.max(used ? 1 : 0, pct * 100)).toFixed(1)}%"></i></div>
     <span class="small use-lvl use-${lvl[0]}-t">${used == null ? "" : `${Math.round(pct * 100)}% · ${lvl[1]}`}</span></div>`;
 }
 function usagePanel() {
+  const P = esc(firebaseConfig.projectId);
   const resetAt = new Date(ptMidnight().getTime() + 86400e3).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
   const fixed = `<details class="use-fixed"><summary><b>What else runs the site</b></summary><ul class="small">
-      <li><b>Firebase</b> (database and sign-in): free Spark plan, no card on file, so nothing can be charged. Daily limits: ${fmtN(FREE.reads)} reads, ${fmtN(FREE.writes)} writes, ${fmtN(FREE.deletes)} deletes; 1 GB stored.</li>
+      <li><b>Firebase</b> (database and sign-in), Blaze plan: each day's first ${fmtN(FREE.reads)} reads, ${fmtN(FREE.writes)} writes and ${fmtN(FREE.deletes)} deletes and the first 1 GB stored cost nothing; anything above that is charged (estimated above when live usage is on). A budget alert in Google Cloud Billing emails you if spending passes the amount you set.</li>
       <li><b>GitHub Pages</b> (hosting snpetanque.com): free; site up to 1 GB, soft limit of 100 GB of downloads a month.</li>
       <li><b>GitHub Actions</b> (tests and publishing): free for a public repository.</li>
       <li><b>snpetanque.com</b>: domain name, paid yearly at GoDaddy (renewal date in your GoDaddy account).</li>
-      <li>Fonts and the QR code generator are part of the site itself: no outside service, no cost.</li></ul></details>`;
-  const head = `<div class="spread"><h3>Usage and limits</h3>${usageLive() && USAGE.at ? `<span class="pill playing">Live</span>` : ""}</div>`;
+      <li>Fonts and the QR code generator are part of the site itself: no outside service, no cost.</li></ul>
+      <div class="row"><a class="btn sm" href="https://console.firebase.google.com/project/${P}/usage" target="_blank" rel="noopener">Firebase usage and billing</a>
+        <a class="btn sm" href="https://console.cloud.google.com/billing/linkedaccount?project=${P}" target="_blank" rel="noopener">Google Cloud billing</a></div></details>`;
+  const biggest = `<div class="stack" style="gap:6px"><b>Biggest competitions</b>
+      ${USAGE.games ? `${USAGE.games.length ? `<div class="tw"><table class="use-days"><thead><tr><th>Competition</th><th class="n">Games</th><th class="n">Entries</th><th>Made</th></tr></thead><tbody>
+        ${USAGE.games.slice(0, 10).map(x => `<tr><td data-notr>${esc(x.t.name || "Untitled")}${x.t.listed ? ` <span class="pill">Example</span>` : ""}</td><td class="n">${fmtN(x.games)}</td><td class="n">${fmtN(entriesOf(x.t))}</td><td class="small">${x.t.created ? new Date(x.t.created).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""}</td></tr>`).join("")}</tbody></table></div>` : ""}
+        <span class="small muted">${USAGE.games.length} competition${USAGE.games.length === 1 ? "" : "s"}, ${fmtN(USAGE.games.reduce((a, x) => a + (x.games || 0), 0))} game${USAGE.games.reduce((a, x) => a + (x.games || 0), 0) === 1 ? "" : "s"} in all.${USAGE.estimate != null && !(usageLive() && !USAGE.err) ? ` Stored data roughly ${fmtB(USAGE.estimate)} of the free 1 GB.` : ""}</span>`
+      : `<span class="small muted">Counts the games in every competition: about one read each (${fmtN(Object.keys(S.tournaments).length)} reads now).</span>`}
+      <div>${USAGE.counting ? `<span class="small muted">${esc(USAGE.counting)}</span>` : `<button class="btn sm" data-act="adm-usage-count">${USAGE.games ? "Count again" : "Count games"}</button>`}</div></div>`;
+  const foot = biggest + fixed;
+  const head = `<div class="spread"><h3>Usage and limits</h3>${usageLive() && USAGE.at && !USAGE.err ? `<span class="pill playing">Live</span>` : ""}</div>`;
+  const wrap = body => `<div class="panel stack" id="adm-usage">${head}${body}${foot}</div>`;
   if (!usageLive()) {
     const why = USAGE.err === "expired" ? `<div class="notice">The hour's access ran out. Show live usage again to carry on.</div>` : "";
-    return `<div class="panel stack" id="adm-usage">${head}${why}
-      <p class="muted">See today's database reads, writes and deletes against the free daily limits, the last 7 days, and how many devices are connected now. The figures come from Google and run 2–4 minutes behind. Google asks you once an hour to let this page view the project's monitoring data.</p>
-      <div><button class="btn primary" data-act="adm-usage-connect">Show live usage</button></div>${fixed}</div>`;
+    return wrap(`${why}<p class="muted">See today's database reads, writes and deletes against the free daily allowance, the last 7 days, this month's estimated charge, and how many devices are connected now. The figures come from Google and run 2–4 minutes behind. Google asks you once an hour to let this page view the project's monitoring data.</p>
+      <div><button class="btn primary" data-act="adm-usage-connect">Show live usage</button></div>`);
   }
-  if (USAGE.err === "api-off") return `<div class="panel stack" id="adm-usage">${head}
-      <div class="notice stack" style="gap:8px"><b>One switch to turn on first</b><span>Google's monitoring service (Cloud Monitoring API) is off for this project. Turn it on once, wait a minute, then try again. It's free to use for these figures.</span>
-      <div class="row"><a class="btn sm primary" href="https://console.cloud.google.com/apis/library/monitoring.googleapis.com?project=${esc(firebaseConfig.projectId)}" target="_blank" rel="noopener">Open Google Cloud to turn it on</a><button class="btn sm" data-act="adm-usage-refresh">Try again</button></div></div>${fixed}</div>`;
-  if (USAGE.err === "denied" || USAGE.err === "failed") return `<div class="panel stack" id="adm-usage">${head}
-      <div class="notice">${USAGE.err === "denied" ? "Google refused access to the usage figures for this account." : "The usage figures couldn't be fetched just now."} <button class="btn sm" data-act="adm-usage-refresh">Try again</button></div>${fixed}</div>`;
+  const msg = USAGE.errMsg ? `<span class="small muted">Google said: ${esc(USAGE.errMsg.slice(0, 200))}</span>` : "";
+  if (USAGE.err === "billing") return wrap(`<div class="notice stack" style="gap:8px"><b>Billing needs to be on</b><span>Google only shares live usage figures with projects on the Blaze (pay as you go) plan. Upgrade in Firebase (Usage and billing → Modify plan), wait a few minutes, then try again. Blaze keeps the same free daily allowance.</span>
+      <div class="row"><a class="btn sm primary" href="https://console.firebase.google.com/project/${P}/usage/details" target="_blank" rel="noopener">Open Firebase billing</a><button class="btn sm" data-act="adm-usage-refresh">Try again</button></div>${msg}</div>`);
+  if (USAGE.err === "api-off") return wrap(`<div class="notice stack" style="gap:8px"><b>One switch to turn on first</b><span>Google's monitoring service (Cloud Monitoring API) is off for this project. Turn it on once, wait a minute, then try again.</span>
+      <div class="row"><a class="btn sm primary" href="https://console.cloud.google.com/apis/library/monitoring.googleapis.com?project=${P}" target="_blank" rel="noopener">Open Google Cloud to turn it on</a><button class="btn sm" data-act="adm-usage-refresh">Try again</button></div>${msg}</div>`);
+  if (USAGE.err === "denied" || USAGE.err === "failed") return wrap(`<div class="notice stack" style="gap:6px"><span>${USAGE.err === "denied" ? "Google refused access to the usage figures for this account." : "The usage figures couldn't be fetched just now."} <button class="btn sm" data-act="adm-usage-refresh">Try again</button></span>${msg}</div>`);
   const T0 = USAGE.today || {}; const days = USAGE.days || [];
   const wd = d => d.start.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", timeZone: "America/Los_Angeles" });
-  const cell = (v, lim) => `<td class="n"><span class="use-cell"><span>${fmtN(v)}</span><b title="${Math.round((v || 0) / lim * 100)}% of the free daily limit"><i style="width:${Math.min(100, (v || 0) / lim * 100).toFixed(1)}%"></i></b></span></td>`;
+  const cell = (v, lim) => `<td class="n"><span class="use-cell"><span>${fmtN(v)}</span><b title="${Math.round((v || 0) / lim * 100)}% of the free daily allowance"><i style="width:${Math.min(100, (v || 0) / lim * 100).toFixed(1)}%"></i></b></span></td>`;
+  const C = USAGE.cost;
   const stored = USAGE.storage != null ? { v: USAGE.storage, note: "" } : USAGE.estimate != null ? { v: USAGE.estimate, note: "rough estimate" } : null;
-  return `<div class="panel stack" id="adm-usage">${head}
-    <p class="small muted">Today so far (the limits reset at ${resetAt} your time). ${USAGE.at ? `Updated ${new Date(USAGE.at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}; Google's figures run 2–4 minutes behind.` : "Loading…"}${USAGE.live != null ? ` <b>${fmtN(USAGE.live)}</b> device${USAGE.live === 1 ? "" : "s"} connected now.` : ""}</p>
+  return wrap(`<p class="small muted">Today so far (the free allowance resets at ${resetAt} your time). ${USAGE.at ? `Updated ${new Date(USAGE.at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}; Google's figures run 2–4 minutes behind.` : "Loading…"}${USAGE.live != null ? ` <b>${fmtN(USAGE.live)}</b> device${USAGE.live === 1 ? "" : "s"} connected now.` : ""}</p>
     ${meter("Reads", T0.reads, FREE.reads)}${meter("Writes", T0.writes, FREE.writes)}${meter("Deletes", T0.deletes, FREE.deletes)}
     ${stored ? meter("Stored data", stored.v, FREE.storage, stored.note, fmtB) : ""}
-    ${days.length ? `<div class="tw"><table class="use-days"><caption class="small muted" style="text-align:left">Last 7 days (Pacific-time days, as Google counts them); each bar is the share of that day's free limit</caption>
-      <thead><tr><th>Day</th><th class="n">Reads</th><th class="n">Writes</th><th class="n">Deletes</th></tr></thead>
-      <tbody>${days.map((d, i) => `<tr><td>${i === 6 ? "Today" : wd(d)}</td>${cell(d.reads, FREE.reads)}${cell(d.writes, FREE.writes)}${cell(d.deletes, FREE.deletes)}</tr>`).join("")}</tbody></table></div>` : ""}
+    ${C ? `<div class="spread use-cost"><span><b>Estimated charge</b> <span class="small muted">approximate, at Google's US-dollar list prices, before VAT</span></span><span>Today <b>${fmtUsd(C.today)}</b> · this month <b>${fmtUsd(C.month)}</b></span></div>` : ""}
+    ${days.length ? `<div class="tw"><table class="use-days use-week"><caption class="small muted" style="text-align:left">Last 7 days (Pacific-time days, as Google counts them); each bar is the share of that day's free allowance</caption>
+      <thead><tr><th>Day</th><th class="n">Reads</th><th class="n">Writes</th><th class="n">Deletes</th><th class="n">Charge</th></tr></thead>
+      <tbody>${days.map((d, i) => `<tr><td>${i === days.length - 1 ? "Today" : wd(d)}</td>${cell(d.reads, FREE.reads)}${cell(d.writes, FREE.writes)}${cell(d.deletes, FREE.deletes)}<td class="n">${fmtUsd(dayCost(d))}</td></tr>`).join("")}</tbody></table></div>` : ""}
     <div class="row"><button class="btn sm" data-act="adm-usage-refresh" ${USAGE.busy ? "disabled" : ""}>Refresh now</button>
-      <a class="btn sm" href="https://console.firebase.google.com/project/${esc(firebaseConfig.projectId)}/firestore/usage" target="_blank" rel="noopener">Firebase usage page</a></div>
-    <div class="stack" style="gap:6px"><b>Biggest competitions</b>
-      ${USAGE.games ? `<div class="tw"><table class="use-days"><thead><tr><th>Competition</th><th class="n">Games</th><th class="n">Entries</th><th>Made</th></tr></thead><tbody>
-        ${USAGE.games.slice(0, 10).map(x => `<tr><td data-notr>${esc(x.t.name || "Untitled")}${x.t.listed ? ` <span class="pill">Example</span>` : ""}</td><td class="n">${fmtN(x.games)}</td><td class="n">${fmtN(entriesOf(x.t))}</td><td class="small">${x.t.created ? new Date(x.t.created).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""}</td></tr>`).join("")}</tbody></table></div>
-        <span class="small muted">${USAGE.games.length} competition${USAGE.games.length === 1 ? "" : "s"}, ${fmtN(USAGE.games.reduce((a, x) => a + (x.games || 0), 0))} game${USAGE.games.reduce((a, x) => a + (x.games || 0), 0) === 1 ? "" : "s"} in all.</span>`
-      : `<span class="small muted">Counts the games in every competition: about one read each (${fmtN(Object.keys(S.tournaments).length)} reads now).</span>`}
-      <div>${USAGE.counting ? `<span class="small muted">${esc(USAGE.counting)}</span>` : `<button class="btn sm" data-act="adm-usage-count">${USAGE.games ? "Count again" : "Count games"}</button>`}</div></div>
-    ${fixed}</div>`;
+      <a class="btn sm" href="https://console.firebase.google.com/project/${P}/firestore/usage" target="_blank" rel="noopener">Firebase usage page</a></div>`);
 }
 function adminView() {
   if (isAdmin()) watchNames();
