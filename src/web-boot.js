@@ -5,7 +5,7 @@
 // Helpers open a link containing the code (or type it in) and their device is remembered as a member.
 const ADMIN_EMAILS = ["samuelcblakey@gmail.com"]; // site admins (enforced in firestore.rules too)
 const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.includes((AUTH.user.email || "").toLowerCase()));
-const SITE = { openTesting: true, teamScoring: false, teamComps: {}, streaming: false, organiserLogin: false, loaded: false }; // streaming: false | "admin" | true // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
+const SITE = { openTesting: true, teamScoring: false, teamComps: {}, streaming: false, organiserLogin: false, cleanupAuto: false, cleanupLast: null, loaded: false }; // streaming: false | "admin" | true // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
 // organiser login (site switch, off by default): this device's code and what it unlocks; the admin's list of codes
@@ -52,8 +52,10 @@ function fbStore() {
     watchTournaments(cb, onErr) {
       unsubs.forEach(u => u()); unsubs = [];
       const parts = {}; const expected = new Set();
+      S.fullList = false;
       const emit = () => {
         if ([...expected].some(k => !(k in parts))) return; // wait until every source has answered once
+        S.fullList = isAdmin() && expected.has("all"); // the admin's list is every competition (clean-up waits for it)
         const m = {}; Object.values(parts).forEach(list => list.forEach(t => m[t.id] = t)); cb(Object.values(m));
       };
       const subQ = (key, q) => { expected.add(key); unsubs.push(onSnapshot(q, s => { parts[key] = s.docs.map(d => d.data()); emit(); }, e => { console.error(e); parts[key] = []; emit(); onErr?.(e); })); };
@@ -747,6 +749,7 @@ function adminView() {
       <div class="seg" role="group" aria-label="Streaming">${[["off", "Off"], ["admin", "Admin only"], ["all", "Everyone"]].map(([m, l]) => `<button type="button" data-act="streaming-mode" data-mode="${m}" aria-pressed="${(SITE.streaming === true ? "all" : SITE.streaming === "admin" ? "admin" : "off") === m}">${l}</button>`).join("")}</div>
     </div>
     ${usagePanel()}
+    ${cleanupPanel()}
     <div class="panel stack" style="gap:6px" id="adm-creators">
       <h3>Who's creating <span class="muted small">${cs.length}</span></h3>
       <p class="small muted">Visitors don't sign in, so each device is one creator. Give them a nickname once you know who they are. Nicknames are only visible to you.</p>
@@ -783,7 +786,74 @@ function adminView() {
     </div>`}
   </div>`;
 }
+/* ---------------- admin: clean-up of abandoned competitions ----------------
+   A competition is abandoned when it has no teams or players, nothing drawn, and nobody has changed it for
+   CLEAN_DAYS days. Examples and run-through templates are never touched. The site has no server code, so the
+   clean-up runs from the admin's screen: a "Delete" button in #admin, and (switch config/site.cleanupAuto) on its
+   own each time the admin opens #admin. Each one is re-read from the server first, so a stale offline copy can
+   never delete a competition someone has since filled in. */
+const CLEAN_DAYS = 7, DAY_MS = 864e5;
+const CLEAN = { confirm: false, busy: "", ran: false, open: false };
+const lastTouched = t => Math.max(t.updated || 0, t.created || 0);
+const isAbandoned = (t, now = Date.now()) => !!t && !t.listed && !t.example && !t.template && !entriesOf(t)
+  && !(t.draws || []).length && !(t.pools || []).length && !(t.brackets || []).length && !(t.clubFix || []).length
+  && lastTouched(t) > 0 && now - lastTouched(t) >= CLEAN_DAYS * DAY_MS;
+const abandoned = () => Object.values(S.tournaments).filter(t => isAbandoned(t)).sort((x, y) => lastTouched(x) - lastTouched(y));
+async function runCleanup(auto) {
+  if (!isAdmin() || CLEAN.busy) return;
+  const ids = abandoned().map(t => t.id); if (!ids.length) { if (!auto) toast("Nothing to tidy."); return; }
+  let ok = 0, kept = 0, failed = 0; CLEAN.busy = `Tidying… 0 of ${ids.length}`; render();
+  const one = async id => {
+    try {
+      const d = await getDocFromServer(doc(FB.db, "tournaments", id)); // the server's copy, not the offline cache
+      if (!d.exists()) { delete S.tournaments[id]; }
+      else if (!isAbandoned(d.data())) kept++;
+      else { await S.store.deleteTournament(id); delete S.tournaments[id]; ADM.sel.delete(id); if (S.tid === id) S.tid = null; ok++; }
+    } catch (e) { console.error(e); failed++; }
+    CLEAN.busy = `Tidying… ${ok + kept + failed} of ${ids.length}`; render();
+  };
+  const queue = ids.slice(); await Promise.all(Array.from({ length: Math.min(4, ids.length) }, async () => { while (queue.length) await one(queue.shift()); }));
+  CLEAN.busy = "";
+  try { await setDoc(doc(FB.db, "config", "site"), { cleanupLast: { at: Date.now(), deleted: ok, auto: !!auto }, updated: Date.now() }, { merge: true }); } catch (e) { console.error(e); }
+  render();
+  if (ok || failed || !auto) toast(failed ? `${ok} empty competition${ok === 1 ? "" : "s"} deleted, ${failed} didn't go. Check your connection and try again.`
+    : `${auto ? "Clean-up: " : ""}${ok} empty competition${ok === 1 ? "" : "s"} deleted.${kept ? ` ${kept} kept (changed since).` : ""}`);
+}
+// automatic: once per visit to #admin, after the site settings and the full competition list have arrived
+function autoCleanup() {
+  if (S.overlayView !== adminView) { CLEAN.ran = false; return; }
+  if (CLEAN.ran || !SITE.loaded || !SITE.cleanupAuto || !isAdmin() || !S.fullList) return;
+  CLEAN.ran = true; runCleanup(true);
+}
+async function cleanupAction(act, a) {
+  if (act === "adm-clean-auto") { const on = a.dataset.on === "1";
+    try { await setDoc(doc(FB.db, "config", "site"), { cleanupAuto: on, updated: Date.now() }, { merge: true }); toast(on ? "Automatic clean-up is on." : "Automatic clean-up is off."); }
+    catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); } return; }
+  if (act === "adm-clean-list") { CLEAN.open = !CLEAN.open; render(); return; }
+  if (act === "adm-clean") { CLEAN.confirm = true; render(); return; }
+  if (act === "adm-clean-cancel") { CLEAN.confirm = false; render(); return; }
+  if (act === "adm-clean-yes") { CLEAN.confirm = false; await runCleanup(false); }
+}
+function cleanupPanel() {
+  const list = abandoned(), n = list.length, L = SITE.cleanupLast;
+  const ago = t => { const d = Math.floor((Date.now() - lastTouched(t)) / DAY_MS); return `${d} day${d === 1 ? "" : "s"}`; };
+  return `<div class="panel stack" id="adm-clean">
+    <div class="spread"><h3>Clean-up</h3><span class="pill ${SITE.cleanupAuto ? "playing" : ""}">${SITE.cleanupAuto ? "Automatic" : "Manual"}</span></div>
+    <p class="muted">Competitions with no teams or players, nothing drawn, and no changes for ${CLEAN_DAYS} days are deleted with their settings and codes. Examples and run-through templates are never touched.
+      ${SITE.cleanupAuto ? "Automatic is on: they're deleted each time you open this page." : "Automatic is off: nothing is deleted until you press the button."}</p>
+    <div class="seg" role="group" aria-label="Automatic clean-up">${[["0", "Manual"], ["1", "Automatic"]].map(([v, l]) => `<button type="button" data-act="adm-clean-auto" data-on="${v}" aria-pressed="${(SITE.cleanupAuto ? "1" : "0") === v}">${l}</button>`).join("")}</div>
+    <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center" id="adm-clean-now">
+      ${CLEAN.busy ? `<span class="small muted">${esc(CLEAN.busy)}</span>`
+        : !n ? `<span class="small muted">Nothing to tidy right now.</span>`
+        : CLEAN.confirm ? `<span class="err">Delete ${n} empty competition${n === 1 ? "" : "s"} for good?</span><button class="btn sm danger" data-act="adm-clean-yes">Yes, delete</button><button class="btn sm" data-act="adm-clean-cancel">Cancel</button>`
+        : `<span><b>${n}</b> ready to delete</span><button class="btn sm danger" data-act="adm-clean">Delete ${n} now</button><button class="btn sm ghost" data-act="adm-clean-list" aria-expanded="${CLEAN.open}">${CLEAN.open ? "Hide list" : "Show list"}</button>`}
+    </div>
+    ${n && CLEAN.open && !CLEAN.busy ? `<ul class="small" id="adm-clean-list" style="margin:0;padding-left:18px">${list.slice(0, 50).map(t => `<li><span data-notr>${esc(t.name || "Untitled")}</span> <span class="muted">· untouched ${ago(t)}${t.archived ? " · archived" : ""}</span></li>`).join("")}${n > 50 ? `<li class="muted">and ${n - 50} more</li>` : ""}</ul>` : ""}
+    ${L ? `<p class="small muted" id="adm-clean-last">Last clean-up ${esc(when(L.at))}: ${L.deleted} deleted${L.auto ? " (automatic)" : ""}.</p>` : ""}
+  </div>`;
+}
 async function adminAction(act, a) {
+  if (act.startsWith("adm-clean")) { await cleanupAction(act, a); return true; }
   if (act === "adm-usage-connect") { await usageConnect(); return true; }
   if (act === "adm-usage-refresh") { USAGE.err = USAGE.err === "expired" ? USAGE.err : null; await usageRefresh(true); return true; }
   if (act === "adm-usage-count") { await usageCount(); return true; }
@@ -832,14 +902,16 @@ function watchSite() {
   unsubSite = onSnapshot(doc(FB.db, "config", "site"), d => {
     const was = SITE.openTesting, wasLogin = SITE.organiserLogin;
     SITE.organiserLogin = d.exists() ? d.data().organiserLogin === true : false;
-    SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() ? (d.data().teamScoring === true ? true : d.data().teamScoring === "admin" ? "admin" : false) : false; SITE.teamComps = d.exists() ? (d.data().teamScoringComps || {}) : {}; SITE.streaming = d.exists() ? (d.data().streaming === true ? true : d.data().streaming === "admin" ? "admin" : false) : false; SITE.loaded = true;
+    SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() ? (d.data().teamScoring === true ? true : d.data().teamScoring === "admin" ? "admin" : false) : false; SITE.teamComps = d.exists() ? (d.data().teamScoringComps || {}) : {}; SITE.streaming = d.exists() ? (d.data().streaming === true ? true : d.data().streaming === "admin" ? "admin" : false) : false;
+    SITE.cleanupAuto = d.exists() ? d.data().cleanupAuto === true : false; SITE.cleanupLast = d.exists() ? (d.data().cleanupLast || null) : null; SITE.loaded = true;
+    autoCleanup();
     if (was !== SITE.openTesting || wasLogin !== SITE.organiserLogin) startWatching();
     render();
   }, () => { SITE.loaded = true; });
 }
 S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
 S.onHome = () => history.replaceState(null, "", location.pathname); // the start screen has no competition in the address
-S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); };
+S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); autoCleanup(); };
 
 // links look like #<competition id> or #<competition id>.<code>; stream overlays and live desks: #<competition id>.stream.<game> / .desk.<game>[.<stream code>]
 function readHash() { const [tid, code] = location.hash.slice(1).split("?")[0].split("."); return { tid: tid || null, code: code || null }; }
@@ -853,7 +925,7 @@ async function handleHash() {
     liveWatch(); render(); return;
   }
   const { tid, code } = readHash();
-  if (tid === "admin") { S.overlayView = adminView; render(); return; }
+  if (tid === "admin") { CLEAN.ran = false; S.overlayView = adminView; render(); autoCleanup(); return; }
   if (tid === "guides") { S.overlayView = guidesView; render(); return; }
   if (tid === "login") { if (code) { ORG.prefill = code; history.replaceState(null, "", "#login"); if (AUTH.user && loginMode() && !orgActive()) await orgLogin(code); } S.overlayView = loginView; render(); return; }
   if (!tid) { render(); return; }
