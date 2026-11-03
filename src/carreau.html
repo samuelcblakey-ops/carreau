@@ -1292,17 +1292,41 @@ const teamScoring = t => !!(S.teamScoringOn && S.teamScoringOn(t)) && !isIndiv(t
 const myTeam = t => (S.myTeam && t && S.myTeam(t)) || null;
 const inMatch = (m, id) => !!id && ((m.a || []).includes(id) || (m.b || []).includes(id));
 const autoMinutes = t => Math.max(0.01, +t.autoConfirmMin || 10);
-// organiser's screen publishes confirmed scores (and unanswered ones once the wait is over in auto mode)
+// organiser's screen publishes confirmed scores (and unanswered ones once the wait is over in auto mode).
+// Busy days: a confirmation that arrives while a batch is being saved isn't dropped; it goes round again as soon as the
+// batch is done, so a burst of results is published straight away rather than on the next 30-second check.
+const proposalDue = (t, m, now) => !m.done && m.a && m.b && m.proposal && (m.proposal.status === "confirmed" ||
+  (t.scoreMode === "teams-auto" && m.proposal.status === "pending" && now - (m.proposal.at || 0) > autoMinutes(t) * 60000));
+// a game whose result couldn't be published is left for 30 s, so a refused save can't go round and round
+S.applyFailed = S.applyFailed || {};
 async function applyProposals() {
-  const t = T(); if (!t || !teamScoring(t) || !canEdit() || myTeam(t) || S.applying) return;
-  const due = MS().filter(m => !m.done && m.a && m.b && m.proposal && (m.proposal.status === "confirmed" ||
-    (t.scoreMode === "teams-auto" && m.proposal.status === "pending" && Date.now() - (m.proposal.at || 0) > autoMinutes(t) * 60000)));
-  if (!due.length) return;
-  S.applying = true;
-  try { for (const m of due) { const p = m.proposal; const r = await recordResult(m.id, p.sa, p.sb, true, { time: !!p.time });
-      if (r === true) { const np = { ...p, status: p.status === "confirmed" ? "applied" : "auto", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(S.tid, m.id, { proposal: np }); } }
-    await assignCourts(); } catch (e) { console.error(e); } finally { S.applying = false; }
-  render();
+  const t = T(); if (!t || !teamScoring(t) || !canEdit() || myTeam(t)) return;
+  if (S.applying) { S.applyAgain = true; return; }
+  const tid = S.tid; let saved = 0;
+  S.applying = true; S.applyAgain = false;
+  try {
+    for (let pass = 0; pass < 50 && S.tid === tid; pass++) {
+      const now = Date.now();
+      const due = MS().filter(m => proposalDue(t, m, now) && !(now - (S.applyFailed[m.id] || 0) < 30000));
+      if (!due.length) break;
+      for (const m of due) {
+        if (S.tid !== tid) break;
+        try { const p = m.proposal; const r = await recordResult(m.id, p.sa, p.sb, true, { time: !!p.time });
+          if (r === true) { const np = { ...p, status: p.status === "confirmed" ? "applied" : "auto", appliedAt: Date.now() }; S.matches[m.id].proposal = np; await S.store.updateMatch(tid, m.id, { proposal: np }); saved++; delete S.applyFailed[m.id]; }
+          else S.applyFailed[m.id] = Date.now();
+        } catch (e) { console.error(e); S.applyFailed[m.id] = Date.now(); }
+      }
+    }
+    if (saved && S.tid === tid) await assignCourts();
+  } catch (e) { console.error(e); } finally { S.applying = false; }
+  if (saved) render();
+  if (S.applyAgain) { S.applyAgain = false; setTimeout(applyProposals, 0); return; }
+  // auto-confirm: check again the moment the next unanswered score is due, not up to 30 s later
+  clearTimeout(S.autoTimer); S.autoTimer = null;
+  const tt = T(); if (tt && tt.id === tid && tt.scoreMode === "teams-auto") {
+    const next = Math.min(...MS().filter(m => !m.done && m.a && m.b && m.proposal?.status === "pending").map(m => (m.proposal.at || 0) + autoMinutes(tt) * 60000));
+    if (isFinite(next)) S.autoTimer = setTimeout(applyProposals, Math.min(Math.max(500, next - Date.now() + 250), 2147483000));
+  }
 }
 setInterval(() => { try { applyProposals(); } catch {} }, 30000);
 setInterval(() => { try { const t = T(); const ae = document.activeElement;
@@ -3030,7 +3054,20 @@ const TAB_ICON = {
   stream: ic('<rect x="3" y="7" width="13" height="11" rx="2"/><path d="M16 11l5-3v9l-5-3z"/>'),
 };
 const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["stream", "Stream"]];
+// changes made on another device (scores, draws): the first one shows at once, and anything else arriving in the next
+// half second is drawn together in one go, so a burst of results on a busy day is a couple of redraws rather than dozens.
+// Changes made on this device still show straight away. A screen that isn't showing (phone locked, another app in front)
+// skips them and catches up when it's back.
+function renderSoon() {
+  if (document.hidden && !S.liveRoute) { S.renderHidden = true; return; }
+  if (S.renderTimer) return;
+  const wait = (S.snapAt || 0) + 500 - Date.now();
+  if (wait <= 0) { S.snapAt = Date.now(); render(); return; }
+  S.renderTimer = setTimeout(() => { S.renderTimer = null; S.snapAt = Date.now(); render(); }, wait);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && S.renderHidden) render(); });
 function render() {
+  clearTimeout(S.renderTimer); S.renderTimer = null; S.renderHidden = false;
   keepFocus(drawPage);
   if (!S.pendingRender) pageMeta();
 }
@@ -4191,10 +4228,11 @@ function watchMatches() {
   S.unsubM?.(); S.unsubM = null;
   if (!S.tid) return;
   const tid = S.tid;
-  S.unsubM = S.store.watchMatches(tid, list => { if (S.tid !== tid) return; S.matches = {}; list.forEach(m => S.matches[m.id] = m); render(); applyProposals(); }, err => console.error(err));
+  S.unsubM = S.store.watchMatches(tid, (list, meta) => { if (S.tid !== tid) return; S.matches = {}; list.forEach(m => S.matches[m.id] = m); if (meta?.remote) renderSoon(); else render(); applyProposals(); }, err => console.error(err));
 }
 function startWatching() {
-  S.store.watchTournaments(list => {
+  S.store.watchTournaments((list, meta) => {
+    const firstLoad = !S.loaded;
     S.tournaments = {}; list.filter(t => !t.archived || S.canSeeArchived()).forEach(t => S.tournaments[t.id] = t);
     S.loaded = true;
     // on load (or when the open competition goes away): the newest of this person's own competitions (not a half-written
@@ -4202,7 +4240,7 @@ function startWatching() {
     if ((!S.tid || !S.tournaments[S.tid]) && !S.home) { const first = list.filter(t => !t.archived && !(t.listed || t.example) && Array.isArray(t.teams) && (!S.menuFilter || S.menuFilter(t))).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
     if (T() && !canEdit() && !viewAll(T()) && (S.tab === "setup" || S.tab === "entries")) S.tab = canScore() ? "courts" : "draw";
     S.onTournaments?.();
-    render();
+    if (meta?.remote && !firstLoad) renderSoon(); else render();
   }, err => console.error(err));
   watchMatches();
 }
@@ -4228,6 +4266,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
 })();
 </script>

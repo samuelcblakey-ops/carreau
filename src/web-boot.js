@@ -53,13 +53,14 @@ function fbStore() {
       unsubs.forEach(u => u()); unsubs = [];
       const parts = {}; const expected = new Set();
       S.fullList = false;
-      const emit = () => {
+      // remote: the change came from another device (nothing of this device's own waiting to save), so the page can batch it
+      const emit = (remote = false) => {
         if ([...expected].some(k => !(k in parts))) return; // wait until every source has answered once
         S.fullList = isAdmin() && expected.has("all"); // the admin's list is every competition (clean-up waits for it)
-        const m = {}; Object.values(parts).forEach(list => list.forEach(t => m[t.id] = t)); cb(Object.values(m));
+        const m = {}; Object.values(parts).forEach(list => list.forEach(t => m[t.id] = t)); cb(Object.values(m), { remote });
       };
-      const subQ = (key, q) => { expected.add(key); unsubs.push(onSnapshot(q, s => { parts[key] = s.docs.map(d => d.data()); emit(); }, e => { console.error(e); parts[key] = []; emit(); onErr?.(e); })); };
-      const subD = (key, tid) => { expected.add(key); unsubs.push(onSnapshot(doc(db, "tournaments", tid), d => { parts[key] = d.exists() ? [d.data()] : []; emit(); }, () => { parts[key] = []; emit(); })); };
+      const subQ = (key, q) => { expected.add(key); unsubs.push(onSnapshot(q, s => { parts[key] = s.docs.map(d => d.data()); emit(!s.metadata.hasPendingWrites); }, e => { console.error(e); parts[key] = []; emit(); onErr?.(e); })); };
+      const subD = (key, tid) => { expected.add(key); unsubs.push(onSnapshot(doc(db, "tournaments", tid), d => { parts[key] = d.exists() ? [d.data()] : []; emit(!d.metadata.hasPendingWrites); }, () => { parts[key] = []; emit(); })); };
       const tc = collection(db, "tournaments");
       // archived competitions are only visible to the admin (enforced in firestore.rules)
       if (isAdmin()) subQ("all", query(tc, limit(300)));
@@ -71,7 +72,7 @@ function fbStore() {
       new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
-    watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data())), onErr); },
+    watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data()), { remote: !s.metadata.hasPendingWrites }), onErr); },
     async setTournament(t) {
       const isNew = !!t._new; const body = clone(t); delete body._new; body.updated = Date.now();
       await track(setDoc(doc(db, "tournaments", t.id), body));
