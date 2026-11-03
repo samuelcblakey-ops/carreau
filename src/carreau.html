@@ -365,6 +365,18 @@ body:has(#modal .modal):has(#toast:not([hidden])) .scrim{padding-bottom:calc(84p
 .medal{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 5px;border-radius:13px;font-size:15px;line-height:1;color:#241b00;background:#e8b923}
 .medal.m2{color:#1e2328;background:#c3cad1}.medal.m3{color:#2b1606;background:#d0894a}
 span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6px;vertical-align:-1px}
+/* Hall of Fame: level labels and the publish sheet (solid colours, white text) */
+.hof-level{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:#2e7d32;vertical-align:1px}
+.hof-level.hof-national{background:#b3261e}.hof-level.hof-regional{background:#1f5fa8}.hof-level.hof-open{background:#2e7d32}
+.hof-levels{display:flex;flex-wrap:wrap;gap:8px}
+.hof-pick{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:var(--card, transparent);color:inherit;font:inherit;font-weight:600;cursor:pointer}
+.hof-pick .dot{width:12px;height:12px;border-radius:50%;background:#2e7d32}.hof-pick.hof-national .dot{background:#b3261e}.hof-pick.hof-regional .dot{background:#1f5fa8}
+.hof-pick.on{color:#fff;border-color:transparent}.hof-pick.on .dot{background:#fff}
+.hof-pick.hof-national.on{background:#b3261e}.hof-pick.hof-regional.on{background:#1f5fa8}.hof-pick.hof-open.on{background:#2e7d32}
+.hof-pick:disabled{opacity:.6;cursor:default}
+.hof-where{align-items:flex-end}.hof-where .f{flex:1 1 200px}
+.hof-part{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px}.hof-part input{width:22px;height:22px;margin-top:1px;flex:none}.hof-part.off{opacity:.65}
+.hof-sheet{max-width:560px}
 tr.pod1 td{background:rgba(232,185,35,.15)}tr.pod2 td{background:rgba(150,163,176,.17)}tr.pod3 td{background:rgba(208,137,74,.15)}
 .facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px}
 @media (max-width:560px){.facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.fact{padding:10px 11px}.fact-v{font-size:17px}}
@@ -1056,6 +1068,14 @@ Object.assign(LANG_TEXT.de, {"Two lines; one moves along a place each round, no 
 Object.assign(LANG_TEXT.nl, {"Two lines; one moves along a place each round, no repeat games": "Twee rijen; één schuift elke ronde een plaats op, geen herhalingen", "Drawn one round at a time": "Ronde voor ronde geloot", "Print the whole draw before play": "Print de hele loting voor het spelen", "The teams then play together all day": "De teams spelen daarna de hele dag samen", "After these games the top teams can play afternoon knockouts. Choose who goes through in Setup.": "Na deze partijen kunnen de beste teams 's middags afvalschema's spelen. Kies bij Instellingen wie doorgaat.", "Everyone shoots a qualifying scorecard, then:": "Iedereen schiet eerst een kwalificatiekaart, daarna:"});
 Object.assign(LANG_TEXT.pt, {"Two lines; one moves along a place each round, no repeat games": "Duas filas; uma avança um lugar em cada ronda, sem jogos repetidos", "Drawn one round at a time": "Sorteadas uma ronda de cada vez", "Print the whole draw before play": "Imprima todo o sorteio antes de jogar", "The teams then play together all day": "As equipas jogam depois juntas o dia todo", "After these games the top teams can play afternoon knockouts. Choose who goes through in Setup.": "Depois destes jogos, as melhores equipas podem jogar as eliminatórias da tarde. Escolha quem passa em Configuração.", "Everyone shoots a qualifying scorecard, then:": "Todos atiram primeiro um cartão de qualificação e depois:"});
 Object.assign(LANG_TEXT.th, {"Two lines; one moves along a place each round, no repeat games": "สองแถว แถวหนึ่งเลื่อนไปหนึ่งที่ทุกรอบ ไม่เจอทีมเดิมซ้ำ", "Drawn one round at a time": "จับสลากทีละรอบ", "Print the whole draw before play": "พิมพ์ผลจับสลากทั้งหมดก่อนแข่ง", "The teams then play together all day": "จากนั้นทีมจะเล่นด้วยกันทั้งวัน", "After these games the top teams can play afternoon knockouts. Choose who goes through in Setup.": "หลังเกมเหล่านี้ ทีมอันดับต้นๆ สามารถเล่นรอบน็อคเอาท์ช่วงบ่ายได้ เลือกว่าใครผ่านเข้ารอบได้ในตั้งค่า", "Everyone shoots a qualifying scorecard, then:": "ทุกคนยิงบัตรคะแนนรอบคัดเลือกก่อน จากนั้น:"});
+// Hall of Fame: publishing a competition's winners
+Object.assign(FR_TEXT, {"Hall of Fame": "Palmarès", "Hall of Fame…": "Palmarès…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Inscrivez les vainqueurs et les finalistes au palmarès public sur snpetanque.com.", "Publish to the Hall of Fame": "Publier au palmarès", "Hidden from the Hall of Fame by the site admin": "Masqué du palmarès par l'administrateur du site", "In the Hall of Fame": "Au palmarès", "Update": "Mettre à jour", "Remove it from the Hall of Fame?": "Le retirer du palmarès ?", "Questions? Contact Info@FoundryITadvisory.com.": "Des questions ? Écrivez à Info@FoundryITadvisory.com.", "The result has changed since it was published.": "Le résultat a changé depuis la publication.", "Update the entry": "Mettre à jour l'entrée", "The site admin set the level. It stays the same when you update the entry.": "L'administrateur du site a fixé le niveau. Il reste le même quand vous mettez à jour l'entrée.", "Update the Hall of Fame entry": "Mettre à jour l'entrée du palmarès", "Competition level": "Niveau du concours", "The site admin set the level.": "L'administrateur du site a fixé le niveau.", "Country": "Pays", "Region (optional)": "Région (facultative)", "e.g. Chiltern": "ex. Chiltern", "What to include": "À inclure", "Not finished yet": "Pas encore terminé", "Note (optional)": "Note (facultative)", "e.g. Played in memory of a club founder": "ex. Joué en mémoire d'un fondateur du club", "Team and player names will be public.": "Les noms des équipes et des joueurs seront publics.", "Publish": "Publier", "Tick at least one part to publish.": "Cochez au moins une ligne à publier.", "Published to the Hall of Fame.": "Publié au palmarès.", "Hall of Fame entry updated.": "Entrée du palmarès mise à jour.", "Only this competition's organiser can publish it.": "Seul l'organisateur de ce concours peut le publier.", "That didn't save. Check your connection and try again.": "Ce n'est pas enregistré. Vérifiez votre connexion et réessayez.", "Removed from the Hall of Fame.": "Retiré du palmarès."});
+Object.assign(LANG_TEXT.es, {"Hall of Fame": "Palmarés", "Hall of Fame…": "Palmarés…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Publica los ganadores y subcampeones en el palmarés público de snpetanque.com.", "Publish to the Hall of Fame": "Publicar en el palmarés", "Hidden from the Hall of Fame by the site admin": "Ocultado del palmarés por el administrador del sitio", "In the Hall of Fame": "En el palmarés", "Update": "Actualizar", "Remove it from the Hall of Fame?": "¿Quitarlo del palmarés?", "Questions? Contact Info@FoundryITadvisory.com.": "¿Preguntas? Escribe a Info@FoundryITadvisory.com.", "The result has changed since it was published.": "El resultado ha cambiado desde que se publicó.", "Update the entry": "Actualizar la entrada", "The site admin set the level. It stays the same when you update the entry.": "El administrador del sitio fijó el nivel. Se mantiene al actualizar la entrada.", "Update the Hall of Fame entry": "Actualizar la entrada del palmarés", "Competition level": "Nivel de la competición", "The site admin set the level.": "El administrador del sitio fijó el nivel.", "Country": "País", "Region (optional)": "Región (opcional)", "e.g. Chiltern": "p. ej. Chiltern", "What to include": "Qué incluir", "Not finished yet": "Aún sin terminar", "Note (optional)": "Nota (opcional)", "e.g. Played in memory of a club founder": "p. ej. Jugado en memoria de un fundador del club", "Team and player names will be public.": "Los nombres de equipos y jugadores serán públicos.", "Publish": "Publicar", "Tick at least one part to publish.": "Marca al menos una parte para publicar.", "Published to the Hall of Fame.": "Publicado en el palmarés.", "Hall of Fame entry updated.": "Entrada del palmarés actualizada.", "Only this competition's organiser can publish it.": "Solo el organizador de esta competición puede publicarla.", "That didn't save. Check your connection and try again.": "No se ha guardado. Comprueba la conexión e inténtalo de nuevo.", "Removed from the Hall of Fame.": "Quitado del palmarés."});
+Object.assign(LANG_TEXT.it, {"Hall of Fame": "Albo d'oro", "Hall of Fame…": "Albo d'oro…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Inserisci vincitori e secondi classificati nell'albo d'oro pubblico su snpetanque.com.", "Publish to the Hall of Fame": "Pubblica nell'albo d'oro", "Hidden from the Hall of Fame by the site admin": "Nascosto dall'albo d'oro dall'amministratore del sito", "In the Hall of Fame": "Nell'albo d'oro", "Update": "Aggiorna", "Remove it from the Hall of Fame?": "Toglierlo dall'albo d'oro?", "Questions? Contact Info@FoundryITadvisory.com.": "Domande? Scrivi a Info@FoundryITadvisory.com.", "The result has changed since it was published.": "Il risultato è cambiato dopo la pubblicazione.", "Update the entry": "Aggiorna la voce", "The site admin set the level. It stays the same when you update the entry.": "L'amministratore del sito ha fissato il livello. Resta lo stesso quando aggiorni la voce.", "Update the Hall of Fame entry": "Aggiorna la voce dell'albo d'oro", "Competition level": "Livello della gara", "The site admin set the level.": "L'amministratore del sito ha fissato il livello.", "Country": "Paese", "Region (optional)": "Regione (facoltativa)", "e.g. Chiltern": "es. Chiltern", "What to include": "Cosa includere", "Not finished yet": "Non ancora finito", "Note (optional)": "Nota (facoltativa)", "e.g. Played in memory of a club founder": "es. Giocata in memoria di un fondatore del club", "Team and player names will be public.": "I nomi di squadre e giocatori saranno pubblici.", "Publish": "Pubblica", "Tick at least one part to publish.": "Seleziona almeno una parte da pubblicare.", "Published to the Hall of Fame.": "Pubblicato nell'albo d'oro.", "Hall of Fame entry updated.": "Voce dell'albo d'oro aggiornata.", "Only this competition's organiser can publish it.": "Solo l'organizzatore di questa gara può pubblicarla.", "That didn't save. Check your connection and try again.": "Non è stato salvato. Controlla la connessione e riprova.", "Removed from the Hall of Fame.": "Tolto dall'albo d'oro."});
+Object.assign(LANG_TEXT.de, {"Hall of Fame": "Ruhmeshalle", "Hall of Fame…": "Ruhmeshalle…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Trage Sieger und Zweite in die öffentliche Ruhmeshalle auf snpetanque.com ein.", "Publish to the Hall of Fame": "In der Ruhmeshalle veröffentlichen", "Hidden from the Hall of Fame by the site admin": "Vom Website-Admin in der Ruhmeshalle ausgeblendet", "In the Hall of Fame": "In der Ruhmeshalle", "Update": "Aktualisieren", "Remove it from the Hall of Fame?": "Aus der Ruhmeshalle entfernen?", "Questions? Contact Info@FoundryITadvisory.com.": "Fragen? Schreib an Info@FoundryITadvisory.com.", "The result has changed since it was published.": "Das Ergebnis hat sich seit der Veröffentlichung geändert.", "Update the entry": "Eintrag aktualisieren", "The site admin set the level. It stays the same when you update the entry.": "Der Website-Admin hat die Stufe festgelegt. Sie bleibt beim Aktualisieren gleich.", "Update the Hall of Fame entry": "Eintrag in der Ruhmeshalle aktualisieren", "Competition level": "Wettbewerbsstufe", "The site admin set the level.": "Der Website-Admin hat die Stufe festgelegt.", "Country": "Land", "Region (optional)": "Region (optional)", "e.g. Chiltern": "z. B. Chiltern", "What to include": "Was aufnehmen", "Not finished yet": "Noch nicht beendet", "Note (optional)": "Notiz (optional)", "e.g. Played in memory of a club founder": "z. B. Gespielt in Erinnerung an einen Vereinsgründer", "Team and player names will be public.": "Team- und Spielernamen werden öffentlich.", "Publish": "Veröffentlichen", "Tick at least one part to publish.": "Wähle mindestens einen Teil zum Veröffentlichen.", "Published to the Hall of Fame.": "In der Ruhmeshalle veröffentlicht.", "Hall of Fame entry updated.": "Eintrag in der Ruhmeshalle aktualisiert.", "Only this competition's organiser can publish it.": "Nur der Organisator dieses Wettbewerbs kann ihn veröffentlichen.", "That didn't save. Check your connection and try again.": "Das wurde nicht gespeichert. Prüfe die Verbindung und versuch es noch einmal.", "Removed from the Hall of Fame.": "Aus der Ruhmeshalle entfernt."});
+Object.assign(LANG_TEXT.nl, {"Hall of Fame": "Erelijst", "Hall of Fame…": "Erelijst…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Zet de winnaars en finalisten op de openbare erelijst op snpetanque.com.", "Publish to the Hall of Fame": "Op de erelijst zetten", "Hidden from the Hall of Fame by the site admin": "Door de sitebeheerder verborgen op de erelijst", "In the Hall of Fame": "Op de erelijst", "Update": "Bijwerken", "Remove it from the Hall of Fame?": "Van de erelijst halen?", "Questions? Contact Info@FoundryITadvisory.com.": "Vragen? Mail naar Info@FoundryITadvisory.com.", "The result has changed since it was published.": "De uitslag is veranderd sinds de publicatie.", "Update the entry": "Vermelding bijwerken", "The site admin set the level. It stays the same when you update the entry.": "De sitebeheerder heeft het niveau vastgezet. Het blijft hetzelfde als je de vermelding bijwerkt.", "Update the Hall of Fame entry": "Vermelding op de erelijst bijwerken", "Competition level": "Niveau van de wedstrijd", "The site admin set the level.": "De sitebeheerder heeft het niveau vastgezet.", "Country": "Land", "Region (optional)": "Regio (optioneel)", "e.g. Chiltern": "bijv. Chiltern", "What to include": "Wat erop komt", "Not finished yet": "Nog niet klaar", "Note (optional)": "Notitie (optioneel)", "e.g. Played in memory of a club founder": "bijv. Gespeeld ter nagedachtenis aan een oprichter van de club", "Team and player names will be public.": "Namen van teams en spelers worden openbaar.", "Publish": "Publiceren", "Tick at least one part to publish.": "Vink minstens één onderdeel aan om te publiceren.", "Published to the Hall of Fame.": "Op de erelijst gezet.", "Hall of Fame entry updated.": "Vermelding op de erelijst bijgewerkt.", "Only this competition's organiser can publish it.": "Alleen de organisator van deze wedstrijd kan hem publiceren.", "That didn't save. Check your connection and try again.": "Dat is niet opgeslagen. Controleer je verbinding en probeer het opnieuw.", "Removed from the Hall of Fame.": "Van de erelijst gehaald."});
+Object.assign(LANG_TEXT.pt, {"Hall of Fame": "Palmarés", "Hall of Fame…": "Palmarés…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Coloque os vencedores e finalistas no palmarés público em snpetanque.com.", "Publish to the Hall of Fame": "Publicar no palmarés", "Hidden from the Hall of Fame by the site admin": "Ocultado do palmarés pelo administrador do site", "In the Hall of Fame": "No palmarés", "Update": "Atualizar", "Remove it from the Hall of Fame?": "Retirar do palmarés?", "Questions? Contact Info@FoundryITadvisory.com.": "Dúvidas? Escreva para Info@FoundryITadvisory.com.", "The result has changed since it was published.": "O resultado mudou desde a publicação.", "Update the entry": "Atualizar a entrada", "The site admin set the level. It stays the same when you update the entry.": "O administrador do site fixou o nível. Mantém-se ao atualizar a entrada.", "Update the Hall of Fame entry": "Atualizar a entrada do palmarés", "Competition level": "Nível da competição", "The site admin set the level.": "O administrador do site fixou o nível.", "Country": "País", "Region (optional)": "Região (opcional)", "e.g. Chiltern": "ex. Chiltern", "What to include": "O que incluir", "Not finished yet": "Ainda não terminado", "Note (optional)": "Nota (opcional)", "e.g. Played in memory of a club founder": "ex. Jogado em memória de um fundador do clube", "Team and player names will be public.": "Os nomes das equipas e dos jogadores serão públicos.", "Publish": "Publicar", "Tick at least one part to publish.": "Assinale pelo menos uma parte para publicar.", "Published to the Hall of Fame.": "Publicado no palmarés.", "Hall of Fame entry updated.": "Entrada do palmarés atualizada.", "Only this competition's organiser can publish it.": "Só o organizador desta competição a pode publicar.", "That didn't save. Check your connection and try again.": "Não foi guardado. Verifique a ligação e tente de novo.", "Removed from the Hall of Fame.": "Retirado do palmarés."});
+Object.assign(LANG_TEXT.th, {"Hall of Fame": "หอเกียรติยศ", "Hall of Fame…": "หอเกียรติยศ…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "ลงชื่อผู้ชนะและรองแชมป์ในหอเกียรติยศสาธารณะที่ snpetanque.com", "Publish to the Hall of Fame": "เผยแพร่ลงหอเกียรติยศ", "Hidden from the Hall of Fame by the site admin": "ผู้ดูแลเว็บไซต์ซ่อนรายการนี้จากหอเกียรติยศ", "In the Hall of Fame": "อยู่ในหอเกียรติยศ", "Update": "อัปเดต", "Remove it from the Hall of Fame?": "นำออกจากหอเกียรติยศ?", "Questions? Contact Info@FoundryITadvisory.com.": "มีคำถาม? ติดต่อ Info@FoundryITadvisory.com", "The result has changed since it was published.": "ผลการแข่งขันเปลี่ยนไปหลังจากเผยแพร่", "Update the entry": "อัปเดตรายการ", "The site admin set the level. It stays the same when you update the entry.": "ผู้ดูแลเว็บไซต์กำหนดระดับไว้แล้ว ระดับจะคงเดิมเมื่อคุณอัปเดตรายการ", "Update the Hall of Fame entry": "อัปเดตรายการในหอเกียรติยศ", "Competition level": "ระดับการแข่งขัน", "The site admin set the level.": "ผู้ดูแลเว็บไซต์กำหนดระดับไว้แล้ว", "Country": "ประเทศ", "Region (optional)": "ภูมิภาค (ไม่บังคับ)", "e.g. Chiltern": "เช่น Chiltern", "What to include": "สิ่งที่จะรวม", "Not finished yet": "ยังไม่จบ", "Note (optional)": "หมายเหตุ (ไม่บังคับ)", "e.g. Played in memory of a club founder": "เช่น แข่งเพื่อรำลึกถึงผู้ก่อตั้งสโมสร", "Team and player names will be public.": "ชื่อทีมและผู้เล่นจะเปิดเผยต่อสาธารณะ", "Publish": "เผยแพร่", "Tick at least one part to publish.": "เลือกอย่างน้อยหนึ่งส่วนเพื่อเผยแพร่", "Published to the Hall of Fame.": "เผยแพร่ลงหอเกียรติยศแล้ว", "Hall of Fame entry updated.": "อัปเดตรายการในหอเกียรติยศแล้ว", "Only this competition's organiser can publish it.": "เฉพาะผู้จัดการแข่งขันนี้เท่านั้นที่เผยแพร่ได้", "That didn't save. Check your connection and try again.": "บันทึกไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง", "Removed from the Hall of Fame.": "นำออกจากหอเกียรติยศแล้ว"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1127,7 +1147,7 @@ document.documentElement.lang = I18N.lang;
 function localStore() {
   const KEY = "carreau-local-v1";
   let data; try { data = JSON.parse(lsGet(KEY) || "null"); } catch { data = null; }
-  data = data || { t: {}, m: {} }; data.l = data.l || {}; data.s = data.s || {}; data.br = data.br || {};
+  data = data || { t: {}, m: {} }; data.l = data.l || {}; data.s = data.s || {}; data.br = data.br || {}; data.hof = data.hof || {};
   const subsT = new Set(), subsM = new Map(), subsL = new Map(), subsS = new Set(), subsS1 = new Map();
   const persist = () => lsSet(KEY, JSON.stringify(data));
   const emitT = () => setTimeout(() => subsT.forEach(cb => cb(Object.values(data.t).map(clone))));
@@ -1138,6 +1158,10 @@ function localStore() {
     mode: "local",
     watchBrand(tid, cb) { setTimeout(() => cb(data.br[tid] ? clone(data.br[tid]) : null)); const k = "b:" + tid; if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(cb); return () => subsL.get(k).delete(cb); },
     async setBrand(tid, b) { if (b) data.br[tid] = clone(b); else delete data.br[tid]; persist(); setTimeout(() => (subsL.get("b:" + tid) || new Set()).forEach(cb => cb(b ? clone(b) : null))); },
+    // Hall of Fame entries (the web build keeps them in hallOfFame/{tid})
+    watchHof(tid, cb) { setTimeout(() => cb(data.hof[tid] ? clone(data.hof[tid]) : null)); const k = "h:" + tid; if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(cb); return () => subsL.get(k).delete(cb); },
+    async setHof(tid, e) { if (e) data.hof[tid] = clone(e); else delete data.hof[tid]; persist(); setTimeout(() => (subsL.get("h:" + tid) || new Set()).forEach(cb => cb(e ? clone(e) : null))); },
+    async deleteHof(tid) { return this.setHof(tid, null); },
     watchStreams(cb) { subsS.add(cb); emitS(); return () => subsS.delete(cb); },
     watchStream(sid, cb) { if (!subsS1.has(sid)) subsS1.set(sid, new Set()); subsS1.get(sid).add(cb); emitS(sid); return () => subsS1.get(sid).delete(cb); },
     async setStream(st) { data.s[st.id] = clone(st); persist(); emitS(st.id); },
@@ -1159,6 +1183,9 @@ function dbStore(db) {
     mode: "db",
     watchBrand(tid, cb, onErr) { return db.doc(`tournaments/${tid}/brand/logo`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setBrand(tid, b) { const ref = db.doc(`tournaments/${tid}/brand/logo`); return b ? ref.set(clone(b)) : ref.delete(); },
+    watchHof(tid, cb, onErr) { return db.doc(`hallOfFame/${tid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
+    setHof(tid, e) { return db.doc(`hallOfFame/${tid}`).set(clone(e)); },
+    deleteHof(tid) { return db.doc(`hallOfFame/${tid}`).delete(); },
     watchStreams(cb, onErr) { return db.collection("streams").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
     watchStream(sid, cb, onErr) { return db.doc(`streams/${sid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setStream(st) { return db.doc(`streams/${st.id}`).set(clone(st)); },
@@ -2454,6 +2481,168 @@ async function archiveCompetition(on) {
   } else await guard(() => saveT(t));
   render(); toast(on ? (S.canSeeArchived() ? "Competition archived. Only the admin can see it now." : "Competition archived. Only the site admin can see it now.") : "Competition restored.");
 }
+/* ---------------- Hall of Fame: publish a finished competition's winners (hallOfFame/{tid}) ---------------- */
+// Who counts: each knockout's final (Main, Silver, Consolante, A/B/C…, shooting knockouts); with no knockout,
+// the top two of the standings (Swiss, snake, round robin, mêlée players), of each league, of the clubs (inter-club),
+// or of a shooting final. Entries are a snapshot, so they outlive the competition being archived or deleted.
+const HOF_LEVELS = ["national", "regional", "open"];
+const HOF_COLOUR = { national: "#b3261e", regional: "#1f5fa8", open: "#2e7d32" };
+const HOF_I18N = {
+  en: { national: "National", regional: "Regional", open: "Open", "GB-ENG": "England", "GB-SCT": "Scotland", "GB-WLS": "Wales", "GB-NIR": "Northern Ireland" },
+  fr: { national: "National", regional: "Régional", open: "Open", "GB-ENG": "Angleterre", "GB-SCT": "Écosse", "GB-WLS": "Pays de Galles", "GB-NIR": "Irlande du Nord" },
+  es: { national: "Nacional", regional: "Regional", open: "Abierto", "GB-ENG": "Inglaterra", "GB-SCT": "Escocia", "GB-WLS": "Gales", "GB-NIR": "Irlanda del Norte" },
+  it: { national: "Nazionale", regional: "Regionale", open: "Open", "GB-ENG": "Inghilterra", "GB-SCT": "Scozia", "GB-WLS": "Galles", "GB-NIR": "Irlanda del Nord" },
+  de: { national: "National", regional: "Regional", open: "Offen", "GB-ENG": "England", "GB-SCT": "Schottland", "GB-WLS": "Wales", "GB-NIR": "Nordirland" },
+  nl: { national: "Nationaal", regional: "Regionaal", open: "Open", "GB-ENG": "Engeland", "GB-SCT": "Schotland", "GB-WLS": "Wales", "GB-NIR": "Noord-Ierland" },
+  pt: { national: "Nacional", regional: "Regional", open: "Aberto", "GB-ENG": "Inglaterra", "GB-SCT": "Escócia", "GB-WLS": "País de Gales", "GB-NIR": "Irlanda do Norte" },
+  th: { national: "ระดับชาติ", regional: "ระดับภูมิภาค", open: "โอเพ่น", "GB-ENG": "อังกฤษ", "GB-SCT": "สกอตแลนด์", "GB-WLS": "เวลส์", "GB-NIR": "ไอร์แลนด์เหนือ" },
+};
+// the UK's home nations are separate, as their federations are; the rest are ISO country codes
+const HOF_COUNTRIES = ["GB-ENG", "GB-SCT", "GB-WLS", "GB-NIR", "IE", "FR", "BE", "NL", "LU", "DE", "CH", "AT", "ES", "PT", "IT", "MC", "AD", "DK", "SE", "NO", "FI", "IS",
+  "CZ", "SK", "PL", "HU", "SI", "HR", "RS", "BG", "RO", "GR", "CY", "MT", "EE", "LV", "LT", "TR", "IL", "MA", "TN", "DZ", "SN", "CI", "BJ", "BF", "ML", "NE", "TG", "CM", "MG", "MU",
+  "US", "CA", "MX", "BR", "AR", "CL", "AU", "NZ", "TH", "VN", "KH", "LA", "MY", "SG", "ID", "PH", "JP", "KR", "CN", "HK", "TW", "IN"];
+const hofWord = k => (HOF_I18N[I18N.lang] || HOF_I18N.en)[k] || HOF_I18N.en[k] || k;
+function hofCountryName(code) {
+  if (!code) return "";
+  if (code.startsWith("GB-")) return hofWord(code);
+  try { return new Intl.DisplayNames([LOCALES[I18N.lang] || "en-GB"], { type: "region" }).of(code) || code; } catch { return code; }
+}
+// default country from the device's language region (en-GB → England, fr-FR → France, th-TH → Thailand)
+function hofDefaultCountry() {
+  const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]).map(String);
+  for (const l of langs) { const r = (l.split(/[-_]/)[1] || "").toUpperCase(); if (r === "GB" || r === "UK") return "GB-ENG"; if (HOF_COUNTRIES.includes(r)) return r; }
+  const byLang = { fr: "FR", es: "ES", it: "IT", de: "DE", nl: "NL", pt: "PT", th: "TH" }[(langs[0] || "").slice(0, 2).toLowerCase()];
+  return byLang || "GB-ENG";
+}
+const hofLabel = level => `<span class="hof-level hof-${HOF_LEVELS.includes(level) ? level : "open"}" data-notr>${esc(hofWord(HOF_LEVELS.includes(level) ? level : "open"))}</span>`;
+// a side of a game (or a ranked entry) as it's kept in the Hall of Fame: its name and its players
+function hofSide(t, ids) {
+  ids = (ids || []).filter(Boolean); if (!ids.length) return null;
+  if (isIndiv(t)) return { name: ids.map(id => entName(t, id)).join(" · "), players: ids.length > 1 ? ids.map(id => entName(t, id)) : [] };
+  if (ids.length === 1) { const tm = t.teams.find(x => x.id === ids[0]); const pl = (tm?.players || []).map(p => String(p || "").trim()).filter(Boolean);
+    return { name: entName(t, ids[0]), players: pl, ...(tm?.club ? { club: String(tm.club).trim() } : {}) }; }
+  return { name: sideName(t, ids), players: ids.map(id => entName(t, id)) };
+}
+const hofTop2 = (t, rows, name) => ({ winner: rows[0] ? (name ? { name: name(rows[0]), players: [] } : hofSide(t, [rows[0].id])) : null,
+  runnerUp: rows[1] ? (name ? { name: name(rows[1]), players: [] } : hofSide(t, [rows[1].id])) : null });
+// { ready, parts: [{ id, name, done, winner, runnerUp }] }; ready once the main part has a result
+function hofResult(t, ms) {
+  ms = ms || MS(); const parts = [];
+  const part = (id, name, done, wr) => parts.push({ id, name, done: !!(done && wr.winner), winner: done ? wr.winner : null, runnerUp: done ? wr.runnerUp : null });
+  const brs = t.brackets || [];
+  if (brs.length) {
+    brs.forEach(b => { const f = ms.find(m => m.bracket === b.id && m.round === b.rounds && !m.third);
+      part("ko-" + b.id, b.name, !!(f && f.done), { winner: f && hofSide(t, winnerSide(f)), runnerUp: f && hofSide(t, loserSide(f)) }); });
+  } else if (isShoot(t)) {
+    const f = shootRanking(t, "F");
+    part("final", "Final", f.length > 0 && f.every(r => r.done) && !shootTies(t, "F").length, hofTop2(t, f));
+  } else if (isClubs(t)) {
+    const cm = ms.filter(m => m.stage === "club");
+    const done = cm.length > 0 && cm.every(m => m.done) && (!day2On(t) || (t.draws || []).some(d => d.id === "CL2"));
+    part("clubs", "Clubs", done, hofTop2(t, clubTable(t, ms), r => r.name));
+  } else if (isLeagues(t)) { // a barrage always leads to afternoon knockouts; leagues may be the whole competition
+    (t.pools || []).forEach(p => { const rk = poolRanking(t, p, ms); part("pool-" + p.id, p.name, rk.complete, hofTop2(t, rk.rows)); });
+  } else {
+    const sys = sysOf(t);
+    if (sys === "swiss" || sys === "melee") {
+      const sm = ms.filter(m => m.stage === sys), rounds = (t.draws || []).filter(d => d.kind === "round").length;
+      part("standings", "Standings", sm.length > 0 && sm.every(m => m.done) && rounds >= Math.max(1, t.swissRounds || 1), hofTop2(t, overallTable(t, sys)));
+    } else if (sys === "snake" || sys === "roundrobin") {
+      part("standings", "Standings", morningDone(t, ms), hofTop2(t, overallTable(t, sys === "snake" ? "snake" : "rr")));
+    }
+  }
+  return { ready: parts.length > 0 && parts[0].done, parts };
+}
+// a fingerprint of the result, so an organiser is told when a correction has changed it since publishing
+const hofSig = parts => parts.filter(p => p.done !== false && p.winner).map(p => [p.id, p.winner?.name, (p.winner?.players || []).join("+"), p.runnerUp?.name, (p.runnerUp?.players || []).join("+")].join("|")).join("#");
+const hofCan = t => !!(t && S.store.setHof && (S.hofCanPublish ? S.hofCanPublish(t) : canEdit()));
+function hofWatch() {
+  const t = T(); const want = t && hofCan(t) && ["standings", "setup"].includes(S.tab) ? t.id : null;
+  if (!want) { if (S.hofKey && S.hofKey !== S.tid) { S.unsubH?.(); S.unsubH = null; S.hofKey = null; } return; }
+  if (S.hofKey === want) return;
+  S.unsubH?.(); S.hofKey = want; S.hof = S.hof || {};
+  S.unsubH = S.store.watchHof(want, e => { if (S.hofKey !== want) return; S.hof[want] = e || null; render(); if (S.modal?.hof) renderModal(); }, err => { console.error(err); if (S.hofKey === want) { S.hof[want] = null; render(); } });
+}
+// the panel on Standings and in Setup: publish, or what's published with Update / Remove
+function hofPanel(t, where) {
+  if (!hofCan(t) || t.archived) return "";
+  const r = hofResult(t); const e = S.hof?.[t.id];
+  if (!r.ready && !e) return "";
+  if (e === undefined) return `<div class="panel hof-panel" data-hof-panel><span class="small muted">Hall of Fame…</span></div>`;
+  const head = `<h3>Hall of Fame</h3>`;
+  if (!e) return `<div class="panel spread hof-panel" data-hof-panel><div>${head}<div class="small muted">Put the winners and runners-up on the public Hall of Fame at snpetanque.com.</div></div>
+    <button class="btn primary" data-act="hof-open">Publish to the Hall of Fame</button></div>`;
+  const changed = r.ready && e.sig !== hofSig(r.parts.filter(p => (e.parts || []).some(x => x.id === p.id)));
+  const where2 = [hofLabel(e.level), `<span data-notr>${esc([hofCountryName(e.country), e.region].filter(Boolean).join(" · "))}</span>`].join(" ");
+  return `<div class="panel stack hof-panel" data-hof-panel style="gap:8px"><div class="spread"><div>${head}
+      <div class="small">${e.hidden ? `<b class="err">Hidden from the Hall of Fame by the site admin</b>` : `<b>In the Hall of Fame</b>`} · ${where2}</div></div>
+      <div class="row">${e.hidden ? "" : `<button class="btn" data-act="hof-open">Update</button>`}${S.hofConfirmRemove === t.id ? `<span class="err">Remove it from the Hall of Fame?</span><button class="btn danger" data-act="hof-remove-yes">Remove</button><button class="btn" data-act="hof-remove-no">Keep it</button>` : `<button class="btn" data-act="hof-remove">Remove</button>`}</div></div>
+    ${e.hidden ? `<div class="small muted">Questions? Contact Info@FoundryITadvisory.com.</div>` : ""}
+    ${changed && !e.hidden ? `<div class="notice small hof-changed">The result has changed since it was published. <button class="btn" data-act="hof-open">Update the entry</button></div>` : ""}
+    ${e.levelSetBy === "admin" && !e.hidden ? `<div class="small muted">The site admin set the level. It stays the same when you update the entry.</div>` : ""}</div>`;
+}
+function hofOpen(t) {
+  const e = S.hof?.[t.id] || null; const r = hofResult(t);
+  const parts = {}; r.parts.forEach(p => parts[p.id] = p.done && (!e || (e.parts || []).some(x => x.id === p.id)));
+  S.modal = { hof: true, tid: t.id, level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: e?.region || "", note: e?.note || "", parts, err: "", busy: false };
+  renderModal();
+}
+function renderHofModal(t, el) {
+  const md = S.modal, e = S.hof?.[t.id] || null, r = hofResult(t); const lockL = e?.levelSetBy === "admin", lockC = e?.countrySetBy === "admin";
+  const d = t.date ? new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" }) : "";
+  const countries = HOF_COUNTRIES.map(c => [c, hofCountryName(c)]).sort((a, b) => (a[0].startsWith("GB-") ? 0 : 1) - (b[0].startsWith("GB-") ? 0 : 1) || a[1].localeCompare(b[1], LOCALES[I18N.lang] || "en"));
+  if (!countries.some(c => c[0] === md.country)) countries.unshift([md.country, hofCountryName(md.country)]);
+  const who = s => s ? `<b data-notr>${esc(s.name)}</b>${s.players?.length && s.players.join(", ") !== s.name ? `<span class="small muted" data-notr> · ${esc(s.players.join(", "))}</span>` : ""}` : "–";
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal hof-sheet" role="dialog" aria-modal="true" aria-label="Publish to the Hall of Fame">
+    <div class="spread"><div><div class="eyebrow">Hall of Fame</div><h3>${e ? "Update the Hall of Fame entry" : "Publish to the Hall of Fame"}</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    <div class="small"><b data-notr>${esc(t.name)}</b><div class="muted" data-notr>${esc([d, t.venue].filter(Boolean).join(" · "))}</div></div>
+    <div class="stack" style="gap:6px"><div class="eyebrow">Competition level</div>
+      <div class="hof-levels" role="group" aria-label="Competition level">${HOF_LEVELS.map(l => `<button type="button" class="hof-pick hof-${l} ${md.level === l ? "on" : ""}" data-act="hof-level" data-k="${l}" aria-pressed="${md.level === l}" ${lockL ? "disabled" : ""}><span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(l))}</span></button>`).join("")}</div>
+      ${lockL ? `<span class="small muted">The site admin set the level.</span>` : ""}</div>
+    <div class="row hof-where"><label class="f"><span>Country</span><select data-hof="country" ${lockC ? "disabled" : ""}>${countries.map(([c, n]) => `<option value="${esc(c)}" ${c === md.country ? "selected" : ""} data-notr>${esc(n)}</option>`).join("")}</select></label>
+      <label class="f"><span>Region (optional)</span><input type="text" maxlength="60" data-hof="region" value="${esc(md.region)}" placeholder="e.g. Chiltern"></label></div>
+    <div class="stack" style="gap:6px"><div class="eyebrow">What to include</div>
+      ${r.parts.map(p => `<label class="hof-part ${p.done ? "" : "off"}"><input type="checkbox" data-hof="part" data-id="${esc(p.id)}" ${md.parts[p.id] && p.done ? "checked" : ""} ${p.done ? "" : "disabled"}>
+        <span class="stack" style="gap:2px"><b data-notr>${esc(tr(p.name))}</b>${p.done ? `<span class="small">${MEDAL[1]}<span class="eyebrow">Winner</span> ${who(p.winner)}</span><span class="small">${MEDAL[2]}<span class="eyebrow">Runner-up</span> ${who(p.runnerUp)}</span>` : `<span class="small muted">Not finished yet</span>`}</span></label>`).join("")}</div>
+    <label class="f"><span>Note (optional)</span><textarea data-hof="note" maxlength="280" rows="2" placeholder="e.g. Played in memory of a club founder">${esc(md.note)}</textarea></label>
+    <p class="small muted">Team and player names will be public.</p>
+    ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
+    <div class="row"><button class="btn primary" data-act="hof-save" ${md.busy ? "disabled" : ""}>${e ? "Update the entry" : "Publish"}</button><button class="btn" data-act="close">Cancel</button></div>
+  </div></div>`;
+  localize(el);
+}
+function hofInput(el) {
+  const md = S.modal; if (!md?.hof) return;
+  const k = el.dataset.hof;
+  if (k === "part") md.parts[el.dataset.id] = el.checked;
+  else if (k === "country" || k === "region" || k === "note") md[k] = el.value;
+}
+function hofEntry(t, md, prev) {
+  const r = hofResult(t); const parts = r.parts.filter(p => p.done && md.parts[p.id]).map(p => ({ id: p.id, name: p.name, winner: p.winner, runnerUp: p.runnerUp || null }));
+  const now = Date.now(); const who = S.hofWho ? S.hofWho() : { byUid: "", byCode: "" };
+  const e = { tid: t.id, name: String(t.name || "").slice(0, 120), date: t.date || "", venue: String(t.venue || "").slice(0, 120), entry: t.entry || "teams", fmt: t.format || "", system: sysOf(t),
+    level: prev?.levelSetBy === "admin" ? prev.level : md.level, country: prev?.countrySetBy === "admin" ? prev.country : md.country,
+    region: String(md.region || "").trim().slice(0, 60), note: String(md.note || "").trim().slice(0, 280), parts, sig: hofSig(parts), lang: I18N.lang,
+    publishedAt: prev?.publishedAt || now, updatedAt: now, byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "", hidden: prev ? !!prev.hidden : false };
+  // what only the site admin sets is carried over unchanged
+  ["hiddenAt", "levelSetBy", "countrySetBy"].forEach(k => { if (prev && prev[k] !== undefined) e[k] = prev[k]; });
+  return e;
+}
+async function hofAction(act, k) {
+  const md = S.modal, t = T(); if (!t || t.id !== md.tid) { S.modal = null; renderModal(); return; }
+  if (act === "hof-level") { if (HOF_LEVELS.includes(k)) md.level = k; renderModal(); return; }
+  if (act === "hof-save") {
+    const prev = S.hof?.[t.id] || null; const e = hofEntry(t, md, prev);
+    if (!e.parts.length) { md.err = "Tick at least one part to publish."; renderModal(); return; }
+    md.busy = true; md.err = ""; renderModal();
+    try { await S.store.setHof(t.id, e); S.hof = S.hof || {}; S.hof[t.id] = e; S.modal = null; renderModal(); render(); toast(prev ? "Hall of Fame entry updated." : "Published to the Hall of Fame."); }
+    catch (err) { console.error(err); md.busy = false; md.err = err?.code === "permission-denied" ? "Only this competition's organiser can publish it." : "That didn't save. Check your connection and try again."; renderModal(); }
+  }
+}
+async function hofRemove(t) {
+  try { await S.store.deleteHof(t.id); S.hof = S.hof || {}; S.hof[t.id] = null; S.hofConfirmRemove = null; render(); toast("Removed from the Hall of Fame."); }
+  catch (err) { console.error(err); toast("That didn't save. Check your connection and try again."); }
+}
 function overrideBox(list) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
     <span>These later games were already played and will be reset so they can be replayed or re-entered:</span>
@@ -2536,6 +2725,7 @@ function renderModal() {
 function drawModal() {
   const el = $("#modal"); const t = T();
   if (!S.modal || !t) { el.innerHTML = ""; return; }
+  if (S.modal.hof) { if (S.modal.tid !== t.id) { S.modal = null; el.innerHTML = ""; return; } renderHofModal(t, el); return; }
   if (S.modal.so) { renderSoModal(t, el); return; }
   const m = S.matches[S.modal.id]; if (!m) { S.modal = null; el.innerHTML = ""; return; }
   if (m.stage === "shoot" || m.shoot) { renderShootModal(t, m, el); return; }
@@ -2588,6 +2778,7 @@ function readModalScores() {
 async function modalAction(act, k, a) {
   const t = T(); const md = S.modal; if (!md) return;
   if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
+  if (md.hof) { await hofAction(act, k); return; }
   // the game went while its dialog was open (a draw undone on another phone, say): close it rather than save into nothing
   if (!t || (md.id && !S.matches[md.id]) || (md.so && (md.ids || []).some(id => !S.matches[id]))) { S.modal = null; renderModal(); toast("That game isn't in the draw any more."); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
@@ -3090,7 +3281,7 @@ function drawPage() {
   const t = T(); const main = $("#main"); checkNewRound(t); renderAlert();
   const scrolls = {}; document.querySelectorAll("[data-scroll-key]").forEach(el => scrolls[el.dataset.scrollKey] = [el.scrollLeft, el.scrollTop]);
   const restore = () => { document.querySelectorAll("[data-scroll-key]").forEach(el => { const v = scrolls[el.dataset.scrollKey]; if (v) { el.scrollLeft = v[0]; el.scrollTop = v[1]; } }); };
-  applyCompTheme(S.liveRoute && !S.liveRoute.tid ? null : T()); brandWatch();
+  applyCompTheme(S.liveRoute && !S.liveRoute.tid ? null : T()); brandWatch(); hofWatch();
   document.body.classList.toggle("stream", S.liveRoute?.view === "stream"); document.body.classList.toggle("desk", S.liveRoute?.view === "desk");
   if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lm = S.matches[S.liveRoute.mid]; scheduleCardTick(S.liveRoute.view === "stream" && lm ? liveOf(lm) : null); return; }
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
@@ -3304,6 +3495,7 @@ function renderSetup(t) {
   </div>` : ""}
   ${S.setupExtra ? S.setupExtra(t) : ""}
   ${lookPanel(t)}
+  ${hofPanel(t, "setup")}
   ${canEdit() ? `<div class="panel spread">
     <div><h3>${t.archived ? "Archived" : "Archive competition"}</h3><p class="small muted">${t.archived ? "Only the site admin can see this competition. Restore it to make it visible again." : `Once the competition has finished, archive it to hide it from everyone except the site admin.${MS().some(m => !m.done && m.a && (m.b || m.stage === "shoot")) ? " Some games aren't finished yet." : ""}`}</p></div>
     ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">Archive “${esc(t.name)}”? Only the admin will be able to see it.</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
@@ -3945,7 +4137,7 @@ function renderStandings(t) {
   } else if (sys === "shooting") html += shootStandings(t);
   else if (isClubs(t)) html += clubStandings(t);
   else if (!(t.brackets || []).length) html += `<div class="empty">Results appear once the bracket is drawn.</div>`;
-  return html + (isClubs(t) ? "" : factsHtml(t)) + `</div>`; // inter-club shows its facts above the team table
+  return html + (isClubs(t) ? "" : factsHtml(t)) + hofPanel(t, "standings") + `</div>`; // inter-club shows its facts above the team table
 }
 
 /* big screen */
@@ -4024,6 +4216,10 @@ document.addEventListener("click", async e => {
   if (act.startsWith("lv-") && act !== "lv-links") { await deskAction(act, a); return; }
   if (act.startsWith("strm-")) { await streamAction(act, a); return; }
   switch (act) {
+    case "hof-open": if (t && hofCan(t)) hofOpen(t); break;
+    case "hof-remove": S.hofConfirmRemove = t?.id; render(); break;
+    case "hof-remove-no": S.hofConfirmRemove = null; render(); break;
+    case "hof-remove-yes": if (t && hofCan(t)) await hofRemove(t); break;
     case "logo-remove": { try { await S.store.setBrand(t.id, null); setBrandLocal(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
     case "lv-links": S.lvLinks = S.lvLinks === a.dataset.id ? null : a.dataset.id; render(); break;
     case "copy": { const el = document.getElementById(a.dataset.target); if (!el) break; try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } break; }
@@ -4166,6 +4362,7 @@ document.addEventListener("change", async e => {
   if (el.dataset.courtOn !== undefined || el.dataset.courts !== undefined) await guard(assignCourts);
 });
 document.addEventListener("input", e => {
+  if (e.target.dataset?.hof && S.modal?.hof) { hofInput(e.target); return; }
   if (e.target.id === "picker-q") {
     const q = e.target.value.trim().toLowerCase(); let n = 0;
     document.querySelectorAll(".pick-row").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
@@ -4268,6 +4465,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
 })();
 </script>

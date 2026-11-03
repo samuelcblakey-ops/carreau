@@ -97,6 +97,10 @@ function fbStore() {
     // club logo: its own small document so the competition document stays light
     watchBrand(tid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "brand", "logo"), d => cb(d.exists() ? d.data() : null), onErr); },
     setBrand(tid, b) { const ref = doc(db, "tournaments", tid, "brand", "logo"); return track(b ? setDoc(ref, b) : deleteDoc(ref)); },
+    // Hall of Fame: one snapshot per published competition, kept apart so it outlives archiving or deleting it
+    watchHof(tid, cb, onErr) { return onSnapshot(doc(db, "hallOfFame", tid), d => cb(d.exists() ? d.data() : null), onErr); },
+    setHof(tid, e) { return track(setDoc(doc(db, "hallOfFame", tid), clone(e))); },
+    deleteHof(tid) { return track(deleteDoc(doc(db, "hallOfFame", tid))); },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },
@@ -120,6 +124,10 @@ S.permFn = t => {
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
 S.canCreate = () => !!AUTH.user && (!loginMode() || isAdmin() || orgActive());
+// Hall of Fame: only the competition's organiser (the device that made it, an organiser link, or an organiser code that
+// made it) or the admin can publish its winners, even while open testing lets everyone run it (enforced in firestore.rules)
+S.hofCanPublish = t => !!(AUTH.user && t) && (isAdmin() || (!t.archived && !t.listed && (isOwner(t) || ROLE[t.id] === "edit" || (orgActive() && !!t.orgCode && t.orgCode === ORG.code))));
+S.hofWho = () => ({ byUid: AUTH.user?.uid || "", byCode: orgActive() ? ORG.code : "" });
 // live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
 S.liveRole = t => !!(t && ROLE[t.id] === "live");
 // streaming is a site switch: Off / Admin only / Everyone (config/site.streaming, enforced in firestore.rules)
@@ -984,6 +992,11 @@ function boot() {
     window.__testDoc = (path, data) => setDoc(doc(FB.db, ...path.split("/")), data, { merge: true });
     window.__testOrg = () => ({ code: ORG.code, active: orgActive(), canCreate: S.canCreate() });
     window.__testUid = () => AUTH.user?.uid;
+    // raw reads and writes, to check the security rules directly
+    window.__testRaw = { set: (path, data) => setDoc(doc(FB.db, ...path.split("/")), data), update: (path, data) => updateDoc(doc(FB.db, ...path.split("/")), data),
+      get: path => getDocFromServer(doc(FB.db, ...path.split("/"))).then(d => d.exists() ? d.data() : null), del: path => deleteDoc(doc(FB.db, ...path.split("/"))),
+      hofShown: () => getDocs(query(collection(FB.db, "hallOfFame"), where("hidden", "==", false), limit(20))).then(s => s.docs.map(d => d.id)),
+      hofAll: () => getDocs(query(collection(FB.db, "hallOfFame"), limit(20))).then(s => s.docs.map(d => d.id)) };
   }
   S.store = fbStore();
   // competitions, games and site settings can be read without signing in: a link to one competition (or a stream)
