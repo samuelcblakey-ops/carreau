@@ -29,6 +29,8 @@ const { chromium } = require('playwright');
     q('[data-tab="standings"]').click(); await w(150);
     L.push(`standings panel: ${txt(q('[data-hof-panel]'))}`);
     q('[data-tab="setup"]').click(); await w(150); L.push(`setup panel: ${!!q('[data-hof-panel] [data-act="hof-open"]')}`);
+    q('[data-tab="draw"]').click(); await w(150);
+    { const first = q('main .hof-top-wrap'); const before = !!first && !!(first.compareDocumentPosition(q('main h2')) & Node.DOCUMENT_POSITION_FOLLOWING); L.push(`draw top: ${before} | ${txt(first?.querySelector('[data-act="hof-open"]'))}`); }
     q('[data-tab="standings"]').click(); await w(150);
     q('[data-hof-panel] [data-act="hof-open"]').click(); await w(150);
     const sheet = q('#modal .hof-sheet');
@@ -43,10 +45,12 @@ const { chromium } = require('playwright');
     L.push(`saved: modal ${!!q('#modal .modal')} | toast ${txt(q('#toast'))} | ${e1.level} ${e1.country} ${e1.region} | note ${e1.note} | parts ${e1.parts.map(x => x.name + ':' + x.winner.name + '/' + x.runnerUp.name).join(',')} | hidden ${e1.hidden} | ${e1.name} ${e1.date} ${e1.venue} ${e1.system}`);
     L.push(`no nested arrays: ${!JSON.stringify(e1).match(/\[\s*\[/)}`);
     L.push(`panel after: ${txt(q('[data-hof-panel]'))}`);
+    q('[data-tab="draw"]').click(); await w(150); L.push(`draw top after publishing: ${!!q('.hof-top')}`); q('[data-tab="standings"]').click(); await w(150);
     // a correction to the final: the organiser is asked to update
     const fin = C.MS().find(m => m.stage === 'ko' && m.round === C.T().brackets[0].rounds && !m.third);
     const ru = e1.parts[0].runnerUp.name; const aW = fin.sa > fin.sb; await C.recordResult(fin.id, aW ? 5 : 13, aW ? 13 : 5, true); await w(200); q('[data-tab="standings"]').click(); await w(100);
     L.push(`changed: ${!!q('.hof-changed')} | ${txt(q('.hof-changed'))}`);
+    q('[data-tab="draw"]').click(); await w(150); L.push(`draw top after correction: ${!!q('.hof-top .hof-changed')}`); q('[data-tab="standings"]').click(); await w(150);
     q('.hof-changed [data-act="hof-open"]').click(); await w(150);
     L.push(`update sheet: ${txt(q('#modal h3'))} | level kept ${q('#modal .hof-pick.hof-regional').classList.contains('on')} | region kept ${q('#modal [data-hof="region"]').value}`);
     q('#modal [data-act="hof-save"]').click(); await w(250);
@@ -132,7 +136,7 @@ const { chromium } = require('playwright');
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); } return L; });
   console.log(out.join('\n'));
   // the country a new entry starts on comes from the device's language region
-  for (const loc of ['fr-FR', 'th-TH', 'en-US']) { const c2 = await b.newContext({ locale: loc }); const p2 = await c2.newPage(); await p2.goto(process.env.APP_URL);
+  for (const loc of ['fr-FR', 'th-TH', 'en-US', 'en-AU', 'de-CH']) { const c2 = await b.newContext({ locale: loc }); const p2 = await c2.newPage(); await p2.goto(process.env.APP_URL);
     console.log(`default ${loc}: ${await p2.evaluate(() => window.__carreau.hofDefaultCountry())}`); await c2.close(); }
   console.log('errs', errs); await b.close();
 })();
