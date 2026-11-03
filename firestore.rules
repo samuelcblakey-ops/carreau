@@ -173,6 +173,41 @@ service cloud.firestore {
         allow delete: if signedIn() && (request.auth.uid == uid || ownsStream(sid) || isAdmin());
       }
     }
+    // Hall of Fame: a snapshot of a finished competition's winner and runner-up for each part, published by its organiser
+    // (the device that made it, an organiser link, or the organiser code it was made with) or the admin. Open testing doesn't
+    // count: a visitor who can run someone else's competition can't publish it. Anyone can read shown entries; hidden ones only
+    // the admin and the organiser. Entries go live straight away; only the admin may hide one (hidden, hiddenAt) or lock its
+    // level or country (levelSetBy / countrySetBy: 'admin'), and an organiser's update must leave all of those unchanged.
+    function hofOrganiser(tid) { return signedIn() && exists(tdoc(tid)) && notArchived(tid) && get(tdoc(tid)).data.get('listed', false) != true
+                                   && (owns(tid) || role(tid) == 'edit' || (get(tdoc(tid)).data.get('orgCode', '') != '' && orgEdits(tid))); }
+    function hofShape(d, tid) {
+      return d.keys().hasOnly(['tid', 'name', 'date', 'venue', 'entry', 'fmt', 'system', 'level', 'country', 'region', 'note', 'parts', 'sig', 'lang',
+                               'publishedAt', 'updatedAt', 'byUid', 'byCode', 'hidden', 'hiddenAt', 'levelSetBy', 'countrySetBy'])
+        && d.tid == tid && d.name is string && d.name.size() <= 120 && d.level in ['national', 'regional', 'open']
+        && d.country is string && d.country.size() >= 2 && d.country.size() <= 8
+        && d.get('region', '') is string && d.get('region', '').size() <= 60 && d.get('note', '') is string && d.get('note', '').size() <= 300
+        && d.get('venue', '') is string && d.get('venue', '').size() <= 120
+        && d.parts is list && d.parts.size() >= 1 && d.parts.size() <= 12 && d.hidden is bool;
+    }
+    function same(k) { return request.resource.data.get(k, null) == resource.data.get(k, null); }
+    match /hallOfFame/{tid} {
+      allow get: if resource == null || resource.data.hidden != true || isAdmin() || hofOrganiser(tid);
+      allow list: if isAdmin() || resource.data.hidden == false;
+      allow create: if hofShape(request.resource.data, tid)
+                    && (isAdmin() || (hofOrganiser(tid) && request.resource.data.byUid == request.auth.uid && request.resource.data.hidden == false
+                                      && !request.resource.data.keys().hasAny(['hiddenAt', 'levelSetBy', 'countrySetBy'])));
+      allow update: if hofShape(request.resource.data, tid)
+                    && (isAdmin() || (hofOrganiser(tid) && same('hidden') && same('hiddenAt') && same('levelSetBy') && same('countrySetBy')
+                                      && same('byUid') && same('byCode') && same('publishedAt')
+                                      && (resource.data.get('levelSetBy', '') != 'admin' || same('level'))
+                                      && (resource.data.get('countrySetBy', '') != 'admin' || same('country'))));
+      allow delete: if isAdmin() || hofOrganiser(tid);
+      // the admin's reason for hiding an entry: for the organiser and the admin only
+      match /private/{docId} {
+        allow read: if docId == 'admin' && (isAdmin() || hofOrganiser(tid));
+        allow write: if docId == 'admin' && isAdmin();
+      }
+    }
     // SN Pétanque Academy (academy.snpetanque.com): one document per player, keyed by their uid, with their results underneath.
     // A player reads and writes only their own; the admin can read everyone's (the Academy admin page).
     match /academy/{uid} {
