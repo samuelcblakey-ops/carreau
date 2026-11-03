@@ -381,6 +381,7 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .hof-where{align-items:flex-end}.hof-where .f{flex:1 1 200px}
 .hof-part{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px}.hof-part input{width:22px;height:22px;margin-top:1px;flex:none}.hof-part.off{opacity:.65}
 .hof-sheet{max-width:560px}
+.hof-top-wrap{margin-bottom:16px}.hof-top{border:2px solid #e8b923}
 tr.pod1 td{background:rgba(232,185,35,.15)}tr.pod2 td{background:rgba(150,163,176,.17)}tr.pod3 td{background:rgba(208,137,74,.15)}
 .facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px}
 @media (max-width:560px){.facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.fact{padding:10px 11px}.fact-v{font-size:17px}}
@@ -2572,9 +2573,11 @@ function hofCountryName(code) {
   if (code.startsWith("GB-")) return hofWord(code);
   try { return new Intl.DisplayNames([LOCALES[I18N.lang] || "en-GB"], { type: "region" }).of(code) || code; } catch { return code; }
 }
-// default country from the device's language region (en-GB → England, fr-FR → France, th-TH → Thailand)
+// default country: England for English devices, otherwise the language region (fr-FR → France, th-TH → Thailand)
 function hofDefaultCountry() {
   const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]).map(String);
+  // any English (en-US, en-AU…) starts on England, the site's home; other languages go by their region (fr-FR → France)
+  if (/^en\b/i.test(langs[0] || "")) return "GB-ENG";
   for (const l of langs) { const r = (l.split(/[-_]/)[1] || "").toUpperCase(); if (r === "GB" || r === "UK") return "GB-ENG"; if (HOF_COUNTRIES.includes(r)) return r; }
   const byLang = { fr: "FR", es: "ES", it: "IT", de: "DE", nl: "NL", pt: "PT", th: "TH" }[(langs[0] || "").slice(0, 2).toLowerCase()];
   return byLang || "GB-ENG";
@@ -2622,7 +2625,7 @@ function hofResult(t, ms) {
 const hofSig = parts => parts.filter(p => p.done !== false && p.winner).map(p => [p.id, p.winner?.name, (p.winner?.players || []).join("+"), p.runnerUp?.name, (p.runnerUp?.players || []).join("+")].join("|")).join("#");
 const hofCan = t => !!(t && S.store.setHof && (S.hofCanPublish ? S.hofCanPublish(t) : canEdit()));
 function hofWatch() {
-  const t = T(); const want = t && hofCan(t) && ["standings", "setup"].includes(S.tab) ? t.id : null;
+  const t = T(); const want = t && hofCan(t) && ["standings", "setup", "draw"].includes(S.tab) ? t.id : null;
   if (!want) { if (S.hofKey && S.hofKey !== S.tid) { S.unsubH?.(); S.unsubH = null; S.hofKey = null; } return; }
   if (S.hofKey === want) return;
   S.unsubH?.(); S.hofKey = want; S.hof = S.hof || {};
@@ -2646,6 +2649,14 @@ function hofPanel(t, where) {
     ${changed && !e.hidden ? `<div class="notice small hof-changed">The result has changed since it was published. <button class="btn" data-act="hof-open">Update the entry</button></div>` : ""}
     ${e.levelSetBy === "admin" && !e.hidden ? `<div class="small muted">The site admin set the level. It stays the same when you update the entry.</div>` : ""}</div>`;
 }
+// top of Draw & results: once the final's score is in and it isn't published yet (or the result has changed since)
+function hofDrawPanel(t) {
+  if (!hofCan(t) || t.archived || !hofResult(t).ready) return "";
+  const e = S.hof?.[t.id]; if (e === undefined) return "";
+  if (e) { const r = hofResult(t); if (e.hidden || e.sig === hofSig(r.parts.filter(p => (e.parts || []).some(x => x.id === p.id)))) return ""; }
+  return hofPanel(t, "draw").replace('class="panel ', 'class="panel hof-top ');
+}
+function renderDrawPage(t) { const p = hofDrawPanel(t); return p ? `<div class="hof-top-wrap">${p}</div>` + renderDraw(t) : renderDraw(t); }
 function hofOpen(t) {
   const e = S.hof?.[t.id] || null; const r = hofResult(t);
   const parts = {}; r.parts.forEach(p => parts[p.id] = p.done && (!e || (e.parts || []).some(x => x.id === p.id)));
@@ -3419,7 +3430,7 @@ function drawPage() {
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
-  const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDraw, courts: renderCourts, standings: renderStandings, display: renderDisplay, stream: renderStreamTab }[S.tab] || renderDraw;
+  const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDrawPage, courts: renderCourts, standings: renderStandings, display: renderDisplay, stream: renderStreamTab }[S.tab] || renderDrawPage;
   // examples: visitors can open every tab, but the organiser pages are locked
   const fn = viewAll(t) && ["setup", "entries", "courts"].includes(S.tab) ? (x => `<div class="notice" style="margin-bottom:16px"><b>Example competition.</b> You can look around every page, but nothing here can be changed. Tap + to make your own.</div><fieldset class="ro-view" disabled>${fn0(x)}</fieldset>`) : fn0;
   main.innerHTML = (S.topBanner ? S.topBanner() : "") + (t.archived ? `<div class="notice" style="margin-bottom:16px">Archived. Only the site admin can see this competition.${S.canSeeArchived() ? ` <button class="btn sm" data-act="restore">Restore</button>` : ""}</div>` : "") + (t.template ? `<div class="notice spread" style="margin-bottom:16px"><span><b>Run-through template.</b> Get your own copy with these settings and shooters, then run it start to finish with the live scorer.</span>${S.canCreate() ? `<button class="btn primary sm" data-act="use-template">Try it yourself</button>` : ""}</div>` : "") + (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
