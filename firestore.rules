@@ -178,16 +178,17 @@ service cloud.firestore {
     // count: a visitor who can run someone else's competition can't publish it. Anyone can read shown entries; hidden ones only
     // the admin and the organiser. Entries go live straight away; only the admin may hide one (hidden, hiddenAt) or lock its
     // level or country (levelSetBy / countrySetBy: 'admin'), and an organiser's update must leave all of those unchanged.
+    // 'gone' marks an entry whose competition has been archived or deleted, so the Hall of Fame page doesn't link to it.
     function hofOrganiser(tid) { return signedIn() && exists(tdoc(tid)) && notArchived(tid) && get(tdoc(tid)).data.get('listed', false) != true
                                    && (owns(tid) || role(tid) == 'edit' || (get(tdoc(tid)).data.get('orgCode', '') != '' && orgEdits(tid))); }
     function hofShape(d, tid) {
       return d.keys().hasOnly(['tid', 'name', 'date', 'venue', 'entry', 'fmt', 'system', 'level', 'country', 'region', 'note', 'parts', 'sig', 'lang',
-                               'publishedAt', 'updatedAt', 'byUid', 'byCode', 'hidden', 'hiddenAt', 'levelSetBy', 'countrySetBy'])
+                               'publishedAt', 'updatedAt', 'byUid', 'byCode', 'hidden', 'hiddenAt', 'levelSetBy', 'countrySetBy', 'gone'])
         && d.tid == tid && d.name is string && d.name.size() <= 120 && d.level in ['national', 'regional', 'open']
         && d.country is string && d.country.size() >= 2 && d.country.size() <= 8
         && d.get('region', '') is string && d.get('region', '').size() <= 60 && d.get('note', '') is string && d.get('note', '').size() <= 300
         && d.get('venue', '') is string && d.get('venue', '').size() <= 120
-        && d.parts is list && d.parts.size() >= 1 && d.parts.size() <= 12 && d.hidden is bool;
+        && d.parts is list && d.parts.size() >= 1 && d.parts.size() <= 12 && d.hidden is bool && d.get('gone', false) is bool;
     }
     function same(k) { return request.resource.data.get(k, null) == resource.data.get(k, null); }
     match /hallOfFame/{tid} {
