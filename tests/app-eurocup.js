@@ -148,6 +148,31 @@ const { chromium } = require('playwright');
     await w(150); C.render(); await w(40);
     L.push('final tie: ' + txt(q('.fixture .fx')));
     await tab('standings'); L.push('final table: ' + txt(qa('main .panel')[0].querySelector('tbody tr')));
+    // 7b. Triples & doubles with the organiser's points: 5 and 3 make 19 (first to 10); 6 and 3 make 21 (first to 11)
+    q('[data-act="new-t"]').click(); await w(100);
+    { const t = T(); Object.assign(t, { wizard: false, checkin: false, system: 'eurocup', name: 'Points' }); t.courts = Array.from({ length: 6 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true }));
+      t.teams = [Object.assign({ id: 'pa', name: 'North', club: 'North', active: true }, squad('N')), Object.assign({ id: 'pb', name: 'South', club: 'South', active: true }, squad('S'))]; await put(t); }
+    await tab('setup'); q('[data-set="euroFormat"][data-val="points"]').click(); await w(120);
+    const ptsNote = () => (txt(q('main')).match(/A tie is worth \d+ points: triples \d+ each, doubles \d+ each\. The first club to \d+ wins the tie[^.]*\./) || ['none'])[0];
+    L.push('points setup: format ' + C.T().euroFormat + ' | boxes ' + q('#f-euptt').value + ' ' + q('#f-euptd').value + ' | ' + ptsNote() + ' | pills ' + qa('.euro-legs .pill').map(x => x.textContent).join(','));
+    const setBox = async (id, v) => { const el = q(id); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); await w(120); };
+    await setBox('#f-euptt', '6'); L.push('triples 6: ' + ptsNote() + ' | even note ' + /can end level/.test(txt(q('main'))));
+    await setBox('#f-euptt', '4'); await setBox('#f-euptd', '2'); L.push('4 and 2: ' + ptsNote() + ' | even note ' + /With an even total a tie can end level\./.test(txt(q('main'))));
+    await setBox('#f-euptt', '6'); await setBox('#f-euptd', '3');
+    await tab('draw'); q('[data-act="first-draw"]').click(); await w(250);
+    const pg = C.MS().sort((a, b) => a.order - b.order), pf = C.T().clubFix[0];
+    L.push('points drawn: ' + pg.map(m => m.eu + ':' + m.pts).join(',') + ' | total ' + pg.reduce((n, m) => n + m.pts, 0) + ' | tag ' + txt(q('.fixture .spread .row')));
+    for (const m of pg) { S.matches[m.id].la = Array.from({ length: m.size }, (_, i) => `N P${i + (m.leg === 1 && m.mixed ? 1 : 4)}`); S.matches[m.id].lb = Array.from({ length: m.size }, (_, i) => `S P${i + (m.leg === 1 && m.mixed ? 1 : 4)}`); }
+    // North win both triples: 12 of 21 passes 11, so the tie is North's with the doubles still to play
+    for (const m of pg.filter(m => m.leg === 1)) await C.recordResult(m.id, 13, 5, true);
+    await C.assignCourts(); await w(100); C.render(); await w(40);
+    L.push('decided at 12: ' + txt(q('.fixture .fx')) + ' | tag ' + txt(q('.fixture .spread .row')) + ' | doubles still on pistes ' + C.MS().filter(m => m.leg === 2 && m.court).length);
+    await tab('standings'); const prow = () => [...qa('main .panel')[0].querySelectorAll('tbody tr')].map(r => txt(r)).join(' / ');
+    L.push('table while doubles play: ' + prow());
+    for (const m of pg.filter(m => m.leg === 2)) await C.recordResult(m.id, 6, 13, true);
+    await w(100); C.render(); await w(40);
+    L.push('table at the end: ' + prow() + ' | note ' + (txt(q('main')).match(/GP is game points: 6 for a triples win, 3 for doubles\. A tie counts as won as soon as a club has more than half its points\./) || ['none'])[0]);
+    await tab('draw'); L.push('tie at the end: ' + txt(q('.fixture .fx')) + ' | tag ' + txt(q('.fixture .spread .row')));
     // 8. Quick setup offers EuroCup
     q('[data-act="new-t"]').click(); await w(150); q('#wz-name').value = 'Euro'; q('[data-act="wiz-next"]').click(); await w(50);
     q('[data-act="wiz-set"][data-k="kind"][data-v="eurocup"]').click(); await w(40); q('[data-act="wiz-next"]').click(); await w(50);
@@ -158,6 +183,7 @@ const { chromium } = require('playwright');
     q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80); await tab('setup');
     L.push('french: ' + qa('[data-set="euroFormat"]').map(x => x.textContent).join(',') + ' | ' + txt(q('[data-set="system"][data-val="eurocup"]')) + ' | ' + C.tr('Name the line-ups') + ' | ' + C.tr('Riverside: R2 is in two triples games.') + ' | ' + C.tr('6 ties over 3 rounds'));
     L.push('french picker: ' + C.tr('Same as last tie') + ' | ' + C.tr('Next:') + ' | ' + C.tr('Tap a name to fill the next place. Tap a filled place to change it.') + ' | ' + C.tr("Copied from round 2. 1 player isn't in the squad any more, so that place is empty.") + ' | ' + C.tr('+ Add a player'));
+    L.push('french points: ' + C.tr('Points for a triples win') + ' | ' + C.tr('A tie is worth 19 points: triples 5 each, doubles 3 each. The first club to 10 wins the tie; the rest of its games are still played and count towards the points.') + ' | ' + C.tr('win the tie') + ' | ' + C.tr('First to 10'));
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack); } return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
