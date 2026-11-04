@@ -392,6 +392,31 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .hof-where{align-items:flex-end}.hof-where .f{flex:1 1 200px}
 .hof-part{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px}.hof-part input{width:22px;height:22px;margin-top:1px;flex:none}.hof-part.off{opacity:.65}
 .hof-sheet{max-width:560px}
+/* Hall of Fame: the header link, the start-screen card and the page */
+.hof-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;flex:none;white-space:nowrap}
+.hof-btn svg{display:block;color:#b8860b}.hof-btn:hover{border-color:var(--accent)}.hof-btn[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.hof-btn[aria-current="page"] svg{color:inherit}
+@media (pointer:coarse){.hof-btn{min-height:44px;min-width:44px}}
+.hof-ic{display:inline-flex;vertical-align:-3px;margin-right:8px;color:#b8860b}.hof-ic svg{width:1em;height:1em}
+.hof-start b{display:flex;align-items:center}.hof-start .hof-ic svg{width:24px;height:24px}
+.hof-page a.btn,.hof-panel a.btn{color:inherit;text-decoration:none}
+.hof-page{max-width:760px;margin:0 auto}
+.hof-hero{align-items:flex-start}.hof-hero h2{display:flex;align-items:center}.hof-hero p{margin:0}
+.hof-selects{display:flex;flex-wrap:wrap;gap:10px}.hof-selects .f{flex:1 1 200px;min-width:0}.hof-selects select{width:100%}
+.hof-tools input[type=search]{width:100%;box-sizing:border-box}
+.hof-chips{display:flex;flex-wrap:wrap;gap:8px}
+.hof-chip{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.hof-chip .dot{width:10px;height:10px;border-radius:50%;background:#2e7d32}.hof-chip.hof-national .dot{background:#b3261e}.hof-chip.hof-regional .dot{background:#1f5fa8}
+.hof-chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}.hof-chip[aria-pressed="true"] .dot{box-shadow:0 0 0 2px #fff}
+.hof-chip.hof-national[aria-pressed="true"]{background:#b3261e;border-color:#b3261e;color:#fff}.hof-chip.hof-regional[aria-pressed="true"]{background:#1f5fa8;border-color:#1f5fa8;color:#fff}.hof-chip.hof-open[aria-pressed="true"]{background:#2e7d32;border-color:#2e7d32;color:#fff}
+@media (pointer:coarse){.hof-chip{min-height:44px}}
+.hof-year{gap:10px}.hof-year-h{margin:10px 0 0;font-size:24px}
+.hof-card{display:flex;flex-direction:column;gap:8px}.hof-card h3{margin:0;overflow-wrap:anywhere}
+.hof-where{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.hof-parts{display:flex;flex-direction:column;gap:10px}.hof-res{display:flex;flex-direction:column;gap:4px}
+.hof-part-name{font-weight:700;font-size:14px}
+.hof-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}.hof-row .eyebrow{margin-right:2px}.hof-row b,.hof-row span{overflow-wrap:anywhere}
+.hof-note{margin:0;font-style:italic;color:var(--muted)}
+.hof-focus{outline:3px solid #e8b923;outline-offset:2px}
 .hof-top-wrap{margin-bottom:16px}.hof-top{border:2px solid #e8b923}
 tr.pod1 td{background:rgba(232,185,35,.15)}tr.pod2 td{background:rgba(150,163,176,.17)}tr.pod3 td{background:rgba(208,137,74,.15)}
 .facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px}
@@ -1115,6 +1140,14 @@ Object.assign(LANG_TEXT.de, {"at least {n} players": "mindestens {1} Spieler", "
 Object.assign(LANG_TEXT.nl, {"at least {n} players": "minstens {1} spelers", "+ Add a player": "+ Speler toevoegen", "To take a player out, clear their name.": "Wis de naam om een speler eruit te halen.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Elke inschrijving is een club met een selectie van minstens {1} spelers. De partijen van elke ontmoeting volgen het ontmoetingsformat.", "Tap a name to fill the next place. Tap a filled place to change it.": "Tik op een naam om de volgende plek te vullen. Tik op een gevulde plek om die te wijzigen.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "De hele selectie speelt al in deze fase. Voeg spelers aan de selectie toe bij Inschrijving.", "All places are filled.": "Alle plekken zijn gevuld.", "Tap a place to change it.": "Tik op een plek om die te wijzigen.", "Same as last tie": "Zoals de vorige ontmoeting", "Next:": "Volgende:", "Copied from round {n}.": "Overgenomen uit ronde {1}.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Overgenomen uit ronde {1}. 1 speler zit niet meer in de selectie, dus die plek is leeg.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Overgenomen uit ronde {1}. {2} spelers zitten niet meer in de selectie, dus hun plekken zijn leeg.", "{x}, place {n}": "{1}, plek {2}", "Leg": "Fase", "Next place": "Volgende"});
 Object.assign(LANG_TEXT.pt, {"at least {n} players": "pelo menos {1} jogadores", "+ Add a player": "+ Adicionar um jogador", "To take a player out, clear their name.": "Para retirar um jogador, apague o nome.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Cada inscrição é um clube com um plantel de pelo menos {1} jogadores. Os jogos de cada encontro seguem o formato do encontro.", "Tap a name to fill the next place. Tap a filled place to change it.": "Toque num nome para preencher o lugar seguinte. Toque num lugar preenchido para o alterar.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "Todo o plantel já joga nesta fase. Adicione jogadores ao plantel em Inscrições.", "All places are filled.": "Todos os lugares estão preenchidos.", "Tap a place to change it.": "Toque num lugar para o alterar.", "Same as last tie": "Igual ao último encontro", "Next:": "Seguinte:", "Copied from round {n}.": "Copiado da ronda {1}.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Copiado da ronda {1}. 1 jogador já não está no plantel, por isso o lugar está vazio.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Copiado da ronda {1}. {2} jogadores já não estão no plantel, por isso os lugares estão vazios.", "{x}, place {n}": "{1}, lugar {2}", "Leg": "Fase", "Next place": "Seguinte"});
 Object.assign(LANG_TEXT.th, {"at least {n} players": "อย่างน้อย {1} คน", "+ Add a player": "+ เพิ่มผู้เล่น", "To take a player out, clear their name.": "หากต้องการเอาผู้เล่นออก ให้ลบชื่อ", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "แต่ละรายการคือสโมสรพร้อมรายชื่อนักกีฬาอย่างน้อย {1} คน เกมในแต่ละแมตช์กำหนดตามรูปแบบแมตช์", "Tap a name to fill the next place. Tap a filled place to change it.": "แตะชื่อเพื่อใส่ในตำแหน่งถัดไป แตะตำแหน่งที่มีชื่อแล้วเพื่อเปลี่ยน", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "นักกีฬาทุกคนในรายชื่อลงเล่นในช่วงนี้แล้ว เพิ่มผู้เล่นในรายชื่อได้ที่หน้าลงทะเบียน", "All places are filled.": "ทุกตำแหน่งมีชื่อแล้ว", "Tap a place to change it.": "แตะตำแหน่งเพื่อเปลี่ยน", "Same as last tie": "เหมือนแมตช์ที่แล้ว", "Next:": "ถัดไป:", "Copied from round {n}.": "คัดลอกจากรอบ {1}", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "คัดลอกจากรอบ {1} ผู้เล่น 1 คนไม่อยู่ในรายชื่อแล้ว ตำแหน่งนั้นจึงว่าง", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "คัดลอกจากรอบ {1} ผู้เล่น {2} คนไม่อยู่ในรายชื่อแล้ว ตำแหน่งเหล่านั้นจึงว่าง", "{x}, place {n}": "{1} ตำแหน่ง {2}", "Leg": "ช่วง", "Next place": "ถัดไป"});
+// Hall of Fame page
+Object.assign(FR_TEXT, {"Winners of competitions run on SN Pétanque": "Les vainqueurs des concours organisés sur SN Pétanque", "Winners and runners-up of competitions run on SN Pétanque, published by their organisers.": "Vainqueurs et finalistes des concours organisés sur SN Pétanque, publiés par leurs organisateurs.", "Name, club or competition": "Nom, club ou concours", "Search the Hall of Fame": "Chercher dans le palmarès", "All countries": "Tous les pays", "All formats": "Tous les formats", "All levels": "Tous les niveaux", "Loading the Hall of Fame…": "Chargement du palmarès…", "No winners from this country yet.": "Pas encore de vainqueurs pour ce pays.", "Show all countries": "Voir tous les pays", "No winners have been published yet. Organisers publish theirs once a competition has finished.": "Aucun vainqueur publié pour l'instant. Les organisateurs publient les leurs une fois le concours terminé.", "Nothing matches your search.": "Rien ne correspond à votre recherche.", "Clear the search and filters": "Effacer la recherche et les filtres", "The Hall of Fame couldn't be loaded. Check your connection and try again.": "Le palmarès n'a pas pu être chargé. Vérifiez votre connexion et réessayez.", "Try again": "Réessayer", "View the competition": "Voir le concours", "Share": "Partager", "Link copied.": "Lien copié.", "That entry isn't in the Hall of Fame any more.": "Cette entrée n'est plus au palmarès."});
+Object.assign(LANG_TEXT.es, {"Winners of competitions run on SN Pétanque": "Los ganadores de las competiciones organizadas en SN Pétanque", "Winners and runners-up of competitions run on SN Pétanque, published by their organisers.": "Ganadores y subcampeones de las competiciones organizadas en SN Pétanque, publicados por sus organizadores.", "Name, club or competition": "Nombre, club o competición", "Search the Hall of Fame": "Buscar en el palmarés", "All countries": "Todos los países", "All formats": "Todos los formatos", "All levels": "Todos los niveles", "Loading the Hall of Fame…": "Cargando el palmarés…", "No winners from this country yet.": "Aún no hay ganadores de este país.", "Show all countries": "Ver todos los países", "No winners have been published yet. Organisers publish theirs once a competition has finished.": "Aún no se ha publicado ningún ganador. Los organizadores publican los suyos cuando termina la competición.", "Nothing matches your search.": "Nada coincide con tu búsqueda.", "Clear the search and filters": "Borrar la búsqueda y los filtros", "The Hall of Fame couldn't be loaded. Check your connection and try again.": "No se ha podido cargar el palmarés. Comprueba la conexión e inténtalo de nuevo.", "Try again": "Reintentar", "View the competition": "Ver la competición", "Share": "Compartir", "Link copied.": "Enlace copiado.", "That entry isn't in the Hall of Fame any more.": "Esta entrada ya no está en el palmarés."});
+Object.assign(LANG_TEXT.it, {"Winners of competitions run on SN Pétanque": "I vincitori delle gare organizzate su SN Pétanque", "Winners and runners-up of competitions run on SN Pétanque, published by their organisers.": "Vincitori e secondi classificati delle gare organizzate su SN Pétanque, pubblicati dai loro organizzatori.", "Name, club or competition": "Nome, club o gara", "Search the Hall of Fame": "Cerca nell'albo d'oro", "All countries": "Tutti i paesi", "All formats": "Tutti i formati", "All levels": "Tutti i livelli", "Loading the Hall of Fame…": "Caricamento dell'albo d'oro…", "No winners from this country yet.": "Ancora nessun vincitore per questo paese.", "Show all countries": "Mostra tutti i paesi", "No winners have been published yet. Organisers publish theirs once a competition has finished.": "Nessun vincitore pubblicato finora. Gli organizzatori pubblicano i propri a gara conclusa.", "Nothing matches your search.": "Nessun risultato per la tua ricerca.", "Clear the search and filters": "Cancella ricerca e filtri", "The Hall of Fame couldn't be loaded. Check your connection and try again.": "Impossibile caricare l'albo d'oro. Controlla la connessione e riprova.", "Try again": "Riprova", "View the competition": "Vedi la gara", "Share": "Condividi", "Link copied.": "Link copiato.", "That entry isn't in the Hall of Fame any more.": "Questa voce non è più nell'albo d'oro."});
+Object.assign(LANG_TEXT.de, {"Winners of competitions run on SN Pétanque": "Die Sieger der Turniere auf SN Pétanque", "Winners and runners-up of competitions run on SN Pétanque, published by their organisers.": "Sieger und Zweite der Turniere auf SN Pétanque, veröffentlicht von ihren Organisatoren.", "Name, club or competition": "Name, Verein oder Turnier", "Search the Hall of Fame": "In der Ruhmeshalle suchen", "All countries": "Alle Länder", "All formats": "Alle Formate", "All levels": "Alle Stufen", "Loading the Hall of Fame…": "Ruhmeshalle wird geladen…", "No winners from this country yet.": "Noch keine Sieger aus diesem Land.", "Show all countries": "Alle Länder zeigen", "No winners have been published yet. Organisers publish theirs once a competition has finished.": "Noch keine Sieger veröffentlicht. Organisatoren veröffentlichen ihre, sobald ein Turnier beendet ist.", "Nothing matches your search.": "Keine Treffer für deine Suche.", "Clear the search and filters": "Suche und Filter zurücksetzen", "The Hall of Fame couldn't be loaded. Check your connection and try again.": "Die Ruhmeshalle konnte nicht geladen werden. Prüfe die Verbindung und versuch es noch einmal.", "Try again": "Erneut versuchen", "View the competition": "Turnier ansehen", "Share": "Teilen", "Link copied.": "Link kopiert.", "That entry isn't in the Hall of Fame any more.": "Dieser Eintrag ist nicht mehr in der Ruhmeshalle."});
+Object.assign(LANG_TEXT.nl, {"Winners of competitions run on SN Pétanque": "De winnaars van wedstrijden op SN Pétanque", "Winners and runners-up of competitions run on SN Pétanque, published by their organisers.": "Winnaars en finalisten van wedstrijden op SN Pétanque, gepubliceerd door hun organisatoren.", "Name, club or competition": "Naam, club of wedstrijd", "Search the Hall of Fame": "Zoeken in de erelijst", "All countries": "Alle landen", "All formats": "Alle spelvormen", "All levels": "Alle niveaus", "Loading the Hall of Fame…": "Erelijst laden…", "No winners from this country yet.": "Nog geen winnaars uit dit land.", "Show all countries": "Toon alle landen", "No winners have been published yet. Organisers publish theirs once a competition has finished.": "Er zijn nog geen winnaars gepubliceerd. Organisatoren zetten de hunne erop zodra een wedstrijd klaar is.", "Nothing matches your search.": "Niets gevonden voor je zoekopdracht.", "Clear the search and filters": "Zoekopdracht en filters wissen", "The Hall of Fame couldn't be loaded. Check your connection and try again.": "De erelijst kon niet worden geladen. Controleer je verbinding en probeer het opnieuw.", "Try again": "Opnieuw proberen", "View the competition": "Bekijk de wedstrijd", "Share": "Delen", "Link copied.": "Link gekopieerd.", "That entry isn't in the Hall of Fame any more.": "Deze vermelding staat niet meer op de erelijst."});
+Object.assign(LANG_TEXT.pt, {"Winners of competitions run on SN Pétanque": "Os vencedores das competições organizadas no SN Pétanque", "Winners and runners-up of competitions run on SN Pétanque, published by their organisers.": "Vencedores e finalistas das competições organizadas no SN Pétanque, publicados pelos organizadores.", "Name, club or competition": "Nome, clube ou competição", "Search the Hall of Fame": "Pesquisar no palmarés", "All countries": "Todos os países", "All formats": "Todos os formatos", "All levels": "Todos os níveis", "Loading the Hall of Fame…": "A carregar o palmarés…", "No winners from this country yet.": "Ainda não há vencedores deste país.", "Show all countries": "Ver todos os países", "No winners have been published yet. Organisers publish theirs once a competition has finished.": "Ainda não foram publicados vencedores. Os organizadores publicam os seus quando a competição termina.", "Nothing matches your search.": "Nada corresponde à sua pesquisa.", "Clear the search and filters": "Limpar a pesquisa e os filtros", "The Hall of Fame couldn't be loaded. Check your connection and try again.": "Não foi possível carregar o palmarés. Verifique a ligação e tente de novo.", "Try again": "Tentar de novo", "View the competition": "Ver a competição", "Share": "Partilhar", "Link copied.": "Ligação copiada.", "That entry isn't in the Hall of Fame any more.": "Esta entrada já não está no palmarés."});
+Object.assign(LANG_TEXT.th, {"Winners of competitions run on SN Pétanque": "ผู้ชนะจากการแข่งขันที่จัดบน SN Pétanque", "Winners and runners-up of competitions run on SN Pétanque, published by their organisers.": "ผู้ชนะและรองแชมป์จากการแข่งขันที่จัดบน SN Pétanque เผยแพร่โดยผู้จัดการแข่งขัน", "Name, club or competition": "ชื่อ สโมสร หรือการแข่งขัน", "Search the Hall of Fame": "ค้นหาในหอเกียรติยศ", "All countries": "ทุกประเทศ", "All formats": "ทุกรูปแบบ", "All levels": "ทุกระดับ", "Loading the Hall of Fame…": "กำลังโหลดหอเกียรติยศ…", "No winners from this country yet.": "ยังไม่มีผู้ชนะจากประเทศนี้", "Show all countries": "แสดงทุกประเทศ", "No winners have been published yet. Organisers publish theirs once a competition has finished.": "ยังไม่มีการเผยแพร่ผู้ชนะ ผู้จัดจะเผยแพร่เมื่อการแข่งขันจบลง", "Nothing matches your search.": "ไม่พบผลลัพธ์ที่ตรงกับการค้นหา", "Clear the search and filters": "ล้างการค้นหาและตัวกรอง", "The Hall of Fame couldn't be loaded. Check your connection and try again.": "โหลดหอเกียรติยศไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง", "Try again": "ลองอีกครั้ง", "View the competition": "ดูการแข่งขัน", "Share": "แชร์", "Link copied.": "คัดลอกลิงก์แล้ว", "That entry isn't in the Hall of Fame any more.": "รายการนี้ไม่อยู่ในหอเกียรติยศแล้ว"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1201,6 +1234,9 @@ function localStore() {
     watchHof(tid, cb) { setTimeout(() => cb(data.hof[tid] ? clone(data.hof[tid]) : null)); const k = "h:" + tid; if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(cb); return () => subsL.get(k).delete(cb); },
     async setHof(tid, e) { if (e) data.hof[tid] = clone(e); else delete data.hof[tid]; persist(); setTimeout(() => (subsL.get("h:" + tid) || new Set()).forEach(cb => cb(e ? clone(e) : null))); },
     async deleteHof(tid) { return this.setHof(tid, null); },
+    async updateHof(tid, patch) { if (!data.hof[tid]) throw { code: "not-found" }; return this.setHof(tid, Object.assign(clone(data.hof[tid]), clone(patch))); },
+    async getHof(tid) { return data.hof[tid] ? clone(data.hof[tid]) : null; },
+    async listHof({ country } = {}) { return Object.values(data.hof).filter(e => !e.hidden && (!country || e.country === country)).map(clone); },
     watchStreams(cb) { subsS.add(cb); emitS(); return () => subsS.delete(cb); },
     watchStream(sid, cb) { if (!subsS1.has(sid)) subsS1.set(sid, new Set()); subsS1.get(sid).add(cb); emitS(sid); return () => subsS1.get(sid).delete(cb); },
     async setStream(st) { data.s[st.id] = clone(st); persist(); emitS(st.id); },
@@ -1210,7 +1246,7 @@ function localStore() {
     watchTournaments(cb) { subsT.add(cb); emitT(); return () => subsT.delete(cb); },
     watchMatches(tid, cb) { if (!subsM.has(tid)) subsM.set(tid, new Set()); subsM.get(tid).add(cb); emitM(tid); return () => subsM.get(tid).delete(cb); },
     async setTournament(t) { data.t[t.id] = clone(t); persist(); emitT(); },
-    async deleteTournament(tid) { delete data.t[tid]; delete data.m[tid]; delete data.l[tid]; persist(); emitT(); },
+    async deleteTournament(tid) { delete data.t[tid]; delete data.m[tid]; delete data.l[tid]; if (data.hof[tid]) data.hof[tid].gone = true; persist(); emitT(); },
     async setMatch(tid, m) { (data.m[tid] ||= {})[m.id] = clone(m); persist(); emitM(tid); },
     async updateMatch(tid, id, patch) { const m = data.m[tid]?.[id]; if (!m) throw { code: "invalid_argument" }; Object.assign(m, clone(patch)); persist(); emitM(tid); },
     async deleteMatch(tid, id) { delete data.m[tid]?.[id]; persist(); emitM(tid); },
@@ -1225,6 +1261,8 @@ function dbStore(db) {
     watchHof(tid, cb, onErr) { return db.doc(`hallOfFame/${tid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setHof(tid, e) { return db.doc(`hallOfFame/${tid}`).set(clone(e)); },
     deleteHof(tid) { return db.doc(`hallOfFame/${tid}`).delete(); },
+    updateHof(tid, patch) { return db.doc(`hallOfFame/${tid}`).update(clone(patch)); },
+    listHof({ country } = {}) { return new Promise((res, rej) => { let u = null; u = db.collection("hallOfFame").limit(300).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => clone(d.data())).filter(e => !e.hidden && (!country || e.country === country))); }, rej); }); },
     watchStreams(cb, onErr) { return db.collection("streams").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
     watchStream(sid, cb, onErr) { return db.doc(`streams/${sid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setStream(st) { return db.doc(`streams/${st.id}`).set(clone(st)); },
@@ -2554,6 +2592,7 @@ function shootStandings(t) {
 /* ---------------- archive ---------------- */
 S.canSeeArchived = S.canSeeArchived || (() => true);
 async function archiveCompetition(on) {
+  await hofMarkGone(T().id, !!on); // first: once archived, the organiser can no longer change its Hall of Fame entry
   const t = clone(T()); t.archived = !!on; t.archivedAt = on ? Date.now() : null;
   const hide = on && !S.canSeeArchived();
   if (hide) {
@@ -2663,7 +2702,7 @@ function hofPanel(t, where) {
   const where2 = [hofLabel(e.level), `<span data-notr>${esc([hofCountryName(e.country), e.region].filter(Boolean).join(" · "))}</span>`].join(" ");
   return `<div class="panel stack hof-panel" data-hof-panel style="gap:8px"><div class="spread"><div>${head}
       <div class="small">${e.hidden ? `<b class="err">Hidden from the Hall of Fame by the site admin</b>` : `<b>In the Hall of Fame</b>`} · ${where2}</div></div>
-      <div class="row">${e.hidden ? "" : `<button class="btn" data-act="hof-open">Update</button>`}${S.hofConfirmRemove === t.id ? `<span class="err">Remove it from the Hall of Fame?</span><button class="btn danger" data-act="hof-remove-yes">Remove</button><button class="btn" data-act="hof-remove-no">Keep it</button>` : `<button class="btn" data-act="hof-remove">Remove</button>`}</div></div>
+      <div class="row">${e.hidden ? "" : `<a class="btn" href="#halloffame.${esc(t.id)}">View</a><button class="btn" data-act="hof-open">Update</button>`}${S.hofConfirmRemove === t.id ? `<span class="err">Remove it from the Hall of Fame?</span><button class="btn danger" data-act="hof-remove-yes">Remove</button><button class="btn" data-act="hof-remove-no">Keep it</button>` : `<button class="btn" data-act="hof-remove">Remove</button>`}</div></div>
     ${e.hidden ? `<div class="small muted">Questions? Contact Info@FoundryITadvisory.com.</div>` : ""}
     ${changed && !e.hidden ? `<div class="notice small hof-changed">The result has changed since it was published. <button class="btn" data-act="hof-open">Update the entry</button></div>` : ""}
     ${e.levelSetBy === "admin" && !e.hidden ? `<div class="small muted">The site admin set the level. It stays the same when you update the entry.</div>` : ""}</div>`;
@@ -2730,13 +2769,138 @@ async function hofAction(act, k) {
     const prev = S.hof?.[t.id] || null; const e = hofEntry(t, md, prev);
     if (!e.parts.length) { md.err = "Tick at least one part to publish."; renderModal(); return; }
     md.busy = true; md.err = ""; renderModal();
-    try { await S.store.setHof(t.id, e); S.hof = S.hof || {}; S.hof[t.id] = e; S.modal = null; renderModal(); render(); toast(prev ? "Hall of Fame entry updated." : "Published to the Hall of Fame."); }
+    try { await S.store.setHof(t.id, e); S.hof = S.hof || {}; S.hof[t.id] = e; if (S.hofPage) S.hofPage.cache = {}; S.modal = null; renderModal(); render(); toast(prev ? "Hall of Fame entry updated." : "Published to the Hall of Fame."); }
     catch (err) { console.error(err); md.busy = false; md.err = err?.code === "permission-denied" ? "Only this competition's organiser can publish it." : "That didn't save. Check your connection and try again."; renderModal(); }
   }
 }
 async function hofRemove(t) {
-  try { await S.store.deleteHof(t.id); S.hof = S.hof || {}; S.hof[t.id] = null; S.hofConfirmRemove = null; render(); toast("Removed from the Hall of Fame."); }
+  try { await S.store.deleteHof(t.id); S.hof = S.hof || {}; S.hof[t.id] = null; if (S.hofPage) S.hofPage.cache = {}; S.hofConfirmRemove = null; render(); toast("Removed from the Hall of Fame."); }
   catch (err) { console.error(err); toast("That didn't save. Check your connection and try again."); }
+}
+/* ---------------- Hall of Fame page (#halloffame, #halloffame.<competition id>) ---------------- */
+// Open to everyone: the shown entries for one country at a time (or all countries), newest first, grouped by year, with
+// search (accents and case ignored) and level / format filters. One read per entry listed; a country's list is kept for five
+// minutes, so changing filters or coming back costs nothing. A link to one entry (#halloffame.<id>) opens its country with it
+// picked out, which is what the organiser's View button and the Share button use.
+const TROPHY_ICON = thIc('<path d="M7 4h10v4.5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5v.8A3.7 3.7 0 0 0 7.8 10.6M17 6h2.5v.8a3.7 3.7 0 0 1-3.3 3.8"/><path d="M12 13.5v3.5M8.5 20.5h7M10 17h4v3.5h-4z"/>');
+const HOF_FORMATS = [["singles", "Singles"], ["doubles", "Doubles"], ["triples", "Triples"], ["melee", "Mêlée"], ["shooting", "Precision shooting"], ["eurocup", "EuroCup"]];
+const hofFmtKey = e => e.system === "shooting" || e.entry === "shooting" ? "shooting" : e.entry === "melee" ? "melee" : e.system === "eurocup" ? "eurocup" : e.fmt || "";
+function hofFmtLabel(e) {
+  const k = hofFmtKey(e), sys = SYS_NAME[e.system] || SYSTEM_LABEL[e.system] || "";
+  if (k === "shooting") return "Precision shooting";
+  if (k === "eurocup") return "EuroCup";
+  if (k === "melee") return e.system && e.system !== "melee" ? `Mêlée · ${sys}` : "Mêlée";
+  return [e.fmt ? e.fmt[0].toUpperCase() + e.fmt.slice(1) : "", sys].filter(Boolean).join(" · ");
+}
+const hofNorm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+// what a search looks through: the competition, its venue and region, the winners and runners-up, their players and clubs
+const hofHay = e => e._hay || (e._hay = hofNorm([e.name, e.venue, e.region, ...(e.parts || []).flatMap(p => [p.winner, p.runnerUp].filter(Boolean)
+  .flatMap(s => [s.name, s.club, ...(s.players || [])]))].filter(Boolean).join(" ")));
+const hofPage = () => S.hofPage || (S.hofPage = { country: hofDefaultCountry(), level: "all", fmt: "all", q: "", cache: {} });
+const hofOnPage = () => S.liveRoute?.view === "hof";
+async function hofLoad(force) {
+  const P = hofPage(), key = P.country || "all";
+  if (P.store !== S.store) { P.store = S.store; P.cache = {}; } // the website swaps the stand-in store for Firebase once signed in
+  const c = P.cache[key]; if (!force && c && (c.loading || Date.now() - c.at < 5 * 60e3)) return;
+  const mine = P.cache[key] = { loading: true, at: Date.now(), list: null };
+  try { const list = S.store.listHof ? await S.store.listHof(key === "all" ? {} : { country: key }) : []; mine.list = list.filter(e => e && !e.hidden); }
+  catch (err) { console.error(err); mine.err = true; mine.at = 0; }
+  mine.loading = false; if (P.cache[key] === mine && hofOnPage()) hofPaint();
+}
+// a link to one entry: look it up (one read), then show its country with it picked out
+function hofDeep(hid) {
+  const P = hofPage(); if (P.deepFor === hid) return;
+  P.deepFor = hid; P.deep = "loading";
+  let fired = false, u = null;
+  const done = e => { if (fired) return; fired = true; setTimeout(() => u && u()); if (P.deepFor !== hid) return;
+    if (e && !e.hidden) { Object.assign(P, { deep: "ok", country: e.country || "all", level: "all", fmt: "all", q: "", hl: hid, scrollTo: hid });
+      // a list loaded a few minutes ago may not have it yet (or have an older copy): put this fresh copy in
+      [P.country, "all"].forEach(k => { const c = P.cache[k]; if (c?.list) c.list = c.list.filter(x => x.tid !== hid).concat(e); }); }
+    else P.deep = "missing";
+    if (hofOnPage()) hofRedraw(); };
+  if (S.store.getHof) { S.store.getHof(hid).then(done, () => done(null)); return; } // from the server: a cached copy may be out of date
+  if (!S.store.watchHof) { done(null); return; }
+  u = S.store.watchHof(hid, done, () => done(null));
+}
+function hofFiltered(list) {
+  const P = hofPage(), terms = hofNorm(P.q).split(/\s+/).filter(Boolean);
+  return list.filter(e => (P.level === "all" || e.level === P.level) && (P.fmt === "all" || hofFmtKey(e) === P.fmt) && terms.every(x => hofHay(e).includes(x)))
+    .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")) || (b.publishedAt || 0) - (a.publishedAt || 0));
+}
+const hofSub = s => [s.club, (s.players || []).join(", ")].filter(x => x && x !== s.name).join(" · ");
+function hofCard(e) {
+  const P = hofPage();
+  const d = e.date ? new Date(e.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" }) : "";
+  const side = (s, n, label) => s ? `<div class="hof-row">${MEDAL[n]}<span class="eyebrow">${label}</span> <b data-notr>${esc(s.name)}</b>${hofSub(s) ? `<span class="small muted" data-notr>${esc(hofSub(s))}</span>` : ""}</div>` : "";
+  const parts = e.parts || [];
+  return `<article class="panel hof-card${P.hl === e.tid ? " hof-focus" : ""}" id="hof-${esc(e.tid)}">
+    <div class="hof-where">${hofLabel(e.level)}<span class="small muted" data-notr>${esc([hofCountryName(e.country), e.region].filter(Boolean).join(" · "))}</span></div>
+    <h3 data-notr>${esc(e.name)}</h3>
+    <div class="small muted hof-meta">${[d && `<span data-notr>${esc(d)}</span>`, e.venue && `<span data-notr>${esc(e.venue)}</span>`, `<span>${esc(hofFmtLabel(e))}</span>`].filter(Boolean).join(" · ")}</div>
+    <div class="hof-parts">${parts.map(p => `<div class="hof-res">${parts.length > 1 ? `<div class="hof-part-name">${esc(p.name)}</div>` : ""}${side(p.winner, 1, "Winner")}${side(p.runnerUp, 2, "Runner-up")}</div>`).join("")}</div>
+    ${e.note ? `<p class="hof-note" data-notr>“${esc(e.note)}”</p>` : ""}
+    <div class="row">${e.gone ? "" : `<a class="btn sm" href="#${esc(e.tid)}">View the competition</a>`}<button type="button" class="btn sm ghost" data-act="hof-share" data-id="${esc(e.tid)}">Share</button></div>
+  </article>`;
+}
+function hofResultsHtml() {
+  const P = hofPage(), c = P.cache[P.country || "all"];
+  if (!c || c.loading || (S.liveRoute?.hid && P.deep === "loading")) return `<div class="empty">Loading the Hall of Fame…</div>`;
+  if (c.err) return `<div class="empty stack" style="gap:10px"><span>The Hall of Fame couldn't be loaded. Check your connection and try again.</span><div><button type="button" class="btn" data-act="hof-retry">Try again</button></div></div>`;
+  if (!c.list.length) return P.country !== "all" ? `<div class="empty stack" style="gap:10px"><span>No winners from this country yet.</span><div><button type="button" class="btn" data-act="hof-all-countries">Show all countries</button></div></div>`
+    : `<div class="empty">No winners have been published yet. Organisers publish theirs once a competition has finished.</div>`;
+  const list = hofFiltered(c.list);
+  if (!list.length) return `<div class="empty stack" style="gap:10px"><span>Nothing matches your search.</span><div><button type="button" class="btn" data-act="hof-clear">Clear the search and filters</button></div></div>`;
+  const years = [];
+  list.forEach(e => { const y = (e.date || "").slice(0, 4) || String(new Date(e.publishedAt || Date.now()).getFullYear()); let g = years.find(x => x.y === y); if (!g) years.push(g = { y, list: [] }); g.list.push(e); });
+  return years.map(g => `<section class="hof-year stack"><h3 class="hof-year-h">${esc(g.y)}</h3>${g.list.map(hofCard).join("")}</section>`).join("");
+}
+function hofScroll() {
+  const P = hofPage(); if (!P.scrollTo) return; const el = document.getElementById("hof-" + P.scrollTo); if (!el) return;
+  P.scrollTo = null; el.scrollIntoView({ block: "center" });
+}
+// a whole-page redraw waits while a box on the page has the focus, so let go of it first (Safari doesn't move focus to a tapped button)
+function hofRedraw() { const ae = document.activeElement; if (ae && $("#main")?.contains(ae) && /INPUT|SELECT|TEXTAREA/.test(ae.tagName)) ae.blur(); render(); }
+// results only, so the search box keeps its focus and the selects stay open-able while typing or loading
+function hofPaint() {
+  if (!hofOnPage()) return; const box = $("#hof-results"); if (!box) { render(); return; }
+  box.innerHTML = hofResultsHtml(); localize(box); hofScroll();
+}
+function renderHofPage() {
+  const P = hofPage(), hid = S.liveRoute.hid;
+  if (hid) hofDeep(hid); else if (P.deepFor) { P.deepFor = null; P.deep = null; }
+  if (!(hid && P.deep === "loading")) hofLoad();
+  const countries = HOF_COUNTRIES.map(c => [c, hofCountryName(c)]).sort((a, b) => (a[0].startsWith("GB-") ? 0 : 1) - (b[0].startsWith("GB-") ? 0 : 1) || a[1].localeCompare(b[1], LOCALES[I18N.lang] || "en"));
+  if (P.country !== "all" && !countries.some(c => c[0] === P.country)) countries.unshift([P.country, hofCountryName(P.country)]);
+  const back = T() ? `<button type="button" class="btn sm ghost" data-tab="${esc(S.tab || "draw")}">‹ Back</button>` : `<a class="btn sm ghost" href="#">‹ Back</a>`;
+  setTimeout(hofScroll);
+  return `<div class="hof-page stack">
+    <div class="spread hof-hero"><div class="stack" style="gap:4px"><h2><span class="hof-ic" aria-hidden="true">${TROPHY_ICON}</span>Hall of Fame</h2>
+      <p class="muted">Winners and runners-up of competitions run on SN Pétanque, published by their organisers.</p></div>${back}</div>
+    ${P.deep === "missing" ? `<div class="notice">That entry isn't in the Hall of Fame any more.</div>` : ""}
+    <div class="panel stack hof-tools" style="gap:12px">
+      <input id="hof-q" type="search" autocomplete="off" value="${esc(P.q)}" placeholder="Name, club or competition" aria-label="Search the Hall of Fame">
+      <div class="hof-selects">
+        <label class="f"><span>Country</span><select id="hof-country">${[["all", "All countries"], ...countries].map(([c, n]) => `<option value="${esc(c)}"${c === P.country ? " selected" : ""}${c === "all" ? "" : " data-notr"}>${esc(n)}</option>`).join("")}</select></label>
+        <label class="f"><span>Format</span><select id="hof-fmt">${[["all", "All formats"], ...HOF_FORMATS].map(([k, n]) => `<option value="${k}"${k === P.fmt ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>
+      </div>
+      <div class="hof-chips" role="group" aria-label="Competition level">${["all", ...HOF_LEVELS].map(k => `<button type="button" class="hof-chip${k === "all" ? "" : " hof-" + k}" data-act="hof-filter-level" data-k="${k}" aria-pressed="${P.level === k}">${k === "all" ? "All levels" : `<span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(k))}</span>`}</button>`).join("")}</div>
+    </div>
+    <div id="hof-results" class="stack" aria-live="polite">${hofResultsHtml()}</div>
+  </div>`;
+}
+async function hofShare(tid) {
+  const P = hofPage(), e = Object.values(P.cache).flatMap(c => c.list || []).find(x => x.tid === tid);
+  const url = `${location.origin}${location.pathname}#halloffame.${tid}`;
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+    try { await navigator.share({ title: `${e?.name || ""} · ${tr("Hall of Fame")}`.replace(/^ · /, ""), url }); return; } catch (err) { if (err?.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(url); toast("Link copied."); } catch { toast(url); }
+}
+// archiving hides a competition from everyone but the admin: its Hall of Fame entry stays, without the link to it (restoring links it again)
+async function hofMarkGone(tid, gone) {
+  const e = S.hof?.[tid]; if (!S.store.updateHof || e === null || (e && !!e.gone === gone)) return;
+  try { await S.store.updateHof(tid, { gone }); if (e) e.gone = gone; if (S.hofPage) S.hofPage.cache = {}; }
+  catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
 }
 function overrideBox(list) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
@@ -3118,6 +3282,7 @@ function parseLiveHash(h) {
   const p = path.split(".");
   const q = {}; (qs || "").split("&").filter(Boolean).forEach(x => { const [k, v = ""] = x.split("="); try { q[decodeURIComponent(k)] = decodeURIComponent(v); } catch {} });
   const opts = { parts: q.parts ? q.parts.split(",").filter(Boolean) : null, o: q.o === "p" || q.o === "l" ? q.o : null };
+  if (p[0] === "halloffame") return { view: "hof", hid: p[1] || null }; // the Hall of Fame, or one entry in it
   if (p[0] === "streams" && p.length === 1) return { view: "streams" };
   if (p[0] === "s" && p[1]) return Object.assign({ sid: p[1], view: p[2] === "stream" || p[2] === "desk" ? p[2] : "setup", code: p[2] === "desk" ? p[3] || null : null }, opts);
   if (p.length < 3 || !["stream", "desk"].includes(p[1]) || !p[0] || !p[2]) return null;
@@ -3131,9 +3296,9 @@ const sDeskLink = st => S.streamDeskLink ? S.streamDeskLink(st) : sLink(st.id, "
 // a live doc as read from storage, with every field present (a half-written doc must never break the overlay)
 const normLive = (mid, L) => { const n = Object.assign(newLive(mid), L); ["ends", "events", "hist"].forEach(k => { if (!Array.isArray(n[k])) n[k] = []; }); if (!n.thrown || typeof n.thrown !== "object") n.thrown = { a: 0, b: 0 }; if (!n.layout || typeof n.layout !== "object") n.layout = {}; n.sa = +n.sa || 0; n.sb = +n.sb || 0; return n; };
 function liveWatch() {
-  const r = S.liveRoute; const key = !r ? null : r.view === "streams" ? "streams" : r.sid ? "s/" + r.sid : r.tid + "/" + r.mid;
+  const r = S.liveRoute; const key = !r ? null : r.view === "streams" ? "streams" : r.view === "hof" ? "hof" : r.sid ? "s/" + r.sid : r.tid + "/" + r.mid;
   if (S.liveKey === key) return;
-  S.unsubL?.(); S.unsubL = null; S.liveKey = key; if (!r) return;
+  S.unsubL?.(); S.unsubL = null; S.liveKey = key; if (!r || key === "hof") return; // the Hall of Fame loads its own list
   if (key === "streams") { watchStreams(); return; }
   if (r.sid) { S.unsubL = S.store.watchStream(r.sid, st => { if (S.liveKey !== key) return; if (st) S.streams[r.sid] = st; else delete S.streams[r.sid]; S.streamsLoaded = true; render(); }, e => console.error(e)); return; }
   S.unsubL = S.store.watchLive(r.tid, r.mid, L => { if (S.liveKey !== key) return; if (L) S.live[r.mid] = normLive(r.mid, L); else delete S.live[r.mid]; render(); }, e => console.error(e));
@@ -3170,6 +3335,7 @@ function liveCtx() {
 }
 function renderLiveRoute() {
   const r = S.liveRoute;
+  if (r.view === "hof") return renderHofPage();
   if (r.view === "streams") return renderStreamsHome();
   if (r.sid && r.view === "setup") return renderStreamSetup();
   const c = liveCtx();
@@ -3536,7 +3702,7 @@ function renderPicker(list) {
   </div>`;
 }
 function pickCompetition(id) {
-  S.picker = false; S.home = false; if (id === S.tid) { render(); return; }
+  S.picker = false; S.home = false; if (id === S.tid) { if (hofOnPage()) leaveLive(); render(); return; }
   S.tid = id; lsSet("carreau-tid", S.tid); S.matches = {}; leaveLive(); S.onSelect?.(); watchMatches(); render();
 }
 // connection light (website only): Live, Saving…, or Offline with changes waiting to sync
@@ -3554,13 +3720,14 @@ function drawHeader() {
   const sub = $(".brand-name small"); if (sub) sub.textContent = "Competition desk";
   // the dedication to Steve Noel sits at the foot of every page, above the copyright line
   const foot = $("#foot"); if (foot) { foot.innerHTML = `<div class="memorial">In loving memory of Steve Noel</div>
-    <div>© 2026 Sam Blakey · SN Pétanque Competition Desk · <span>All rights reserved</span> · <a href="privacy.html">Privacy</a> · <a href="how-it-works.html">How it works</a>${S.guideLink ? ` · <a href="#guides">Guides</a>` : ""} · <span>No cookies, no tracking</span></div>`; localize(foot); }
+    <div>© 2026 Sam Blakey · SN Pétanque Competition Desk · <span>All rights reserved</span> · <a href="privacy.html">Privacy</a> · <a href="how-it-works.html">How it works</a>${S.guideLink ? ` · <a href="#guides">Guides</a>` : ""} · <a href="#halloffame">Hall of Fame</a> · <span>No cookies, no tracking</span></div>`; localize(foot); }
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();
   $("#tsel").innerHTML = `${list.length ? `<div class="picker-wrap"><button type="button" class="picker-btn" data-act="picker" aria-expanded="${!!S.picker}" data-notr>
       ${cur && logoSrc(cur.id) ? `<img class="pb-logo" src="${esc(logoSrc(cur.id))}" alt="">` : ""}<span class="pb-name">${esc(cur?.name || "Choose a competition")}</span><span class="pb-chev" aria-hidden="true">▾</span></button>
       ${S.picker ? renderPicker(list) : ""}</div>` : ""}
+    <a class="hof-btn" href="#halloffame" data-notr aria-label="${esc(tr("Hall of Fame"))}" title="${esc(tr("Hall of Fame"))}"${hofOnPage() ? ' aria-current="page"' : ""}>${TROPHY_ICON}<span class="hide-sm">${esc(tr("Hall of Fame"))}</span></a>
     <div class="theme-wrap" data-notr><div class="seg"><button type="button" class="theme-btn" data-act="theme-menu" aria-expanded="${!!S.themeMenu}" aria-label="${esc(tr("Appearance"))}" title="${esc(tr("Appearance"))}">${THEME_ICON[themePref()]}</button></div>
       <div class="theme-menu" role="group" aria-label="${esc(tr("Appearance"))}" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" data-theme-pick="${v}" aria-pressed="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
     <div class="lang-wrap" data-notr><div class="seg"><button type="button" class="lang-btn" data-act="lang-menu" aria-expanded="${!!S.langMenu}" aria-label="${esc(tr("Language"))}: ${I18N.lang.toUpperCase()}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
@@ -3586,6 +3753,7 @@ function renderWelcome() {
       ${S.canCreate() ? `<button type="button" class="start-card go" data-act="new-t"><b>Run a competition</b><span>Set it up in four quick steps</span></button>` : S.startLogin?.() || ""}
       <div class="start-card info"><b>Follow a competition</b><span>Open the link or scan the QR code the organiser shares</span></div>
       <a class="start-card" href="#streams"><b>Stream a game</b><span>A live score overlay for Facebook Live or YouTube</span></a>
+      <a class="start-card hof-start" href="#halloffame"><b><span class="hof-ic" aria-hidden="true">${TROPHY_ICON}</span>Hall of Fame</b><span>Winners of competitions run on SN Pétanque</span></a>
       ${S.guideLink ? `<button type="button" class="start-card" data-act="guide-play" data-id="first"><b>Watch how it works</b><span>A 2½-minute walk-through of a first competition</span></button>` : ""}
     </div>
     ${mine.length ? `<section class="stack" style="gap:10px"><h2>Your competitions</h2><div class="ex-grid">${mine.map(card).join("")}</div></section>` : ""}
@@ -4503,7 +4671,7 @@ document.addEventListener("click", async e => {
   if (S.picker && !e.target.closest(".picker")) { S.picker = false; renderHeader(); localize($("header.app")); }
   const sr = e.target.closest(".tw.st tr[data-st]");
   if (sr) { const id = sr.dataset.st, set = S.stOpen ||= new Set(); set.has(id) ? set.delete(id) : set.add(id); sr.classList.toggle("open", set.has(id)); sr.querySelector(".st-name")?.setAttribute("aria-expanded", String(set.has(id))); return; }
-  if (e.target.closest("header .brand .home")) { e.preventDefault(); if (S.liveRoute) return; S.home = true; S.picker = false; S.tid = null; lsSet("carreau-tid", ""); S.matches = {}; watchMatches(); S.onHome?.(); render(); window.scrollTo(0, 0); return; }
+  if (e.target.closest("header .brand .home")) { e.preventDefault(); if (S.liveRoute && !hofOnPage()) return; if (S.liveRoute) leaveLive(); S.home = true; S.picker = false; S.tid = null; lsSet("carreau-tid", ""); S.matches = {}; watchMatches(); S.onHome?.(); render(); window.scrollTo(0, 0); return; }
   const br = e.target.closest('[data-act="bk-round"]');
   if (br) { (S.bkRound ||= {})[S.tid + ":" + br.dataset.b] = { v: br.dataset.v, sig: br.dataset.sig }; render(); return; }
   const bz = e.target.closest('[data-act="bk-zoom"]');
@@ -4545,6 +4713,11 @@ document.addEventListener("click", async e => {
   if (act.startsWith("strm-")) { await streamAction(act, a); return; }
   switch (act) {
     case "hof-open": if (t && hofCan(t)) hofOpen(t); break;
+    case "hof-filter-level": hofPage().level = HOF_LEVELS.includes(a.dataset.k) ? a.dataset.k : "all"; hofRedraw(); break;
+    case "hof-all-countries": hofPage().country = "all"; hofRedraw(); break;
+    case "hof-clear": Object.assign(hofPage(), { q: "", level: "all", fmt: "all" }); hofRedraw(); break;
+    case "hof-retry": hofLoad(true); hofRedraw(); break;
+    case "hof-share": await hofShare(a.dataset.id); break;
     case "hof-remove": S.hofConfirmRemove = t?.id; render(); break;
     case "hof-remove-no": S.hofConfirmRemove = null; render(); break;
     case "hof-remove-yes": if (t && hofCan(t)) await hofRemove(t); break;
@@ -4670,6 +4843,7 @@ document.addEventListener("change", async e => {
     const b = { logo: d, at: Date.now() };
     try { await S.store.setBrand(t0.id, b); setBrandLocal(t0.id, b); toast("Logo saved."); } catch (err) { handleWriteError(err); } return; }
   if (S.overlayView && S.overlayChange && await S.overlayChange(el)) return;
+  if (el.id === "hof-country" || el.id === "hof-fmt") { const P = hofPage(); if (el.id === "hof-fmt") P.fmt = el.value; else { P.country = el.value; P.hl = null; hofLoad(); } hofPaint(); return; }
   if (!canEdit() || !T()) return;
 
   if (el.closest("#modal")) return;
@@ -4698,6 +4872,7 @@ document.addEventListener("change", async e => {
 });
 document.addEventListener("input", e => {
   if (e.target.dataset?.hof && S.modal?.hof) { hofInput(e.target); return; }
+  if (e.target.id === "hof-q") { hofPage().q = e.target.value; hofPaint(); return; }
   if (e.target.id === "picker-q") {
     const q = e.target.value.trim().toLowerCase(); let n = 0;
     document.querySelectorAll(".pick-row").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
@@ -4814,6 +4989,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
 })();
 </script>

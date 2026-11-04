@@ -91,6 +91,7 @@ function fbStore() {
       const extra = [doc(db, "tournaments", tid, "brand", "logo"), doc(db, "tournaments", tid, "private", "codes"), doc(db, "tournaments", tid, "private", "livecode")];
       try { (await getDocs(collection(db, "tournaments", tid, "live"))).docs.forEach(d => extra.push(d.ref)); } catch {}
       await Promise.allSettled(extra.map(r => deleteDoc(r)));
+      try { await updateDoc(doc(db, "hallOfFame", tid), { gone: true }); } catch {} // a Hall of Fame entry stays, without its link
       await deleteDoc(doc(db, "tournaments", tid)); // last, so a failure part-way never leaves games without their competition
     },
     watchLive(tid, mid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "live", mid), d => cb(d.exists() ? d.data() : null), onErr); },
@@ -101,6 +102,20 @@ function fbStore() {
     watchHof(tid, cb, onErr) { return onSnapshot(doc(db, "hallOfFame", tid), d => cb(d.exists() ? d.data() : null), onErr); },
     setHof(tid, e) { return track(setDoc(doc(db, "hallOfFame", tid), clone(e))); },
     deleteHof(tid) { return track(deleteDoc(doc(db, "hallOfFame", tid))); },
+    updateHof(tid, patch) { return track(updateDoc(doc(db, "hallOfFame", tid), clone(patch))); },
+    // one entry, from the server (this device's cached copy may be older than an admin's change); offline, the cached copy
+    getHof(tid) {
+      return getDocFromServer(doc(db, "hallOfFame", tid)).then(d => d.exists() ? d.data() : null, e => {
+        if (e?.code !== "unavailable") throw e;
+        return new Promise((res, rej) => { let u = null; u = onSnapshot(doc(db, "hallOfFame", tid), d => { setTimeout(() => u && u()); res(d.exists() ? d.data() : null); }, rej); });
+      });
+    },
+    // the Hall of Fame page: shown entries only (the rules refuse anything else), for one country or all. Equality filters only,
+    // so no composite index is needed; the page sorts them. Past a few hundred entries, add an index and order by date instead.
+    listHof({ country } = {}) {
+      const c = [where("hidden", "==", false)]; if (country) c.push(where("country", "==", country));
+      return getDocs(query(collection(db, "hallOfFame"), ...c, limit(300))).then(s => s.docs.map(d => d.data()));
+    },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },
@@ -928,7 +943,7 @@ async function handleHash() {
   const lr = parseLiveHash(); S.liveRoute = lr; S.overlayView = null; S.picker = false;
   if (lr) {
     if (lr.sid) { if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingStreamJoin = { sid: lr.sid, code: lr.code }; } watchStream(lr.sid); liveWatch(); render(); return; }
-    if (lr.view === "streams") { liveWatch(); render(); return; }
+    if (lr.view === "streams" || lr.view === "hof") { liveWatch(); render(); return; }
     if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingLiveJoin = { tid: lr.tid, code: lr.code }; }
     if (lr.tid !== S.tid) { S.tid = lr.tid; S.matches = {}; restart(); } else if (S.pendingLiveJoin) watchRole();
     liveWatch(); render(); return;
@@ -978,7 +993,7 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__
 }
 
 function boot() {
-  const h = readHash(); if (h.tid && !["admin", "login", "guides"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
+  const h = readHash(); if (h.tid && !["admin", "login", "guides", "halloffame"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
   const lr = parseLiveHash(); if (lr) { if (lr.tid) S.tid = lr.tid; S.liveRoute = lr; }
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
