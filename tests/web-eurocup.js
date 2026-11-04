@@ -14,9 +14,12 @@ const { chromium } = require('playwright');
     q('[data-tab="draw"]').click(); await w(400); q('[data-act="first-draw"]').click(); await w(3000);
     const ms = C.MS(); L.push(`saved: games ${ms.length} | ties ${C.T().clubFix.length} | toast ${q('#toast').textContent}`);
     const f = C.T().clubFix[0]; q(`[data-act="eu-lineup"][data-fx="${f.id}"][data-leg="1"]`).click(); await w(300);
-    const set = async (mid, side, i, v) => { const el = q(`.modal select[data-lu="${mid}"][data-side="${side}"][data-i="${i}"]`); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); await w(40); };
+    // tap names in playing order: open triple, then mixed triple; then the other club
+    const pick = async v => { const b = [...document.querySelectorAll('.modal .lu-p')].find(b => b.firstElementChild.textContent === v); b.click(); await w(40); };
     const ot = ms.find(m => m.eu === 'ot'), mt = ms.find(m => m.eu === 'mt');
-    for (const [k, X] of [['a', 'N'], ['b', 'S']]) { for (let i = 0; i < 3; i++) await set(ot.id, k, i, `${X}${i + 3}`); await set(mt.id, k, 0, `${X}1`); await set(mt.id, k, 1, `${X}2`); await set(mt.id, k, 2, `${X}6`); }
+    for (const n of ['N3', 'N4', 'N5', 'N1', 'N2', 'N6']) await pick(n);
+    q('.modal .lu-squad [data-act="lu-side"]').click(); await w(60);
+    for (const n of ['S3', 'S4', 'S5', 'S1', 'S2', 'S6']) await pick(n);
     q('[data-act="lu-save"]').click(); await w(2500);
     L.push(`line-ups: ${C.MS().find(m => m.id === ot.id).la.join(',')} v ${C.MS().find(m => m.id === ot.id).lb.join(',')} | on pistes ${C.MS().filter(m => m.court).map(m => m.eu).sort().join(',')} | toast ${q('#toast').textContent}`);
     q(`[data-match="${ot.id}"]`).click(); await w(300); q('[data-act="qlose"][data-k="sb"][data-n="7"]').click(); await w(1500);

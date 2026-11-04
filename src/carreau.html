@@ -150,7 +150,18 @@ label.f,.fields>*{min-width:0}
 .side .nm .lu{display:block;font-weight:400}
 .eu-meta b{color:var(--ink)}.eu-leg{align-items:center}.euro-legs{display:grid;gap:4px}
 .squad{display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}.sq-row{display:grid;grid-template-columns:2.5ch 1fr auto;gap:6px;align-items:center}.sq-row .num{font-family:var(--display);font-weight:700;color:var(--muted);text-align:right}.sq-row select{width:auto}
-.modal.lineups{max-width:760px}.modal.lineups>*{flex-shrink:0}.modal.lineups>.spread{flex-wrap:nowrap;align-items:flex-start}.lu-club h4{margin:0}.lu-game{display:grid;gap:4px}.lu-sel{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}.lu-sel select{width:100%}
+.modal.lineups{max-width:760px}.modal.lineups>*{flex-shrink:0}.modal.lineups>.spread{flex-wrap:nowrap;align-items:flex-start}.lu-club h4{margin:0}.lu-game{display:grid;gap:4px}.lu-clubs button{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lu-slots{display:grid;gap:6px;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));max-width:600px}
+.lu-slot span:first-child{overflow-wrap:anywhere}
+.lu-slot{min-height:44px;min-width:0;padding:6px 8px;font-size:14px;line-height:1.25;border:1px dashed var(--line);border-radius:10px;background:var(--surface-2);color:var(--muted);font:inherit;font-weight:600;display:inline-flex;align-items:center;justify-content:space-between;gap:4px;cursor:pointer;text-align:left}
+.lu-slot.filled{border-style:solid;background:var(--surface);color:var(--ink)}
+.lu-slot.on{border:2px solid var(--accent);color:var(--accent);background:var(--accent-soft,var(--surface))}
+.lu-slot .x{color:var(--muted);font-weight:400}
+.lu-squad{border-top:1px solid var(--line);padding-top:12px}
+.lu-names{display:flex;flex-wrap:wrap;gap:8px}
+.lu-p{min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.lu-p:hover,.lu-slot:hover{border-color:var(--accent)}
+
 .side.win .nm{font-weight:700}
 .side .sc{font-family:var(--display);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
 .side.win .sc{color:var(--accent)}
@@ -1096,6 +1107,14 @@ Object.assign(LANG_TEXT.de, {"Hall of Fame": "Ruhmeshalle", "Hall of Fame…": "
 Object.assign(LANG_TEXT.nl, {"Hall of Fame": "Erelijst", "Hall of Fame…": "Erelijst…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Zet de winnaars en finalisten op de openbare erelijst op snpetanque.com.", "Publish to the Hall of Fame": "Op de erelijst zetten", "Hidden from the Hall of Fame by the site admin": "Door de sitebeheerder verborgen op de erelijst", "In the Hall of Fame": "Op de erelijst", "Update": "Bijwerken", "Remove it from the Hall of Fame?": "Van de erelijst halen?", "Questions? Contact Info@FoundryITadvisory.com.": "Vragen? Mail naar Info@FoundryITadvisory.com.", "The result has changed since it was published.": "De uitslag is veranderd sinds de publicatie.", "Update the entry": "Vermelding bijwerken", "The site admin set the level. It stays the same when you update the entry.": "De sitebeheerder heeft het niveau vastgezet. Het blijft hetzelfde als je de vermelding bijwerkt.", "Update the Hall of Fame entry": "Vermelding op de erelijst bijwerken", "Competition level": "Niveau van de wedstrijd", "The site admin set the level.": "De sitebeheerder heeft het niveau vastgezet.", "Country": "Land", "Region (optional)": "Regio (optioneel)", "e.g. Chiltern": "bijv. Chiltern", "What to include": "Wat erop komt", "Not finished yet": "Nog niet klaar", "Note (optional)": "Notitie (optioneel)", "e.g. Played in memory of a club founder": "bijv. Gespeeld ter nagedachtenis aan een oprichter van de club", "Team and player names will be public.": "Namen van teams en spelers worden openbaar.", "Publish": "Publiceren", "Tick at least one part to publish.": "Vink minstens één onderdeel aan om te publiceren.", "Published to the Hall of Fame.": "Op de erelijst gezet.", "Hall of Fame entry updated.": "Vermelding op de erelijst bijgewerkt.", "Only this competition's organiser can publish it.": "Alleen de organisator van deze wedstrijd kan hem publiceren.", "That didn't save. Check your connection and try again.": "Dat is niet opgeslagen. Controleer je verbinding en probeer het opnieuw.", "Removed from the Hall of Fame.": "Van de erelijst gehaald."});
 Object.assign(LANG_TEXT.pt, {"Hall of Fame": "Palmarés", "Hall of Fame…": "Palmarés…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "Coloque os vencedores e finalistas no palmarés público em snpetanque.com.", "Publish to the Hall of Fame": "Publicar no palmarés", "Hidden from the Hall of Fame by the site admin": "Ocultado do palmarés pelo administrador do site", "In the Hall of Fame": "No palmarés", "Update": "Atualizar", "Remove it from the Hall of Fame?": "Retirar do palmarés?", "Questions? Contact Info@FoundryITadvisory.com.": "Dúvidas? Escreva para Info@FoundryITadvisory.com.", "The result has changed since it was published.": "O resultado mudou desde a publicação.", "Update the entry": "Atualizar a entrada", "The site admin set the level. It stays the same when you update the entry.": "O administrador do site fixou o nível. Mantém-se ao atualizar a entrada.", "Update the Hall of Fame entry": "Atualizar a entrada do palmarés", "Competition level": "Nível da competição", "The site admin set the level.": "O administrador do site fixou o nível.", "Country": "País", "Region (optional)": "Região (opcional)", "e.g. Chiltern": "ex. Chiltern", "What to include": "O que incluir", "Not finished yet": "Ainda não terminado", "Note (optional)": "Nota (opcional)", "e.g. Played in memory of a club founder": "ex. Jogado em memória de um fundador do clube", "Team and player names will be public.": "Os nomes das equipas e dos jogadores serão públicos.", "Publish": "Publicar", "Tick at least one part to publish.": "Assinale pelo menos uma parte para publicar.", "Published to the Hall of Fame.": "Publicado no palmarés.", "Hall of Fame entry updated.": "Entrada do palmarés atualizada.", "Only this competition's organiser can publish it.": "Só o organizador desta competição a pode publicar.", "That didn't save. Check your connection and try again.": "Não foi guardado. Verifique a ligação e tente de novo.", "Removed from the Hall of Fame.": "Retirado do palmarés."});
 Object.assign(LANG_TEXT.th, {"Hall of Fame": "หอเกียรติยศ", "Hall of Fame…": "หอเกียรติยศ…", "Put the winners and runners-up on the public Hall of Fame at snpetanque.com.": "ลงชื่อผู้ชนะและรองแชมป์ในหอเกียรติยศสาธารณะที่ snpetanque.com", "Publish to the Hall of Fame": "เผยแพร่ลงหอเกียรติยศ", "Hidden from the Hall of Fame by the site admin": "ผู้ดูแลเว็บไซต์ซ่อนรายการนี้จากหอเกียรติยศ", "In the Hall of Fame": "อยู่ในหอเกียรติยศ", "Update": "อัปเดต", "Remove it from the Hall of Fame?": "นำออกจากหอเกียรติยศ?", "Questions? Contact Info@FoundryITadvisory.com.": "มีคำถาม? ติดต่อ Info@FoundryITadvisory.com", "The result has changed since it was published.": "ผลการแข่งขันเปลี่ยนไปหลังจากเผยแพร่", "Update the entry": "อัปเดตรายการ", "The site admin set the level. It stays the same when you update the entry.": "ผู้ดูแลเว็บไซต์กำหนดระดับไว้แล้ว ระดับจะคงเดิมเมื่อคุณอัปเดตรายการ", "Update the Hall of Fame entry": "อัปเดตรายการในหอเกียรติยศ", "Competition level": "ระดับการแข่งขัน", "The site admin set the level.": "ผู้ดูแลเว็บไซต์กำหนดระดับไว้แล้ว", "Country": "ประเทศ", "Region (optional)": "ภูมิภาค (ไม่บังคับ)", "e.g. Chiltern": "เช่น Chiltern", "What to include": "สิ่งที่จะรวม", "Not finished yet": "ยังไม่จบ", "Note (optional)": "หมายเหตุ (ไม่บังคับ)", "e.g. Played in memory of a club founder": "เช่น แข่งเพื่อรำลึกถึงผู้ก่อตั้งสโมสร", "Team and player names will be public.": "ชื่อทีมและผู้เล่นจะเปิดเผยต่อสาธารณะ", "Publish": "เผยแพร่", "Tick at least one part to publish.": "เลือกอย่างน้อยหนึ่งส่วนเพื่อเผยแพร่", "Published to the Hall of Fame.": "เผยแพร่ลงหอเกียรติยศแล้ว", "Hall of Fame entry updated.": "อัปเดตรายการในหอเกียรติยศแล้ว", "Only this competition's organiser can publish it.": "เฉพาะผู้จัดการแข่งขันนี้เท่านั้นที่เผยแพร่ได้", "That didn't save. Check your connection and try again.": "บันทึกไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง", "Removed from the Hall of Fame.": "นำออกจากหอเกียรติยศแล้ว"});
+// EuroCup line-ups picker and bigger squads
+Object.assign(FR_TEXT, {"at least {n} players": "au moins {1} joueurs", "+ Add a player": "+ Ajouter un joueur", "To take a player out, clear their name.": "Pour retirer un joueur, effacez son nom.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Chaque inscription est un club avec un effectif d'au moins {1} joueurs. Les parties de chaque rencontre suivent le format de rencontre.", "Tap a name to fill the next place. Tap a filled place to change it.": "Touchez un nom pour remplir la place suivante. Touchez une place remplie pour la changer.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "Tout l'effectif joue déjà dans cette phase. Ajoutez des joueurs à l'effectif dans Inscriptions.", "All places are filled.": "Toutes les places sont remplies.", "Tap a place to change it.": "Touchez une place pour la changer.", "Same as last tie": "Comme la dernière rencontre", "Next:": "Suivant :", "Copied from round {n}.": "Copié du tour {1}.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Copié du tour {1}. 1 joueur ne fait plus partie de l'effectif : sa place est vide.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Copié du tour {1}. {2} joueurs ne font plus partie de l'effectif : leurs places sont vides.", "{x}, place {n}": "{1}, place {2}", "Leg": "Phase", "Next place": "Suivant"});
+Object.assign(LANG_TEXT.es, {"at least {n} players": "al menos {1} jugadores", "+ Add a player": "+ Añadir un jugador", "To take a player out, clear their name.": "Para quitar a un jugador, borra su nombre.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Cada inscripción es un club con una plantilla de al menos {1} jugadores. Las partidas de cada encuentro dependen del formato del encuentro.", "Tap a name to fill the next place. Tap a filled place to change it.": "Toca un nombre para llenar el siguiente puesto. Toca un puesto ocupado para cambiarlo.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "Toda la plantilla ya juega en esta fase. Añade jugadores a la plantilla en Inscripción.", "All places are filled.": "Todos los puestos están ocupados.", "Tap a place to change it.": "Toca un puesto para cambiarlo.", "Same as last tie": "Igual que el último encuentro", "Next:": "Siguiente:", "Copied from round {n}.": "Copiado de la ronda {1}.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Copiado de la ronda {1}. 1 jugador ya no está en la plantilla, así que su puesto está vacío.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Copiado de la ronda {1}. {2} jugadores ya no están en la plantilla, así que sus puestos están vacíos.", "{x}, place {n}": "{1}, puesto {2}", "Leg": "Fase", "Next place": "Siguiente"});
+Object.assign(LANG_TEXT.it, {"at least {n} players": "almeno {1} giocatori", "+ Add a player": "+ Aggiungi un giocatore", "To take a player out, clear their name.": "Per togliere un giocatore, cancella il suo nome.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Ogni iscrizione è un club con una rosa di almeno {1} giocatori. Le partite di ogni incontro dipendono dal formato dell'incontro.", "Tap a name to fill the next place. Tap a filled place to change it.": "Tocca un nome per riempire il posto successivo. Tocca un posto pieno per cambiarlo.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "Tutta la rosa gioca già in questa fase. Aggiungi giocatori alla rosa in Iscrizioni.", "All places are filled.": "Tutti i posti sono pieni.", "Tap a place to change it.": "Tocca un posto per cambiarlo.", "Same as last tie": "Come l'ultimo incontro", "Next:": "Avanti:", "Copied from round {n}.": "Copiato dal turno {1}.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Copiato dal turno {1}. 1 giocatore non è più nella rosa, quindi il suo posto è vuoto.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Copiato dal turno {1}. {2} giocatori non sono più nella rosa, quindi i loro posti sono vuoti.", "{x}, place {n}": "{1}, posto {2}", "Leg": "Fase", "Next place": "Prossimo"});
+Object.assign(LANG_TEXT.de, {"at least {n} players": "mindestens {1} Spieler", "+ Add a player": "+ Spieler hinzufügen", "To take a player out, clear their name.": "Um einen Spieler herauszunehmen, den Namen löschen.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Jede Meldung ist ein Verein mit einem Kader von mindestens {1} Spielern. Die Spiele jeder Begegnung legt das Begegnungsformat fest.", "Tap a name to fill the next place. Tap a filled place to change it.": "Einen Namen antippen, um den nächsten Platz zu füllen. Einen belegten Platz antippen, um ihn zu ändern.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "Der ganze Kader spielt in dieser Runde schon. Weitere Spieler unter Anmeldung zum Kader hinzufügen.", "All places are filled.": "Alle Plätze sind belegt.", "Tap a place to change it.": "Einen Platz antippen, um ihn zu ändern.", "Same as last tie": "Wie in der letzten Begegnung", "Next:": "Weiter:", "Copied from round {n}.": "Aus Runde {1} übernommen.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Aus Runde {1} übernommen. 1 Spieler ist nicht mehr im Kader, sein Platz ist daher leer.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Aus Runde {1} übernommen. {2} Spieler sind nicht mehr im Kader, ihre Plätze sind daher leer.", "{x}, place {n}": "{1}, Platz {2}", "Leg": "Phase", "Next place": "Nächster"});
+Object.assign(LANG_TEXT.nl, {"at least {n} players": "minstens {1} spelers", "+ Add a player": "+ Speler toevoegen", "To take a player out, clear their name.": "Wis de naam om een speler eruit te halen.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Elke inschrijving is een club met een selectie van minstens {1} spelers. De partijen van elke ontmoeting volgen het ontmoetingsformat.", "Tap a name to fill the next place. Tap a filled place to change it.": "Tik op een naam om de volgende plek te vullen. Tik op een gevulde plek om die te wijzigen.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "De hele selectie speelt al in deze fase. Voeg spelers aan de selectie toe bij Inschrijving.", "All places are filled.": "Alle plekken zijn gevuld.", "Tap a place to change it.": "Tik op een plek om die te wijzigen.", "Same as last tie": "Zoals de vorige ontmoeting", "Next:": "Volgende:", "Copied from round {n}.": "Overgenomen uit ronde {1}.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Overgenomen uit ronde {1}. 1 speler zit niet meer in de selectie, dus die plek is leeg.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Overgenomen uit ronde {1}. {2} spelers zitten niet meer in de selectie, dus hun plekken zijn leeg.", "{x}, place {n}": "{1}, plek {2}", "Leg": "Fase", "Next place": "Volgende"});
+Object.assign(LANG_TEXT.pt, {"at least {n} players": "pelo menos {1} jogadores", "+ Add a player": "+ Adicionar um jogador", "To take a player out, clear their name.": "Para retirar um jogador, apague o nome.", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "Cada inscrição é um clube com um plantel de pelo menos {1} jogadores. Os jogos de cada encontro seguem o formato do encontro.", "Tap a name to fill the next place. Tap a filled place to change it.": "Toque num nome para preencher o lugar seguinte. Toque num lugar preenchido para o alterar.", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "Todo o plantel já joga nesta fase. Adicione jogadores ao plantel em Inscrições.", "All places are filled.": "Todos os lugares estão preenchidos.", "Tap a place to change it.": "Toque num lugar para o alterar.", "Same as last tie": "Igual ao último encontro", "Next:": "Seguinte:", "Copied from round {n}.": "Copiado da ronda {1}.", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "Copiado da ronda {1}. 1 jogador já não está no plantel, por isso o lugar está vazio.", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "Copiado da ronda {1}. {2} jogadores já não estão no plantel, por isso os lugares estão vazios.", "{x}, place {n}": "{1}, lugar {2}", "Leg": "Fase", "Next place": "Seguinte"});
+Object.assign(LANG_TEXT.th, {"at least {n} players": "อย่างน้อย {1} คน", "+ Add a player": "+ เพิ่มผู้เล่น", "To take a player out, clear their name.": "หากต้องการเอาผู้เล่นออก ให้ลบชื่อ", "Each entry is a club with its squad of at least {n} players. The games in each tie are set by the tie format.": "แต่ละรายการคือสโมสรพร้อมรายชื่อนักกีฬาอย่างน้อย {1} คน เกมในแต่ละแมตช์กำหนดตามรูปแบบแมตช์", "Tap a name to fill the next place. Tap a filled place to change it.": "แตะชื่อเพื่อใส่ในตำแหน่งถัดไป แตะตำแหน่งที่มีชื่อแล้วเพื่อเปลี่ยน", "Everyone in the squad is already in this leg. Add players to the squad on Registration.": "นักกีฬาทุกคนในรายชื่อลงเล่นในช่วงนี้แล้ว เพิ่มผู้เล่นในรายชื่อได้ที่หน้าลงทะเบียน", "All places are filled.": "ทุกตำแหน่งมีชื่อแล้ว", "Tap a place to change it.": "แตะตำแหน่งเพื่อเปลี่ยน", "Same as last tie": "เหมือนแมตช์ที่แล้ว", "Next:": "ถัดไป:", "Copied from round {n}.": "คัดลอกจากรอบ {1}", "Copied from round {n}. 1 player isn't in the squad any more, so that place is empty.": "คัดลอกจากรอบ {1} ผู้เล่น 1 คนไม่อยู่ในรายชื่อแล้ว ตำแหน่งนั้นจึงว่าง", "Copied from round {n}. {n} players aren't in the squad any more, so their places are empty.": "คัดลอกจากรอบ {1} ผู้เล่น {2} คนไม่อยู่ในรายชื่อแล้ว ตำแหน่งเหล่านั้นจึงว่าง", "{x}, place {n}": "{1} ตำแหน่ง {2}", "Leg": "ช่วง", "Next place": "ถัดไป"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1279,7 +1298,7 @@ const EURO_FORMATS = {
 };
 const euroFmt = t => EURO_FORMATS[t.euroFormat] || EURO_FORMATS.rounds;
 const euroTotal = f => f.legs.reduce((n, l) => n + l.games.reduce((a, g) => a + g[4], 0), 0);
-const EURO_SQUAD = { min: 6, tie: 8, max: 12 }; // squad on Registration; at most 8 of them play in any one tie
+const EURO_SQUAD = { min: 6, tie: 8, max: 40 }; // squad on Registration (a club's whole pool); at most 8 of them play in any one tie
 const EURO_SEX = { m: "♂", f: "♀" };
 const squadOf = (t, id) => { const tm = t.teams.find(x => x.id === id); return tm ? (tm.players || []).map((n, i) => ({ name: (n || "").trim(), sex: (tm.genders || [])[i] || "" })).filter(p => p.name) : []; };
 const lineupOk = m => !m.eu || ((m.la || []).filter(Boolean).length === m.size && (m.lb || []).filter(Boolean).length === m.size);
@@ -2752,12 +2771,34 @@ function toast(msg, undo) {
 /* ---------- EuroCup line-ups: who plays in each game of a tie, named from each club's squad ---------- */
 const LEG_NAME = { 1: "Triples", 2: "Doubles", 3: "Singles" };
 const fxOf = (t, m) => clubFixtures(t).find(f => !f.d2 && f.a === m.ca && f.b === m.cb);
-function openLineups(t, fxId, leg) {
+// One club and one leg at a time: the club's places in that leg, and its squad as name buttons. Tapping a name fills
+// the highlighted place and moves on to the next empty one, so tapping players in playing order fills the leg.
+// Anyone already placed in the leg drops out of the names; tapping a filled place empties it again.
+function openLineups(t, fxId, leg, side) {
   const f = clubFixtures(t).find(x => x.id === fxId); if (!f) return;
   const games = fxGames(MS(), f).filter(m => m.eu); if (!games.length) return;
   const sel = Object.fromEntries(games.map(m => [m.id, { a: Array.from({ length: m.size }, (_, i) => (m.la || [])[i] || ""), b: Array.from({ length: m.size }, (_, i) => (m.lb || [])[i] || "") }]));
-  S.modal = { lineup: true, fx: fxId, leg: games.some(m => m.leg === leg) ? leg : games[0].leg, sel, err: "" }; renderModal();
+  const md = S.modal = { lineup: true, fx: fxId, leg: games.some(m => m.leg === leg) ? leg : games[0].leg, side: side === "b" ? "b" : "a", sel, err: "", note: "" };
+  md.cur = luNext(md, games, null); renderModal();
 }
+// a club's places in the current leg, in playing order
+const luSlots = (md, games) => games.filter(m => m.leg === md.leg).sort(byOrder).flatMap(m => Array.from({ length: m.size }, (_, i) => ({ id: m.id, i })));
+// the next empty place after `from` (going round to the start), or null once every place is filled
+function luNext(md, games, from) {
+  const sl = luSlots(md, games), k = from ? sl.findIndex(s => s.id === from.id && s.i === from.i) : -1;
+  for (let j = 1; j <= sl.length; j++) { const s = sl[(k + j) % sl.length]; if (!md.sel[s.id]?.[md.side][s.i]) return s; }
+  return null;
+}
+const luFull = (md, games, side, leg) => games.filter(m => m.leg === leg).every(m => (md.sel[m.id]?.[side] || []).every(Boolean));
+// the club's line-up for the same leg in its nearest earlier tie (otherwise any other tie that has one)
+function luLastTie(t, f, md) {
+  const club = md.side === "a" ? f.a : f.b, ms = MS();
+  return clubFixtures(t).filter(x => x.id !== f.id && (x.a === club || x.b === club)).map(x => {
+    const k = x.a === club ? "a" : "b", g = fxGames(ms, x).filter(m => m.eu && m.leg === md.leg);
+    return { x, k, g, has: g.some(m => ((k === "a" ? m.la : m.lb) || []).some(Boolean)) };
+  }).filter(o => o.has).sort((p, q) => { const pe = p.x.day < f.day, qe = q.x.day < f.day; return pe !== qe ? (pe ? -1 : 1) : pe ? q.x.day - p.x.day : p.x.day - q.x.day; })[0] || null;
+}
+
 // problems that stop a save (errs) and reminders of the rules that don't (warns), across every leg of the tie
 function lineupIssues(t, f, sel) {
   const games = fxGames(MS(), f).filter(m => m.eu).sort(byOrder), errs = [], warns = [];
@@ -2786,13 +2827,30 @@ function renderLineupModal(t, el) {
   const md = S.modal, f = clubFixtures(t).find(x => x.id === md.fx); if (!f) { S.modal = null; el.innerHTML = ""; return; }
   const games = fxGames(MS(), f).filter(m => m.eu).sort(byOrder), legs = [...new Set(games.map(m => m.leg))].sort((x, y) => x - y);
   const { errs, warns } = lineupIssues(t, f, md.sel);
-  const side = k => { const sq = squadOf(t, games[0][k][0]);
-    return `<div class="lu-club stack" style="gap:8px"><h4 data-notr>${esc(clubName(t, k === "a" ? f.a : f.b))}</h4>${games.filter(m => m.leg === md.leg).map(m => `<div class="lu-game"><div class="small"><b>${esc(m.label)}</b> <span class="muted">${m.pts === 1 ? "1 point" : `${m.pts} points`}${m.done ? " · Finished" : m.court ? " · Playing" : ""}</span></div>
-      <div class="lu-sel">${md.sel[m.id][k].map((v, i) => `<select data-lu="${m.id}" data-side="${k}" data-i="${i}" aria-label="${esc(m.label)}, player ${i + 1}"><option value="">–</option>${sq.map(p => `<option value="${esc(p.name)}" ${p.name === v ? "selected" : ""}>${esc(p.name)}${p.sex ? " " + EURO_SEX[p.sex] : ""}</option>`).join("")}</select>`).join("")}</div></div>`).join("")}</div>`; };
+  const k = md.side, sq = squadOf(t, games[0][k][0]), lg = games.filter(m => m.leg === md.leg);
+  const used = new Set(lg.flatMap(m => md.sel[m.id][k].filter(Boolean)));
+  const names = sq.map((p, i) => ({ p, i })).filter(o => !used.has(o.p.name));
+  const cname = s => clubName(t, s === "a" ? f.a : f.b), other = k === "a" ? "b" : "a";
+  const sexOf = v => sq.find(p => p.name === v)?.sex;
+  const slot = (m, i) => { const v = md.sel[m.id][k][i], on = !!md.cur && md.cur.id === m.id && md.cur.i === i;
+    return `<button type="button" class="lu-slot ${v ? "filled" : ""} ${on ? "on" : ""}" data-act="lu-slot" data-id="${m.id}" data-i="${i}" aria-pressed="${on}" aria-label="${esc(m.label)}, place ${i + 1}">${v ? `<span data-notr>${esc(v)}${sexOf(v) ? " " + EURO_SEX[sexOf(v)] : ""}</span><span class="x" aria-hidden="true">×</span>` : on ? `<span data-notr>${esc(trAs("Next place", "Next"))}</span>` : `<span aria-hidden="true">–</span>`}</button>`; };
+  const nextLeg = legs.find(l => l > md.leg && (!luFull(md, games, "a", l) || !luFull(md, games, "b", l)));
+  const after = !luFull(md, games, other, md.leg) ? `<button type="button" class="btn sm primary" data-act="lu-side" data-side="${other}"><span>Next:</span> <span data-notr>${esc(cname(other))}</span></button>`
+    : nextLeg ? `<button type="button" class="btn sm primary" data-act="lu-leg" data-leg="${nextLeg}"><span>Next:</span> <span>${LEG_NAME[nextLeg]}</span></button>` : "";
+  const last = luLastTie(t, f, md);
   el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal lineups" role="dialog" aria-modal="true" aria-label="Line-ups">
-    <div class="spread"><div><div class="eyebrow"><span>Round ${f.day}</span> · <span data-notr>${esc(clubName(t, f.a))} v ${esc(clubName(t, f.b))}</span></div><h3>Line-ups</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
-    ${legs.length > 1 ? `<div class="seg" role="group">${legs.map(l => `<button type="button" data-act="lu-leg" data-leg="${l}" aria-pressed="${md.leg === l}">${LEG_NAME[l]}</button>`).join("")}</div>` : ""}
-    <div class="grid2">${side("a")}${side("b")}</div>
+    <div class="spread"><div><div class="eyebrow"><span>Round ${f.day}</span> · <span data-notr>${esc(cname("a"))} v ${esc(cname("b"))}</span></div><h3>Line-ups</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    ${legs.length > 1 ? `<div class="seg" role="group" aria-label="Leg">${legs.map(l => `<button type="button" data-act="lu-leg" data-leg="${l}" aria-pressed="${md.leg === l}">${LEG_NAME[l]}${luFull(md, games, "a", l) && luFull(md, games, "b", l) ? " ✓" : ""}</button>`).join("")}</div>` : ""}
+    <div class="seg lu-clubs" role="group" aria-label="Club">${["a", "b"].map(s => `<button type="button" data-act="lu-side" data-side="${s}" aria-pressed="${k === s}"><span data-notr>${esc(cname(s))}</span>${luFull(md, games, s, md.leg) ? " ✓" : ""}</button>`).join("")}</div>
+    <div class="stack" style="gap:10px">${lg.map(m => `<div class="lu-game"><div class="small"><b>${esc(m.label)}</b> <span class="muted">${m.pts === 1 ? "1 point" : `${m.pts} points`}${m.done ? " · Finished" : m.court ? " · Playing" : ""}</span></div>
+      <div class="lu-slots" style="--n:${Math.min(m.size, 3)}">${Array.from({ length: m.size }, (_, i) => slot(m, i)).join("")}</div></div>`).join("")}</div>
+    <div class="lu-squad stack" style="gap:8px">
+      ${md.cur ? `<div class="spread"><div class="eyebrow"><span>Squad</span> · <span data-notr>${esc(cname(k))}</span></div>${last ? `<button type="button" class="btn sm ghost" data-act="lu-copy">Same as last tie</button>` : ""}</div>
+        ${names.length ? `<p class="small muted">Tap a name to fill the next place. Tap a filled place to change it.</p><div class="lu-names">${names.map(o => `<button type="button" class="lu-p" data-act="lu-pick" data-p="${o.i}"><span data-notr>${esc(o.p.name)}</span>${o.p.sex ? ` <span aria-hidden="true">${EURO_SEX[o.p.sex]}</span>` : ""}</button>`).join("")}</div>`
+          : `<p class="small muted">Everyone in the squad is already in this leg. Add players to the squad on Registration.</p>`}`
+      : `<div class="spread"><span class="small"><b>All places are filled.</b> <span class="muted">Tap a place to change it.</span></span>${after}</div>${last ? `<div><button type="button" class="btn sm ghost" data-act="lu-copy">Same as last tie</button></div>` : ""}`}
+      ${md.note ? `<p class="small notice">${esc(md.note)}</p>` : ""}
+    </div>
     <p class="small muted">A game goes to a piste once both clubs have named its players, and the ${LEG_NAME[2].toLowerCase()} start when the ${LEG_NAME[1].toLowerCase()} are finished. Nobody plays in two games of the same leg.</p>
     ${errs.length ? `<div class="err stack" style="gap:2px">${errs.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
     ${warns.length ? `<div class="notice stack" style="gap:2px">${warns.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
@@ -2801,7 +2859,25 @@ function renderLineupModal(t, el) {
   </div></div>`;
   localize(el);
 }
+// taps in the line-ups dialog
+function luAction(t, md, act, a) {
+  const f = clubFixtures(t).find(x => x.id === md.fx); if (!f) return;
+  const games = fxGames(MS(), f).filter(m => m.eu);
+  if (act === "lu-leg" || act === "lu-side") { if (act === "lu-leg") md.leg = +a.dataset.leg; else md.side = a.dataset.side === "b" ? "b" : "a"; md.note = ""; md.cur = luNext(md, games, null); }
+  else if (act === "lu-slot") { const s = md.sel[a.dataset.id]?.[md.side]; if (!s) return; const i = +a.dataset.i; if (s[i]) s[i] = ""; md.cur = { id: a.dataset.id, i }; }
+  else if (act === "lu-pick") { const p = squadOf(t, games[0][md.side][0])[+a.dataset.p]; const at = md.cur || luNext(md, games, null); if (!p || !at) return;
+    const lg = games.filter(m => m.leg === md.leg); if (lg.some(m => md.sel[m.id][md.side].includes(p.name))) return; // already in this leg (a double tap)
+    md.sel[at.id][md.side][at.i] = p.name; md.cur = luNext(md, games, at); }
+  else if (act === "lu-copy") { const last = luLastTie(t, f, md); if (!last) return;
+    const sq = new Set(squadOf(t, games[0][md.side][0]).map(p => p.name)); let gone = 0;
+    games.filter(m => m.leg === md.leg).forEach(m => { const src = last.g.find(o => o.eu === m.eu), was = src ? ((last.k === "a" ? src.la : src.lb) || []) : [];
+      md.sel[m.id][md.side] = Array.from({ length: m.size }, (_, i) => { const n = was[i] || ""; if (n && !sq.has(n)) { gone++; return ""; } return n; }); });
+    md.note = gone ? (gone === 1 ? `Copied from round ${last.x.day}. 1 player isn't in the squad any more, so that place is empty.` : `Copied from round ${last.x.day}. ${gone} players aren't in the squad any more, so their places are empty.`) : `Copied from round ${last.x.day}.`;
+    md.cur = luNext(md, games, null); }
+  md.err = ""; renderModal();
+}
 async function saveLineups(t) {
+
   const md = S.modal, f = clubFixtures(t).find(x => x.id === md.fx); if (!f) return;
   if (lineupIssues(t, f, md.sel).errs.length) return;
   const changed = fxGames(MS(), f).filter(m => m.eu && md.sel[m.id] && (!sameIds(m.la || [], md.sel[m.id].a) || !sameIds(m.lb || [], md.sel[m.id].b)));
@@ -2812,7 +2888,7 @@ async function saveLineups(t) {
 }
 function openMatch(id) {
   const m = S.matches[id]; if (!m || !m.a || (!m.b && m.stage !== "shoot")) return;
-  if (m.eu && !m.done && !lineupOk(m)) { const t = T(), f = t && fxOf(t, m); if (f && canEdit()) openLineups(t, f.id, m.leg); else toast("This game starts once both clubs have named their players."); return; }
+  if (m.eu && !m.done && !lineupOk(m)) { const t = T(), f = t && fxOf(t, m); if (f && canEdit()) openLineups(t, f.id, m.leg, (m.la || []).filter(Boolean).length === m.size ? "b" : "a"); else toast("This game starts once both clubs have named their players."); return; }
   S.modal = { id, sa: m.sa ?? 0, sb: m.sb ?? 0, early: !!m.time, err: "", mode: m.done ? (m.time ? "time" : "full") : "quick", pad: null };
   if (m.stage === "shoot" || m.shoot) { const duel = !!m.b; S.modal.live = !m.done && canScore(); S.modal.shotsA = fullShots(duel ? m.shotsA : m.shots); if (duel) S.modal.shotsB = fullShots(m.shotsB); S.modal.soVals = duel ? { a: [...(m.soA || [])], b: [...(m.soB || [])] } : {}; }
   renderModal();
@@ -2922,7 +2998,7 @@ async function modalAction(act, k, a) {
   // the game went while its dialog was open (a draw undone on another phone, say): close it rather than save into nothing
   if (!t || (md.id && !S.matches[md.id]) || (md.so && (md.ids || []).some(id => !S.matches[id]))) { S.modal = null; renderModal(); toast("That game isn't in the draw any more."); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
-  if (act === "lu-leg") { md.leg = +a.dataset.leg; renderModal(); return; }
+  if (md.lineup && ["lu-leg", "lu-side", "lu-slot", "lu-pick", "lu-copy"].includes(act)) { luAction(t, md, act, a); return; }
   if (act === "lu-save") { await guard(() => saveLineups(t)); return; }
   if (act === "lu-open") { const m = S.matches[md.id], f = m && fxOf(t, m); if (f) openLineups(t, f.id, m.leg); return; }
   if (act === "so-cell") { md.socell = { key: a.dataset.key, i: +a.dataset.i }; renderModal(); return; }
@@ -3578,7 +3654,8 @@ function renderSetup(t) {
     <div class="panel stack">
       <h3>Entries</h3>
       <div class="stack" style="gap:8px"><div class="eyebrow">Entry type</div>${seg("entry", t.entry, [["teams", "Fixed teams"], ["melee", "Mêlée (random teams)"], ["shooting", "Precision shooting"]], locked)}</div>
-      ${isEuro(t) ? `<p class="small muted">Each entry is a club with its squad of ${EURO_SQUAD.min} to ${EURO_SQUAD.max} players. The games in each tie are set by the tie format.</p>` : isShoot(t) ? `<p class="small muted">Shooters enter individually. Tir de précision to FIPJP rules: 5 ateliers (lone boule, boule behind the jack, boule between two boules, boule behind an obstacle, the jack), each shot from 6, 7, 8 and 9 m. Every shot scores 0, 1, 3 or 5, so a scorecard is out of 100.</p>` : isEuro(t) ? "" : `<div class="stack" style="gap:8px"><div class="eyebrow">Format</div>${seg("format", t.format, [["singles", "Singles"], ["doubles", "Doubles"], ["triples", "Triples"]], locked)}</div>`}
+      ${isEuro(t) ? `<p class="small muted">Each entry is a club with its squad of at least ${EURO_SQUAD.min} players. The games in each tie are set by the tie format.</p>`
+ : isShoot(t) ? `<p class="small muted">Shooters enter individually. Tir de précision to FIPJP rules: 5 ateliers (lone boule, boule behind the jack, boule between two boules, boule behind an obstacle, the jack), each shot from 6, 7, 8 and 9 m. Every shot scores 0, 1, 3 or 5, so a scorecard is out of 100.</p>` : isEuro(t) ? "" : `<div class="stack" style="gap:8px"><div class="eyebrow">Format</div>${seg("format", t.format, [["singles", "Singles"], ["doubles", "Doubles"], ["triples", "Triples"]], locked)}</div>`}
       ${t.entry === "melee" ? `<div class="stack" style="gap:8px"><div class="eyebrow">Mêlée style</div>${seg("meleeMode", meleeMode(t), [["rounds", "New teams every round"], ["advance", "All rounds drawn in advance"], ["once", "Teams drawn once"]], locked)}</div>
         <p class="small muted">${{ rounds: "Players enter individually. Each round draws new random teams once the previous round is finished (mêlée-démêlée), mixing doubles and triples when numbers don't divide evenly and avoiding repeat partners where it can. Players are ranked individually.",
           advance: "Players enter individually and get new random teams each round, but every round is drawn at the start so you can print or post the whole draw before play. Repeat partners are avoided where possible. Players who arrive late can't be added once the draw is made.",
@@ -3789,15 +3866,27 @@ function addFold(t, list, forms) {
 }
 const usedInDraw = id => MS().some(m => ents(m).includes(id));
 // EuroCup: a club and its squad (each player marked man or woman, for the mixed games). The same form edits a squad.
+// the squad being typed in, kept between redraws so "+ Add a player" (or a result arriving from another phone) loses nothing
+function euroDraft(t) {
+  const key = t.id + ":" + (S.euEdit || "new");
+  if (S.euDraft?.key !== key) { const ed = S.euEdit && t.teams.find(x => x.id === S.euEdit), ps = [...(ed?.players || [])];
+    S.euDraft = { key, name: ed?.name || "", ps, gs: [...(ed?.genders || [])], rows: Math.min(EURO_SQUAD.max, Math.max(8, ps.length + 1)) }; }
+  return S.euDraft;
+}
+function euroReadForm() {
+  const d = S.euDraft; if (!d || !$("#add-form #nt-p0")) return;
+  if ($("#nt-name")) d.name = $("#nt-name").value;
+  for (let i = 0; $("#nt-p" + i); i++) { d.ps[i] = $("#nt-p" + i).value; d.gs[i] = $("#nt-g" + i).value; }
+}
 function euroForm(t) {
-  const ed = S.euEdit && t.teams.find(x => x.id === S.euEdit), sq = ed ? ed.players || [] : [], gs = ed ? ed.genders || [] : [];
-  const rows = Math.min(EURO_SQUAD.max, Math.max(8, sq.length + 2)), nameLocked = !!ed && usedInDraw(ed.id);
+  const ed = S.euEdit && t.teams.find(x => x.id === S.euEdit), d = euroDraft(t), nameLocked = !!ed && usedInDraw(ed.id);
   return `<form class="panel stack" id="add-form">
     <h3>${ed ? "Edit squad" : "Add a club"}</h3>
-    <label class="f"><span>Club name</span><input type="text" id="nt-name" required autocomplete="off" value="${esc(ed?.name || "")}" ${nameLocked ? "disabled" : ""}></label>
-    <div class="stack" style="gap:6px"><div class="eyebrow">Squad · ${EURO_SQUAD.min} to ${EURO_SQUAD.max} players</div>
-      <div class="squad">${Array.from({ length: rows }, (_, i) => `<div class="sq-row"><span class="num">${i + 1}</span><input type="text" id="nt-p${i}" value="${esc(sq[i] || "")}" aria-label="Player ${i + 1}" autocomplete="off"><select id="nt-g${i}" aria-label="Man or woman"><option value="">–</option><option value="m" ${gs[i] === "m" ? "selected" : ""}>♂ Man</option><option value="f" ${gs[i] === "f" ? "selected" : ""}>♀ Woman</option></select></div>`).join("")}</div>
-      <p class="small muted">Up to ${EURO_SQUAD.tie} of them play in any one tie. You can change the squad at any time, even after the draw.</p></div>
+    <label class="f"><span>Club name</span><input type="text" id="nt-name" required autocomplete="off" value="${esc(nameLocked ? ed.name : d.name)}" ${nameLocked ? "disabled" : ""}></label>
+    <div class="stack" style="gap:6px"><div class="eyebrow"><span>Squad</span> · <span>at least ${EURO_SQUAD.min} players</span></div>
+      <div class="squad">${Array.from({ length: d.rows }, (_, i) => `<div class="sq-row"><span class="num">${i + 1}</span><input type="text" id="nt-p${i}" value="${esc(d.ps[i] || "")}" aria-label="Player ${i + 1}" autocomplete="off"><select id="nt-g${i}" aria-label="Man or woman"><option value="">–</option><option value="m" ${d.gs[i] === "m" ? "selected" : ""}>♂ Man</option><option value="f" ${d.gs[i] === "f" ? "selected" : ""}>♀ Woman</option></select></div>`).join("")}</div>
+      ${d.rows < EURO_SQUAD.max ? `<div><button type="button" class="btn sm" data-act="eu-add-row">+ Add a player</button></div>` : ""}
+      <p class="small muted"><span>Up to ${EURO_SQUAD.tie} of them play in any one tie. You can change the squad at any time, even after the draw.</span> <span>To take a player out, clear their name.</span></p></div>
     ${t.checkin && !ed ? `<label class="chk"><input type="checkbox" id="add-here"> Here now (check in straight away)</label>` : ""}
     <div class="row"><button class="btn primary" type="submit">${ed ? "Save squad" : "Add"}</button>${ed ? `<button type="button" class="btn ghost" data-act="eu-edit-cancel">Cancel</button>` : ""}</div>
   </form>`;
@@ -4472,8 +4561,10 @@ document.addEventListener("click", async e => {
       if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "draw"; S.matches = {}; leaveLive();
       await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); render(); toast("Your own copy is ready. Start the qualifying round when you're set."); break;
     }
-    case "eu-edit": if (!canEdit() || !t.teams.some(x => x.id === a.dataset.id)) break; S.euEdit = a.dataset.id; (S.addOpen ||= {})[t.id] = true; render(); setTimeout(() => { $("#add-form")?.scrollIntoView({ block: "start", behavior: "smooth" }); $("#nt-p0")?.focus({ preventScroll: true }); }, 40); break;
-    case "eu-edit-cancel": S.euEdit = null; render(); break;
+    case "eu-edit": if (!canEdit() || !t.teams.some(x => x.id === a.dataset.id)) break; S.euEdit = a.dataset.id; S.euDraft = null; (S.addOpen ||= {})[t.id] = true; render(); setTimeout(() => { $("#add-form")?.scrollIntoView({ block: "start", behavior: "smooth" }); $("#nt-p0")?.focus({ preventScroll: true }); }, 40); break;
+    case "eu-edit-cancel": S.euEdit = null; S.euDraft = null; render(); break;
+    case "eu-add-row": { if (!canEdit() || !isEuro(t)) break; euroDraft(t); euroReadForm(); const d = S.euDraft; if (d.rows >= EURO_SQUAD.max) break; d.rows++; document.activeElement?.blur?.(); render(); // a phone keeps focus in the last box typed in, which would hold the redraw back
+      setTimeout(() => $("#nt-p" + (d.rows - 1))?.focus(), 30); break; }
     case "eu-lineup": { if (!canEdit()) break; openLineups(t, a.dataset.fx, +a.dataset.leg); break; }
     case "del-t": if (S.canDelete && !S.canDelete(t)) break;
  S.confirmDelete = true; render(); break;
@@ -4579,7 +4670,6 @@ document.addEventListener("change", async e => {
     const b = { logo: d, at: Date.now() };
     try { await S.store.setBrand(t0.id, b); setBrandLocal(t0.id, b); toast("Logo saved."); } catch (err) { handleWriteError(err); } return; }
   if (S.overlayView && S.overlayChange && await S.overlayChange(el)) return;
-  if (el.dataset.lu !== undefined && S.modal?.lineup) { const s = S.modal.sel[el.dataset.lu]; if (!s) return; s[el.dataset.side][+el.dataset.i] = el.value; S.modal.err = ""; renderModal(); return; }
   if (!canEdit() || !T()) return;
 
   if (el.closest("#modal")) return;
@@ -4616,6 +4706,7 @@ document.addEventListener("input", e => {
   }
   if (S.overlayView && S.overlayInput && S.overlayInput(e.target)) return;
   if (e.target.id === "find-q") { S.findQ = e.target.value; const box = $("#find-results"); const t = T(); if (box && t) { box.innerHTML = findResults(t, S.findQ); localize(box); } return; }
+  if (e.target.closest?.("#add-form") && S.euDraft && isEuro(T() || {})) { euroReadForm(); return; }
   if (e.target.id !== "reg-search") return;
   S.regFilter = e.target.value; const q = S.regFilter.toLowerCase();
   document.querySelectorAll("[data-row]").forEach(r => r.hidden = !!q && !r.dataset.text.includes(q));
@@ -4635,6 +4726,7 @@ document.addEventListener("submit", async e => {
       const dup = ps.find((p, i) => ps.findIndex(q => clubKey(q) === clubKey(p)) !== i); if (dup) { toast(`${dup} is in the squad twice. Give each player a different name.`); return; }
       if (ed) { ed.name = name; ed.club = name; ed.players = ps; ed.genders = gs; S.euEdit = null; }
       else t.teams.push(Object.assign({ id: "e" + uid(), name, players: ps, genders: gs, club: name, active: true }, ci));
+      S.euDraft = null;
     }
     else {
       const ps = Array.from({ length: SIZE[t.format] }, (_, i) => $("#nt-p" + i).value.trim());

@@ -28,6 +28,19 @@ const { chromium } = require('playwright');
     L.push('edit form: ' + txt(q('#add-form h3')) + ' | filled ' + q('#nt-p4').value + ' ' + q('#nt-g4').value);
     for (let i = 5; i < 8; i++) { q('#nt-p' + i).value = 'R' + (i + 1); q('#nt-g' + i).value = i === 5 ? 'f' : 'm'; } q('#add-form').requestSubmit(); await w(120);
     L.push('edited: ' + C.T().teams[0].players.length + ' ' + C.T().teams[0].genders.join('') + ' | pill ' + txt(q('.erow .pill')));
+    // bigger clubs: + Add a player adds a place, and nothing typed is lost when the page redraws
+    q('[data-act="eu-edit"]').click(); await w(80);
+    const typeIn = (i, v, g) => { q('#nt-p' + i).value = v; q('#nt-p' + i).dispatchEvent(new Event('input', { bubbles: true })); q('#nt-g' + i).value = g; q('#nt-g' + i).dispatchEvent(new Event('input', { bubbles: true })); };
+    const rows0 = qa('#add-form .sq-row').length; typeIn(8, 'R9', 'm');
+    q('[data-act="eu-add-row"]').click(); await w(80);
+    L.push('add a player: rows ' + rows0 + ' → ' + qa('#add-form .sq-row').length + ' | typed kept ' + q('#nt-p8').value + ' ' + q('#nt-g8').value + ' | new place focused ' + (document.activeElement?.id === 'nt-p9'));
+    C.render(); await w(40); L.push('after a redraw: ' + q('#nt-p8').value + ' | rows ' + qa('#add-form .sq-row').length);
+    for (let i = 9; i < 15; i++) { if (!q('#nt-p' + i)) { q('[data-act="eu-add-row"]').click(); await w(60); } typeIn(i, 'R' + (i + 1), 'm'); }
+    q('#add-form').requestSubmit(); await w(120);
+    L.push('big squad: ' + C.T().teams[0].players.length + ' | last ' + C.T().teams[0].players.slice(-1)[0] + ' | pill ' + txt(q('.erow .pill')));
+    q('[data-act="eu-edit"]').click(); await w(80);
+    L.push('edit big squad: rows ' + qa('#add-form .sq-row').length + ' | all there ' + (q('#nt-p14').value === 'R15') + ' | eyebrow ' + txt(q('#add-form .eyebrow')));
+    q('[data-act="eu-edit-cancel"]').click(); await w(60);
     // paste a list with genders
     q('#bulk').value = 'Hillside: H1 (W), H2 (M), H3 M, H4 (M), H5 (W), H6 (M)\nLakeside: L1 (M), L2 (M), L3 (M), L4 (M), L5 (M), L6 (M)'; q('#bulk-form').requestSubmit(); await w(120);
     L.push('pasted: ' + C.T().teams.slice(1).map(x => x.name + ' ' + x.genders.join('')).join(','));
@@ -40,35 +53,58 @@ const { chromium } = require('playwright');
     L.push('drawn: ties ' + t1.clubFix.length + ' | rounds ' + [...new Set(t1.clubFix.map(f => f.day))].join(',') + ' | games ' + ms.length + ' | per tie ' + ms.filter(m => m.ca === t1.clubFix[0].a && m.cb === t1.clubFix[0].b).map(m => m.label + ':' + m.pts).join(',') + ' | on pistes ' + ms.filter(m => m.court).length);
     L.push('page: ' + txt(q('main .rp-live')).slice(0, 60) + ' | leg heads ' + qa('.eu-leg .eyebrow').slice(0, 2).map(x => x.textContent).join(',') + ' | first card ' + txt(q('.fixture .match')).slice(0, 60));
     L.push('context: ' + C.matchContext(C.T(), ms.find(m => m.eu === 'mt' && m.round === 1)));
-    // 4. Line-ups: tap a game, the line-ups open
+    // 4. Line-ups: tap a game, the line-ups open with one club's places and its squad as name buttons
     const f0 = C.T().clubFix.find(f => f.day === 1), g0 = C.MS().filter(m => m.ca === f0.a && m.cb === f0.b);
-    q(`[data-match="${g0[0].id}"]`).click(); await w(80);
-    L.push('tap opens line-ups: ' + !!q('.modal.lineups') + ' | legs ' + qa('.modal [data-act="lu-leg"]').map(x => x.textContent).join(',') + ' | selects ' + qa('.modal select').length + ' | options ' + q('.modal select').options.length);
-    const sqA = C.T().teams.find(x => x.id === g0[0].a[0]).players, sqB = C.T().teams.find(x => x.id === g0[0].b[0]).players;
-    const set = async (mid, side, i, v) => { const el = q(`.modal select[data-lu="${mid}"][data-side="${side}"][data-i="${i}"]`); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); await w(30); };
-    const ot = g0.find(m => m.eu === 'ot'), mt = g0.find(m => m.eu === 'mt');
-    // A: open triple the three men, mixed triple all men too (not allowed), and a player twice
-    const menA = sqA.filter((_, i) => C.T().teams.find(x => x.id === g0[0].a[0]).genders[i] === 'm'), womenA = sqA.filter((_, i) => C.T().teams.find(x => x.id === g0[0].a[0]).genders[i] === 'f');
-    for (let i = 0; i < 3; i++) await set(ot.id, 'a', i, menA[i]);
-    await set(mt.id, 'a', 0, menA[0]); await set(mt.id, 'a', 1, menA[3]); await set(mt.id, 'a', 2, menA[4] || menA[1]);
-    L.push('errors: ' + qa('.modal .err span').map(x => x.textContent).join(' / ') + ' | save disabled ' + q('[data-act="lu-save"]').disabled);
-    await set(mt.id, 'a', 0, womenA[0]); await set(mt.id, 'a', 2, womenA[1]);
-    L.push('fixed: errors ' + qa('.modal .err span').length + ' | save disabled ' + q('[data-act="lu-save"]').disabled);
+    const ot = g0.find(m => m.eu === 'ot'), mt = g0.find(m => m.eu === 'mt'), names = () => qa('.modal .lu-p').map(b => b.firstElementChild.textContent);
+    const pick = async v => { const b = qa('.modal .lu-p').find(b => b.firstElementChild.textContent === v); if (!b) return false; b.click(); await w(30); return true; };
+    // a place by hand: the right club, tap the place (empties it if filled), then the name
+    const set = async (mid, side, i, v) => { if (S.modal.side !== side) { q(`.modal .lu-clubs [data-side="${side}"]`).click(); await w(30); }
+      q(`.modal [data-act="lu-slot"][data-id="${mid}"][data-i="${i}"]`).click(); await w(30); return v ? pick(v) : true; };
+    q(`[data-match="${ot.id}"]`).click(); await w(80);
+    L.push('tap opens line-ups: ' + !!q('.modal.lineups') + ' | legs ' + qa('.modal [data-act="lu-leg"]').map(x => x.textContent).join(',') + ' | clubs ' + qa('.modal .lu-clubs button').map(x => x.textContent).join(',') + ' | drop-downs ' + qa('.modal select').length + ' | places ' + qa('.modal .lu-slot').length + ' | names ' + names().length + ' | first place next ' + (q('.modal .lu-slot.on')?.dataset.id === ot.id && q('.modal .lu-slot.on')?.dataset.i === '0'));
+    const tmA = C.T().teams.find(x => x.id === ot.a[0]), tmB = C.T().teams.find(x => x.id === ot.b[0]);
+    const menA = tmA.players.filter((_, i) => tmA.genders[i] === 'm'), womenA = tmA.players.filter((_, i) => tmA.genders[i] === 'f');
+    const menB = tmB.players.filter((_, i) => tmB.genders[i] === 'm'), womenB = tmB.players.filter((_, i) => tmB.genders[i] === 'f');
+    // tapping three names in a row fills the open triple and moves on to the mixed triple; picked players leave the names
+    for (const n of menA.slice(0, 3)) await pick(n);
+    L.push('auto-advance: open triple ' + S.modal.sel[ot.id].a.join(',') + ' | next place mixed 1 ' + (S.modal.cur?.id === mt.id && S.modal.cur?.i === 0) + ' | picked gone ' + !names().some(n => menA.slice(0, 3).includes(n)) + ' | names left ' + names().length + ' | can pick again ' + await pick(menA[0]));
+    // three men in the mixed triple: refused
+    for (const n of menA.slice(3, 6)) await pick(n);
+    L.push('mixed error: ' + qa('.modal .err span').map(x => x.textContent).join(' / ') + ' | save disabled ' + q('[data-act="lu-save"]').disabled + ' | full: ' + txt(q('.modal .lu-squad')).slice(0, 70));
+    // tap a filled place: it empties and its player is back in the names
+    q(`.modal [data-act="lu-slot"][data-id="${mt.id}"][data-i="0"]`).click(); await w(30);
+    L.push('tap a filled place: emptied ' + (S.modal.sel[mt.id].a[0] === '') + ' | highlighted ' + (S.modal.cur?.id === mt.id && S.modal.cur?.i === 0) + ' | back in names ' + names().includes(menA[3]));
+    await pick(womenA[0]);
+    L.push('fixed: errors ' + qa('.modal .err span').length + ' | save disabled ' + q('[data-act="lu-save"]').disabled + ' | next button ' + txt(q('.modal .lu-squad [data-act="lu-side"]')));
     q('[data-act="lu-save"]').click(); await w(200);
     L.push('one side saved: ' + txt(q('#toast')) + ' | on pistes ' + C.MS().filter(m => m.court).length + ' | card ' + txt(q(`[data-match="${ot.id}"]`)).slice(0, 80));
-    // B names its triples: both triples go to pistes, the doubles wait for theirs
+    // the other club, through the Next button: both triples go to pistes, the doubles wait for theirs
     q(`[data-act="eu-lineup"][data-fx="${f0.id}"][data-leg="1"]`).click(); await w(80);
-    const gB = C.T().teams.find(x => x.id === g0[0].b[0]).genders, menB = sqB.filter((_, i) => gB[i] === 'm'), womenB = sqB.filter((_, i) => gB[i] === 'f');
-    for (let i = 0; i < 3; i++) await set(ot.id, 'b', i, menB[i]); await set(mt.id, 'b', 0, womenB[0]); await set(mt.id, 'b', 1, menB[3] || womenB[1]); await set(mt.id, 'b', 2, menB[4] || womenB[2] || menB[0]);
-    L.push('B errors: ' + qa('.modal .err span').map(x => x.textContent).join(' / '));
+    L.push('reopen: club ' + S.modal.side + ' full ' + !S.modal.cur + ' | next ' + txt(q('.modal .lu-squad [data-act="lu-side"]')));
+    q('.modal .lu-squad [data-act="lu-side"]').click(); await w(40);
+    for (const n of [...menB.slice(0, 3), womenB[0], menB[3], menB[4]]) await pick(n);
+    L.push('B: errors ' + qa('.modal .err span').length + ' | clubs ' + qa('.modal .lu-clubs button').map(x => x.textContent).join(',') + ' | legs ' + qa('.modal [data-act="lu-leg"]').map(x => x.textContent).join(',') + ' | next ' + txt(q('.modal .lu-squad [data-act="lu-leg"]')));
     q('[data-act="lu-save"]').click(); await w(200);
-    L.push('triples on pistes: ' + C.MS().filter(m => m.court && m.ca === f0.a && m.cb === f0.b).map(m => m.eu).join(',') + ' | toast ' + txt(q('#toast')));
-    // doubles line-ups now (both clubs), they wait for the triples to finish
+    L.push('triples on pistes: ' + C.MS().filter(m => m.court && m.ca === f0.a && m.cb === f0.b).map(m => m.eu).sort().join(',') + ' | toast ' + txt(q('#toast')));
+    // doubles, both clubs, tapping names in playing order; they wait for the triples to finish
     q(`[data-act="eu-lineup"][data-fx="${f0.id}"][data-leg="2"]`).click(); await w(80);
-    const dbl = g0.filter(m => m.leg === 2); let k = 0; for (const m of dbl) { for (let i = 0; i < 2; i++) { await set(m.id, 'a', i, m.mixed ? (i ? menA[4] : womenA[0]) : menA[(k + i) % menA.length]); await set(m.id, 'b', i, m.mixed ? (i ? menB[4] || womenB[1] : womenB[0]) : menB[(k + i) % menB.length]); } k += 2; }
-    L.push('doubles errors: ' + qa('.modal .err span').length + ' | warns ' + qa('.modal .notice span').length);
+    for (const n of [menA[0], menA[1], menA[2], menA[3], womenA[0], menA[4]]) await pick(n);
+    q('.modal .lu-squad [data-act="lu-side"]').click(); await w(40);
+    for (const n of [menB[0], menB[1], menB[2], menB[3], womenB[0], menB[4]]) await pick(n);
+    const dbl = g0.filter(m => m.leg === 2);
+    L.push('doubles errors: ' + qa('.modal .err span').length + ' | warns ' + qa('.modal .notice span').length + ' | mixed double ' + S.modal.sel[dbl.find(m => m.mixed).id].a.join(',') + ' v ' + S.modal.sel[dbl.find(m => m.mixed).id].b.join(','));
     q('[data-act="lu-save"]').click(); await w(200);
     L.push('doubles wait: ' + C.MS().filter(m => m.court && m.leg === 2).length);
+    // Same as last tie: the club's next tie copies its round 1 triples; a player who has left the squad leaves an empty place
+    { const tt = T(), r = tt.teams.find(x => x.id === tmA.id), j = r.players.indexOf(menA[1]); r.players.splice(j, 1); r.genders.splice(j, 1); await put(tt); }
+    const f1 = C.T().clubFix.find(f => f.day > 1 && (f.a === f0.a || f.b === f0.a)), k1 = f1.a === f0.a ? 'a' : 'b';
+    q(`[data-act="eu-lineup"][data-fx="${f1.id}"][data-leg="1"]`).click(); await w(80);
+    if (S.modal.side !== k1) { q(`.modal .lu-clubs [data-side="${k1}"]`).click(); await w(30); }
+    const otherClub = !!q('.modal [data-act="lu-copy"]');
+    q('.modal [data-act="lu-copy"]').click(); await w(60);
+    const g1 = C.MS().filter(m => m.ca === f1.a && m.cb === f1.b), ot1 = g1.find(m => m.eu === 'ot'), mt1 = g1.find(m => m.eu === 'mt');
+    L.push('same as last tie: button ' + otherClub + ' | open triple ' + S.modal.sel[ot1.id][k1].map(x => x || '_').join(',') + ' | mixed ' + S.modal.sel[mt1.id][k1].join(',') + ' | note ' + txt(q('.modal .lu-squad .notice')) + ' | highlighted the empty place ' + (S.modal.cur?.id === ot1.id && S.modal.cur?.i === 1));
+    q('.modal [data-act="close"]').click(); await w(40);
     await C.recordResult(ot.id, 13, 4, true); await C.recordResult(mt.id, 9, 13, true); await w(150);
     L.push('after triples: doubles on pistes ' + C.MS().filter(m => m.court && m.leg === 2 && m.ca === f0.a).length + ' | fixture ' + txt(q(`[data-fx-box="${f0.id}"] .fx`)));
     for (const [i, m] of dbl.entries()) await C.recordResult(m.id, i === 2 ? 5 : 13, i === 2 ? 13 : 7, true); await w(150);
@@ -121,6 +157,7 @@ const { chromium } = require('playwright');
     // 9. French
     q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80); await tab('setup');
     L.push('french: ' + qa('[data-set="euroFormat"]').map(x => x.textContent).join(',') + ' | ' + txt(q('[data-set="system"][data-val="eurocup"]')) + ' | ' + C.tr('Name the line-ups') + ' | ' + C.tr('Riverside: R2 is in two triples games.') + ' | ' + C.tr('6 ties over 3 rounds'));
+    L.push('french picker: ' + C.tr('Same as last tie') + ' | ' + C.tr('Next:') + ' | ' + C.tr('Tap a name to fill the next place. Tap a filled place to change it.') + ' | ' + C.tr("Copied from round 2. 1 player isn't in the squad any more, so that place is empty.") + ' | ' + C.tr('+ Add a player'));
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack); } return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
