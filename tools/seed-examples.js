@@ -120,6 +120,33 @@ window.__seed = { log: [], done: false, links: {} };
     clubs: { name: "Inter-club · Chiltern, East Midlands, Anglia", cfg: { entry: "teams", system: "clubs", format: "triples", clubTeams: 6, clubPairing: "rotation", clubDays: 3, seeding: "entry" },
       entries: teams(18, 3, i => { const club = ["Chiltern", "East Midlands", "Anglia"][Math.floor(i / 6)]; return { club, name: `${club} ${(i % 6) + 1}` }; }),
       go: async () => { await click('[data-act="first-draw"]'); await w(1500); if (!C.MS().length) throw new Error("inter-club draw failed"); await play(); } },
+    // EuroCup Final (Pétanque England): 4 clubs, each with a squad of 8 (3 women, 5 men), every club plays every other club;
+    // a tie is 2 triples (5 points each), 3 doubles (3 each) and 6 singles (2 each) = 31 points, first to 16
+    eurocupfinal: { name: "EuroCup Final · 4 clubs, triples, doubles & singles", cfg: { entry: "teams", system: "eurocup", euroFormat: "final", format: "triples", seeding: "entry", pistes: 12 },
+      entries: t => ["Oakfield", "Millbrook", "Ashcombe", "Kingsmead"].forEach((place, i) => { const id = "e" + (i + 1), name = `${place} Pétanque Club`, ps = Array.from({ length: 8 }, player);
+        t.teams.push({ id, name, club: name, players: ps, genders: ps.map((_, k) => k < 3 ? "f" : "m"), active: true, checkedIn: true }); strength[id] = Math.random(); }),
+      go: async () => {
+        await click('[data-act="first-draw"]'); await w(1500); if (!C.MS().length) throw new Error("EuroCup draw failed");
+        // line-ups from each squad (women 0-2, men 3-7): all 8 play, a woman in each mixed game, singles 1 is woman v woman;
+        // the men swap places from round to round
+        const t = C.T(), sq = id => t.teams.find(x => x.id === id).players;
+        const PICK = { ot: [3, 4, 5], mt: [0, 6, 7], od1: [3, 4], od2: [5, 6], md: [1, 7], s1: [0], s2: [2], s3: [3], s4: [4], s5: [5], s6: [6] };
+        const man = (k, r) => k < 3 ? k : 3 + ((k - 3 + r) % 5);
+        // the draw's games are still being saved for a few seconds, and a line-up written to a game that isn't saved yet is
+        // lost, so keep writing the missing ones until every game shows its line-ups
+        const full = m => (m.la || []).filter(Boolean).length === m.size && (m.lb || []).filter(Boolean).length === m.size;
+        for (let k = 0; k < 10 && C.MS().some(m => m.eu && !full(m)); k++) {
+          await w(2000);
+          for (const m of C.MS().filter(m => m.eu && !full(m))) {
+            const pick = id => PICK[m.eu].map(k => sq(id)[man(k, m.round || 1)]);
+            try { await S.store.updateMatch(S.tid, m.id, { la: pick(m.a[0]), lb: pick(m.b[0]) }); } catch (e) { /* not saved yet: next pass */ }
+          }
+          await w(1500);
+        }
+        if (C.MS().some(m => m.eu && !full(m))) throw new Error("line-ups didn't save");
+        await C.assignCourts(); await w(800);
+        await play(m => m.round === 3 && m.leg === 3); // the last round's singles are left on their pistes
+        await C.assignCourts(); await w(800); } },
     shooting: { name: "Precision shooting · qualifying → top 8 knockout", cfg: { entry: "shooting", system: "knockout", format: "singles", shootFormat: "ko8", koThird: true, seeding: "random", pistes: 8 },
       entries: players(16),
       go: async () => {
