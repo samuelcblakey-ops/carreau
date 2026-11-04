@@ -26,6 +26,7 @@ const { chromium } = require('playwright');
   const B = await mk('B'); await B.goto(process.env.WEB_URL); await w(3500);
   log('links:', await B.evaluate(() => [!!document.querySelector('header .hof-btn[href="#halloffame"]'), !!document.querySelector('#foot a[href="#halloffame"]'), !!document.querySelector('.start-actions a[href="#halloffame"]')].join(' ')));
   await B.click('header .hof-btn'); await w(2500);
+  log('opens on the grid:', await B.evaluate(t => !!document.querySelector(`#hof-${t}.hof-tile`), tid)); await B.click('[data-act="hof-view"][data-k="cards"]'); await w(300);
   log('page:', await txt(B, 'main h2'), '| country', await B.evaluate(() => document.querySelector('#hof-country')?.value), '| has the card', (await txt(B, '#hof-results .hof-card h3')).split(' / ').includes('Hitchin Autumn Cup'),
     '| view link', await B.evaluate(t => !!document.querySelector(`#hof-${t} a.btn[href="#${t}"]`), tid), '| no competition watched', await B.evaluate(() => !window.__carreau.S.tid || window.__carreau.S.tid !== 'halloffame'));
   await B.selectOption('#hof-country', 'all'); await w(2000); log('all countries: has the card', (await txt(B, '#hof-results .hof-card h3')).split(' / ').includes('Hitchin Autumn Cup'));
@@ -46,7 +47,7 @@ const { chromium } = require('playwright');
   await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
   log('admin hide:', await AD.evaluate(async t => { try { await window.__testRaw.update('hallOfFame/' + t, { hidden: true, hiddenAt: Date.now() }); return 'ok'; } catch (e) { return 'denied ' + e.code; } }, tid));
   await B.reload(); await w(3500);
-  log('hidden: card shown', await B.evaluate(t => !!document.querySelector('#hof-' + t), tid), '| list still loads', await B.evaluate(() => !!document.querySelector('#hof-results .hof-card, #hof-results .empty')));
+  log('hidden: card shown', await B.evaluate(t => !!document.querySelector('#hof-' + t), tid), '| list still loads', await B.evaluate(() => !!document.querySelector('#hof-results .hof-card, #hof-results .hof-tile, #hof-results .hof-line, #hof-results .empty')));
   await B2.goto(process.env.WEB_URL + '#halloffame.' + tid); await B2.reload(); await w(3500);
   log('hidden link:', await txt(B2, 'main .notice'));
   log('errs', errs); await b.close();

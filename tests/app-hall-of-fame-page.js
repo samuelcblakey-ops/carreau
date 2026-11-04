@@ -1,4 +1,5 @@
-// The Hall of Fame page (#halloffame): the links to it (header trophy, footer, start screen), the list for the visitor's
+// The Hall of Fame page (#halloffame): the links to it (header trophy, footer, start screen), the three layouts (grid by default,
+// cards, list; a tile or line opens its full card in place), the list for the visitor's
 // country grouped by year, hidden entries left out, country / level / format filters, a search that ignores accents and case,
 // links to one entry (the organiser's View button), "View the competition" only while the competition can still be opened,
 // French, and a phone-width check.
@@ -31,8 +32,8 @@ const SEED = () => {
   const out = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)]; const L = []; try {
     const txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim();
     const go = async h => { document.activeElement?.blur?.(); location.hash = h; await w(250); };
-    const cards = () => qa('#hof-results .hof-card').map(c => txt(c.querySelector('h3')));
-    const years = () => qa('#hof-results .hof-year-h').map(txt);
+    const cards = () => qa('#hof-results .hof-card h3, #hof-results .hof-tile .hof-tile-name, #hof-results .hof-line .hof-line-comp b').map(txt);
+    const years = () => qa('#hof-results .hof-year-h').map(h => h.firstChild.textContent.trim());
     const change = async (sel, v) => { const el = q(sel); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); await w(200); };
     const search = async v => { const el = q('#hof-q'); el.focus(); el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); await w(80); };
     // 1. the three ways in
@@ -40,6 +41,19 @@ const SEED = () => {
     // 2. the page, on the visitor's country
     await go('halloffame');
     L.push(`page: ${txt(q('main h2'))} | title ${document.title} | current ${q('header .hof-btn').getAttribute('aria-current')} | country ${q('#hof-country').value} | years ${years().join(',')} | cards ${cards().join(' / ')}`);
+    // the grid it opens on: one small tile per competition, which opens its full card in place
+    L.push(`opens on: ${qa('.hof-viewbar [aria-pressed="true"]').map(x => x.dataset.k).join(',')} | tiles ${qa('#hof-results .hof-tile').length} | full cards ${qa('#hof-results .hof-card').length} | year count ${txt(q('.hof-year-h .hof-count'))}`);
+    L.push(`tile: ${txt(q('#hof-t1'))} | edge ${getComputedStyle(q('#hof-t1')).borderLeftColor}`);
+    q('#hof-t1').click(); await w(150);
+    L.push(`tile opened: card ${!!q('#hof-t1.hof-card')} | close focused ${document.activeElement?.dataset?.act === 'hof-close-entry'} | other tiles ${qa('#hof-results .hof-tile').length}`);
+    q('#hof-t1 [data-act="hof-close-entry"]').click(); await w(150);
+    L.push(`tile closed: ${!!q('#hof-t1.hof-tile')} | focus back ${document.activeElement?.id === 'hof-t1'}`);
+    // the list: one line each, remembered on the device
+    q('[data-act="hof-view"][data-k="list"]').click(); await w(150);
+    L.push(`list: lines ${qa('#hof-results .hof-line').length} | ${txt(q('#hof-t2'))} | saved ${localStorage.getItem('carreau-hof-view')}`);
+    q('#hof-t2').click(); await w(150); L.push(`line opened: ${!!q('#hof-t2.hof-card')} | lines ${qa('#hof-results .hof-line').length}`);
+    // full cards for the checks below
+    q('[data-act="hof-view"][data-k="cards"]').click(); await w(150);
     const c1 = q('#hof-t1');
     L.push(`card: ${txt(c1.querySelector('.hof-where'))} | ${txt(c1.querySelector('.hof-meta'))} | parts ${qa('#hof-t1 .hof-part-name').map(txt).join(',')} | ${txt(c1.querySelector('.hof-row'))} | note ${txt(c1.querySelector('.hof-note'))} | view ${c1.querySelector('a.btn')?.getAttribute('href')}`);
     L.push(`one part, no heading: ${!q('#hof-t2 .hof-part-name')} | melee: ${txt(q('#hof-t3 .hof-meta'))}`);
@@ -67,6 +81,10 @@ const SEED = () => {
     await go('halloffame.t4'); await w(200);
     L.push(`deep link: country ${q('#hof-country').value} | focus ${qa('.hof-focus').map(c => c.id).join(',')} | cards ${cards().join(' / ')}`);
     await go('halloffame.t5'); await w(200); L.push(`hidden link: ${txt(q('main .notice'))}`);
+    // a link to one entry in the grid opens it there
+    await go('halloffame'); q('[data-act="hof-view"][data-k="grid"]').click(); await w(150);
+    await go('halloffame.t2'); await w(200); L.push(`deep link in grid: opened ${!!q('#hof-t2.hof-card.hof-focus')} | tiles ${qa('#hof-results .hof-tile').length}`);
+    q('[data-act="hof-view"][data-k="cards"]').click(); await w(150);
     // 8. share: the native share sheet on phones, otherwise the link is copied
     await go('halloffame'); await w(150); await change('#hof-country', 'all');
     q('#hof-t1 [data-act="hof-share"]').click(); await w(200); L.push(`share: ${txt(q('#toast'))}`);
@@ -96,6 +114,7 @@ const SEED = () => {
     // 11. in French
     await go('halloffame'); await w(150);
     q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="fr"]').click(); await w(250);
+    L.push(`fr layouts: ${txt(q('.hof-viewbar .eyebrow'))} | ${qa('.hof-viewbar button').map(txt).join(',')}`);
     L.push(`fr: ${txt(q('main h2'))} | ${q('#hof-q').placeholder} | ${txt(q('#hof-country option'))} | ${qa('.hof-chip').map(txt).join(',')} | ${txt(q('header .hof-btn'))} | foot ${txt(q('#foot a[href="#halloffame"]'))}`);
     await change('#hof-country', 'all'); L.push(`fr card: ${txt(q('#hof-t1 .hof-meta'))} | ${txt(q('#hof-t1 .hof-row'))} | ${txt(q('#hof-t1 a.btn'))}`);
     q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
@@ -103,6 +122,11 @@ const SEED = () => {
   console.log(out.join('\n'));
   // 12. on a phone: the header with the trophy and the page fit the width
   await p.setViewportSize({ width: 375, height: 760 }); await p.evaluate(() => { location.hash = 'halloffame'; }); await p.waitForTimeout(300);
+  await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('#hof-country').value = 'all'; document.querySelector('#hof-country').dispatchEvent(new Event('change', { bubbles: true })); await w(200);
+    document.querySelector('[data-act="hof-view"][data-k="grid"]').click(); await w(200); });
+  console.log('phone grid: ' + JSON.stringify(await p.evaluate(() => ({ columns: getComputedStyle(document.querySelector('.hof-grid')).gridTemplateColumns.split(' ').length, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))));
+  await p.evaluate(async () => { document.querySelector('[data-act="hof-view"][data-k="list"]').click(); await new Promise(r => setTimeout(r, 200)); });
+  console.log('phone list: ' + JSON.stringify(await p.evaluate(() => { const l = document.querySelector('.hof-line'); return { overflow: document.documentElement.scrollWidth > innerWidth + 1, venue: getComputedStyle(l.querySelector('.hof-line-sub')).display, height: Math.round(l.getBoundingClientRect().height) < 70 }; })));
   console.log('phone: ' + JSON.stringify(await p.evaluate(() => ({ overflow: document.documentElement.scrollWidth > innerWidth + 1, trophy: !!document.querySelector('header .hof-btn'),
     label: getComputedStyle(document.querySelector('header .hof-btn span')).display, picker: Math.round(document.querySelector('.picker-btn')?.getBoundingClientRect().width || 0) }))));
   console.log('errs', errs); await b.close();
