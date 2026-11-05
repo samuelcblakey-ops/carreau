@@ -1,4 +1,7 @@
-# Every push and pull request runs the tests.
+# Every push and pull request runs the tests, split into parallel jobs so the result comes back sooner:
+#   - app:   build the site + the app tests (4 at a time)
+#   - web:   the website tests against the Firebase emulators, as three jobs side by side (each has its own emulators)
+#   - test:  passes only when all of the above passed. This is the check that main's protection requires.
 # A push to main that passes the tests is deployed automatically:
 #   - the website to GitHub Pages
 #   - the Firestore security rules to Firebase (once the FIREBASE_SERVICE_ACCOUNT secret is set)
@@ -13,10 +16,38 @@ on:
 permissions:
   contents: read
 
+# a newer push to the same pull request cancels the run that's still testing the old one (main is never cancelled)
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  test:
+  app:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: node tests/run.js app
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results-app
+          path: test-results/
+
+  web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -29,12 +60,24 @@ jobs:
           java-version: 21
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm test
+      - run: npm run build
+      - run: npx firebase emulators:exec --only firestore,auth --project demo-carreau "node tests/run.js web --shard ${{ matrix.shard }}/3"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: test-results
+          name: test-results-web-${{ matrix.shard }}
           path: test-results/
+
+  # the required check: green only when the build, the app tests and every web shard passed
+  test:
+    needs: [app, web]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - run: |
+          echo "app: ${{ needs.app.result }} · web: ${{ needs.web.result }}"
+          [ "${{ needs.app.result }}" = success ] && [ "${{ needs.web.result }}" = success ]
 
   deploy:
     needs: test

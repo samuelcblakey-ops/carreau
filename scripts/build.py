@@ -86,6 +86,10 @@ for f in os.listdir(os.path.join(root, "public")):
     if os.path.isfile(src): shutil.copy(src, out)
     elif os.path.isdir(src): shutil.copytree(src, os.path.join(out, f), dirs_exist_ok=True)
 open(os.path.join(out, ".nojekyll"), "w").write("")
+# which commit this is (scripts/ship.sh reads snpetanque.com/build.txt to confirm a release is live)
+try: sha = os.environ.get("GITHUB_SHA") or subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
+except Exception: sha = "unknown"
+open(os.path.join(out, "build.txt"), "w").write(sha + "\n")
 # stamp the service worker with this build (so phones pick up new versions) and its language files
 sw = os.path.join(out, "sw.js"); ver = hashlib.md5(html.encode()).hexdigest()[:10]
 txt = open(sw).read(); open(sw, "w").write(txt.replace("__VERSION__", ver).replace("__FBV__", V).replace("__LANGS__", json.dumps({c: f for c, (f, _) in lang_files.items()})))
