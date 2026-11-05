@@ -2,6 +2,8 @@
 #   - app:   build the site + the app tests (4 at a time)
 #   - web:   the website tests against the Firebase emulators, as three jobs side by side (each has its own emulators)
 #   - test:  passes only when all of the above passed. This is the check that main's protection requires.
+# The test jobs run in Playwright's own image, which already has Chromium and its system libraries, so they don't spend
+# minutes in apt. Keep its version equal to playwright's in package.json.
 # A push to main that passes the tests is deployed automatically:
 #   - the website to GitHub Pages
 #   - the Firestore security rules to Firebase (once the FIREBASE_SERVICE_ACCOUNT secret is set)
@@ -25,14 +27,16 @@ jobs:
   app:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
+      - name: Python for the build
+        run: command -v python3 >/dev/null || { apt-get update -qq && apt-get install -y -qq --no-install-recommends python3-minimal; }
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm run build
       - run: node tests/run.js app
       - uses: actions/upload-artifact@v7
@@ -44,6 +48,7 @@ jobs:
   web:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
     strategy:
       fail-fast: false
       matrix:
@@ -58,8 +63,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Python for the build
+        run: command -v python3 >/dev/null || { apt-get update -qq && apt-get install -y -qq --no-install-recommends python3-minimal; }
+      - uses: actions/cache@v6   # the Firestore emulator's download, which firebase-tools otherwise fetches every run
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase-emulators-${{ hashFiles('package-lock.json') }}
+          restore-keys: firebase-emulators-
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm run build
       - run: npx firebase emulators:exec --only firestore,auth --project demo-carreau "node tests/run.js web --shard ${{ matrix.shard }}/3"
       - uses: actions/upload-artifact@v7
