@@ -2,6 +2,10 @@
 // `node tests/run.js web` runs the website tests against the Firebase emulators
 // (start them with `npm test`, which wraps this in `firebase emulators:exec`).
 // Each test prints what it saw; the expectations below decide pass or fail.
+//   node tests/run.js app melee shoot   only the tests whose file name contains "melee" or "shoot"
+//   node tests/run.js app --jobs 6      how many tests run at once (app: 4 by default; web: 1, they share the emulators)
+//   node tests/run.js web --shard 2/3   the second third of the tests (CI runs the web suite as three parallel jobs)
+//   --retries 0                         a test that fails is run once more on its own (default 1); "passed on retry" is reported
 const { execFile } = require('child_process'), path = require('path'), fs = require('fs');
 const OUT = path.join(__dirname, '..', 'test-results'); fs.mkdirSync(OUT, { recursive: true });
 const SUITES = {
@@ -365,20 +369,50 @@ const SUITES = {
   },
 };
 (async () => {
-  const suite = process.argv[2] || 'app'; const env = { ...process.env, OUT };
+  const argv = process.argv.slice(2), suite = argv[0] && !argv[0].startsWith('-') ? argv.shift() : 'app';
+  if (!SUITES[suite]) { console.log(`unknown suite "${suite}" (app or web)`); process.exit(2); }
+  let jobs = suite === 'app' ? 4 : 1, retries = 1, shard = null; const names = [];
+  while (argv.length) {
+    const a = argv.shift();
+    if (a === '--jobs' || a === '-j') jobs = Math.max(1, +argv.shift() || 1);
+    else if (a === '--retries') retries = Math.max(0, +argv.shift() || 0);
+    else if (a === '--shard') { const [i, n] = String(argv.shift()).split('/').map(Number); shard = { i, n }; }
+    else names.push(a.replace(/^tests\//, ''));
+  }
+  let files = Object.keys(SUITES[suite]);
+  if (names.length) files = files.filter(f => names.some(n => f.includes(n)));
+  if (shard) files = files.filter((f, k) => k % shard.n === shard.i - 1);
+  if (!files.length) { console.log(`no ${suite} tests match: ${names.join(' ')}`); process.exit(2); }
+  const env = { ...process.env, OUT };
   let srv;
   if (suite === 'app') env.APP_URL = 'file://' + path.join(__dirname, '..', 'src', 'carreau.html');
   else { srv = await require('./serve')(5055); env.WEB_URL = 'http://127.0.0.1:5055/'; }
-  let failed = 0;
-  for (const [file, expects] of Object.entries(SUITES[suite])) {
-    let out = '';
-    out = await new Promise(res => execFile('node', [path.join(__dirname, file)], { env, encoding: 'utf8', timeout: 240000, maxBuffer: 1 << 24 },
-      (err, stdout, stderr) => res(stdout + (err ? '\n' + (stderr || err.message) : ''))));
-    fs.writeFileSync(path.join(OUT, file.replace('.js', '.log')), out);
-    const miss = expects.filter(re => !re.test(out));
-    if (miss.length) { failed++; console.log(`✗ ${file}\n  missing: ${miss.join('\n           ')}\n--- output ---\n${out}\n`); }
-    else console.log(`✓ ${file}`);
+  const t0 = Date.now(), secs = ms => (ms / 1000).toFixed(1) + 's';
+  const runOne = file => new Promise(res => {
+    const start = Date.now();
+    execFile('node', [path.join(__dirname, file)], { env, encoding: 'utf8', timeout: 240000, maxBuffer: 1 << 24 }, (err, stdout, stderr) => {
+      const out = stdout + (err ? '\n' + (stderr || err.message) : '');
+      fs.writeFileSync(path.join(OUT, file.replace('.js', '.log')), out);
+      res({ file, out, ms: Date.now() - start, miss: SUITES[suite][file].filter(re => !re.test(out)) });
+    });
+  });
+  // run `jobs` tests at a time; each prints one line as it finishes
+  const results = {}, queue = [...files];
+  await Promise.all(Array.from({ length: Math.min(jobs, files.length) }, async () => {
+    while (queue.length) { const r = await runOne(queue.shift()); results[r.file] = r; console.log(`${r.miss.length ? '✗' : '✓'} ${r.file} (${secs(r.ms)})`); }
+  }));
+  // a failure is run again on its own (with the rest finished, so it isn't competing for the CPU)
+  const flaky = [];
+  for (const file of files) for (let k = 0; k < retries && results[file].miss.length; k++) {
+    const r = await runOne(file);
+    if (!r.miss.length) { flaky.push(file); console.log(`↻ ${file} passed on retry (${secs(r.ms)})`); }
+    results[file] = r;
   }
+  const failed = files.filter(f => results[f].miss.length);
+  for (const f of failed) console.log(`\n✗ ${f}\n  missing: ${results[f].miss.join('\n           ')}\n--- output ---\n${results[f].out}\n`);
   srv?.close();
-  console.log(failed ? `${failed} test file(s) failed` : 'all tests passed'); process.exit(failed ? 1 : 0);
+  const slow = files.map(f => results[f]).sort((a, b) => b.ms - a.ms).slice(0, 3).map(r => `${r.file} ${secs(r.ms)}`).join(', ');
+  console.log(`${files.length} ${suite} test file(s) in ${secs(Date.now() - t0)} with ${jobs} at a time · slowest: ${slow}`);
+  if (flaky.length) console.log(`passed only on retry (flaky?): ${flaky.join(', ')}`);
+  console.log(failed.length ? `${failed.length} test file(s) failed: ${failed.join(', ')}` : 'all tests passed'); process.exit(failed.length ? 1 : 0);
 })();
