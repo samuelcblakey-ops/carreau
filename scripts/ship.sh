@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Release this branch: rebase on the latest main, push, open its pull request (or update the open one),
+# Release this branch: merge in the latest main if it's behind, push, open its pull request (or update the open one),
 # wait for CI, merge it, then wait for the deploy and confirm snpetanque.com is serving it.
 #   scripts/ship.sh                        title: the spec's title, else the first commit's subject
 #   scripts/ship.sh "Score keypad"         pull request title
 #   scripts/ship.sh --body-file notes.md   pull request description (default: the spec, the commits and the checks)
 # Needs push access (a Code tab session with carreau picked under Repo) and everything committed.
+# History is never rewritten (no rebase, no force push): the session permission check blocks force pushes.
 # GitHub is reached only through its REST API (gh api), because the GraphQL API behind `gh pr` is blocked in these sessions.
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
@@ -28,16 +29,18 @@ case "$branch" in main|HEAD) die "you're on $branch: make a branch first (git sw
 [ -z "$(git status --porcelain --untracked-files=no)" ] || die "uncommitted changes: commit them first (git add -A && git commit)"
 git push --dry-run -q origin HEAD:refs/heads/zz-push-check 2>/dev/null || die "this session can't push. Start the work in the Code tab (claude.ai/code) with samuelcblakey-ops/carreau picked under Repo; Cowork sessions can't push."
 
-say "rebasing $branch on the latest main"
+say "bringing $branch up to date with main"
 git fetch -q origin main || die "couldn't fetch origin"
-if ! git rebase -q origin/main; then
-  git rebase --abort
-  die "conflicts with main: git rebase origin/main, fix the files, git rebase --continue, scripts/check.sh, then ship again"
+if ! git merge-base --is-ancestor origin/main HEAD; then
+  if ! git merge -q --no-edit origin/main; then
+    git merge --abort
+    die "conflicts with main: git merge origin/main, fix the files, git add them, git commit, scripts/check.sh, then ship again"
+  fi
 fi
 [ -n "$(git log --oneline origin/main..HEAD)" ] || die "nothing to ship: $branch has no commits that main doesn't have"
 
 say "pushing"
-git push -q --force-with-lease -u origin HEAD || die "push failed"
+git push -q -u origin HEAD || die "push failed (if the branch on GitHub has commits you don't, git pull --no-rebase origin $branch, then ship again)"
 head=$(git rev-parse HEAD)
 
 spec=$(git diff --name-only --diff-filter=AM origin/main...HEAD -- 'specs/*.md' | grep -v -E 'specs/(README|TEMPLATE)\.md' | head -1)
