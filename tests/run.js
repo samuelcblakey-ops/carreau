@@ -264,7 +264,7 @@ const SUITES = {
       /subtitle shooting fr: Tir de précision$/m, /errs \[\]/],
     'app-round-status.js': [/round 1 drawn: live red true \| 2 games still to finish \| Draw round 2\|disabled/, /one score in: live red true \| 1 game still to finish \| Draw round 2\|disabled/,
       /french: 1 partie à terminer \| Tirer la partie 2\|disabled/, /all scores in: ready green true \| Round finished \| Draw round 2\|enabled/,
-      /round 2 drawn: live \| 2 games still to finish \| Draw round 3\|disabled/, /last planned round finished: ready \| Morning complete \| Draw round 3\|enabled/, /errs \[\]/],
+      /draw round 2 renders: finished seen false \| next enabled seen false \| games shown 2/, /round 2 drawn: live \| 2 games still to finish \| Draw round 3\|disabled/, /last planned round finished: ready \| Morning complete \| Draw round 3\|enabled/, /double tap: rounds 2/, /errs \[\]/],
     'app-a11y.js': [/skip link: a\.skip \| shown true \| Skip to content/, /skip goes to: #main \| address kept true \| next button\.start-card\[new-t\]/,
       /start: h1 1 \| title SN Pétanque · Competition desk/, /registration: h1 Spring Swiss · Registration \(hidden\) \| title Registration · Spring Swiss · SN Pétanque/,
       /meter: progressbar "Checked in on the day" 75/, /check in by keyboard: true true/, /tab by keyboard: standings true \| title Standings · Spring Swiss · SN Pétanque/,
