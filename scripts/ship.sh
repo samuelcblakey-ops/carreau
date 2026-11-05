@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# Release this branch: rebase on the latest main, push, open its pull request (or reuse it, e.g. a spec's draft),
-# have GitHub merge it as soon as CI passes, then wait for the deploy and confirm snpetanque.com is serving it.
+# Release this branch: rebase on the latest main, push, open its pull request (or update the open one),
+# wait for CI, merge it, then wait for the deploy and confirm snpetanque.com is serving it.
 #   scripts/ship.sh                        title: the spec's title, else the first commit's subject
 #   scripts/ship.sh "Score keypad"         pull request title
 #   scripts/ship.sh --body-file notes.md   pull request description (default: the spec, the commits and the checks)
-#   scripts/ship.sh --no-wait              stop once auto-merge is on: GitHub merges and deploys by itself
-#   scripts/ship.sh --draft                push and open a draft pull request only (how a planning session files a spec)
 # Needs push access (a Code tab session with carreau picked under Repo) and everything committed.
+# GitHub is reached only through its REST API (gh api), because the GraphQL API behind `gh pr` is blocked in these sessions.
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 REPO=${SHIP_REPO:-samuelcblakey-ops/carreau} SITE=${SHIP_SITE:-https://snpetanque.com}  # overridable for testing the script
-wait=1 draft=0 title="" bodyfile=""
+OWNER=${REPO%%/*}
+title="" bodyfile=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --no-wait) wait=0 ;;
-    --draft) draft=1 ;;
     --body-file) bodyfile=$2; shift ;;
+    -*) echo "!! unknown option $1" >&2; exit 1 ;;
     *) title=$1 ;;
   esac
   shift
 done
 say() { echo "== $*"; }
 die() { echo "!! $*" >&2; exit 1; }
+api() { gh api "repos/$REPO/$1" "${@:2}"; }
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 case "$branch" in main|HEAD) die "you're on $branch: make a branch first (git switch -c <short-name>)" ;; esac
@@ -38,6 +38,7 @@ fi
 
 say "pushing"
 git push -q --force-with-lease -u origin HEAD || die "push failed"
+head=$(git rev-parse HEAD)
 
 spec=$(git diff --name-only --diff-filter=AM origin/main...HEAD -- 'specs/*.md' | grep -v -E 'specs/(README|TEMPLATE)\.md' | head -1)
 [ -n "$title" ] || { [ -n "$spec" ] && title=$(grep -m1 '^# ' "$spec" | sed 's/^# *//'); }
@@ -47,60 +48,74 @@ if [ -z "$bodyfile" ]; then
   {
     [ -n "$spec" ] && echo "Spec: [$spec](https://github.com/$REPO/blob/$branch/$spec)" && echo
     echo "## Commits"; git log --reverse --format='- %s' origin/main..HEAD; echo
-    echo "## Checks"; echo "- CI runs the build, the app tests and the web tests (three parallel jobs); this merges itself once they pass."
+    echo "## Checks"; echo "- CI runs the build, the app tests and the web tests (parallel jobs); scripts/ship.sh merges this once they pass."
   } > "$bodyfile"
 fi
+[ -r "$bodyfile" ] || die "can't read $bodyfile"
 
-num=$(gh pr list --repo $REPO --head "$branch" --state open --json number --jq '.[0].number // empty')
+num=$(api "pulls?head=$OWNER:$branch&state=open" --jq '.[0].number // empty') || die "couldn't list pull requests"
 if [ -z "$num" ]; then
-  args=(--repo "$REPO" --head "$branch" --base main --title "$title" --body-file "$bodyfile")
-  [ $draft = 1 ] && args+=(--draft)
-  url=$(gh pr create "${args[@]}") || die "couldn't open the pull request"
-  num=${url##*/}
-elif [ $draft = 0 ]; then
-  [ "$(gh pr view "$num" --repo $REPO --json isDraft --jq .isDraft)" = true ] && { gh pr ready "$num" --repo $REPO >/dev/null || die "couldn't mark #$num ready"; }
-  gh pr edit "$num" --repo $REPO --title "$title" --body-file "$bodyfile" >/dev/null || true
+  num=$(api pulls -X POST -f head="$branch" -f base=main -f title="$title" -F body=@"$bodyfile" --jq .number) \
+    || die "couldn't open the pull request"
+else
+  api "pulls/$num" -X PATCH -f title="$title" -F body=@"$bodyfile" --silent || echo "(couldn't update the title and description of #$num; carrying on)"
 fi
+[ -n "$num" ] || die "couldn't open the pull request"
 echo "Pull request #$num: https://github.com/$REPO/pull/$num"
-if [ $draft = 1 ]; then echo "Draft only: a building session picks it up with scripts/ship.sh on this branch."; exit 0; fi
 
-auto=1
-gh pr merge "$num" --repo $REPO --auto --merge >/dev/null 2>&1 || auto=0
-if [ $auto = 1 ] && [ $wait = 0 ]; then echo "Auto-merge is on: GitHub merges #$num once the checks pass, then deploys it."; exit 0; fi
-[ $auto = 0 ] && echo "(auto-merge is off for this repo, so this waits for the checks and merges itself)"
-
-say "waiting for the checks (about 8 minutes)"
-for _ in $(seq 1 30); do [ "$(gh pr checks "$num" --repo $REPO --json name --jq length 2>/dev/null || echo 0)" -gt 0 ] && break; sleep 5; done
-if ! gh pr checks "$num" --repo $REPO --watch --fail-fast --interval 30 >/dev/null 2>&1; then
-  gh pr checks "$num" --repo $REPO
-  run=$(gh run list --repo $REPO --branch "$branch" --workflow ci-cd.yml --limit 1 --json databaseId --jq '.[0].databaseId')
-  die "a check failed. The failing output: gh run view $run --repo $REPO --log-failed | tail -80. Fix, commit, scripts/ship.sh again."
-fi
-if [ $auto = 0 ]; then gh pr merge "$num" --repo $REPO --merge >/dev/null || die "couldn't merge #$num"; fi
-
-say "waiting for GitHub to merge"
-state=""
-for _ in $(seq 1 60); do
-  state=$(gh pr view "$num" --repo $REPO --json state,mergeCommit --jq '.state + " " + (.mergeCommit.oid // "")')
-  [ "${state%% *}" = MERGED ] && break
+say "waiting for the checks on ${head:0:7} (about 8 minutes)"
+# every check run on the pushed commit must finish; `test` is the one main's protection requires, and it comes last
+result=""
+for _ in $(seq 1 180); do  # 30 minutes
+  runs=$(api "commits/$head/check-runs?per_page=100" --jq '.check_runs[] | [.name, .status, (.conclusion // "")] | @tsv' 2>/dev/null) || { sleep 10; continue; }
+  if [ -n "$runs" ] && echo "$runs" | cut -f1 | grep -qx test && ! echo "$runs" | cut -f2 | grep -qvx completed; then
+    result=$runs; break
+  fi
   sleep 10
 done
-[ "${state%% *}" = MERGED ] || die "#$num isn't merged after 10 minutes: gh pr view $num --repo $REPO"
-sha=${state#* }
+[ -n "$result" ] || die "the checks on #$num didn't finish within 30 minutes: https://github.com/$REPO/pull/$num/checks"
+bad=$(echo "$result" | awk -F'\t' '$3 != "success" && $3 != "skipped" && $3 != "neutral" { print "   " $1 ": " $3 }')
+if [ -n "$bad" ]; then
+  echo "$bad" >&2
+  run=$(api "actions/runs?head_sha=$head&per_page=1" --jq '.workflow_runs[0].id // empty' 2>/dev/null)
+  die "a check failed: https://github.com/$REPO/actions/runs/$run (the failing job's log is there). Fix, commit, scripts/ship.sh again."
+fi
+echo "All $(echo "$result" | wc -l) checks passed."
+
+say "merging #$num"
+merged=0
+for _ in $(seq 1 12); do  # GitHub can take a moment to record the required check as passed
+  if out=$(api "pulls/$num/merge" -X PUT -f merge_method=merge -f sha="$head" 2>&1); then merged=1; break; fi
+  case "$out" in *"Head branch was modified"*|*"409"*) die "the branch changed while CI ran: scripts/ship.sh again" ;; esac
+  sleep 10
+done
+[ $merged = 1 ] || die "couldn't merge #$num: $out"
+sha=""
+for _ in $(seq 1 12); do
+  sha=$(api "pulls/$num" --jq 'select(.merged) | .merge_commit_sha // empty' 2>/dev/null)
+  [ -n "$sha" ] && break
+  sleep 5
+done
+[ -n "$sha" ] || die "#$num says merged but has no merge commit yet: https://github.com/$REPO/pull/$num"
 echo "Merged as ${sha:0:7}"
 
 say "waiting for main's tests and the deploy (about 10 minutes)"
-run=""
+run="" status="" conclusion=""
 for _ in $(seq 1 30); do
-  run=$(gh run list --repo $REPO --branch main --commit "$sha" --workflow ci-cd.yml --json databaseId --jq '.[0].databaseId // empty')
+  run=$(api "actions/runs?head_sha=$sha&event=push&branch=main&per_page=1" --jq '.workflow_runs[0].id // empty' 2>/dev/null)
   [ -n "$run" ] && break
   sleep 10
 done
 [ -n "$run" ] || die "no CI run started for ${sha:0:7} on main: https://github.com/$REPO/actions"
-if ! gh run watch "$run" --repo $REPO --exit-status --interval 30 >/dev/null 2>&1; then
+for _ in $(seq 1 120); do  # 60 minutes: it may queue behind an earlier deploy
+  read -r status conclusion < <(api "actions/runs/$run" --jq '[.status, (.conclusion // "-")] | join(" ")' 2>/dev/null) || true
+  [ "$status" = completed ] && break
+  sleep 30
+done
+[ "$status" = completed ] || die "main's run is still going after an hour: https://github.com/$REPO/actions/runs/$run"
+if [ "$conclusion" != success ]; then
   # a newer merge can replace a run that was still waiting; that newer run tests and deploys this change too
-  [ "$(gh run view "$run" --repo $REPO --json conclusion --jq .conclusion 2>/dev/null)" = cancelled ] \
-    || die "main's run failed, so it wasn't deployed: gh run view $run --repo $REPO --log-failed"
+  [ "$conclusion" = cancelled ] || die "main's run ended $conclusion, so it wasn't deployed: https://github.com/$REPO/actions/runs/$run"
   echo "(a newer merge took over the deploy; waiting for it to go live)"
 fi
 
