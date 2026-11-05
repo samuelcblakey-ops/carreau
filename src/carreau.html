@@ -1254,7 +1254,17 @@ function localStore() {
   let data; try { data = JSON.parse(lsGet(KEY) || "null"); } catch { data = null; }
   data = data || { t: {}, m: {} }; data.l = data.l || {}; data.s = data.s || {}; data.br = data.br || {}; data.hof = data.hof || {};
   const subsT = new Set(), subsM = new Map(), subsL = new Map(), subsS = new Set(), subsS1 = new Map();
-  const persist = () => lsSet(KEY, JSON.stringify(data));
+  // opened from disk (the app tests), refuse what Firestore can't store, an array directly inside an array, so the
+  // quick tests catch it instead of the website failing to save (the inter-club draw, #34)
+  const nestedAt = (v, p) => {
+    if (Array.isArray(v)) { for (let i = 0; i < v.length; i++) { if (Array.isArray(v[i])) return `${p}[${i}]`; const r = nestedAt(v[i], `${p}[${i}]`); if (r) return r; } }
+    else if (v && typeof v === "object") for (const k in v) { const r = nestedAt(v[k], p ? `${p}.${k}` : k); if (r) return r; }
+    return null;
+  };
+  const persist = () => {
+    if (location.protocol === "file:") { const at = nestedAt(data, ""); if (at) setTimeout(() => { throw new Error("Firestore can't save an array inside an array: " + at); }); }
+    lsSet(KEY, JSON.stringify(data));
+  };
   const emitT = () => setTimeout(() => subsT.forEach(cb => cb(Object.values(data.t).map(clone))));
   const emitM = tid => setTimeout(() => (subsM.get(tid) || new Set()).forEach(cb => cb(Object.values(data.m[tid] || {}).map(clone))));
   const emitL = (tid, mid) => setTimeout(() => (subsL.get(tid + "/" + mid) || new Set()).forEach(cb => cb(data.l[tid]?.[mid] ? clone(data.l[tid][mid]) : null)));
