@@ -7,6 +7,7 @@
 # A push to main that passes the tests is deployed automatically:
 #   - the website to GitHub Pages
 #   - the Firestore security rules to Firebase (once the FIREBASE_SERVICE_ACCOUNT secret is set)
+# To redeploy main without a new merge: Actions → CI/CD → Run workflow (branch main). It tests, then deploys.
 name: CI/CD
 
 on:
@@ -92,7 +93,7 @@ jobs:
 
   deploy:
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -100,7 +101,7 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.pages.outputs.page_url }}
+      url: ${{ steps.pages.outputs.page_url || steps.pages2.outputs.page_url || steps.pages3.outputs.page_url }}
     concurrency:
       group: production
       cancel-in-progress: false
@@ -124,8 +125,34 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx firebase deploy --only firestore:rules --project carreau-petanque --non-interactive
           rm -f "$RUNNER_TEMP/sa.json"
       - uses: actions/configure-pages@v6
+      # one artifact per attempt, so "Re-run failed jobs" works (deploy-pages refuses a run with two of the same name)
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
+          name: github-pages-${{ github.run_attempt }}
+      # Pages can take more than deploy-pages' default 10 minutes; waiting for it keeps the production lock held until it's
+      # really done. If Pages is still busy with an earlier deployment (one whose job gave up), it refuses this one, so wait
+      # and try again.
       - id: pages
         uses: actions/deploy-pages@v5
+        continue-on-error: true
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+          timeout: 1800000
+      - if: steps.pages.outcome == 'failure'
+        run: echo "Pages refused or failed the deployment; trying again in 5 minutes" && sleep 300
+      - id: pages2
+        if: steps.pages.outcome == 'failure'
+        uses: actions/deploy-pages@v5
+        continue-on-error: true
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+          timeout: 1800000
+      - if: steps.pages2.outcome == 'failure'
+        run: echo "Pages refused or failed the deployment again; last try in 5 minutes" && sleep 300
+      - id: pages3
+        if: steps.pages2.outcome == 'failure'
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+          timeout: 1800000
