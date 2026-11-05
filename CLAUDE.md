@@ -28,7 +28,7 @@ scripts/setup.sh      # packages, browser, build; says whether this session can 
    - `scripts/check.sh [names]`: build, translation check and app tests (4 at a time, about 1½ minutes).
    - `scripts/check.sh --web <name>`: also the web tests whose names match. Use this for anything that touches Firebase, rules, sign-in or what gets saved.
 4. **Look at it.** Tests save screenshots in `test-results/*.png`. Open them and check the screen at phone width (390 px) and on desktop before you ship.
-5. **Ship**: commit, then run `scripts/ship.sh`. It rebases on main, pushes, opens the pull request (or updates the open one), waits for CI and merges it once every check passes. Then it waits for the deploy and confirms snpetanque.com is serving it. Shipping is approved when the task says "ship it".
+5. **Ship**: commit, then run `scripts/ship.sh`. It merges in the latest main if the branch is behind (never rebases or force-pushes), pushes, opens the pull request (or updates the open one), waits for CI and merges it once every check passes. Then it waits for the deploy and confirms snpetanque.com is serving it. Shipping is approved when the task says "ship it".
 
 ## Rules that have bitten before
 
@@ -53,8 +53,8 @@ scripts/setup.sh      # packages, browser, build; says whether this session can 
 
 - Work usually arrives as `specs/<short-name>.md`, already on main (specs are shipped there through a normal pull request). Build it on a branch named `<short-name>`.
 - Build what the spec says. If it's unclear or seems wrong, stop and ask rather than guess.
-- Other sessions may be building other specs at the same time, each in its own copy. Keep to your spec's area, and expect `scripts/ship.sh` to rebase you onto their work.
-- If the rebase stops on a conflict in the translation tables, keep both sides.
+- Other sessions may be building other specs at the same time, each in its own copy. Keep to your spec's area, and expect `scripts/ship.sh` to merge their work into your branch.
+- If that merge stops on a conflict, fix the files (in the translation tables, keep both sides), commit, run `scripts/check.sh` and ship again.
 
 ## When you finish
 
