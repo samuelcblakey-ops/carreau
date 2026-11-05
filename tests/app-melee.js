@@ -20,6 +20,17 @@ const { chromium } = require('playwright');
     q('[data-tab="draw"]').click(); await w(40); q('[data-act="melee-teams"]').click(); await w(150);
     q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(200);
     L.push('swiss with drawn teams: ' + C.MS().length + ' games, bye ' + C.MS().some(m => m.bye) + ' notice gone ' + !q('[data-act="melee-redraw"]'));
+    // drawn team names follow the organiser's language
+    const names = () => C.T().teams.map(x => x.name).slice(0, 2).join(', ');
+    const lang = async l => { q('[data-act="lang-menu"]').click(); await w(40); q(`[data-lang="${l}"]`).click(); await w(80); };
+    L.push('drawn names en: ' + names());
+    for (const l of ['fr', 'th']) {
+      await lang(l); await mk({ name: 'Names ' + l, meleeMode: 'once', format: 'triples', system: 'swiss' }, 14);
+      q('[data-tab="draw"]').click(); await w(40); q('[data-act="melee-teams"]').click(); await w(150);
+      L.push('drawn names ' + l + ': ' + names());
+      if (l === 'fr') { q('[data-act="melee-redraw"]').click(); await w(150); L.push('redraw keeps language: ' + C.T().teams[0].name); }
+    }
+    await lang('en');
     // all rounds in advance
     await mk({ name: 'Advance', meleeMode: 'advance', format: 'doubles', swissRounds: 3 }, 16);
     q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(250);

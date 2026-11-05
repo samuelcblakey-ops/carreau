@@ -1935,7 +1935,7 @@ function drawMeleeTeams(t) {
   if (!sizes) return { error: "Not enough players to make teams." };
   const nt = clone(t); let k = 0;
   nt.teams = sizes.map((sz, i) => { const ps = ids.slice(k, k + sz); k += sz;
-    return { id: "e" + uid(), name: `Team ${i + 1}`, players: ps.map(id => t.players.find(p => p.id === id).name), club: "", active: true, checkedIn: true }; });
+    return { id: "e" + uid(), name: `${tr("Team")} ${i + 1}`, players: ps.map(id => t.players.find(p => p.id === id).name), club: "", active: true, checkedIn: true }; });
   nt.entry = "teams"; nt.meleeDrawn = true;
   return { t: nt, count: nt.teams.length };
 }
