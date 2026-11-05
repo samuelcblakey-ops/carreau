@@ -123,6 +123,30 @@ if [ "$conclusion" != success ]; then
 fi
 
 say "checking $SITE"
+# Code sessions' network policy may block the site itself; then GitHub's record of the Pages deployment is the proof.
+code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$SITE/build.txt?t=$(date +%s)" 2>/dev/null)
+if [ "${code:-000}" = 000 ]; then
+  echo "(this session can't reach $SITE; confirming through GitHub's record of the Pages deployment instead)"
+  # what's live is the newest deployment that succeeded (a failed one leaves the site as it was)
+  for i in $(seq 1 40); do  # 20 minutes, for a deployment that's still going
+    git fetch -q origin main
+    pending="" livesha=""
+    while read -r dep depsha; do
+      state=$(api "deployments/$dep/statuses?per_page=1" --jq '.[0].state // empty' 2>/dev/null)
+      case "$state" in
+        success) livesha=$depsha; break ;;
+        queued|pending|in_progress|waiting|"") git merge-base --is-ancestor "$sha" "$depsha" 2>/dev/null && pending=$depsha ;;
+      esac
+    done < <(api "deployments?environment=github-pages&per_page=8" --jq '.[] | "\(.id) \(.sha)"' 2>/dev/null)
+    if [ -n "$livesha" ] && git merge-base --is-ancestor "$sha" "$livesha" 2>/dev/null; then
+      echo "Live: GitHub Pages deployed ${livesha:0:7}, which includes #$num ($SITE/build.txt shows the commit)."; exit 0
+    fi
+    # a newer merge that took over the deploy may not have created its deployment yet, so allow 5 minutes
+    [ -n "$pending" ] || [ "$i" -lt 10 ] || die "no Pages deployment including ${sha:0:7} succeeded or is still going (live: ${livesha:-unknown}): https://github.com/$REPO/deployments/github-pages"
+    sleep 30
+  done
+  die "the Pages deployment of ${pending:0:7} is still going after 20 minutes: https://github.com/$REPO/deployments/github-pages"
+fi
 live=""
 for _ in $(seq 1 80); do
   live=$(curl -fsS "$SITE/build.txt?t=$(date +%s)" 2>/dev/null | tr -d '[:space:]')
