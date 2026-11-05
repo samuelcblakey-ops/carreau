@@ -21,14 +21,14 @@ scripts/setup.sh      # packages, browser, build; says whether this session can 
 
 ## The loop
 
-1. **Branch**: `git switch -c <short-name> origin/main`. For a spec, use its name; if the spec came on its own branch, `git switch <short-name> && git rebase origin/main` instead. One small change per branch: if its title needs "and", split it.
+1. **Branch**: `git switch -c <short-name> origin/main`. For a spec, name the branch after it (`specs/score-keypad.md` → `score-keypad`). One small change per branch: if its title needs "and", split it.
 2. **Find the code without flooding your context.** Never read `src/carreau.html` whole. Lines 649 to 1184 are the translation tables, with lines up to 68,000 characters long. Search like this: `grep -n "function renderEntries" src/carreau.html | cut -c1-200`. Then read a range with offset and limit.
 3. **Test as you go**:
    - `node tests/run.js app <name>`: one test with its real pass/fail checks, in a few seconds.
    - `scripts/check.sh [names]`: build, translation check and app tests (4 at a time, about 1½ minutes).
    - `scripts/check.sh --web <name>`: also the web tests whose names match. Use this for anything that touches Firebase, rules, sign-in or what gets saved.
 4. **Look at it.** Tests save screenshots in `test-results/*.png`. Open them and check the screen at phone width (390 px) and on desktop before you ship.
-5. **Ship**: commit, then run `scripts/ship.sh`. It rebases on main, pushes, opens the pull request (or marks the spec's draft ready) and merges it once CI passes. Then it waits for the deploy and confirms snpetanque.com is serving it. Shipping is approved when the task says "ship it".
+5. **Ship**: commit, then run `scripts/ship.sh`. It rebases on main, pushes, opens the pull request (or updates the open one), waits for CI and merges it once every check passes. Then it waits for the deploy and confirms snpetanque.com is serving it. Shipping is approved when the task says "ship it".
 
 ## Rules that have bitten before
 
@@ -51,7 +51,7 @@ scripts/setup.sh      # packages, browser, build; says whether this session can 
 
 ## Specs and parallel sessions
 
-- Work usually arrives as `specs/<short-name>.md`, either already on main or on a branch of the same name with a draft pull request.
+- Work usually arrives as `specs/<short-name>.md`, already on main (specs are shipped there through a normal pull request). Build it on a branch named `<short-name>`.
 - Build what the spec says. If it's unclear or seems wrong, stop and ask rather than guess.
 - Other sessions may be building other specs at the same time, each in its own copy. Keep to your spec's area, and expect `scripts/ship.sh` to rebase you onto their work.
 - If the rebase stops on a conflict in the translation tables, keep both sides.

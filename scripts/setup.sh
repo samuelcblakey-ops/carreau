@@ -21,7 +21,7 @@ npm run build --silent | tail -1 || ok=0
 echo "== GitHub"
 git fetch -q origin main 2>/dev/null || true
 if git push --dry-run -q origin HEAD:refs/heads/zz-push-check 2>/dev/null; then
-  echo "can push and open pull requests as $(gh api user --jq .login 2>/dev/null)"
+  echo "can push and open pull requests"
 else
   echo "!! This session can't push to GitHub. Code sessions can: start one in the Code tab (claude.ai/code)"
   echo "   with samuelcblakey-ops/carreau picked under Repo. Cowork sessions can't attach the repo."

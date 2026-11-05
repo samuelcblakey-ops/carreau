@@ -17,16 +17,16 @@ The planning session:
 
 1. Reads the code and notes, and asks Sam any open questions. A spec with open questions isn't ready.
 2. Splits big features into several specs. Each spec is one pull request, smallest and safest first. Each spec lists what it touches and what it depends on.
-3. Files each spec on a branch with the same name and opens a draft pull request:
+3. Ships the specs to main through a normal pull request (specs only, no code), so every builder starts from them:
 
    ```bash
-   git switch -c <short-name> origin/main
-   # write specs/<short-name>.md
-   git add specs/<short-name>.md && git commit -m "Spec: <title>"
-   scripts/ship.sh --draft
+   git switch -c spec-<short-name> origin/main
+   # write specs/<short-name>.md (and any others in the same plan)
+   git add specs/ && git commit -m "Spec: <title>"
+   scripts/ship.sh "Spec: <title>"
    ```
 
-The draft pull requests are the queue of work that's ready to build. You can see them at https://github.com/samuelcblakey-ops/carreau/pulls, or with `gh pr list --draft`.
+The specs in `specs/` that have no code merged for them yet are the queue of work that's ready to build.
 
 ## 2. Build (one session per spec, several at once)
 
@@ -36,16 +36,16 @@ Start one Code tab session per spec (carreau picked under Repo), with a prompt l
 
 The building session:
 
-1. Runs `scripts/setup.sh` and switches to the spec's branch, or makes one with the spec's name if the spec is already on main. Then it reads `CLAUDE.md` and the spec.
+1. Runs `scripts/setup.sh` and makes a branch named after the spec: `git switch -c <short-name> origin/main`. Then it reads `CLAUDE.md` and the spec.
 2. Builds the change, along with the test lines from the spec's acceptance checks.
 3. Runs `scripts/check.sh` and looks at the screenshots.
-4. Commits, then runs `scripts/ship.sh`. That marks the draft ready, merges it when CI passes and confirms it's live.
+4. Commits, then runs `scripts/ship.sh`. That opens the pull request, merges it when CI passes and confirms it's live.
 
 Run specs side by side only when their **Touches** lines don't overlap. Two sessions changing the same function will collide when the second one rebases.
 
 ## 3. After it ships
 
-The spec is merged together with its code, so `specs/` keeps a record of why each change was made. Leave merged specs where they are.
+The spec stays in `specs/` next to the code that built it, so `specs/` keeps a record of why each change was made. Leave merged specs where they are.
 
 ## Writing a good spec
 
