@@ -86,12 +86,14 @@ const { chromium } = require('playwright');
     const rgb = s => s.match(/\d+(\.\d+)?/g).slice(0, 3).map(Number); const bgOf = n => { for (; n; n = n.parentElement) { const c = getComputedStyle(n).backgroundColor; if (!/rgba\(0, 0, 0, 0\)|transparent/.test(c)) return c; } return 'rgb(255,255,255)'; };
     const lum = c => { const [r, g, b] = rgb(c).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }); return .2126 * r + .7152 * g + .0722 * b; };
     const a = lum(getComputedStyle(el).color), z = lum(bgOf(el)); const op = getComputedStyle(el.closest('.tb-name')).opacity; return 'contrast ' + ((Math.max(a, z) + .05) / (Math.min(a, z) + .05)).toFixed(2) + ' opacity ' + op; }));
-  // 7. phones: a wide table can be reached and is named; Tab never leaves a control under the tab bar
-  await p.setViewportSize({ width: 390, height: 844 }); await w(250);
+  // 7. phones: a wide table can be reached and is named; Tab never leaves a control under the tab bar.
+  // All the standings columns fit at 390 px in Barlow, so the wide table is checked on a 320 px phone.
+  await p.setViewportSize({ width: 320, height: 640 }); await w(250);
   await p.click('[data-tab="standings"]'); await w(80);
   await ev(() => document.querySelector('[data-act="st-cols"]')?.click()); await w(120);
   console.log('wide table: ' + await ev(() => { const t = [...document.querySelectorAll('main .tw')].find(x => x.scrollWidth > x.clientWidth + 1); return t ? `${t.getAttribute('role')} ${t.tabIndex} "${t.getAttribute('aria-label')}"` : 'none'; }) + ' | narrow tables left alone ' + await ev(() => [...document.querySelectorAll('main .tw')].filter(x => x.scrollWidth <= x.clientWidth + 1).every(x => !x.hasAttribute('role'))));
   await ev(() => document.querySelector('[data-act="st-cols"]')?.click()); await w(80);
+  await p.setViewportSize({ width: 390, height: 844 }); await w(250);
   await p.click('[data-tab="entries"]'); await w(100); await ev(() => { window.scrollTo(0, 0); document.querySelector('.skip').focus(); });
   let hidden = 0, tabbed = 0; for (let i = 0; i < 45; i++) { await key('Tab'); const r = await ev(() => { const a = document.activeElement; if (!a || !a.closest('main')) return null; const nav = document.querySelector('nav.tabs').getBoundingClientRect(); const x = a.getBoundingClientRect(); return x.bottom > nav.top + 1 && x.top < nav.bottom; }); if (r === null) continue; tabbed++; if (r) hidden++; }
   console.log('phone tab: controls ' + (tabbed > 10) + ' | hidden under the tab bar ' + hidden);

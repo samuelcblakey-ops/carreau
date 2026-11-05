@@ -1254,7 +1254,17 @@ function localStore() {
   let data; try { data = JSON.parse(lsGet(KEY) || "null"); } catch { data = null; }
   data = data || { t: {}, m: {} }; data.l = data.l || {}; data.s = data.s || {}; data.br = data.br || {}; data.hof = data.hof || {};
   const subsT = new Set(), subsM = new Map(), subsL = new Map(), subsS = new Set(), subsS1 = new Map();
-  const persist = () => lsSet(KEY, JSON.stringify(data));
+  // opened from disk (the app tests), refuse what Firestore can't store, an array directly inside an array, so the
+  // quick tests catch it instead of the website failing to save (the inter-club draw, #34)
+  const nestedAt = (v, p) => {
+    if (Array.isArray(v)) { for (let i = 0; i < v.length; i++) { if (Array.isArray(v[i])) return `${p}[${i}]`; const r = nestedAt(v[i], `${p}[${i}]`); if (r) return r; } }
+    else if (v && typeof v === "object") for (const k in v) { const r = nestedAt(v[k], p ? `${p}.${k}` : k); if (r) return r; }
+    return null;
+  };
+  const persist = () => {
+    if (location.protocol === "file:") { const at = nestedAt(data, ""); if (at) setTimeout(() => { throw new Error("Firestore can't save an array inside an array: " + at); }); }
+    lsSet(KEY, JSON.stringify(data));
+  };
   const emitT = () => setTimeout(() => subsT.forEach(cb => cb(Object.values(data.t).map(clone))));
   const emitM = tid => setTimeout(() => (subsM.get(tid) || new Set()).forEach(cb => cb(Object.values(data.m[tid] || {}).map(clone))));
   const emitL = (tid, mid) => setTimeout(() => (subsL.get(tid + "/" + mid) || new Set()).forEach(cb => cb(data.l[tid]?.[mid] ? clone(data.l[tid][mid]) : null)));
@@ -1935,7 +1945,7 @@ function drawMeleeTeams(t) {
   if (!sizes) return { error: "Not enough players to make teams." };
   const nt = clone(t); let k = 0;
   nt.teams = sizes.map((sz, i) => { const ps = ids.slice(k, k + sz); k += sz;
-    return { id: "e" + uid(), name: `Team ${i + 1}`, players: ps.map(id => t.players.find(p => p.id === id).name), club: "", active: true, checkedIn: true }; });
+    return { id: "e" + uid(), name: `${tr("Team")} ${i + 1}`, players: ps.map(id => t.players.find(p => p.id === id).name), club: "", active: true, checkedIn: true }; });
   nt.entry = "teams"; nt.meleeDrawn = true;
   return { t: nt, count: nt.teams.length };
 }
@@ -2224,6 +2234,7 @@ function renderPlanEditor(t, { locked, compact } = {}) {
   </div>`;
 }
 async function startKnockouts() {
+  if (S.drawing) return;
   S.selfDraw = true; const t = T(); const ms = MS(); const plan = getPlan(t); const made = [];
   for (const br of plan.brackets) {
     const ents = koEntrants(T(), ms, br);
@@ -2266,8 +2277,12 @@ async function assignCourts() {
   for (const p of plan) { const at = Date.now(); S.matches[p.id] && Object.assign(S.matches[p.id], { court: p.court, courtAt: at }); await S.store.updateMatch(S.tid, p.id, { court: p.court, courtAt: at }); }
   return plan.length;
 }
+// one tap draws one round: S.drawing stays set until the draw has saved, and a second draw meanwhile does nothing
 async function addDraw(res) {
+  if (S.drawing) return;
   if (res.error) { toast(res.error); return; }
+  S.drawing = true;
+  try {
   S.selfDraw = true;
   const t = clone(T());
   const all = [...MS().map(clone), ...res.matches];
@@ -2277,9 +2292,12 @@ async function addDraw(res) {
   if (res.clubs) { t.clubs = res.clubs; t.clubFix = res.clubFix; t.clubSched = []; t.clubDays = res.clubDayCount; }
   if (res.clubFixAdd) { t.clubFix = [...clubFixtures(t), ...res.clubFixAdd]; t.clubSched = []; t.clubDays = Math.max(t.clubDays || 0, ...res.clubFixAdd.map(f => f.day)); }
   if (res.bracket) t.brackets = [...(t.brackets || []), res.bracket];
-  await saveT(t);
-  await writeMatches(res.matches);
+  // the games first, so this screen (and every other one) never shows the new round without its games
+  const games = writeMatches(res.matches);
+  const saved = saveT(t);
+  await Promise.all([games, saved]);
   toast(res.note || `${res.draw.label} drawn.`);
+  } finally { S.drawing = false; }
 }
 async function undoDraw(did) {
   const t = clone(T());
@@ -4907,7 +4925,7 @@ document.addEventListener("click", async e => {
     case "archive-no": S.confirmArchive = false; render(); break;
     case "archive-yes": S.confirmArchive = false; await archiveCompetition(true); break;
     case "restore": await archiveCompetition(false); break;
-    case "next-round": await guard(() => addDraw(isMelee(t) ? drawMeleeRound(t, MS()) : drawSwissRound(t, MS()))); break;
+    case "next-round": if (S.drawing) break; await guard(() => addDraw(isMelee(t) ? drawMeleeRound(t, MS()) : drawSwissRound(t, MS()))); break;
     case "undo": await guard(() => undoDraw(a.dataset.id)); break;
     case "assign": { const n = await guard(assignCourts); toast(n ? `${n} game(s) sent to pistes.` : "No free piste or no game ready."); render(); break; }
     case "start-kos": await guard(startKnockouts); break;
