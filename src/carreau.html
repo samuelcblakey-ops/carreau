@@ -4066,7 +4066,7 @@ function renderEntries(t) {
   // a new competition: the quick setup on its own; once entries exist (imported, or added after leaving it) it sits above the list
   const wz = wizPanel(t); if (wz && !list.length) return `<div class="wiz-page">${wz}</div>`;
   return wz + `<div class="stack">
-    <div class="spread"><h2>Registration</h2><span class="muted small">${isEuro(t) ? `EuroCup · ${euroFmt(t).label}` : `${FORMAT_LABEL[t.format]} · ${t.meleeDrawn ? "Mêlée, teams drawn once · " + SYSTEM_LABEL[t.system] : melee ? "Mêlée" : SYSTEM_LABEL[t.system]}`}</span></div>
+    <div class="spread"><h2>Registration</h2><span class="muted small">${isEuro(t) ? `EuroCup · ${euroFmt(t).label}` : isShoot(t) ? "Precision shooting" : `${FORMAT_LABEL[t.format]} · ${t.meleeDrawn ? "Mêlée, teams drawn once · " + SYSTEM_LABEL[t.system] : melee ? "Mêlée" : SYSTEM_LABEL[t.system]}`}</span></div>
     ${t.meleeDrawn && !t.draws.length && canEdit() ? `<div class="notice spread"><span>These teams were drawn at random from ${t.players.filter(p => p.active !== false && (!t.checkin || p.checkedIn)).length} players. Happy with them? Make the draw on Draw & results.</span><span class="row"><button class="btn sm" data-act="melee-redraw">Redraw teams</button><button class="btn sm ghost" data-act="melee-unteam">Back to players</button></span></div>` : ""}
     <div class="panel stack">
       ${t.checkin ? `<div class="spread"><div><div class="eyebrow">Checked in on the day</div><div class="reg-count"><b>${here.length}</b> of ${entered.length} ${noun}</div></div>

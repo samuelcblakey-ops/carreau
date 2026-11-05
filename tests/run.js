@@ -260,6 +260,8 @@ const SUITES = {
     'app-busy-day.js': [/burst published: true \| games 4 \| within 8 s true \| all applied true/, /scores: 13-4,13-5,13-6,13-7/,
       /auto: not before the wait true \| published true auto \| soon after true/, /first change drawn at once: true \| 21 changes in [123] redraws \| batched true/,
       /hidden: redraws 0 \| shown again: true/, /errs \[\]/],
+    'app-entries-subtitle.js': [/subtitle shooting: Precision shooting$/m, /subtitle melee: Doubles · Mêlée$/m, /subtitle swiss: Doubles · Swiss rounds$/m,
+      /subtitle shooting fr: Tir de précision$/m, /errs \[\]/],
     'app-round-status.js': [/round 1 drawn: live red true \| 2 games still to finish \| Draw round 2\|disabled/, /one score in: live red true \| 1 game still to finish \| Draw round 2\|disabled/,
       /french: 1 partie à terminer \| Tirer la partie 2\|disabled/, /all scores in: ready green true \| Round finished \| Draw round 2\|enabled/,
       /round 2 drawn: live \| 2 games still to finish \| Draw round 3\|disabled/, /last planned round finished: ready \| Morning complete \| Draw round 3\|enabled/, /errs \[\]/],
