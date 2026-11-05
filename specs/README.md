@@ -41,7 +41,7 @@ The building session:
 3. Runs `scripts/check.sh` and looks at the screenshots.
 4. Commits, then runs `scripts/ship.sh`. That opens the pull request, merges it when CI passes and confirms it's live.
 
-Run specs side by side only when their **Touches** lines don't overlap. Two sessions changing the same function will collide when the second one rebases.
+Run specs side by side only when their **Touches** lines don't overlap. Two sessions changing the same function will collide when the second one merges in main.
 
 ## 3. After it ships
 
