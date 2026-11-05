@@ -1,6 +1,6 @@
 # Carreau Competition Desk
 
-Petanque competition tool: Swiss, snake, barrage, leagues, inter-club, knockout, round robin, mêlée and precision shooting, with piste allocation, live scores and standings. Live at <https://samuelcblakey-ops.github.io/carreau/>.
+Petanque competition tool: Swiss, snake, barrage, leagues, inter-club, knockout, round robin, mêlée and precision shooting, with piste allocation, live scores and standings. Live at <https://snpetanque.com>.
 
 ## Layout
 
@@ -16,26 +16,29 @@ Petanque competition tool: Swiss, snake, barrage, leagues, inter-club, knockout,
 
 ## How changes ship
 
-1. **Make one small, self-contained change per branch.** For example "score keypad" or "archive button", not both. Small changes are easy to review and test, and easy to undo.
-2. Commit on a branch, push, and open a pull request (GitHub Desktop: *Branch → New branch*, then *Create Pull Request*).
-3. **CI runs automatically** on the pull request: it builds the site and runs every test. A red ✗ means don't merge.
-4. **Merge to `main` = release.** Once the tests pass on `main`, GitHub Actions deploys the website to GitHub Pages and the security rules to Firebase. Nothing is uploaded by hand.
-5. To roll back, revert the commit (GitHub Desktop: *History → right-click → Revert*). That ships the previous version through the same pipeline.
+1. **Make one small, self-contained change per branch.** For example "score keypad" or "archive button", not both. Small changes are easy to review and test, and easy to undo. Bigger work is planned as specs first (`specs/README.md`), one per pull request.
+2. Commit on a branch, then run `scripts/ship.sh`. It pushes the branch, opens a pull request and asks GitHub to merge it when the tests pass.
+3. **CI runs automatically** on the pull request in parallel jobs: the build and app tests, plus three jobs of web tests. A red ✗ means it won't merge.
+4. **Merge to `main` = release.** Once the tests pass on `main`, GitHub Actions deploys the website to GitHub Pages and the security rules to Firebase. `scripts/ship.sh` waits for this and checks <https://snpetanque.com/build.txt> to confirm it's live. Nothing is uploaded by hand.
+5. To roll back, revert the commit (`git revert <commit>` on a branch, then `scripts/ship.sh`). That ships the previous version through the same pipeline.
 
 ## Run it locally
 
 ```bash
-npm ci
-npx playwright install chromium
-npm test            # build + app tests + web tests (needs Java for the emulators)
-npm run test:app    # quick: app tests only, no Java needed
+scripts/setup.sh                 # packages, browser, build; says whether this copy can push to GitHub
+node tests/run.js app melee      # one app test (by part of its name), with its pass/fail checks
+scripts/check.sh                 # build + translation check + all app tests, 4 at a time (about 1½ minutes)
+scripts/check.sh --web hall      # ... plus matching web tests on the Firebase emulators (needs Java)
+npm test                         # everything, one test at a time (the full web suite takes about 15 minutes)
 ```
+
+See `CLAUDE.md` for conventions (translations, Firestore shapes, tests) and the working loop.
 
 ## One-time settings (already done unless noted)
 
 - **Settings → Pages → Source: GitHub Actions**, so Pages serves what the pipeline builds.
 - **Settings → Secrets and variables → Actions → `FIREBASE_SERVICE_ACCOUNT`**: the JSON key of a Firebase service account with the *Firebase Rules Admin* role. Without it, the pipeline skips the rules deploy and warns.
-- **Settings → Branches → protect `main`**: require the `test` check to pass before merging.
+- **Settings → Branches → protect `main`**: require the `test` check to pass before merging. (`test` is the job that waits for all the parallel test jobs.)
 
 ## Licence
 
