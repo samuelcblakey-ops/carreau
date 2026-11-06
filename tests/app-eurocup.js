@@ -41,12 +41,20 @@ const { chromium } = require('playwright');
     q('[data-act="eu-edit"]').click(); await w(80);
     L.push('edit big squad: rows ' + qa('#add-form .sq-row').length + ' | all there ' + (q('#nt-p14').value === 'R15') + ' | eyebrow ' + txt(q('#add-form .eyebrow')));
     q('[data-act="eu-edit-cancel"]').click(); await w(60);
+    // paste gets the form's checks: nothing is added when a line fails
+    const paste = async v => { q('#bulk').value = v; q('#bulk-form').requestSubmit(); await w(100); return txt(q('#toast')); };
+    { const n0 = C.T().teams.length; const a = await paste('riverside: A1 (W), A2 (M), A3 (M), A4 (M), A5 (M), A6 (M)'), b = await paste('Newside: N1 (W), N2 (M), N3 (M), N4 (M), N5 (M), N6 (M)\nnewside: M1 (W), M2 (M), M3 (M), M4 (M), M5 (M), M6 (M)');
+      L.push('paste same club twice: ' + (a === 'That club is already entered.' && b === a && C.T().teams.length === n0 ? 'refused' : 'toasts ' + a + ' / ' + b) + ' | clubs ' + C.T().teams.length);
+      const d = await paste('Dupside: D1 (W), D2 (M), D3 (M), d2 (M), D5 (M), D6 (M)');
+      L.push('paste duplicate player: ' + (C.T().teams.length === n0 && /^d2 is in the squad twice\./.test(d) ? 'refused' : 'toast ' + d + ' | clubs ' + C.T().teams.length));
+      const m = await paste('Bigside: ' + Array.from({ length: 45 }, (_, i) => 'B' + (i + 1) + (i ? ' (M)' : ' (W)')).join(', '));
+      L.push('paste 45 players: ' + (C.T().teams.length === n0 ? 'refused' : 'added') + ' | message ' + m + ' | bulk kept ' + (q('#bulk').value.length > 0)); }
     // paste a list with genders
     q('#bulk').value = 'Hillside: H1 (W), H2 (M), H3 M, H4 (M), H5 (W), H6 (M)\nLakeside: L1 (M), L2 (M), L3 (M), L4 (M), L5 (M), L6 (M)'; q('#bulk-form').requestSubmit(); await w(120);
     L.push('pasted: ' + C.T().teams.slice(1).map(x => x.name + ' ' + x.genders.join('')).join(','));
     await tab('draw'); L.push('blocked: ' + !q('[data-act="first-draw"]') + ' | ' + txt(q('main .notice')).slice(0, 120));
     { const t = T(); t.teams[2].genders[0] = 'f'; t.teams.push(Object.assign({ id: 'e4', name: 'Parkside', club: 'Parkside', active: true }, squad('PK'))); await put(t); }
-    await tab('draw'); L.push('ready: ' + txt(q('[data-act="first-draw"]')) + ' | ' + (txt(q('main')).match(/4 clubs → 6 fixtures/) || ['none'])[0]);
+    await tab('draw'); L.push('ready: ' + txt(q('[data-act="first-draw"]')) + ' | ' + (txt(q('main')).match(/4 clubs entered → 6 ties/) || ['none'])[0]);
     // 3. Draw: 6 ties over 3 rounds, 5 games each; nothing goes to a piste before the line-ups
     q('[data-act="first-draw"]').click(); await w(250);
     let ms = C.MS(); const t1 = C.T();
@@ -249,5 +257,40 @@ const { chromium } = require('playwright');
   const pn = await pistes();
   out.push(`pistes 390: page width ${pn.width} | game label visible ${pn.label} | players shown ${pn.players}`);
   await p.screenshot({ path: process.env.OUT + '/eurocup-pistes-390.png', fullPage: true });
+  // 11. Wording: EuroCup says clubs, ties and rounds, with plurals (never "teams", "1 ties" or "1 rounds")
+  const wording = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s); const L = []; try {
+    const txt = el => (el?.innerText || '').replace(/\s+/g, ' ').trim(), tab = async k => { q(`[data-tab="${k}"]`).click(); await w(60); };
+    const put = async t => { await S.store.setTournament(t); S.tournaments[t.id] = t; C.render(); await w(60); };
+    const club = (c, k, on) => ({ id: 'wd' + k, name: c, club: c, active: true, checkedIn: on, players: Array.from({ length: 8 }, (_, i) => `${c[0]}${i + 1}`), genders: Array.from({ length: 8 }, (_, i) => i < 3 ? 'f' : 'm') });
+    const names = ['Riverside', 'Hillside', 'Lakeside', 'Parkside', 'Seaside', 'Westside'];
+    q('[data-act="new-t"]').click(); await w(100); let t = JSON.parse(JSON.stringify(C.T()));
+    Object.assign(t, { wizard: false, checkin: true, system: 'eurocup', name: 'Wording' }); t.courts = Array.from({ length: 6 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true }));
+    t.teams = names.map((c, k) => club(c, k, k === 0)); await put(t);
+    // Registration and Draw & results (Setup's entry type choice, Fixed teams or Mêlée, is the same for every system)
+    const seen = []; await tab('entries'); seen.push(txt(q('main'))); await tab('draw'); const pre = txt(q('main')); seen.push(pre);
+    L.push('eurocup checked in: ' + (pre.match(/1 club checked in/) || ['none'])[0] + ' | ' + (pre.match(/\d+ entered clubs? (?:hasn't|haven't) checked in/) || ['none'])[0] + ' | ' + (pre.match(/Check in at least \d+ clubs/) || ['none'])[0]);
+    t = JSON.parse(JSON.stringify(C.T())); t.checkin = false; t.teams = t.teams.slice(0, 2); await put(t);
+    await tab('entries'); seen.push(txt(q('main'))); await tab('setup'); const setup = txt(q('main')); await tab('draw'); const two = txt(q('main')); seen.push(two);
+    // drawn: one tie over 2 rounds, then 6 ties all in round 1
+    q('[data-act="first-draw"]').click(); await w(250); q('[data-act="club-add-day"]').click(); await w(120); const added = txt(q('main')); seen.push(added);
+    t = JSON.parse(JSON.stringify(C.T())); t.draws = []; t.clubFix = undefined; t.teams = names.slice(0, 4).map((c, k) => club(c, k, true)); await put(t);
+    for (const m of C.MS()) await S.store.deleteMatch?.(S.tid, m.id);
+    q('[data-act="first-draw"]').click(); await w(250); t = JSON.parse(JSON.stringify(C.T())); t.clubFix.forEach(f => f.day = 1); t.clubDays = 1; await put(t); const one = txt(q('main')); seen.push(one);
+    const all = seen.join(' ');
+    L.push('eurocup counts: setup ' + (setup.match(/\(\d+ clubs → \d+ ties?\)/) || ['none'])[0] + ' | ' + (added.match(/\d+ ties? over \d+ rounds?\b/) || ['none'])[0]
+      + ' | ' + (one.match(/\d+ ties? over \d+ rounds?\b/) || ['none'])[0] + ' | ' + (one.match(/Pistes are filled from any \w+, earliest \w+ first/) || ['none'])[0]);
+    L.push('eurocup wording: ' + (two.match(/\d+ clubs entered → \d+ ties?\b/) || ['none'])[0] + ' | ' + (/\bteams?\b/i.test(all) ? 'says teams: ' + all.match(/.{0,40}\bteams?\b.{0,20}/i)[0] : 'no "teams"') + ' | ' + (/\b1 ties\b/.test(all) ? 'says "1 ties"' : 'no "1 ties"') + ' | ' + (/\b1 rounds\b/.test(all) ? 'says "1 rounds"' : 'no "1 rounds"'));
+    // French: every new line translated, and the draw page before the draw has no English left
+    t = JSON.parse(JSON.stringify(C.T())); t.draws = []; t.clubFix = undefined; t.checkin = true; t.teams = names.map((c, k) => club(c, k, k === 0)); await put(t);
+    q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80); await tab('draw');
+    const lines = ['2 clubs entered → 1 tie', '4 clubs entered → 6 ties', '1 club checked in', "5 entered clubs haven't checked in and won't be in the draw.", "1 entered club hasn't checked in and won't be in the draw.",
+      'Check in at least 2 clubs on Registration before drawing.', 'Every club plays every other club once (2 clubs → 1 tie). Two clubs make a single tie, for a knockout round.', '6 ties over 1 round', '1 tie over 2 rounds', '6 ties over 3 rounds',
+      'Ties can be moved at any time, even once results are in. Pistes are filled from any round, earliest round first.', '2/2 clubs have a link', 'Check-in is off, so every entered club goes into the draw.', "Clubs must check in on the day before they're included in the draw"];
+    const eng = /\b(entered|checked in|ties?|rounds?|have a link|Check in at least|Pistes are filled|earliest|before drawing|must check in)\b/;
+    const left = lines.filter(x => C.tr(x) === x || eng.test(C.tr(x))), page = txt(q('main')), pageEng = (page.match(new RegExp('.{0,30}' + eng.source + '.{0,20}')) || [])[0];
+    L.push('fr eurocup wording: ' + (left.length || pageEng ? 'English: ' + [...left, pageEng].filter(Boolean).join(' / ') : 'no English') + ' | ' + C.tr('2 clubs entered → 1 tie') + ' | ' + C.tr('1 tie over 2 rounds'));
+    } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack); } return L; });
+  out.push(...wording);
+  await p.screenshot({ path: process.env.OUT + '/eurocup-wording-fr-390.png', fullPage: true });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();

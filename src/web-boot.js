@@ -220,7 +220,7 @@ function teamLinksPanel(t) {
   if (!S.teamScoringSetup(t) || !(t.scoreMode === "teams" || t.scoreMode === "teams-auto") || (t.entry !== "teams")) return "";
   watchTeamCodes(t.id);
   const codes = TEAMCODES[t.id] || {}; const teams = (t.teams || []).filter(e => e.active !== false); const missing = teams.filter(e => !codes[e.id]).length;
-  return `<div class="panel stack" id="team-links"><div class="spread"><h3>Team links</h3>${teams.length ? `<span class="small muted">${teams.length - missing}/${teams.length} teams have a link</span>` : ""}</div>
+  return `<div class="panel stack" id="team-links"><div class="spread"><h3>Team links</h3>${teams.length ? `<span class="small muted">${teams.length - missing}/${teams.length} ${t.system === "eurocup" ? "clubs" : "teams"} have a link</span>` : ""}</div>
     <p class="small muted">Give each team its own link or QR code (for example at check-in). It sets up their phone to enter scores for their games only, and to confirm their opponents' scores.</p>
     ${missing ? `<div><button class="btn primary sm" data-act="team-links-make">${missing === teams.length ? "Create team links" : `Create ${missing} more`}</button></div>` : ""}
     ${teams.filter(e => codes[e.id]).map(e => { const name = e.name || (e.players || []).join(", "); const open = S.teamQr === e.id; return `<div class="erow"><div class="who"><b>${esc(name)}</b></div><input id="tl-${e.id}" value="${esc(teamLink(t, e.id))}" readonly style="flex:1;min-width:160px" class="small"><button class="btn sm" data-act="copy" data-target="tl-${e.id}">Copy</button><button class="btn sm ${open ? "primary" : ""}" data-act="team-qr" data-id="${e.id}" aria-expanded="${open}">${open ? "Hide QR" : "QR code"}</button></div>
