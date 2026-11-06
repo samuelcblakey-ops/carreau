@@ -195,6 +195,23 @@ const { chromium } = require('playwright');
     const first = C.T().clubFix.find(f => f.id !== mv.id && onPistes().some(m => m.ca === f.a && m.cb === f.b));
     for (const leg of [1, 2]) { for (const m of C.MS().filter(m => m.ca === first.a && m.cb === first.b && m.leg === leg)) await C.recordResult(m.id, 13, 7, true); await w(100); }
     L.push('after the first tie finishes: moved tie on pistes ' + mvOn() + ' | clubs in two ties on pistes ' + (twoTies().join(',') || 'none'));
+    // 7d. A squad player renamed after the line-ups are named: the line-ups follow, finished games keep the old name
+    q('[data-act="new-t"]').click(); await w(100);
+    { const t = T(); Object.assign(t, { wizard: false, checkin: false, system: 'eurocup', name: 'Rename' }); t.courts = Array.from({ length: 6 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true }));
+      t.teams = [Object.assign({ id: 'na', name: 'North', club: 'North', active: true }, squad('N')), Object.assign({ id: 'nb', name: 'South', club: 'South', active: true }, squad('S'))]; await put(t); }
+    await tab('draw'); q('[data-act="first-draw"]').click(); await w(250);
+    { const rg = C.MS(), luA = { ot: [4, 5, 6], mt: [1, 7, 8], od1: [1, 4], od2: [6, 7], md: [2, 8] };
+      for (const m of rg) { const ka = m.a[0] === 'na' ? 'la' : 'lb', kb = ka === 'la' ? 'lb' : 'la', nos = luA[m.eu];
+        const patch = { [ka]: nos.map(n => 'N P' + n), [kb]: nos.map(n => 'S P' + n) }; Object.assign(S.matches[m.id], patch); await S.store.updateMatch(S.tid, m.id, patch); }
+      await C.recordResult(rg.find(m => m.eu === 'od1').id, 13, 7, true); await w(100); }
+    await tab('entries'); q('[data-act="eu-edit"][data-id="na"]').click(); await w(80);
+    q('#nt-p0').value = 'Alice Long'; q('#add-form').requestSubmit(); await w(200);
+    { const rg = C.MS(), side = m => m.a[0] === 'na' ? m.la : m.lb, rmt = rg.find(m => m.eu === 'mt'), rmd = rg.find(m => m.eu === 'od1'), rf = C.T().clubFix[0];
+      await tab('draw'); q(`[data-act="eu-lineup"][data-fx="${rf.id}"][data-leg="1"]`).click(); await w(80);
+      const ka = rmt.a[0] === 'na' ? 'a' : 'b'; if (S.modal.side !== ka) { q(`.modal .lu-clubs [data-side="${ka}"]`).click(); await w(30); }
+      L.push('rename after line-ups: line-up shows ' + (txt(q(`.modal [data-act="lu-slot"][data-id="${rmt.id}"][data-i="0"]`)).match(/Alice Long/) || ['none'])[0] + ' | mixed triple ' + (qa('.modal .err span').some(x => /mixed triple/.test(x.textContent)) ? 'error' : 'ok') + ' | save line-ups ' + (q('[data-act="lu-save"]').disabled ? 'disabled' : 'enabled'));
+      L.push('rename keeps: squad ' + C.T().teams.find(x => x.id === 'na').players[0] + ' | mixed triple ' + side(rmt).join(',') + ' | finished open double ' + side(rmd).join(','));
+      q('.modal [data-act="close"]').click(); await w(40); }
     // 8. Quick setup offers EuroCup
     q('[data-act="new-t"]').click(); await w(150); q('#wz-name').value = 'Euro'; q('[data-act="wiz-next"]').click(); await w(50);
     q('[data-act="wiz-set"][data-k="kind"][data-v="eurocup"]').click(); await w(40); q('[data-act="wiz-next"]').click(); await w(50);

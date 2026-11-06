@@ -5070,7 +5070,7 @@ document.addEventListener("focusout", () => setTimeout(() => { if (S.pendingRend
 document.addEventListener("submit", async e => {
   e.preventDefault(); const t = clone(T()); if (!t) return;
   if (e.target.id === "add-form") {
-    const hereNow = !!$("#add-here")?.checked; const ci = hereNow ? { checkedIn: true, checkedInAt: Date.now() } : {};
+    const hereNow = !!$("#add-here")?.checked; let rn = null; const ci = hereNow ? { checkedIn: true, checkedInAt: Date.now() } : {};
     if (isIndiv(t)) { const nm = $("#np-name").value.trim(); if (!nm) return; t.players.push(Object.assign({ id: "p" + uid(), name: nm, active: true }, ci)); }
     else if (isEuro(t)) {
       const ed = S.euEdit && t.teams.find(x => x.id === S.euEdit); const ps = [], gs = [];
@@ -5079,7 +5079,10 @@ document.addEventListener("submit", async e => {
       if (!name) { toast("Enter the club's name."); return; }
       if (t.teams.some(x => x !== ed && x.active !== false && clubKey(x.name) === clubKey(name))) { toast("That club is already entered."); return; }
       const dup = ps.find((p, i) => ps.findIndex(q => clubKey(q) === clubKey(p)) !== i); if (dup) { toast(`${dup} is in the squad twice. Give each player a different name.`); return; }
-      if (ed) { ed.name = name; ed.club = name; ed.players = ps; ed.genders = gs; S.euEdit = null; }
+      // a player renamed in the same place in the squad is renamed in the club's line-ups too (games not finished)
+      if (ed) { const ren = Object.create(null); for (let i = 0; $("#nt-p" + i); i++) { const o = (ed.players || [])[i], v = $("#nt-p" + i).value.trim(); if (o && v && o !== v) ren[o] = v; }
+        if (Object.keys(ren).length) rn = { id: ed.id, ren };
+        ed.name = name; ed.club = name; ed.players = ps; ed.genders = gs; S.euEdit = null; }
       else t.teams.push(Object.assign({ id: "e" + uid(), name, players: ps, genders: gs, club: name, active: true }, ci));
       S.euDraft = null;
     }
@@ -5089,7 +5092,11 @@ document.addEventListener("submit", async e => {
       t.teams.push(Object.assign({ id: "e" + uid(), name, players: ps, club: $("#nt-club").value.trim(), active: true }, ci));
     }
     e.target.reset(); if ($("#add-here")) $("#add-here").checked = hereNow; document.activeElement?.blur();
-    await guard(() => saveT(t)); e.target.querySelector("input")?.focus?.();
+    await guard(() => saveT(t));
+    if (rn) await guard(async () => { for (const m of MS().filter(m => m.eu && !m.done)) { const patch = {};
+      for (const [k, l] of [["a", "la"], ["b", "lb"]]) if ((m[k] || []).includes(rn.id) && (m[l] || []).some(n => rn.ren[n])) patch[l] = m[l].map(n => rn.ren[n] || n);
+      if (Object.keys(patch).length) { Object.assign(S.matches[m.id], patch); await S.store.updateMatch(S.tid, m.id, patch); } } render(); });
+    e.target.querySelector("input")?.focus?.();
   }
   if (e.target.id === "bulk-form") {
     const lines = $("#bulk").value.split(/\n/).map(s => s.trim()).filter(Boolean); if (!lines.length) return;
