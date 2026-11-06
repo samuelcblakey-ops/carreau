@@ -189,7 +189,7 @@ button.ptile{cursor:pointer}button.ptile:hover{border-color:var(--accent);box-sh
 .ptile.me{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent),0 0 0 1px var(--accent)}
 .pt-h{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
 .pt-n{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
-.pt-ctx{min-width:0;font-size:12px;line-height:1.25;color:var(--muted);text-align:right;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.pt-ctx{min-width:0;font-size:12px;line-height:1.25;color:var(--muted);text-align:right;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.pt-ctx.eu{font-weight:600;color:var(--ink)}.pt-lu{display:block;font-weight:400}
 .pt-s{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
 .pt-s .nm{min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.25}
 .pt-s .sc{font-family:var(--display);font-size:18px;font-weight:700}
@@ -4548,9 +4548,13 @@ function renderCourts(t) {
   const tile = c => {
     const m = live.find(x => x.court === c.id);
     if (!m) return "";
-    const side = k => `<div class="pt-s"><span class="nm" data-notr>${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? ""}</span></div>`;
+    // EuroCup: the club, then the players it named for this game (as on Draw & results)
+    const lu = k => m.eu ? ((k === "a" ? m.la : m.lb) || []).filter(Boolean).join(", ") : "";
+    const side = k => `<div class="pt-s"><span class="nm"><span data-notr>${esc(sideName(t, m[k]))}</span>${lu(k) ? `<span class="pt-lu small muted" data-notr>${esc(lu(k))}</span>` : ""}</span><span class="sc">${m["s" + k] ?? ""}</span></div>`;
+    // EuroCup: the game first ("Open triple", "Singles 3"); the clubs are already on the tile
+    const ctx = m.eu ? `${m.label} · Round ${m.round}` : matchContext(t, m);
     return `<${tag} class="ptile ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}>
-      <div class="pt-h"><span class="pt-n" data-notr>${esc(c.name)}</span>${timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pt-ctx">${esc(matchContext(t, m))}</span>`}</div>${side("a")}${side("b")}</${tag}>`;
+      <div class="pt-h"><span class="pt-n" data-notr>${esc(c.name)}</span>${timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pt-ctx ${m.eu ? "eu" : ""}">${esc(ctx)}</span>`}</div>${side("a")}${side("b")}</${tag}>`;
   };
   const next = m => `<${tag} class="nxrow ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}><span class="nx-m"><span><b data-notr>${esc(sideName(t, m.a))}</b> v <b data-notr>${esc(sideName(t, m.b))}</b></span><span class="small muted">${esc(matchContext(t, m))}</span></span></${tag}>`;
   return `<div class="stack">

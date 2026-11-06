@@ -234,6 +234,7 @@ const SUITES = {
       /table while doubles play: 1 North 1 1 0 12 0 2 \+16 \/ 2 South 1 0 1 0 12 0 -16/,
       /table at the end: 1 North 1 1 0 12 9 2 -5 \/ 2 South 1 0 1 9 12 3 \+5 \| note GP is game points: 6 for a triples win, 3 for doubles\. A tie counts as won as soon as a club has more than half its points\./,
       /tie at the end: North 12 – 9 South \| tag NORTH WIN THE TIE 5\/5 games/,
+      /pistes tiles distinct: 12 of 12 \| game label visible true \| players shown true/, /pistes 390: page width 390 \| game label visible true \| players shown true/,
       /wizard: rounds,points,final/, /wizard saved: eurocup final teams \| toast All set\. Now add the clubs and their squads\./,
       /french: Tours 1–4 : 5 parties,Triplettes et doublettes : vos points,Finale : 11 parties, 31 points \| EuroCup \| Composer les équipes \| Riverside : R2 est dans deux parties en triplette\. \| 6 rencontres sur 3 tours/,
       /french picker: Comme la dernière rencontre \| Suivant : \| Touchez un nom pour remplir la place suivante\. Touchez une place remplie pour la changer\. \| Copié du tour 2\. 1 joueur ne fait plus partie de l'effectif : sa place est vide\. \| \+ Ajouter un joueur/,
