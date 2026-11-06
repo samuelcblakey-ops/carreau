@@ -52,7 +52,7 @@ const SUITES = {
     'app-quick-score.js': [/quick by default: true \| no score boxes: true \| no who-won step: true/, /loser pad buttons: 13\+13 \| teams Team \w+ \/ Team \w+ \| Tap the losing team's score\. The winner gets 13 and it saves straight away\./, /saved: true 6-13 modal closed true \| undo shown true/, /undone: done false piste back true/,
       /level refused: Level when time ran out/, /time result: true 11-9 time true \| card says Ended on time/, /below target refused: true/, /time badge: late Time \| on time Playing/,
       /french: Vainqueur à 13 \/ Arrêtée au temps \| Touchez le score de l'équipe perdante\. Le vainqueur marque 13/, /score dialog 375x667: switch 44\+ px \| ended on time tappable true \| 11-9 saved Ended on time/,
-      /score dialog 390x844 with toast and long names: switch 44\+ px/, /score dialog close button visible over the new-round banner: true/, /errs \[\]/],
+      /score dialog 390x844 with toast and long names: switch 44\+ px/, /score dialog close button visible over the new-round banner: true/, /undo with a waiting game: piste handed on true \| undone game Piste 1 \| other game waiting/, /errs \[\]/],
     'app-find-game.js': [/own draw, no alert: true/, /find panel: true/, /result: Charlie Pat Charlie v \w+ Round 1 · Piste \d This is me/, /box kept focus: true/, /my game card: true/,
       /alert: true \| Round 2 is out · you're on Piste \d v \w+ View/, /alert closed: true/, /my row: Charlie/, /phone columns: #,Team,W,L,Buch,\+\/-/, /sticky header: sticky/,
       /all columns: #,Team,Pld,W,L,Buch,Fine,For,Agst,\+\/-/, /cleared: true/, /errs \[\]/],

@@ -3324,9 +3324,14 @@ async function modalAction(act, k, a) {
     const ok = await guard(() => recordResult(md.id, sa, sb, true, { time }));
     if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa, sb, done: true, time }; renderModal(); return; }
     if (ok) { const id = md.id; S.modal = null; renderModal();
+      // the game that was just given this game's piste, so Undo can take it back
+      const took = before.court ? MS().find(o => o.id !== id && o.court === before.court && !o.done)?.id : null;
       toast("Result saved.", before.done ? null : async () => {
         const r = await guard(() => recordResult(id, before.sa, before.sb, false, { time: false }));
+        const tk = took && S.matches[took];
+        if (r === true && tk && tk.court === before.court && !tk.done && tk.sa == null && tk.sb == null) { tk.court = null; await S.store.updateMatch(S.tid, took, { court: null }); }
         if (r === true && before.court && !MS().some(o => o.court === before.court && !o.done)) { S.matches[id].court = before.court; await S.store.updateMatch(S.tid, id, { court: before.court }); }
+        if (r === true) await assignCourts();
         render(); toast("Result undone.");
       }); }
     return;
