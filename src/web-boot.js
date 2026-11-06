@@ -129,8 +129,18 @@ function fbStore() {
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },
     async setStream(st) { const isNew = !!st._new; const body = clone(st); delete body._new; await track(setDoc(doc(db, "streams", st.id), body));
       if (isNew) { delete st._new; const code = newCode(); await track(setDoc(doc(db, "streams", st.id, "private", "code"), { code })); SCODES[st.id] = code; render(); } },
+    // the same for a standalone stream's desk: only live and updated change (all a desk-link phone may change)
+    changeStream(sid, fn) { const ref = doc(db, "streams", sid);
+      return track(runTransaction(db, async tx => { const d = await tx.get(ref); if (!d.exists()) throw Object.assign(new Error("This stream is gone."), { code: "not-found" });
+        const prev = d.data().live || null; const L = fn(prev); if (!L) return { L: prev, wrote: false };
+        const updated = Date.now(); tx.update(ref, { live: clone(L), updated }); return { L, wrote: true, updated }; })); },
     async deleteStream(sid) { try { await deleteDoc(doc(db, "streams", sid, "private", "code")); } catch {} await deleteDoc(doc(db, "streams", sid)); },
     setLive(tid, mid, L) { return track(setDoc(doc(db, "tournaments", tid, "live", mid), clone(L))); },
+    // a live desk tap applied to the server's latest live score (fn(prev) gives the new score, or null for no change), so two
+    // phones on one desk both count; resolves to { L: the score now saved, wrote }. Online only: transactions need the server.
+    changeLive(tid, mid, fn) { const ref = doc(db, "tournaments", tid, "live", mid);
+      return track(runTransaction(db, async tx => { const d = await tx.get(ref); const prev = d.exists() ? d.data() : null; const L = fn(prev);
+        if (!L) return { L: prev, wrote: false }; tx.set(ref, clone(L)); return { L, wrote: true }; })); },
     setMatch(tid, m) { return track(setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m))); },
     // a draw: all its games and the competition in one batch (Firestore allows 500 writes per batch; the competition goes in the last one)
     // patch: the competition's changed fields only (an update), else the whole competition
@@ -170,6 +180,7 @@ S.liveRole = t => !!(t && ROLE[t.id] === "live");
 // streaming is a site switch: Off / Admin only / Everyone (config/site.streaming, enforced in firestore.rules)
 S.streamingOn = () => SITE.streaming === true || (SITE.streaming === "admin" && isAdmin());
 // standalone streams: the device that created one owns it; a phone with the desk link joins as 'live'
+S.me = () => AUTH.user?.uid || ""; // this device, so the live desk can tell another phone's mène from its own
 S.streamMine = st => isAdmin() || st.ownerUid === AUTH.user?.uid;
 S.streamCan = st => !!AUTH.user && (isAdmin() || st.ownerUid === AUTH.user.uid || SROLE[st.id] === "live");
 S.decorateStream = st => { st.ownerUid = AUTH.user.uid; st._new = true; };
