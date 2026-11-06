@@ -29,7 +29,7 @@ const SUITES = {
       /a team still there: saved 1 \| checked in false/, /quick score on a game that has gone: errors 0 \| dialog open false \| toast That game isn't in the draw any more\./,
       /save live score on a game that has gone: errors 0 \| dialog open false/, /live scorer open: true/, /shot on a scorecard that has gone: errors 0 \| dialog open false/,
       /french: Cette partie ne fait plus partie du tirage\./, /errs \[\]/],
-    'app-picker.js': [/no select: true/, /open: true groups: Your competitions 6 \/ Examples 2/, /meta: .*Triples · Swiss · 0 teams · Not started/, /search focused: true/,
+    'app-picker.js': [/eurocup summary: 4 Nov 2026 · EuroCup · 4 clubs · Ties drawn$/m, /melee in advance summary after 2 results: Round 1 /, /no select: true/, /open: true groups: Your competitions 6 \/ Examples 2/, /meta: .*Triples · Swiss · 0 teams · Not started/, /search focused: true/,
       /search filters: Bristol Open 7\n/, /search zzzz: no match message true \| errors 0/, /enter with no match: no competition opened \| carreau-tid unchanged/, /search melee finds Mêlée: true/, /picked: Bristol Open 7 closed: true button shows: Bristol Open 7/, /outside click closes: true/, /escape closes: true/, /errs \[\]/],
     'app-mobile.js': [/phone: \{"overflow":false,"navFixed":true,"navBottom":true,"icons":true,"header":\d{2,3},"langOneRow":true,"inputFont":"16px"\}/, /desktop: \{"overflow":false,"navFixed":false,"navBottom":false,"icons":false/,
       /setup with knockout plan 390: page width 390 \| tab bar width 390 \| plan true/, /setup with knockout plan 320: page width 320 \| tab bar width 320 \| plan true/,
