@@ -4935,7 +4935,10 @@ document.addEventListener("click", async e => {
     case "archive-yes": S.confirmArchive = false; await archiveCompetition(true); break;
     case "restore": await archiveCompetition(false); break;
     case "next-round": if (S.drawing) break; await guard(() => addDraw(isMelee(t) ? drawMeleeRound(t, MS()) : drawSwissRound(t, MS()))); break;
-    case "undo": await guard(() => undoDraw(a.dataset.id)); break;
+    // a double tap on "Draw round N" lands its second tap on Undo (same place at 768 px and wider): ignore it
+    case "undo": { if (S.drawing) break; const d = (t.draws || []).find(x => x.id === a.dataset.id);
+      if (d && d.kind === "round" && d.created && Date.now() - d.created < 1500) break;
+      await guard(() => undoDraw(a.dataset.id)); break; }
     case "assign": { const n = await guard(assignCourts); toast(n ? `${n} game(s) sent to pistes.` : "No free piste or no game ready."); render(); break; }
     case "start-kos": await guard(startKnockouts); break;
     case "club-day2": await guard(() => addDraw(drawClubDay2(t, MS()))); break;

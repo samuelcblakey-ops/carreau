@@ -43,5 +43,33 @@ const { chromium } = require('playwright');
     const nb = q('[data-act="next-round"]'); nb.click(); if (!nb.isConnected) q('main').appendChild(nb); nb.click(); await w(400);
     L.push(`double tap: rounds ${C.T().draws.filter(d => d.kind === 'round').length}`);
     return L; });
+  // wide screens put "Undo round N" where "Draw round N" was: a double tap must still leave the new round in place
+  const ready = async (pg, name) => { await pg.goto(process.env.APP_URL); await pg.evaluate(() => localStorage.clear()); await pg.reload(); await pg.waitForTimeout(300);
+    await pg.evaluate(async name => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
+      q('[data-act="new-t"]').click(); await w(60); const t = JSON.parse(JSON.stringify(C.T()));
+      Object.assign(t, { name, system: 'swiss', checkin: false, swissRounds: 3 });
+      ['A', 'B', 'C', 'D'].forEach(n => t.teams.push({ id: n, name: 'Team ' + n, players: ['x'], active: true }));
+      await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30);
+      q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300);
+      for (const m of C.MS().filter(m => m.group === 'R1' && m.a && m.b && !m.bye)) await C.recordResult(m.id, 13, 2, true);
+      await w(100); q('[data-tab="draw"]').click(); await w(60);
+      window.__toasts = []; new MutationObserver(() => window.__toasts.push(document.querySelector('#toast').textContent)).observe(document.querySelector('#toast'), { childList: true, subtree: true, characterData: true });
+    }, name); };
+  const rounds = pg => pg.evaluate(() => window.__carreau.T().draws.filter(d => d.kind === 'round').length);
+  const removed = pg => pg.evaluate(() => window.__toasts.some(x => /Draw removed/.test(x)));
+  for (const width of [1024, 768, 390]) {
+    const ctx = await b.newContext({ viewport: { width, height: 900 }, hasTouch: true }); const pg = await ctx.newPage(); pg.on('pageerror', e => errs.push(e.message));
+    await ready(pg, 'Wide ' + width); await pg.dblclick('[data-act="next-round"]'); await pg.waitForTimeout(600);
+    const r1 = await rounds(pg), t1 = await removed(pg);
+    await ready(pg, 'Taps ' + width); const bb = await pg.locator('[data-act="next-round"]').boundingBox();
+    const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2; await pg.touchscreen.tap(x, y); await pg.waitForTimeout(120); await pg.touchscreen.tap(x, y); await pg.waitForTimeout(600);
+    const r2 = await rounds(pg), t2 = await removed(pg);
+    console.log(`double tap draw round 2 at ${width}: rounds ${Math.min(r1, r2)} | toast ${t1 || t2 ? '"Draw removed."' : 'not "Draw removed."'} | dblclick ${r1} taps ${r2}`);
+    if (width === 1024) { await pg.screenshot({ path: 'test-results/round-status-double-tap-1024.png' });
+      await pg.waitForTimeout(1500); await pg.click('[data-act="undo"]'); await pg.waitForTimeout(500);
+      console.log(`undo after 2 s: rounds ${await rounds(pg)}`); }
+    if (width === 390) await pg.screenshot({ path: 'test-results/round-status-double-tap-390.png' });
+    await ctx.close();
+  }
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
