@@ -86,6 +86,8 @@ function fbStore() {
         await track(setDoc(doc(db, "tournaments", t.id, "private", "codes"), codes)); CODES[t.id] = codes; render();
       }
     },
+    // only the fields a change touched (race-comp-fields): another organiser's change to other fields stays
+    updateTournament(tid, patch) { return track(updateDoc(doc(db, "tournaments", tid), fieldPatch(patch))); },
     async deleteTournament(tid) {
       if (!isAdmin()) throw Object.assign(new Error("Only the admin can delete competitions."), { code: "permission-denied" }); // never half-delete
       // games go in batches (up to 450 per request) rather than one request per game
@@ -129,16 +131,20 @@ function fbStore() {
     setLive(tid, mid, L) { return track(setDoc(doc(db, "tournaments", tid, "live", mid), clone(L))); },
     setMatch(tid, m) { return track(setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m))); },
     // a draw: all its games and the competition in one batch (Firestore allows 500 writes per batch; the competition goes in the last one)
-    async setMatches(tid, list, t) {
+    // patch: the competition's changed fields only (an update), else the whole competition
+    async setMatches(tid, list, t, patch) {
       const ops = list.map(m => [doc(db, "tournaments", tid, "matches", m.id), clone(m)]);
-      if (t) { const body = clone(t); delete body._new; body.updated = Date.now(); ops.push([doc(db, "tournaments", t.id), body]); }
-      for (let i = 0; i < ops.length; i += 500) { const b = writeBatch(db); ops.slice(i, i + 500).forEach(([r, d]) => b.set(r, d)); await track(b.commit()); }
+      if (t && patch) ops.push([doc(db, "tournaments", t.id), fieldPatch(patch), true]);
+      else if (t) { const body = clone(t); delete body._new; body.updated = Date.now(); ops.push([doc(db, "tournaments", t.id), body]); }
+      for (let i = 0; i < ops.length; i += 500) { const b = writeBatch(db); ops.slice(i, i + 500).forEach(([r, d, upd]) => upd ? b.update(r, d) : b.set(r, d)); await track(b.commit()); }
     },
     updateMatch(tid, id, patch) { return track(updateDoc(doc(db, "tournaments", tid, "matches", id), clone(patch))); },
     deleteMatch(tid, id) { return track(deleteDoc(doc(db, "tournaments", tid, "matches", id))); }
   };
 }
 
+// a field update for Firestore: a field that's gone is deleted
+const fieldPatch = p => Object.fromEntries(Object.entries(p).map(([k, v]) => [k, v === undefined ? deleteField() : clone(v)]));
 // matches as the app uses them: a proposal's server timestamp becomes milliseconds (an estimate until the server confirms it)
 const matchData = d => { const m = d.data({ serverTimestamps: "estimate" }); const at = m.proposal?.at; if (at && typeof at.toMillis === "function") m.proposal.at = at.toMillis(); return m; };
 const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);

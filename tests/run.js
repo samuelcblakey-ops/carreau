@@ -368,6 +368,8 @@ const SUITES = {
     'web-early-load.js': [/spectator before sign-in: Early Bird Open \| signed in yet false/, /spectator after sign-in: true Early Bird Open$/m,
       /organiser during sign-in tab: setup/, /organiser after sign-in: setup \| Early Bird Open \| setup tab true/, /no link lands on: Early Bird Open \| home false/, /errs \[\]/],
     'web-theme.js': [/organiser colour: #b3261e/, /organiser logo: WROTE/, /bad logo refused: permission-denied/, /follower sees: #b3261e \| logo true/, /follower writes logo: permission-denied/, /follower has no look panel: true/, /errs \[\]/],
+    'web-race-edits.js': [/setup and check-in together, 5 tries: both kept 5 of 5/, /late check-in during the draw: kept true \| round 1 games 6/,
+      /offline setup change after sync: kept true \| B's check-in kept true/, /^errs \[\]$/m],
     'web-offline.js': [/online light: live Live/, /offline light: off Offline/, /offline save closes at once: true \| score shown: true 13-5/, /waiting light: off Offline · \d+ waiting to sync/, /three waiting: off Offline · 3 waiting to sync/, /offline reload: Offline · 3 waiting/,
       /offline reopen: New competition \| score kept: true 13-5/, /back online light: live Live/, /back online: Live \| waiting 0/, /other device sees it: true 13-5/, /errs \[\]/],
     'web-organiser-login.js': [/admin panel: Organiser login OFF/, /off: visitor new button true/, /off: login page: .*isn't switched on yet/, /code made: true \| link: true/, /codes listed: true/, /live pill: LIVE/,

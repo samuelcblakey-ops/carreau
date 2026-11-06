@@ -2393,11 +2393,30 @@ function handleWriteError(e) {
   toast("That change didn't save. Check your connection and try again.");
 }
 async function guard(fn) { try { return await fn(); } catch (e) { handleWriteError(e); } }
-async function saveT(t) { t.updated = Date.now(); S.tournaments[t.id] = t; render(); await S.store.setTournament(t); }
+// The top-level fields of a competition that changed from the copy the change was made from (a field that's gone: undefined).
+// The website saves only these, so two organisers changing different things at the same moment both keep their change.
+function changedFields(base, t) {
+  const p = {};
+  for (const k of new Set([...Object.keys(base), ...Object.keys(t)])) {
+    if (k === "_new") continue;
+    if (!(k in t)) p[k] = undefined; else if (JSON.stringify(base[k]) !== JSON.stringify(t[k])) p[k] = t[k];
+  }
+  p.updated = t.updated; return p;
+}
+// the field update needs the copy this change was made from: every caller passes a clone, so S.tournaments still holds it here
+const fieldBase = t => { const base = S.tournaments[t.id]; return S.store.updateTournament && !t._new && base && base !== t ? base : null; };
+async function saveT(t) {
+  const base = fieldBase(t); t.updated = Date.now(); S.tournaments[t.id] = t; render();
+  if (base) await S.store.updateTournament(t.id, changedFields(base, t)); else await S.store.setTournament(t);
+}
 // games (and, for a draw, the competition) in one write where the store can (the website: a batch), so no screen ever shows part of a round
 async function writeMatches(list, t) {
   list.forEach(m => S.matches[m.id] = m);
-  if (S.store.setMatches && !t?._new) { if (t) { t.updated = Date.now(); S.tournaments[t.id] = t; render(); } return S.store.setMatches(S.tid, list, t); }
+  if (S.store.setMatches && !t?._new) {
+    let patch = null;
+    if (t) { const base = fieldBase(t); t.updated = Date.now(); if (base) patch = changedFields(base, t); S.tournaments[t.id] = t; render(); }
+    return S.store.setMatches(S.tid, list, t, patch);
+  }
   const games = (async () => { for (let i = 0; i < list.length; i += 20) await Promise.all(list.slice(i, i + 20).map(m => S.store.setMatch(S.tid, m))); })();
   await Promise.all([games, t && saveT(t)]);
 }
