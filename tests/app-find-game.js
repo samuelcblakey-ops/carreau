@@ -31,6 +31,22 @@ const { chromium } = require('playwright');
     q('[data-act="st-cols"]').click(); await w(60); L.push('all columns: ' + vis());
     // forget me
     q('[data-tab="draw"]').click(); await w(40); q('[data-act="find-clear"]').click(); await w(80); L.push('cleared: ' + !!q('#find-q'));
+    const find = async name => { const i = q('#find-q'); i.value = name; i.dispatchEvent(new Event('input', { bubbles: true })); await w(60); const r = q('#find-results .find-row .who'); return r ? r.innerText.replace(/\s+/g, ' ') : 'none'; };
+    // a team with the bye in round 1 (5 teams)
+    document.activeElement?.blur(); q('[data-act="new-t"]').click(); await w(60); const t2 = JSON.parse(JSON.stringify(C.T()));
+    Object.assign(t2, { name: 'Bye', system: 'swiss', checkin: false, swissRounds: 3 });
+    ['Golf', 'Hotel', 'India', 'Juliet', 'Kilo'].forEach((n, i) => t2.teams.push({ id: 'b' + i, name: n, players: ['Sam ' + n], active: true }));
+    await S.store.setTournament(t2); S.tournaments[t2.id] = t2; await w(30);
+    q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300);
+    const bye = C.MS().find(m => m.bye); const byeName = t2.teams.find(e => e.id === bye.a[0]).name;
+    L.push('bye team in round 1: ' + (await find(byeName)).replace(/^.*?(Bye this round\.|No game drawn yet\.).*$/, '$1'));
+    // last game in French: back on the first competition, round 2 played 13–7, no round 3 yet
+    document.activeElement?.blur(); S.tid = t.id; S.matches = {}; C.watchMatches ? C.watchMatches() : 0; C.render(); await w(100); q('[data-tab="draw"]').click(); await w(60);
+    for (const m of C.MS().filter(m => m.a && m.b && !m.done && !m.bye)) await C.recordResult(m.id, 13, 7, true);
+    await w(60); C.render(); await w(40);
+    const r2 = C.MS().find(m => m.round === 2 && !m.bye); const winner = C.T().teams.find(e => e.id === r2.a[0]).name;
+    q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80);
+    const fr = await find(winner); L.push('fr last game: ' + (fr.match(/Dernière partie.*/) || [fr])[0]);
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); }
     return L; });
   console.log(out.join('\n')); await p.screenshot({ path: process.env.OUT + '/find-game.png' }); console.log('errs', errs); await b.close();
