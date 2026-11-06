@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
   await A.click('[data-act="new-t"]'); await w(2500);
   const tid = await A.evaluate(() => location.hash.slice(1));
   await A.click('[data-act="wiz-skip"]'); await w(800); await A.click('[data-tab="entries"]'); await w(400); // a new competition opens on the quick setup
-  await A.fill('#bulk', 'Club Pins\nCarreau Vents\nGravier Collines\nMistral Lions'); await A.click('#bulk-form button[type=submit]'); await w(1200);
+  await A.fill('#bulk', 'Club Pins\nCarreau Vents\nGravier Collines\nMistral Lions\nBoule Rouge\nPointeurs Sud'); await A.click('#bulk-form button[type=submit]'); await w(1200);
   await A.click('[data-act="checkin-all"]'); await w(800);
   await A.click('[data-tab="draw"]'); await w(500); await A.click('[data-act="first-draw"]'); await w(2500);
   log('online light:', await dot(A));
@@ -27,12 +27,20 @@ const { chromium } = require('playwright');
   await A.waitForFunction(() => !window.__carreau.S.modal, null, { timeout: 5000 }).catch(() => {});
   log('offline save closes at once:', Date.now() - t0 < 2500, '| score shown:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb; }, mid));
   log('waiting light:', await dot(A));
+  // two more scores with no signal: 3 waiting, and still 3 after reopening the app offline
+  for (const id of await A.evaluate(mid => window.__carreau.MS().filter(m => m.a && m.b && !m.bye && !m.done && m.id !== mid).slice(0, 2).map(m => m.id), mid)) {
+    await A.click(`[data-match="${id}"]`); await w(300); await A.click('[data-act="qlose"][data-k="sb"][data-n="7"]'); await A.waitForFunction(() => !window.__carreau.S.modal, null, { timeout: 5000 }).catch(() => {}); await w(300);
+  }
+  log('three waiting:', await dot(A));
   // reopen the app with no signal: served from the phone's copy
   await A.reload(); await w(5000);
+  log('offline reload:', (await dot(A)).replace(/^off /, ''));
+  await A.screenshot({ path: process.env.OUT + '/offline-reload-390.png' });
   log('offline reopen:', await A.evaluate(() => document.querySelector('.picker-btn .pb-name')?.textContent || 'none'), '| score kept:', await A.evaluate(id => { const m = window.__carreau?.S.matches[id]; return m ? m.done + ' ' + m.sa + '-' + m.sb : 'none'; }, mid));
   // signal back: the queued score syncs
   await A.context().setOffline(false); await w(6000);
   log('back online light:', await dot(A));
+  log('back online:', (await dot(A)).replace(/^live /, ''), '| waiting', await A.evaluate(() => +localStorage.getItem('carreau-waiting')));
   const B = await mk('spectator'); await B.goto(base + '#' + tid); await w(5000);
   log('other device sees it:', await B.evaluate(id => { const m = window.__carreau.S.matches[id]; return m ? m.done + ' ' + m.sa + '-' + m.sb : 'none'; }, mid));
   log('errs', JSON.stringify(errs.filter(e => !/net::|Failed to fetch|offline|Could not reach/i.test(e))));
