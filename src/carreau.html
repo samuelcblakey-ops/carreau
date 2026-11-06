@@ -1551,21 +1551,25 @@ function teamPanel(t) {
   const me = myTeam(t); if (!me || !teamScoring(t)) return "";
   const mine = MS().filter(m => inMatch(m, me) && !m.bye).sort(byOrder);
   const cur = mine.find(m => !m.done && m.a && m.b);
-  const p = cur?.proposal; const opp = cur ? sideName(t, (cur.a || []).includes(me) ? cur.b : cur.a) : "";
-  const iAmA = cur && (cur.a || []).includes(me);
-  const sc = p ? (iAmA ? `${p.sa}–${p.sb}` : `${p.sb}–${p.sa}`) : "";
-  let body;
-  if (!cur) body = `<p class="muted">No game for you right now. Your next game appears here as soon as it's drawn.</p>`;
-  else {
+  // EuroCup: a club plays several games of a tie at once, so every one of them on a piste gets its own card
+  const onPiste = cur && isEuro(t) ? mine.filter(m => !m.done && m.a && m.b && m.round === cur.round && m.court) : [];
+  const cards = onPiste.length ? onPiste : cur ? [cur] : [];
+  const card = cur => {
+    const p = cur.proposal; const opp = sideName(t, (cur.a || []).includes(me) ? cur.b : cur.a);
+    const iAmA = (cur.a || []).includes(me);
+    const sc = p ? (iAmA ? `${p.sa}–${p.sb}` : `${p.sb}–${p.sa}`) : "";
+    let body;
     const where = `<div class="small muted">${esc(matchContext(t, cur))}${cur.court ? ` · Piste ${esc(courtName(t, cur.court))}` : " · waiting for a piste"}</div>`;
     const head = `<div><b>v ${esc(opp)}</b>${where}</div>`;
     if (!p || p.status === "applied" || p.status === "auto") body = `<div class="spread">${head}<button class="btn primary" data-act="team-score" data-id="${cur.id}">Enter score</button></div>`;
     else if (p.status === "pending" && p.by === me) body = `<div class="spread">${head}<span class="pill playing">You sent ${sc}</span></div><p class="small muted">Waiting for ${esc(opp)} to confirm${t.scoreMode === "teams-auto" ? ` (it counts automatically after ${autoMinutes(t)} minutes)` : ""}. <button class="btn sm ghost" data-act="team-score" data-id="${cur.id}">Change</button></p>`;
     else if (p.status === "pending") body = `<div class="stack" style="gap:8px">${head}<div class="notice"><b>${esc(opp)} entered ${sc}</b> (your score first). Is that right?</div>
-      <div class="row"><button class="btn primary" data-act="team-confirm" data-id="${cur.id}">Confirm</button><button class="btn" data-act="team-dispute" data-id="${cur.id}">Dispute</button></div></div>`;
+        <div class="row"><button class="btn primary" data-act="team-confirm" data-id="${cur.id}">Confirm</button><button class="btn" data-act="team-dispute" data-id="${cur.id}">Dispute</button></div></div>`;
     else if (p.status === "confirmed") body = `<div class="spread">${head}<span class="pill done">Confirmed ${sc}</span></div><p class="small muted">The score is going up on the board.</p>`;
     else body = `<div class="spread">${head}<span class="pill">Disputed</span></div><p class="small muted">The organiser will settle this score. Please see the desk.</p>`;
-  }
+    return body;
+  };
+  const body = cards.length ? cards.map(m => `<div class="stack team-game" style="gap:8px">${card(m)}</div>`).join("") : `<p class="muted">No game for you right now. Your next game appears here as soon as it's drawn.</p>`;
   const done = mine.filter(m => m.done).slice(-3).reverse();
   return `<div class="panel stack team-panel" style="gap:10px;border-color:var(--accent);margin-bottom:16px"><div><div class="eyebrow">My team</div><h3>${esc(entName(t, me))}</h3></div>${body}
     ${done.length ? `<div class="small muted">${done.map(m => { const a = (m.a || []).includes(me); const won = winnerSide(m)?.includes(me); return `${won ? "Won" : "Lost"} ${a ? m.sa : m.sb}–${a ? m.sb : m.sa} v ${esc(sideName(t, a ? m.b : m.a) || "bye")}`; }).join(" · ")}</div>` : ""}</div>`;
