@@ -87,6 +87,23 @@ const { chromium } = require('playwright');
     for (let k = 0; k < 4; k++) { const open = C.MS().filter(m => m.a && m.b && !m.done && m.bracket === 'A'); if (!open.length) break; for (const m of open) { const aw = num(m.a) < num(m.b); await C.recordResult(m.id, aw ? 13 : 2, aw ? 2 : 13, true); } await w(150); }
     L.push(`main done: ready ${res().ready} | ${show(res())}`);
 
+    // 2b. Swiss with afternoon knockouts planned: the Draw & results panel waits for the final, and updating the
+    // morning entry after the knockouts starts with the knockout ticked
+    await mk({ system: 'swiss', swissRounds: 1, name: 'Swiss cup' }, 4);
+    await C.savePlan(pl => { pl.brackets = [{ id: 'A', name: 'Final', from: 1, to: 2, third: false }]; }); await w(100);
+    await playAll(); q('[data-tab="standings"]').click(); await w(100); q('[data-tab="draw"]').click(); await w(200);
+    L.push(`swiss with knockout planned, morning done: draw panel shows publish ${!!q('.hof-top [data-act="hof-open"]')} | standings ready ${res().ready}`);
+    q('[data-tab="standings"]').click(); await w(150); q('[data-hof-panel] [data-act="hof-open"]').click(); await w(150);
+    q('#modal [data-act="hof-save"]').click(); await w(250);
+    L.push(`morning published: ${(S.hof[C.T().id]?.parts || []).map(x => x.id).join(',')}`);
+    await C.startKnockouts(); await w(300); q('[data-tab="draw"]').click(); await w(150);
+    L.push(`knockouts drawn: draw panel shows publish ${!!q('.hof-top [data-act="hof-open"]')}`);
+    await playAll(); q('[data-tab="standings"]').click(); await w(100); q('[data-tab="draw"]').click(); await w(200);
+    L.push(`after the final: draw panel shows publish ${!!q('.hof-top [data-act="hof-open"]')}`);
+    q('.hof-top [data-act="hof-open"]').click(); await w(150);
+    const koBox = q('#modal [data-hof="part"][data-id="ko-A"]'); q('#modal [data-act="hof-save"]').click(); await w(250);
+    L.push(`update after knockouts: knockout ticked ${!!koBox?.checked} | saved ${!q('#modal .modal') && (S.hof[C.T().id]?.parts || []).some(x => x.id === 'ko-A')} | ${txt(q('#toast'))}`);
+
     // 3. round robin
     await mk({ system: 'roundrobin', name: 'RR' }, 4); await playAll(); L.push(`round robin: ready ${res().ready} | ${show(res())}`);
 

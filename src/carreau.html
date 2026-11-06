@@ -2786,8 +2786,16 @@ function hofPanel(t, where) {
     ${e.levelSetBy === "admin" && !e.hidden ? `<div class="small muted">The site admin set the level. It stays the same when you update the entry.</div>` : ""}</div>`;
 }
 // top of Draw & results: once the final's score is in and it isn't published yet (or the result has changed since)
+// with afternoon knockouts planned, wait for the knockouts' last final (the morning leader isn't the winner)
+function hofKoWait(t, r) {
+  if (!t.koPlan || !PLAN_SYSTEMS.includes(t.system)) return false;
+  const brs = t.brackets || []; if (!brs.length) return true;
+  const ids = getPlan(t).brackets.map(b => b.id).filter(id => brs.some(b => b.id === id));
+  const last = ids.length ? ids[ids.length - 1] : brs[brs.length - 1].id;
+  return !r.parts.some(p => p.id === "ko-" + last && p.done);
+}
 function hofDrawPanel(t) {
-  if (!hofCan(t) || t.archived || !hofResult(t).ready) return "";
+  if (!hofCan(t) || t.archived) return ""; const r0 = hofResult(t); if (!r0.ready || hofKoWait(t, r0)) return "";
   const e = S.hof?.[t.id]; if (e === undefined) return "";
   if (e) { const r = hofResult(t); if (e.hidden || e.sig === hofSig(r.parts.filter(p => (e.parts || []).some(x => x.id === p.id)))) return ""; }
   return hofPanel(t, "draw").replace('class="panel ', 'class="panel hof-top ');
@@ -2795,7 +2803,8 @@ function hofDrawPanel(t) {
 function renderDrawPage(t) { const p = hofDrawPanel(t); return p ? `<div class="hof-top-wrap">${p}</div>` + renderDraw(t) : renderDraw(t); }
 function hofOpen(t) {
   const e = S.hof?.[t.id] || null; const r = hofResult(t);
-  const parts = {}; r.parts.forEach(p => parts[p.id] = p.done && (!e || (e.parts || []).some(x => x.id === p.id)));
+  const kept = !!e && r.parts.some(p => (e.parts || []).some(x => x.id === p.id)); // none of the entry's parts left (e.g. Swiss → knockouts): tick every finished part
+  const parts = {}; r.parts.forEach(p => parts[p.id] = p.done && (!kept || (e.parts || []).some(x => x.id === p.id)));
   S.modal = { hof: true, tid: t.id, level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: e?.region || "", note: e?.note || "", parts, err: "", busy: false };
   renderModal();
 }
