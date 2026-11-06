@@ -26,6 +26,8 @@ const { chromium } = require('playwright');
   log('competition registered:', await A.evaluate(() => window.__carreau.S.teamScoringOn(window.__carreau.T())), '| organiser still no choice:', !(await has(A, '[data-set="scoreMode"]')));
   await AD.click('[data-act="team-links-make"]'); await w(1500);
   const links = await AD.evaluate(() => Object.fromEntries([...document.querySelectorAll('#team-links input[id^="tl-"]')].map(i => [i.id.slice(3), i.value])));
+  await A.click('[data-tab="draw"]'); await w(200); await A.click('[data-tab="setup"]'); await w(500);
+  const editLink = await A.inputValue('#share-edit');
   log('team links:', Object.keys(links).length);
   // per-team QR code: shown on its own, encodes that team's link, hides again
   const firstTeam = Object.keys(links)[0];
@@ -43,6 +45,14 @@ const { chromium } = require('playwright');
   await T1.click('.team-panel [data-act="team-score"]'); await w(300);
   await T1.click('[data-act="qlose"][data-k="sb"][data-n="7"]'); await w(1500);
   log('proposal pending:', await T1.evaluate(id => JSON.stringify((({ sa, sb, status }) => ({ sa, sb, status }))(window.__carreau.S.matches[id].proposal || {})), g1.id));
+  // the owner taps a team's link on their own phone: it stays the organiser's phone
+  const roleOf = p => p.evaluate(() => { const C = window.__carreau, t = C.T(); return C.S.permFn(t).edit && !C.S.myTeam(t) ? 'organiser' : C.S.myTeam(t) ? 'team' : 'viewer'; });
+  const NOTICE = "You run this competition, so this phone stays an organiser. Open the team link on the team's phone.";
+  await A.goto(links[g1.b]); await w(1500);
+  const aToast = await A.textContent('#toast'); await A.click('[data-tab="draw"]'); await w(500);
+  log('owner opens team link: role', await roleOf(A), '| to check shown', await has(A, '.check-panel'), '| notice shown', aToast.includes(NOTICE));
+  if (process.env.OUT) await A.screenshot({ path: process.env.OUT + '/owner-team-link.png' });
+  await AD.evaluate(() => { location.hash = 'admin'; }); await w(1500); // only the owner's phone is left to publish
   const sec = await T1.evaluate(async ([g1, g2]) => { const C = window.__carreau, S = C.S, t = C.T(); const out = [];
     try { await S.store.updateMatch(t.id, g1, { sa: 13, sb: 0, done: true }); out.push('result WROTE'); } catch (e) { out.push('result ' + e.code); }
     try { await S.teamRespond(t, S.matches[g1], 'confirmed'); out.push('self-confirm WROTE'); } catch (e) { out.push('self-confirm ' + e.code); }
@@ -54,7 +64,17 @@ const { chromium } = require('playwright');
   await T2.screenshot({ path: process.env.OUT + '/team-confirm.png' });
   await T2.click('[data-act="team-confirm"]'); await w(4000);
   log('organiser screen published:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb + ' ' + m.proposal.status; }, g1.id));
+  log("team proposes, other team confirms: published by the owner's phone", await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done === true && m.proposal.status === 'applied'; }, g1.id));
+  await AD.evaluate(id => { location.hash = id; }, tid); await w(2000);
   await w(1500); log('team sees result:', (await T1.textContent('.team-panel')).replace(/\s+/g, ' ').includes('Won 13–7'));
+  // a phone with the organiser link opens a team link: it can still edit
+  const O = await mk('organiserLink', 390); await O.goto(editLink); await w(4500);
+  await O.goto(links[g2.b]); await w(1500);
+  const oToast = await O.textContent('#toast');
+  if (process.env.OUT) await O.screenshot({ path: process.env.OUT + '/organiser-link-team-link.png' });
+  await O.click('[data-tab="draw"]'); await w(500);
+  log('organiser-link phone opens team link: can still edit', (await roleOf(O)) === 'organiser' && await has(O, '[data-tab="setup"]'), '| notice', oToast.includes(NOTICE));
+  await O.context().close();
   // dispute on game 2
   const T3 = await mk('teamC', 390); await T3.goto(links[g2.a]); await w(4500);
   await T3.click('.team-panel [data-act="team-score"]'); await w(300);

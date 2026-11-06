@@ -373,8 +373,17 @@ function openCodeBox() {
 function closeCodeBox() { document.getElementById("modal").innerHTML = ""; }
 document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "code-input") { e.preventDefault(); document.querySelector('[data-act="code-submit"]')?.click(); } });
 
+// a phone that already runs the competition (owner, organiser link or code, admin) keeps that role when it opens a team link
+async function runsComp(tid) {
+  if (isAdmin() || ROLE[tid] === "edit") return true;
+  let t = S.tournaments[tid];
+  if (!t) { try { const d = await getDocFromServer(doc(FB.db, "tournaments", tid)); t = d.exists() ? d.data() : null; } catch {} }
+  if (t && ((isOwner(t) && !loginMode()) || (orgActive() && !!t.orgCode && t.orgCode === ORG.code))) return true;
+  try { const d = await getDocFromServer(doc(FB.db, "tournaments", tid, "members", AUTH.user.uid)); return d.exists() && d.data().role === "edit"; } catch { return false; }
+}
 async function joinTeam(tid, teamId, code) {
   const ref = doc(FB.db, "tournaments", tid, "members", AUTH.user.uid);
+  if (await runsComp(tid)) { S.tab = "draw"; render(); toast("You run this competition, so this phone stays an organiser. Open the team link on the team's phone."); return true; }
   try { await setDoc(ref, { role: "team", teamId, code, joinedAt: Date.now() }); TEAM[tid] = teamId; remember(tid); restart(); S.tab = "draw"; render();
     const t = S.tournaments[tid]; const nm = t?.teams?.find(e => e.id === teamId)?.name; toast(`This phone now enters scores for ${nm || "your team"}.`); return true; }
   catch (e) { console.error(e); toast("That team link didn't work. Ask the organiser for a new one."); return false; }
