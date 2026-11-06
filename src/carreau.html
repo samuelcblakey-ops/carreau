@@ -1220,7 +1220,7 @@ function frCompile() {
   const exact = {}, re = [];
   for (const [k, v] of Object.entries(I18N.lang === "fr" ? FR_TEXT : LANG_TEXT[I18N.lang] || {})) {
     if (/\{[nx]\}/.test(k)) {
-      const src = k.replace(/[.*+?^$()|[\]\\]/g, "\\$&").replace(/\{n\}/g, "([+\\-−]?\\d+)").replace(/\{x\}/g, "(.+?)");
+      const src = k.replace(/[.*+?^$()|[\]\\]/g, "\\$&").replace(/\{n\}/g, "([+\\-−]?\\d+)").replace(/\{x\}/g, "((?:(?! · ).)+?)"); // {x} never spans a " · ", so a line of parts translates part by part
       re.push([new RegExp("^" + src + "$"), v, k.replace(/\{[nx]\}/g, "").length]);
     } else exact[k] = v;
   }
@@ -2355,7 +2355,7 @@ function koChangedBy(t, m) {
   const prev = S.matches[m.id]; const before = key();
   S.matches[m.id] = m; try { return key() !== before; } finally { S.matches[m.id] = prev; }
 }
-// recordResult returns true when saved, or { blocked: [descriptions] } when a correction would change
+// recordResult returns true when saved, or { blocked: [{ ctx, game }] } when a correction would change
 // later games that are already finished (call again with { override: true } to reset those games).
 async function recordResult(id, sa, sb, done, opts = {}) {
   const t = T(); const prev = S.matches[id]; const m = clone(prev);
@@ -2382,7 +2382,7 @@ async function recordResult(id, sa, sb, done, opts = {}) {
   if (blocked.length) { toast("This result has already moved two rounds on, so it can't be corrected here."); return false; }
   // a morning result corrected after the knockouts were drawn from its standings: ask before saving
   const ko = wasDone && !opts.override && koChangedBy(t, m);
-  if ((resets.length || ko) && !opts.override) return { blocked: resets.map(r => `${matchContext(t, r)}: ${sideName(t, r.a) || "?"} ${r.sa ?? ""}–${r.sb ?? ""} ${sideName(t, r.b) || "?"}`), ko };
+  if ((resets.length || ko) && !opts.override) return { blocked: resets.map(r => ({ ctx: matchContext(t, r), game: `${sideName(t, r.a) || "?"} ${r.sa ?? ""}–${r.sb ?? ""} ${sideName(t, r.b) || "?"}` })), ko };
   if (resets.length && !overrideAllowed(prev)) { toast("Only the current and previous round can be corrected."); return false; }
   const patch = { sa, sb, done, finishedAt: m.finishedAt || null };
   if (opts.win !== undefined) patch.win = opts.win || null;
@@ -3057,7 +3057,7 @@ function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
     ${ko ? `<span>The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.</span>` : ""}
     ${list.length ? `<span>These later games were already played and will be reset so they can be replayed or re-entered:</span>
-    <ul style="margin:0;padding-left:18px">${list.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    <ul style="margin:0;padding-left:18px">${list.map(x => `<li><span>${esc(x.ctx)}</span>: <span data-notr>${esc(x.game)}</span></li>`).join("")}</ul>` : ""}
     ${canEdit() ? `<div class="row"><button class="btn danger" data-act="override">${list.length ? "Override and reset these games" : "Save anyway"}</button><button class="btn" data-act="close">Cancel</button></div>` : `<span class="small">Ask the organiser to make this correction.</span>`}</div>`;
 }
 
