@@ -62,6 +62,20 @@ const { chromium } = require('playwright');
     location.hash = 'streams'; await w(150); L.push('list: ' + qa('.erow .who b').map(e => e.textContent).join(' | '));
     location.hash = `s.${sid}`; await w(150); q('[data-act="strm-del"]').click(); await w(40); q('[data-act="strm-del-yes"]').click(); await w(150);
     L.push('deleted: ' + !S.streams[sid] + ' ' + location.hash);
+    // 8a. the desk and overlay say mènes (English) and keep each language's own word (French)
+    try {
+    location.hash = 'streams'; await w(150); q('[data-act="strm-new"]').click(); await w(200); const s2 = location.hash.split('.')[1]; await set('[data-sfield="label"]', 'Friendly');
+    location.hash = `s.${s2}.desk`; await w(150);
+    L.push('desk: ' + q('.desk .small.muted[style]').textContent + ' | label ' + q('.dk-mid .eyebrow').innerText);
+    for (const n of [2, 1]) { q('[data-act="lv-win"][data-side="a"]').click(); await w(40); q(`[data-act="lv-pts"][data-n="${n}"]`).click(); await w(80); }
+    location.hash = `s.${s2}.stream?o=l`; await w(150); const bar = q('.ov-lbl').textContent;
+    location.hash = `s.${s2}.stream?parts=line&o=p`; await w(150);
+    L.push('overlay: ' + (q('.ov-line').textContent.match(/\S+ \d+ ·/) || ['none'])[0].replace(/ ·$/, '') + ' | bar label ' + bar);
+    const lang = async l => { const bt = document.createElement('button'); bt.dataset.lang = l; document.body.appendChild(bt); bt.click(); await w(120); bt.remove(); };
+    location.hash = `s.${s2}.desk`; await w(150); await lang('fr');
+    L.push('fr desk: ' + q('.dk-mid .eyebrow').textContent + ' | ' + q('.desk .small.muted[style]').textContent);
+    await lang('en'); location.hash = 'streams'; await w(150);
+    } catch (e) { L.push('ERR ' + e.message); }
     // 8. a competition game's overlay hides the footer too
     q('[data-act="new-t"]').click(); await w(60); const t = JSON.parse(JSON.stringify(C.T()));
     Object.assign(t, { name: 'Overlay test', system: 'swiss', format: 'doubles', checkin: false, swissRounds: 3, wizard: false });
