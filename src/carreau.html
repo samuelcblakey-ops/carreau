@@ -169,7 +169,7 @@ label.f,.fields>*{min-width:0}
 .court-tag{font-family:var(--display);font-weight:700;font-size:14px;color:var(--ink);letter-spacing:.03em}
 .tbd{color:var(--muted);font-style:italic}
 /* tables */
-.tw{overflow-x:auto}
+.tw{overflow-x:auto;position:relative}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
@@ -4398,7 +4398,7 @@ function renderDraw(t) {
 // EuroCup: who has won the tie (decided once a club passes half the points), or the points needed to win it
 function euroTieTag(t, f, fm) {
   const s = euroTieState(fm.filter(m => m.eu), true);
-  return s.won || s.lost ? `<span class="pill done"><span data-notr>${esc(clubName(t, s.won ? f.a : f.b))}</span> <span>win the tie</span></span>` : s.level ? `<span class="pill">Level</span>` : `<span class="small muted">First to ${s.mark}</span>`;
+  return s.won || s.lost ? `<span class="pill done wrap"><span data-notr>${esc(clubName(t, s.won ? f.a : f.b))}</span> <span>win the tie</span></span>` : s.level ? `<span class="pill">Level</span>` : `<span class="small muted">First to ${s.mark}</span>`;
 }
 // EuroCup: each leg of a tie (triples, doubles, singles) with its line-ups button
 
