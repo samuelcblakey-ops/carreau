@@ -77,6 +77,15 @@ const { chromium } = require('playwright');
     document.querySelector('[data-act="archive"]').click(); await w(40); document.querySelector('[data-act="archive-yes"]').click(); await w(100);
     log.push('archived visible locally: '+!!C.S.tournaments[C.S.tid]+' banner: '+document.querySelector('main').innerText.slice(0,60).replace(/\s+/g,' '));
     document.querySelector('main [data-act="restore"]').click(); await w(80); log.push('restored: '+(C.T().archived===false));
+    // 7. switching the system before any knockout is drawn resets the knockout plan
+    await mk({system:'swiss', name:'Plan reset'}, 16);
+    document.querySelector('[data-tab="setup"]').click(); await w(60);
+    [...document.querySelectorAll('[data-act="plan-preset"]')].find(x=>/Plate/.test(x.textContent)).click(); await w(80);
+    const pr = b => JSON.stringify(b.map(x=>[x.name,x.from,x.to]));
+    const before = pr(C.getPlan(C.T()).brackets);
+    document.querySelector('[data-set="system"][data-val="pools"]').click(); await w(80);
+    const t9 = C.T(), after = pr(C.getPlan(t9).brackets);
+    log.push('plan before '+before+' after '+after); log.push('swiss top8+plate then barrage: plan is '+(t9.system==='pools'&&!t9.koPlan&&/B knockout/.test(after)?'barrage default':'kept'));
     } catch(e) { log.push('ERR '+e.message+' | modal: '+document.querySelector('#modal').innerText.slice(0,200)+' | main: '+document.querySelector('main').innerText.slice(0,200)); }
     return log;
   });
