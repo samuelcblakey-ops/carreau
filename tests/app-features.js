@@ -77,7 +77,16 @@ const { chromium } = require('playwright');
     document.querySelector('[data-act="archive"]').click(); await w(40); document.querySelector('[data-act="archive-yes"]').click(); await w(100);
     log.push('archived visible locally: '+!!C.S.tournaments[C.S.tid]+' banner: '+document.querySelector('main').innerText.slice(0,60).replace(/\s+/g,' '));
     document.querySelector('main [data-act="restore"]').click(); await w(80); log.push('restored: '+(C.T().archived===false));
-    // 7. CSV export: playing order, readable status, accents kept in the file name, BOM
+    // 7. switching the system before any knockout is drawn resets the knockout plan
+    await mk({system:'swiss', name:'Plan reset'}, 16);
+    document.querySelector('[data-tab="setup"]').click(); await w(60);
+    [...document.querySelectorAll('[data-act="plan-preset"]')].find(x=>/Plate/.test(x.textContent)).click(); await w(80);
+    const pr = b => JSON.stringify(b.map(x=>[x.name,x.from,x.to]));
+    const before = pr(C.getPlan(C.T()).brackets);
+    document.querySelector('[data-set="system"][data-val="pools"]').click(); await w(80);
+    const t9 = C.T(), after = pr(C.getPlan(t9).brackets);
+    log.push('plan before '+before+' after '+after); log.push('swiss top8+plate then barrage: plan is '+(t9.system==='pools'&&!t9.koPlan&&/B knockout/.test(after)?'barrage default':'kept'));
+    // 8. CSV export: playing order, readable status, accents kept in the file name, BOM
     await mk({system:'swiss', swissRounds:2, seeding:'entry', name:"Concours de l'Été à Hitchin", koPlan:{seeding:'seeded', brackets:[{id:'A', name:'Main knockout', from:1, to:4, third:false}]}}, 8);
     document.querySelector('[data-act="first-draw"]').click(); await w(400); await play(m=>m.round===1); await w(200);
     document.querySelector('[data-act="next-round"]').click(); await w(250); await play(m=>m.round===2); await w(200);
