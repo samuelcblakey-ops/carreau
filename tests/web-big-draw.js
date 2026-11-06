@@ -6,6 +6,7 @@ const { chromium } = require('playwright');
   const w = ms => new Promise(r => setTimeout(r, ms)); const log = (...a) => console.log(...a);
   const mk = async (n, vw = 1100, vh = 900) => { const c = await b.newContext({ viewport: { width: vw, height: vh } }); await c.addInitScript(() => { window.__CARREAU_EMULATOR = true; }); const p = await c.newPage(); p.on('pageerror', e => errs.push(n + ': ' + e.message)); return p; };
   const A = await mk('organiser'); await A.goto(base); await A.waitForSelector('[data-act="new-t"]', { timeout: 20000 }).catch(e => errs.push('organiser: ' + e.message));
+  await w(3500); // let sign-in and the first snapshots settle before writing, as the other web tests do
   await A.click('[data-act="new-t"]'); await w(2500);
   const tid = await A.evaluate(() => location.hash.slice(1).split('.')[0]);
   const r1 = await A.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms));
