@@ -298,7 +298,7 @@ const SUITES = {
       /visitor cannot read nicknames: true/, /show theirs: true/, /confirm shown: true/,
       /bulk delete toast: 2 competitions deleted\./, /A comps gone, B kept: true/, /A list after delete: 0/, /errs \[\]/,
     ],
-    'web-cleanup.js': [/panel: Clean-up\s*Manual \| true/, /ready: 4 ready to delete\s*Delete 4 now\s*Show list/, /list: true \| keeps: true \| age shown: true/,
+    'web-cleanup.js': [/panel: Clean-up\s*Manual \| true/, /ready: 4 ready to delete\s*Delete 4 now\s*Show list/, /list: true \| keeps: true \| age shown: true/, /future competition kept: true \| past competition still listed: true/, /list shows date: true/, /future kept by Delete now: true/, /future kept by Automatic: true/,
       /confirm: Delete 4 empty competitions for good\?\s*Yes, delete\s*Cancel/, /toast: 3 empty competitions deleted\. 1 kept \(changed since\)\./,
       /deleted: true \| kept: true/, /after: Nothing to tidy right now\. \| Last clean-up .+: 3 deleted\./, /auto on: Clean-up\s*Automatic/,
       /auto: true \| Clean-up: 1 empty competition deleted\. \| Last clean-up .+: 1 deleted \(automatic\)\./, /saved: true true/, /visitor switch: 403/, /errs \[\]/],
