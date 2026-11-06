@@ -16,6 +16,16 @@ const { chromium } = require('playwright');
     L.push('footer fr: ' + (q('[data-act="lang-menu"]').click(), await w(40), q('[data-lang="fr"]').click(), await w(80), q('#foot').textContent.replace(/\s+/g, ' ').trim()) + ' | link ' + q('#foot a').getAttribute('href'));
     L.push('dedication in the footer: ' + !!q('#foot .memorial') + ' | not in the header: ' + !q('header .memorial'));
     L.push('remembered: ' + localStorage.getItem('carreau-lang'));
+    // the header and tabs stay translated after the menus and on the pages that only redraw the main area
+    const hdrOk = () => q('.brand-name small').textContent !== 'Competition desk' && q('[data-tab="entries"] .t-long').textContent !== 'Registration' && !!q('.new-t') && !/New/.test(q('.new-t').textContent);
+    q('[data-act="lang-menu"]').click(); await w(60);
+    L.push(`fr after language menu: header ${q('.brand-name small').textContent} | tabs ${q('[data-tab="entries"] .t-long').textContent}`);
+    q('[data-act="lang-menu"]').click(); await w(60);
+    q('[data-act="theme-menu"]').click(); await w(60); document.body.click(); await w(60);
+    L.push('fr after sun/moon menu closed by an outside tap: header translated ' + hdrOk());
+    location.hash = '#halloffame'; await w(300); L.push('fr hall of fame: header translated ' + hdrOk());
+    location.hash = '#streams'; await w(300); L.push('fr stream a game: header translated ' + hdrOk());
+    location.hash = ''; await w(200);
     q('[data-lang="en"]').click(); await w(60); L.push('back to english: ' + q('.memorial').textContent);
     } catch (e) { L.push('ERR ' + e.message); } return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
