@@ -83,5 +83,24 @@ const { chromium } = require('playwright');
   console.log(`score dialog close button visible over the new-round banner: ${se.close}`);
   const lg = await phone(390, 844, true);
   console.log(`score dialog 390x844 with toast and long names: switch ${lg.seg >= 44 ? '44+' : lg.seg} px`);
+  // 8. undo when a game was waiting: the undone game gets its piste back, the other game waits again
+  { const pp = await b.newPage({ viewport: { width: 400, height: 860 } }); pp.on('pageerror', e => errs.push(e.message));
+    await pp.goto(process.env.APP_URL); await pp.evaluate(() => localStorage.clear()); await pp.reload(); await pp.waitForTimeout(300);
+    const line = await pp.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
+      q('[data-act="new-t"]').click(); await w(60); const t = JSON.parse(JSON.stringify(C.T()));
+      Object.assign(t, { name: 'Undo', system: 'swiss', checkin: false, swissRounds: 3, randomCourts: false, courts: [1, 2, 3].map(i => ({ id: 'c' + i, name: String(i), active: true })) });
+      'ABCDEFGH'.split('').forEach(n => t.teams.push({ id: n, name: 'Team ' + n, players: ['x'], active: true }));
+      await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30);
+      q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300);
+      const games = C.MS().filter(m => m.a && m.b && !m.bye);
+      const on1 = games.find(m => m.court === 'c1'), waiting = games.filter(m => !m.court);
+      if (!on1 || waiting.length !== 1) return `setup wrong: on pistes ${games.filter(m => m.court).length} waiting ${waiting.length}`;
+      q(`[data-match="${on1.id}"]`).click(); await w(60);
+      q('[data-act="qlose"][data-k="sa"][data-n="6"]').click(); await w(200);
+      const took = S.matches[waiting[0].id].court === 'c1';
+      q('[data-act="toast-undo"]').click(); await w(300);
+      const a = S.matches[on1.id], o = S.matches[waiting[0].id];
+      return `undo with a waiting game: piste handed on ${took} | undone game ${a.court ? 'Piste ' + C.T().courts.find(c => c.id === a.court).name : 'waiting'} | other game ${o.court ? 'Piste ' + o.court : 'waiting'}`; });
+    console.log(line); await pp.screenshot({ path: process.env.OUT + '/quick-score-undo-piste.png' }); await pp.close(); }
   console.log('errs', errs); await b.close();
 })();
