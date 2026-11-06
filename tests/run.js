@@ -76,7 +76,7 @@ const SUITES = {
       /dark: dark \| menu closed true \| icon changed true \| saved dark/, /escape closes: true \| focus back true/, /outside click closes: true/, /light: light/,
       /french: Apparence \| Langue/, /setup points to it: true/, /errs \[\]/],
     'app-hall-of-fame.js': [/swiss with knockout planned, morning done: draw panel shows publish false \| standings ready true/, /morning published: standings$/m, /knockouts drawn: draw panel shows publish false/,
-      /after the final: draw panel shows publish true/, /update after knockouts: knockout ticked true \| saved true \| Hall of Fame entry updated\./, /ko before: ready false/, /panel before result: false/, /ko: ready true \| Main knockout Team 0\(P0a\+P0b\) > Team [123]/,
+      /after the final: draw panel shows publish true/, /quick setup swiss, morning done: draw panel shows publish false \| no plan true \| draw knockouts true/, /quick setup swiss, after the final: draw panel shows publish true/, /update after knockouts: knockout ticked true \| saved true \| Hall of Fame entry updated\./, /ko before: ready false/, /panel before result: false/, /ko: ready true \| Main knockout Team 0\(P0a\+P0b\) > Team [123]/,
       /standings panel: Hall of Fame.*Publish to the Hall of Fame/, /setup panel: true/, /draw top: true \| Publish to the Hall of Fame/, /draw top after publishing: false/, /draw top after correction: true/,
       /sheet: Publish to the Hall of Fame \| levels National,Regional,Open\* \| country GB-ENG \| first countries England,Northern Ireland,Scotland,Wales/,
       /sheet parts: Main knockoutWinner Team 0 · P0a, P0bRunner-up Team (\d) · P\1a, P\1b \| public line true/, /regional picked: true \| colour rgb\(31, 95, 168\)/,
