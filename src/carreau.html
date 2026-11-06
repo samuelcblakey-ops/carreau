@@ -288,6 +288,8 @@ input[type=search]{background:var(--surface-2);border:1px solid var(--line);bord
 .guide-video{display:block;width:100%;border-radius:10px;background:#000;aspect-ratio:16/10}
 .modal.guide{max-width:min(1100px,96vw);width:100%}
 .modal{background:var(--surface);border-radius:14px;max-width:520px;width:100%;max-height:calc(100% - 20px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--line)}
+/* every part of a dialog keeps its natural height (a squashed .seg with overflow:hidden vanished on small phones); the dialog scrolls instead */
+.modal>*{flex-shrink:0}
 .scorer{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
 .scorer .who{min-width:0}
 .scorer .who b{display:block;font-size:17px;overflow-wrap:anywhere}
@@ -367,7 +369,9 @@ details.add-more[open]>summary{border-bottom:1px solid var(--line)}details.add-m
 body:has(#modal .modal) .toast{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 body:has(#modal .modal):has(#toast:not([hidden])) .scrim{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .toast-undo{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;min-height:36px}
-.modeseg{display:flex;width:100%;margin-bottom:4px}.modeseg button{flex:1}
+.modeseg{display:flex;width:100%;margin-bottom:4px;flex-shrink:0}.modeseg button{flex:1;min-height:44px}
+/* the new-round banner goes under an open dialog so it never covers the dialog's top or its ✕ */
+body:has(#modal .modal) .roundalert{z-index:45}
 .quick{display:grid;gap:8px}.quick .qbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;min-height:56px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:16px}
 .quick .qbtn.on{border-color:var(--accent);background:var(--accent-soft)}
 .qteam{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
@@ -2650,7 +2654,12 @@ function renderShooting(t) {
 function shootStandings(t) {
   const ms = MS(); let html = "";
   const f = shootRanking(t, "F");
-  if (f.length) html += `<div class="panel stack" style="gap:6px"><h3>Final</h3>${f.every(r => r.done) ? `<div>${MEDAL[1]}<span class="eyebrow">Winner</span> <b>${esc(entName(t, f[0].id))}</b> · ${f[0].total} pts</div>${f[1] ? `<div>${MEDAL[2]}<span class="eyebrow">Runner-up</span> ${esc(entName(t, f[1].id))} · ${f[1].total} pts</div>` : ""}${f[2] ? `<div>${MEDAL[3]}<span class="eyebrow">Third</span> ${esc(entName(t, f[2].id))} · ${f[2].total} pts</div>` : ""}` : `<span class="muted">In progress.</span>`}</div>`;
+  // a level podium place waits for its shoot-out: no Winner/Runner-up for it yet, just the final in points order
+  const fTies = f.length && f.every(r => r.done) ? shootTies(t, "F") : [];
+  const open = new Set(fTies.flatMap(g => g.rows.map((r, k) => g.start + k)));
+  const place = (i, label) => f[i] ? `<div>${open.has(i) ? `<b>${esc(entName(t, f[i].id))}</b>` : `${MEDAL[i + 1]}<span class="eyebrow">${label}</span> ${i ? esc(entName(t, f[i].id)) : `<b>${esc(entName(t, f[i].id))}</b>`}`} · ${f[i].total} pts</div>` : "";
+  const fTieLine = fTies.map(g => `<div class="notice so-alert"><b>Shoot-out needed</b> · <span data-notr>${g.rows.map(r => esc(entName(t, r.id))).join(", ")}</span></div>`).join("");
+  if (f.length) html += `<div class="panel stack" style="gap:6px"><h3>Final</h3>${f.every(r => r.done) ? `${fTieLine}${place(0, "Winner")}${place(1, "Runner-up")}${place(2, "Third")}` : `<span class="muted">In progress.</span>`}</div>`;
   const q = shootRanking(t, "Q");
   if (!q.length) return html + `<div class="empty">Standings appear once the qualifying round starts.</div>`;
   return html + `<div class="panel"><div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n x" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
@@ -4994,8 +5003,8 @@ document.addEventListener("input", e => {
   if (e.target.dataset?.hof && S.modal?.hof) { hofInput(e.target); return; }
   if (e.target.id === "hof-q") { hofPage().q = e.target.value; hofPaint(); return; }
   if (e.target.id === "picker-q") {
-    const q = e.target.value.trim().toLowerCase(); let n = 0;
-    document.querySelectorAll(".pick-row").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
+    const q = hofNorm(e.target.value.trim()); let n = 0;
+    document.querySelectorAll(".pick-row[data-id]").forEach(r => { r.hidden = !!q && !hofNorm(r.dataset.name).includes(q); if (!r.hidden) n++; });
     document.querySelectorAll(".pick-group").forEach(g => g.hidden = !g.querySelector(".pick-row:not([hidden])"));
     const none = document.querySelector(".pick-none"); if (none) none.hidden = n > 0; return;
   }
@@ -5047,7 +5056,7 @@ document.addEventListener("submit", async e => {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && (S.langMenu || S.themeMenu)) { const was = S.themeMenu ? ".theme-btn" : ".lang-btn"; S.langMenu = S.themeMenu = false; renderHeader(); localize($("header.app")); $(was)?.focus(); return; }
   if (e.key === "Escape" && S.picker) { S.picker = false; renderHeader(); localize($("header.app")); $(".picker-btn")?.focus(); return; }
-  if (e.key === "Enter" && e.target.id === "picker-q") { const first = [...document.querySelectorAll(".pick-row")].find(r => !r.hidden); if (first) pickCompetition(first.dataset.id); return; }
+  if (e.key === "Enter" && e.target.id === "picker-q") { const first = [...document.querySelectorAll(".pick-row[data-id]")].find(r => !r.hidden); if (first) pickCompetition(first.dataset.id); return; }
   if (e.key === "Escape" && S.modal) { S.modal = null; renderModal(); }
   if (e.key === "Tab") { const dlg = $("#guide-modal .modal") || (S.modal ? $("#modal .modal") : null); if (!dlg) return;
     const f = [...dlg.querySelectorAll('a[href], button, input, select, textarea, video[controls], [tabindex]:not([tabindex="-1"])')].filter(canFocus), ae = document.activeElement;
