@@ -30,7 +30,7 @@ const SUITES = {
       /save live score on a game that has gone: errors 0 \| dialog open false/, /live scorer open: true/, /shot on a scorecard that has gone: errors 0 \| dialog open false/,
       /french: Cette partie ne fait plus partie du tirage\./, /errs \[\]/],
     'app-picker.js': [/no select: true/, /open: true groups: Your competitions 6 \/ Examples 2/, /meta: .*Triples · Swiss · 0 teams · Not started/, /search focused: true/,
-      /search filters: Bristol Open 7\n/, /picked: Bristol Open 7 closed: true button shows: Bristol Open 7/, /outside click closes: true/, /escape closes: true/, /errs \[\]/],
+      /search filters: Bristol Open 7\n/, /search zzzz: no match message true \| errors 0/, /enter with no match: no competition opened \| carreau-tid unchanged/, /search melee finds Mêlée: true/, /picked: Bristol Open 7 closed: true button shows: Bristol Open 7/, /outside click closes: true/, /escape closes: true/, /errs \[\]/],
     'app-mobile.js': [/phone: \{"overflow":false,"navFixed":true,"navBottom":true,"icons":true,"header":\d{2,3},"langOneRow":true,"inputFont":"16px"\}/, /desktop: \{"overflow":false,"navFixed":false,"navBottom":false,"icons":false/, /errs \[\]/],
     'app-print-draw.js': [/default on screen: Round 1 \| chips All,Table,1,2,3/, /order on screen: Round 1 \| Round 2 \| Round 3/, /table on page: true/, /print page: pages 3 \| Round 1 \| Round 2 \| Round 3 \| table false \| page breaks true \| round 1 rows \d+ \| piste shown true \| team names true/,
       /fallback: printed 1 \| hides table true \| round per page true/, /swiss order: Round 2 \| Round 1/, /errs \[\]/],
