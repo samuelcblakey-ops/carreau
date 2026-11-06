@@ -1600,6 +1600,9 @@ const autoMinutes = t => Math.max(0.01, +t.autoConfirmMin || 10);
 // batch is done, so a burst of results is published straight away rather than on the next 30-second check.
 const proposalDue = (t, m, now) => !m.done && m.a && m.b && m.proposal && (m.proposal.status === "confirmed" ||
   (t.scoreMode === "teams-auto" && m.proposal.status === "pending" && now - (m.proposal.at || 0) > autoMinutes(t) * 60000));
+// a proposal is published only if the score dialog would have accepted it (anything else waits in To check)
+const proposalOk = (t, p) => { const w = +t.target || 13, sa = p.sa, sb = p.sb, hi = Math.max(sa, sb);
+  return Number.isInteger(sa) && Number.isInteger(sb) && sa >= 0 && sb >= 0 && sa !== sb && (p.time ? hi < w : hi === w); };
 // a game whose result couldn't be published is left for 30 s, so a refused save can't go round and round
 S.applyFailed = S.applyFailed || {};
 async function applyProposals() {
@@ -1610,7 +1613,7 @@ async function applyProposals() {
   try {
     for (let pass = 0; pass < 50 && S.tid === tid; pass++) {
       const now = Date.now();
-      const due = MS().filter(m => proposalDue(t, m, now) && !(now - (S.applyFailed[m.id] || 0) < 30000));
+      const due = MS().filter(m => proposalDue(t, m, now) && proposalOk(t, m.proposal) && !(now - (S.applyFailed[m.id] || 0) < 30000));
       if (!due.length) break;
       for (const m of due) {
         if (S.tid !== tid) break;
