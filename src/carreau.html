@@ -70,6 +70,7 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
   .brand{font-size:20px}.brand small{font-size:10.5px}
   .tsel{width:100%;flex-wrap:nowrap}.tsel .picker-wrap{flex:1 1 auto;min-width:0}.picker-btn{min-width:0}
   .tsel .pill,.hide-sm{display:none}span.show-sm{display:inline}
+  .code-btn{min-width:44px;padding-inline:10px;border-color:var(--line);background:var(--surface-2)}header .code-btn .code-ic{display:block} /* "Organiser code": key icon only, named by aria-label */
   .new-t{font-size:15px;font-weight:700;padding:7px 12px;line-height:1;white-space:nowrap}
   nav.tabs{position:fixed;z-index:30;left:0;right:0;bottom:0;gap:0;background:var(--surface);border-top:1px solid var(--line);
     padding:4px max(4px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px));box-shadow:0 -4px 16px rgba(0,0,0,.06)}
@@ -324,6 +325,7 @@ table.shots td,table.shots th{padding:5px 6px}
 .shotcell{min-width:40px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-family:var(--display);font-size:17px;font-weight:700;cursor:pointer}
 .so-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.so-name{flex:1 1 120px;font-weight:700;min-width:0}.so-cells{display:flex;gap:4px;flex-wrap:wrap}
 .so .shotcell{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;height:44px}.so .shotcell small{font-size:10px;font-family:var(--body,inherit);font-weight:600;color:var(--muted)}
+@media (pointer:coarse){.shotcell{min-width:44px;height:44px}header .btn.code-btn{min-height:44px}} /* touch: shot and shoot-out cells 44×44 */
 .so-tot{font-family:var(--display);font-size:20px;min-width:30px;text-align:right}
 .round-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}.rb-group{display:inline-flex;flex-wrap:wrap;align-items:center;gap:5px}.rb-group .eyebrow{margin-right:2px}
 .rchip{min-width:40px;min-height:36px;padding:0 10px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;position:relative}
@@ -351,7 +353,7 @@ details.day1-table>summary{cursor:pointer;list-style-position:inside}details.day
 .rr-a{text-align:right}.rr-a,.rr-b{min-width:0;overflow-wrap:anywhere;color:var(--muted)}.rr-a.win,.rr-b.win{color:var(--ink);font-weight:700}
 .rr-sc{font-family:var(--display);font-size:18px;font-weight:700;white-space:nowrap;text-align:center;min-width:52px}.rr-sc.rr-bye{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted)}
 .ko-plan > summary{cursor:pointer;list-style-position:inside;padding:2px 0}.ko-plan[open] > summary{margin-bottom:10px}
-.show-sm{display:none}
+.show-sm{display:none}.code-btn{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;flex:none}.code-btn .code-ic{display:none}
 .start{max-width:960px;gap:22px}.start-hero h1{font-family:var(--display);font-size:clamp(28px,6vw,42px);line-height:1.05;margin:4px 0 8px}.start-hero p{max-width:640px}.start p{margin:0}
 .start-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
 .start-card{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;text-decoration:none}

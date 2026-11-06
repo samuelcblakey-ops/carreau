@@ -116,6 +116,42 @@ const { chromium } = require('playwright');
       L.push(`eurocup registration 320: name column ${nw >= 120 ? '120+' : Math.round(nw)} px | man/woman drop-downs ${dd >= 43.5 ? '44+' : Math.round(dd)} px`);
       q('.elist').scrollIntoView(); return L; });
     L.push(...r); await p.screenshot({ path: 'test-results/mobile-eurocup-320.png' }); await p.context().close(); }
+  // Shooting scorecard grid (spec phone-sizes-2): on touch screens every shot cell, and the shoot-out cells, are 44×44+
+  { const sbad = [];
+    for (const wd of [390, 320]) {
+      const p = await touch(wd);
+      const r = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)], bad = [];
+        q('[data-act="new-t"]').click(); await w(100); const t = JSON.parse(JSON.stringify(C.T()));
+        Object.assign(t, { name: 'Shoot', entry: 'shooting', system: 'knockout', format: 'singles', seeding: 'entry', shootFormat: 'final', shootFinal: 2, checkin: false, wizard: false });
+        for (let i = 0; i < 4; i++) t.players.push({ id: 'p' + i, name: 'Shooter ' + i, active: true });
+        await S.store.setTournament(t); S.tournaments[t.id] = t; C.render(); await w(60);
+        q('[data-tab="draw"]').click(); await w(60); q('[data-act="first-draw"]').click(); await w(200);
+        q("[data-shoot]").click(); await w(80);
+        if (S.modal?.live) { q('[data-act="shoot-mode"]').click(); await w(60); }
+        const cells = qa('#modal .shotcell').filter(e => e.getClientRects().length);
+        cells.forEach(e => { const r = e.getBoundingClientRect(); if (r.width < 43.5 || r.height < 43.5) bad.push(`shot cell ${Math.round(r.width)}x${Math.round(r.height)}`); });
+        q('#modal .shotcell')?.click(); await w(60); return { bad: [...new Set(bad)], n: cells.length }; });
+      sbad.push(...r.bad.map(x => wd + ' ' + x)); L.push(`shooting grid cells seen ${wd}: ${r.n}`);
+      await p.screenshot({ path: `test-results/mobile-shooting-grid-${wd}.png` }); await p.context().close();
+    }
+    L.push('shooting grid cells under 44: ' + (sbad.length ? sbad.join(', ') : 'none')); }
+  // A spectator's header (spec phone-sizes-2): the website's "Organiser code" button (taken from src/web-boot.js)
+  // next to the picker; the picker still shows the first word of the name and the button stays on one line.
+  { const codeBtn = require('fs').readFileSync(require('path').join(__dirname, '..', 'src', 'web-boot.js'), 'utf8').match(/return `(<button[^`]*data-act="enter-code"[^`]*)`;/)[1];
+    for (const wd of [390, 320]) {
+      const p = await touch(wd);
+      const r = await p.evaluate(async ({ wd, codeBtn }) => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
+        q('[data-act="new-t"]').click(); await w(100); const t = JSON.parse(JSON.stringify(C.T())); Object.assign(t, { name: 'Riverside Spring Open', checkin: false, wizard: false });
+        await S.store.setTournament(t); S.tournaments[t.id] = t; S.canWrite = false; S.headerExtra = () => codeBtn; C.render(); await w(80);
+        const nm = q('.picker-btn .pb-name'), rg = document.createRange(); rg.setStart(nm.firstChild, 0); rg.setEnd(nm.firstChild, nm.textContent.indexOf(' '));
+        const word = rg.getBoundingClientRect().width <= nm.clientWidth + 0.5;
+        const bt = q('header [data-act="enter-code"]'), br = bt.getBoundingClientRect(), tops = new Set();
+        const tw = document.createTreeWalker(bt, NodeFilter.SHOW_TEXT); let n; while ((n = tw.nextNode())) { const rr = document.createRange(); rr.selectNodeContents(n); [...rr.getClientRects()].filter(x => x.width > 0).forEach(x => tops.add(Math.round(x.top))); }
+        const one = tops.size <= 1 && br.height <= 46;
+        return `spectator header ${wd}: name ${word ? 'shows a word' : 'cut to ' + Math.round(nm.clientWidth) + ' px'} | organiser code button ${one ? 'one line' : tops.size + ' lines ' + Math.round(br.height) + ' px'} | button ${Math.round(br.width)}x${Math.round(br.height)} named "${bt.getAttribute('aria-label') || bt.textContent.trim()}" | page width ${document.scrollingElement.scrollWidth}`; }, { wd, codeBtn });
+      L.push(r); await p.screenshot({ path: `test-results/mobile-spectator-header-${wd}.png` }); await p.context().close();
+    }
+  }
   // dark mode: the knockout "PISTE N" badge
   { const p = await touch(390);
     const r = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);

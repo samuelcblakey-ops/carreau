@@ -40,6 +40,8 @@ const SUITES = {
       /draw & results with plan open 390: page width 390 \| plan open true \| draw button true/, /eurocup tie pill 320 de: page width 320 \| pills [1-9]/,
       /touch controls seen 320: logo 1, ranking switch [1-9]\d*, plan third-place [1-9], plan remove [1-9], round chip [1-9]\d*, quick score [1-9]\d*, knockout chip [1-9]\d*, bracket zoom [1-9], day chip [1-9]\d*, results grid [1-9]\d*/,
       /touch targets under 44: none/, /tab labels fit 320 nl pt de: true/, /picker 320 shows a word: true/,
+      /shooting grid cells seen 390: [1-9]\d*/, /shooting grid cells seen 320: [1-9]\d*/, /shooting grid cells under 44: none/,
+      /spectator header 390: name shows a word \| organiser code button one line \| button \d+x\d+ named "Organiser code" \| page width 390$/m, /spectator header 320: name shows a word \| organiser code button one line \| button \d+x\d+ named "Organiser code" \| page width 320$/m,
       /eurocup registration 320: name column 120\+ px \| man\/woman drop-downs 44\+ px/, /dark piste badge contrast 4\.5\+: true/, /errs \[\]/],
     'app-print-draw.js': [/default on screen: Round 1 \| chips All,Table,1,2,3/, /order on screen: Round 1 \| Round 2 \| Round 3/, /table on page: true/, /print page: pages 3 \| Round 1 \| Round 2 \| Round 3 \| table false \| page breaks true \| round 1 rows \d+ \| piste shown true \| team names true/,
       /fallback: printed 1 \| hides table true \| round per page true/, /swiss order: Round 2 \| Round 1/, /errs \[\]/],

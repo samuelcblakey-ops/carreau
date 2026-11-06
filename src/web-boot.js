@@ -264,7 +264,7 @@ S.headerExtra = () => {
   if (TEAM[t.id]) return `<span class="pill done">Team</span>`;
   if (p.edit) return `<span class="pill done">Organiser</span>`;
   if (p.score) return `<span class="pill done">Scorer</span>`;
-  return `<button class="btn sm ghost" data-act="enter-code">Organiser code</button>`;
+  return `<button class="btn sm ghost code-btn" data-act="enter-code" aria-label="Organiser code" title="Organiser code"><svg class="code-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></svg><span class="hide-sm">Organiser code</span></button>`;
 };
 // start screen when this visitor can't create: with organiser login on, running a competition starts by logging in
 S.startLogin = () => loginMode() ? `<button type="button" class="start-card go" data-act="org-page"><b>Run a competition</b><span>Log in with your organiser code</span></button>` : "";
