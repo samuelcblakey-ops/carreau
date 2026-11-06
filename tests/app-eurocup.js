@@ -280,6 +280,9 @@ const { chromium } = require('playwright');
     L.push('eurocup counts: setup ' + (setup.match(/\(\d+ clubs → \d+ ties?\)/) || ['none'])[0] + ' | ' + (added.match(/\d+ ties? over \d+ rounds?\b/) || ['none'])[0]
       + ' | ' + (one.match(/\d+ ties? over \d+ rounds?\b/) || ['none'])[0] + ' | ' + (one.match(/Pistes are filled from any \w+, earliest \w+ first/) || ['none'])[0]);
     L.push('eurocup wording: ' + (two.match(/\d+ clubs entered → \d+ ties?\b/) || ['none'])[0] + ' | ' + (/\bteams?\b/i.test(all) ? 'says teams: ' + all.match(/.{0,40}\bteams?\b.{0,20}/i)[0] : 'no "teams"') + ' | ' + (/\b1 ties\b/.test(all) ? 'says "1 ties"' : 'no "1 ties"') + ' | ' + (/\b1 rounds\b/.test(all) ? 'says "1 rounds"' : 'no "1 rounds"'));
+    // Plan the rounds says ties: its heading, and an empty round (round 2 after adding a round to a single tie)
+    L.push('eurocup plan heading: ' + (added.match(/Choose the round for each \w+/) || ['none'])[0] + ' | ' + (/fixture/i.test(added) ? 'says: ' + added.match(/.{0,40}fixture.{0,40}/i)[0] : 'no "fixture"'));
+    L.push('eurocup empty round: ' + (added.match(/No \w+ in this round yet\.(?: Choose this round for an? \w+ in Plan the rounds\.)?/) || ['none'])[0]);
     // French: every new line translated, and the draw page before the draw has no English left
     t = JSON.parse(JSON.stringify(C.T())); t.draws = []; t.clubFix = undefined; t.checkin = true; t.teams = names.map((c, k) => club(c, k, k === 0)); await put(t);
     q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80); await tab('draw');
