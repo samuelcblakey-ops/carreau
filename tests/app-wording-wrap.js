@@ -11,7 +11,7 @@ const { chromium } = require('playwright');
     const wide = () => document.documentElement.scrollWidth;
     q('[data-act="new-t"]').click(); await w(100);
     // phrases with ? and : (translated in the header, which is localised on every render)
-    const words = ['Who won the end?', 'How many points?', 'Not playing:', 'Not you?', 'Just filming one game?', 'Choose the winner (for example after a shoot-off):'];
+    const words = ['Who won the mène?', 'How many points?', 'Not playing:', 'Not you?', 'Just filming one game?', 'Choose the winner (for example after a shoot-off):'];
     for (const l of ['fr', 'de']) { await lang(l); const probe = document.createElement('div'); probe.id = 'probe'; probe.innerHTML = words.map(x => `<span>${x}</span>`).join('|');
       q('header.app').appendChild(probe); C.render(); await w(60); L.push(`${l}: ${[...q('#probe').children].map(x => x.textContent).join(' | ')}`); probe.remove(); }
     await lang('en');
