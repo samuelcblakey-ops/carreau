@@ -18,6 +18,7 @@ const SUITES = {
       /KO entrants 8 duels 8/, /tie prompt shown/, /shoot final done true winner \["p\d+"\]/,
       /final standings: (Shoot final · Standings )?Standings Final WINNER/,
       /archived visible locally: true/, /restored: true/, /^errs \[\]$/m,
+      /csv order: Round 1, Round 2, Semi-finals, Final$/m, /csv status: Finished \| Playing \| Waiting$/m, /csv file name: Concours de l'Été à Hitchin\.csv$/m, /csv bom: true/, /csv status fr: Terminée \| En jeu \| En attente$/m,
     ],
     'app-shoot-live.js': [
       /next up shown: true/, /live opens by default: true first prompt: Shooter \d Shot 1 of 20 A1 · Lone boule 6 m/,

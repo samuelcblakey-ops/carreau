@@ -1193,6 +1193,13 @@ Object.assign(LANG_TEXT.de, {"The knockouts were drawn from these standings. Sav
 Object.assign(LANG_TEXT.nl, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "De afvalschema's zijn op basis van deze stand geloot. Opslaan laat ze zoals ze zijn. Om opnieuw te loten: annuleer en gebruik eerst Afvalschema ongedaan maken, zolang er nog geen partij in het afvalschema klaar is.", "Save anyway": "Toch opslaan"});
 Object.assign(LANG_TEXT.pt, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "Os quadros foram sorteados a partir desta classificação. Guardar mantém-nos como estão. Para os sortear de novo, cancele e use primeiro Anular quadro, enquanto nenhum jogo do quadro tiver terminado.", "Save anyway": "Guardar mesmo assim"});
 Object.assign(LANG_TEXT.th, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "สายน็อคเอาท์ถูกจับจากตารางคะแนนนี้ การบันทึกจะคงสายไว้ตามเดิม หากต้องการจับใหม่ ให้ยกเลิกแล้วกด ยกเลิกสายน็อคเอาท์ ก่อน ขณะที่ยังไม่มีเกมน็อคเอาท์ใดจบ", "Save anyway": "บันทึกต่อไป"});
+Object.assign(FR_TEXT, {"Waiting": "En attente"});
+Object.assign(LANG_TEXT.es, {"Waiting": "En espera"});
+Object.assign(LANG_TEXT.it, {"Waiting": "In attesa"});
+Object.assign(LANG_TEXT.de, {"Waiting": "Wartet"});
+Object.assign(LANG_TEXT.nl, {"Waiting": "Wacht"});
+Object.assign(LANG_TEXT.pt, {"Waiting": "Em espera"});
+Object.assign(LANG_TEXT.th, {"Waiting": "รอแข่ง"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -5130,9 +5137,15 @@ document.addEventListener("keydown", e => {
 
 async function exportCsv() {
   const t = T(); const rows = [["Stage", "Round", "Piste", isIndiv(t) ? "Side A" : "Team A", "Score A", "Score B", isIndiv(t) ? "Side B" : "Team B", "Status"]];
-  MS().sort(byOrder).forEach(m => rows.push([matchContext(t, m), m.round, m.courtUsed || m.court ? courtName(t, m.courtUsed || m.court) : "", sideName(t, m.a) || "", m.sa ?? "", m.sb ?? "", m.bye ? "BYE" : sideName(t, m.b) || "", mStatus(m)]));
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
-  try { await S.downloads.save({ filename: `${t.name.replace(/[^\w\- ]+/g, "").trim() || "results"}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
+  // playing order: the morning rounds first, then each knockout (in the order they were drawn) round by round
+  const bi = m => m.stage === "ko" ? 1 + Math.max(0, (t.brackets || []).findIndex(b => b.id === m.bracket)) : 0;
+  const csvStatus = m => tr({ done: "Finished", playing: "Playing" }[mStatus(m)] || "Waiting");
+  MS().sort((x, y) => bi(x) - bi(y) || byOrder(x, y)).forEach(m => rows.push([matchContext(t, m), m.round, m.courtUsed || m.court ? courtName(t, m.courtUsed || m.court) : "", sideName(t, m.a) || "", m.sa ?? "", m.sb ?? "", m.bye ? "BYE" : sideName(t, m.b) || "", csvStatus(m)]));
+  // a BOM first so Excel reads the file as UTF-8 (accented names)
+  const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  // keep accents and spaces in the file name; drop only what file names can't hold
+  const fname = (t.name || "").replace(/[\/\\:*?"<>|\u0000-\u001f]+/g, "").replace(/\s+/g, " ").trim().replace(/^\.+/, "") || "results";
+  try { await S.downloads.save({ filename: `${fname}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
 }
 
 /* ---------------- boot ---------------- */
