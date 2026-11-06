@@ -15,7 +15,9 @@ const { chromium } = require('playwright');
   const seed = (id, name, days, extra = {}) => put(id, { id, name, ownerUid: 'visitor-x', entry: 'teams', teams: [], players: [], archived: false, listed: false, created: now - days * DAY - 1000, updated: now - days * DAY, ...extra });
   const exists = async id => (await fetch(`${REST}/tournaments/${id}`, { headers: H })).status === 200;
   const team = i => ({ id: 'e' + i, name: 'Team ' + i, players: ['a'], active: true });
-  await seed('cuOld', 'CU old empty', 10);
+  const ymd = ms => { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  await seed('cuOld', 'CU old empty', 10, { date: ymd(now - 40 * DAY) });
+  await seed('cuFuture', 'CU future empty', 10, { date: ymd(now + 30 * DAY) });
   await seed('cuMelee', 'CU old empty melee', 30, { entry: 'melee' });
   await seed('cuArch', 'CU old empty archived', 12, { archived: true });
   await seed('cuNew', 'CU new empty', 2);
@@ -34,7 +36,14 @@ const { chromium } = require('playwright');
   await AD.click('[data-act="adm-clean-list"]'); await w(300);
   const list = await txt('#adm-clean-list');
   log('list:', ['CU old empty ·', 'CU old empty melee', 'CU old empty archived', 'CU stale copy'].every(n => list.includes(n)),
-    '| keeps:', !['CU new', 'CU old full', 'CU old melee players', 'CU old example', 'CU old template', 'CU old drawn'].some(n => list.includes(n)), '| age shown:', /untouched 30 days/.test(list));
+    '| keeps:', !['CU new', 'CU future', 'CU old full', 'CU old melee players', 'CU old example', 'CU old template', 'CU old drawn'].some(n => list.includes(n)), '| age shown:', /untouched 30 days/.test(list));
+  log('future competition kept:', !list.includes('CU future'), '| past competition still listed:', list.includes('CU old empty ·'));
+  const pastDay = await AD.evaluate(d => new Date(d + 'T12:00').toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }), ymd(now - 40 * DAY));
+  const dated = `CU old empty · ${pastDay} · untouched 10 days`;
+  log('list shows date:', list.includes(dated), '|', dated);
+  await AD.setViewportSize({ width: 390, height: 844 }); await w(300);
+  await (await AD.$('#adm-clean')).screenshot({ path: process.env.OUT + '/admin-cleanup-list-phone.png' });
+  await AD.setViewportSize({ width: 1100, height: 900 }); await w(300);
   // someone fills in "CU stale copy" on the server; the admin's screen still holds the old empty copy
   await put('cuStale', { id: 'cuStale', name: 'CU stale copy', ownerUid: 'visitor-x', entry: 'teams', teams: [team(1)], players: [], archived: false, listed: false, created: now - 9 * DAY, updated: Date.now() });
   await w(1000);
@@ -45,6 +54,7 @@ const { chromium } = require('playwright');
   for (let i = 0; i < 100; i++) { await w(200); if (/deleted/.test(await AD.textContent('#toast').catch(() => ''))) break; }
   log('toast:', await AD.textContent('#toast'));
   const st = {}; for (const id of ['cuOld', 'cuMelee', 'cuArch', 'cuNew', 'cuFull', 'cuPlayers', 'cuEx', 'cuTpl', 'cuDrawn', 'cuStale']) st[id] = await exists(id);
+  log('future kept by Delete now:', await exists('cuFuture'));
   log('deleted:', !st.cuOld && !st.cuMelee && !st.cuArch, '| kept:', st.cuNew && st.cuFull && st.cuPlayers && st.cuEx && st.cuTpl && st.cuDrawn && st.cuStale);
   await w(800);
   log('after:', await txt('#adm-clean-now'), '|', await txt('#adm-clean-last'));
@@ -56,6 +66,7 @@ const { chromium } = require('playwright');
   await AD.evaluate(() => { location.hash = 'admin'; });
   for (let i = 0; i < 50; i++) { await w(200); if (!(await exists('cuLater'))) break; }
   await w(800);
+  log('future kept by Automatic:', await exists('cuFuture'));
   log('auto:', !(await exists('cuLater')), '|', await AD.textContent('#toast'), '|', await txt('#adm-clean-last'));
   const site = await (await fetch(`${REST}/config/site`, { headers: H })).json();
   log('saved:', site.fields?.cleanupAuto?.booleanValue, site.fields?.cleanupLast?.mapValue?.fields?.auto?.booleanValue);

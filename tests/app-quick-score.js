@@ -45,5 +45,43 @@ const { chromium } = require('playwright');
     q('[data-lang="fr"]').click(); await w(60); await open(games[2].id);
     L.push('french: ' + [...document.querySelectorAll('#modal .modeseg button')].map(b => b.textContent).join(' / ') + ' | ' + q('#modal .quick .small.muted')?.textContent);
     return L; });
-  console.log(out.join('\n')); await p.screenshot({ path: process.env.OUT + '/quick-score.png' }); console.log('errs', errs); await b.close();
+  console.log(out.join('\n')); await p.screenshot({ path: process.env.OUT + '/quick-score.png' });
+  // 7. small phones, real taps: the Winner to 13 | Ended on time switch keeps its height, the ✕ sits above the new-round banner
+  const phone = async (width, height, long) => {
+    const ctx = await b.newContext({ viewport: { width, height }, hasTouch: true }); const pp = await ctx.newPage(); pp.on('pageerror', e => errs.push(e.message));
+    await pp.goto(process.env.APP_URL); await pp.evaluate(() => localStorage.clear()); await pp.reload(); await pp.waitForTimeout(300);
+    const id = await pp.evaluate(async long => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
+      q('[data-act="new-t"]').click(); await w(60); const t = JSON.parse(JSON.stringify(C.T()));
+      Object.assign(t, { name: 'Small', system: 'swiss', checkin: false, swissRounds: 3 });
+      ['A', 'B', 'C', 'D'].forEach(n => t.teams.push({ id: n, name: long ? `Les Boulistes Extraordinaires de Saint-Rémy-de-Provence ${n}` : 'Team ' + n, players: ['x'], active: true }));
+      await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30);
+      q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300);
+      S.alert = { tid: t.id, label: 'Round 1 is out', until: Date.now() + 15000 }; C.render(); await w(40);
+      return C.MS().find(m => m.a && m.b && !m.bye).id; }, long);
+    await pp.locator(`[data-match="${id}"]`).tap(); await pp.waitForTimeout(150);
+    if (long) { await pp.evaluate(() => window.__carreau.toast('That change didn\'t save. Check your connection and try again.')); await pp.waitForTimeout(150); }
+    const seg = await pp.evaluate(() => { const r = document.querySelector('#modal .modeseg').getBoundingClientRect(); return Math.round(r.height); });
+    const r = { seg, size: `${width}x${height}` };
+    // the ✕ is what a finger at its centre lands on, with the banner still up
+    r.close = await pp.evaluate(() => { const x = document.querySelector('#modal [data-act="close"]'), al = document.querySelector('#roundalert'); if (!x || al.hidden) return false;
+      const b = x.getBoundingClientRect(), hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return b.top >= 0 && b.bottom <= innerHeight && !!hit && x.contains(hit); });
+    await pp.screenshot({ path: `${process.env.OUT}/quick-score-${width}x${height}.png` });
+    if (!long) {
+      const tb = pp.locator('#modal [data-act="mode"][data-mode="time"]'); await tb.scrollIntoViewIfNeeded();
+      r.hit = await tb.evaluate(el => { const b = el.getBoundingClientRect(), hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return b.height >= 44 && !!hit && el.contains(hit); });
+      await tb.tap(); await pp.waitForTimeout(80); r.hit = r.hit && await tb.getAttribute('aria-pressed') === 'true';
+      await pp.locator('#modal [data-act="pick"][data-k="sa"][data-n="11"]').first().tap(); await pp.waitForTimeout(40);
+      await pp.locator('#modal [data-act="pick"][data-k="sb"][data-n="9"]').first().tap(); await pp.waitForTimeout(40);
+      await pp.locator('#modal [data-act="save-final"]').tap(); await pp.waitForTimeout(200);
+      r.saved = await pp.evaluate(id => { const C = window.__carreau, m = C.S.matches[id]; document.querySelector('[data-tab="draw"]').click(); return m.done && m.time ? `${m.sa}-${m.sb}` : 'not saved'; }, id);
+      await pp.waitForTimeout(60); r.pill = await pp.locator(`[data-match="${id}"] .pill`).first().textContent();
+    }
+    await ctx.close(); return r;
+  };
+  const se = await phone(375, 667, false);
+  console.log(`score dialog 375x667: switch ${se.seg >= 44 ? '44+' : se.seg} px | ended on time tappable ${se.hit} | ${se.saved} saved ${se.pill}`);
+  console.log(`score dialog close button visible over the new-round banner: ${se.close}`);
+  const lg = await phone(390, 844, true);
+  console.log(`score dialog 390x844 with toast and long names: switch ${lg.seg >= 44 ? '44+' : lg.seg} px`);
+  console.log('errs', errs); await b.close();
 })();
