@@ -241,6 +241,8 @@ const SUITES = {
       /wizard: rounds,points,final/, /wizard saved: eurocup final teams \| toast All set\. Now add the clubs and their squads\./,
       /french: Tours 1–4 : 5 parties,Triplettes et doublettes : vos points,Finale : 11 parties, 31 points \| EuroCup \| Composer les équipes \| Riverside : R2 est dans deux parties en triplette\. \| 6 rencontres sur 3 tours/,
       /french picker: Comme la dernière rencontre \| Suivant : \| Touchez un nom pour remplir la place suivante\. Touchez une place remplie pour la changer\. \| Copié du tour 2\. 1 joueur ne fait plus partie de l'effectif : sa place est vide\. \| \+ Ajouter un joueur/,
+      /eurocup draw after inter-club days 1: rounds 3/, /tie moved into a busy round: moved true \| clubs in two ties on pistes none \| same player on two pistes none \| moved tie on pistes false/,
+      /after the first tie finishes: moved tie on pistes true \| clubs in two ties on pistes none/,
       /french points: Points pour une triplette gagnée \| Une rencontre vaut 19 points : triplettes 5 chacune, doublettes 3 chacune\. Le premier club à 10 gagne la rencontre ; .* \| gagne la rencontre \| Premier à 10/, /errs \[\]/],
     'app-clubs.js': [/system options: Swiss,Snake,Barrage → KO,Leagues,Inter-club,EuroCup,Knockout,Round robin/, /fields: teams per club 2 \| pairings Like for like,Rotation,Everyone plays everyone \| default Like for like \| seeding hidden true \| knockouts hidden true/,
       /days: field 3 \| note 3 clubs → 3 fixtures/, /clubs panel: Alpha 1\. Alpha 1 · 2\. Alpha 2 2 OF 2 \| Bravo .* \| Charlie .* 2 OF 2/, /club input required: true \| datalist 3 \| bulk club field true \| reorder buttons 6/,
