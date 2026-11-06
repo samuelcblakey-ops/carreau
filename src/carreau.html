@@ -571,6 +571,7 @@ body.desk header.app{display:none}
 .disp .court .side .nm{font-size:20px}
 .disp .court .side .sc{font-size:34px}
 .disp h2{font-size:38px}
+.disp .pools{grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr))}.disp .disp-pool table{font-size:20px}.disp .disp-pool th{font-size:15px}
 @media (max-width:560px){h2{font-size:22px}.stepper button{width:40px;height:40px}}
 @media (prefers-reduced-motion:no-preference){.match,.btn{transition:border-color .12s}}
 </style>
@@ -4832,23 +4833,33 @@ function renderStandings(t) {
 /* big screen */
 function renderDisplay(t) {
   const ms = MS(); const live = ms.filter(m => !m.done && m.court);
-  const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder).slice(0, 8);
+  const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder);
   const sys = sysOf(t);
   let table = "";
   if ((sys === "swiss" || sys === "melee" || sys === "snake") && ms.some(m => m.stage === sys)) table = standingsTable(t, overallTable(t, sys).slice(0, 12), { buch: sys !== "melee" });
   else if (sys === "roundrobin" && ms.length) table = standingsTable(t, overallTable(t, "rr").slice(0, 12));
   else if (sys === "shooting" && ms.length) table = shootStandings(t);
   else if (isClubs(t) && ms.some(m => m.stage === "club")) table = clubTableHtml(t, clubTable(t, ms));
-  const curRound = t.draws.filter(d => d.kind === "round").length;
+  // barrage and leagues: one table per group, the same columns as on Draw & results
+  const pools = isGroups(t) && !(t.brackets || []).length ? (t.pools || []).map(p => { const rk = poolRanking(t, p, ms), pl = getPlan(t).brackets[0];
+    return `<section class="panel stack disp-pool" style="gap:8px"><h3>${esc(p.name)}</h3><div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th><th class="n" title="Points for">For</th><th class="n" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
+      ${rk.rows.map((r, i) => `<tr class="${!r.unplaced && rk.complete && i >= pl.from - 1 && i < pl.to ? "q" : ""}"><td>${r.unplaced ? "–" : i + 1}</td><td class="wrap">${esc(entName(t, r.id))}</td><td class="n"><b>${r.w}</b></td><td class="n">${r.l}</td><td class="n">${r.pf}</td><td class="n">${r.pa}</td><td class="n">${r.diff > 0 ? "+" : ""}${r.diff}</td></tr>`).join("")}</tbody></table></div></section>`; }).join("") : "";
+  // mêlée with every round drawn in advance: the round in play is the lowest one with games left
+  const advance = sys === "melee" && meleeMode(t) === "advance";
+  const openRounds = advance ? ms.filter(m => m.stage === "melee" && !m.done).map(m => m.round) : [];
+  const curRound = openRounds.length ? Math.min(...openRounds) : t.draws.filter(d => d.kind === "round").length;
+  const next = (advance && openRounds.length ? waiting.filter(m => m.stage !== "melee" || m.round === curRound) : waiting).slice(0, 8);
+  const date = t.date ? new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" }) : "";
   return `<div class="disp">
-    <div class="spread"><div class="row" style="flex-wrap:nowrap;gap:16px;align-items:center">${logoSrc(t.id) ? `<img class="disp-logo" src="${esc(logoSrc(t.id))}" alt="">` : ""}<div><div class="eyebrow">${esc(t.venue || "")}${t.venue ? " · " : ""}${esc(t.date || "")}</div><h2>${esc(t.name)}</h2></div></div>
+    <div class="spread"><div class="row" style="flex-wrap:nowrap;gap:16px;align-items:center">${logoSrc(t.id) ? `<img class="disp-logo" src="${esc(logoSrc(t.id))}" alt="">` : ""}<div><div class="eyebrow"><span data-notr>${esc(t.venue || "")}</span>${t.venue ? " · " : ""}${esc(date)}</div><h2 data-notr>${esc(t.name)}</h2></div></div>
       <div class="row">${(t.brackets || []).length ? `<span class="pill playing" style="font-size:15px;padding:4px 12px">Knockouts</span>` : curRound ? `<span class="pill playing" style="font-size:15px;padding:4px 12px">Round ${curRound}</span>` : ""}<button class="btn sm" data-act="fullscreen">Full screen</button></div></div>
     <div class="courts">${t.courts.filter(c => c.active !== false).map(c => { const m = live.find(x => x.court === c.id);
       return m ? `<div class="court"><div class="cn">${esc(c.name)}<span class="small muted" style="font-family:var(--body);font-size:12px;font-weight:600">${esc(matchContext(t, m))}</span></div>${["a", "b"].map(k => `<div class="side"><span class="nm">${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? 0}</span></div>`).join("")}</div>`
         : `<div class="court free"><div class="cn">${esc(c.name)}</div><span class="muted">Free</span></div>`; }).join("")}</div>
-    ${waiting.length ? `<section class="stack" style="gap:8px"><h3>Next up</h3><div class="mlist">${waiting.map(m => `<div class="match ro"><div class="meta"><span>${esc(matchContext(t, m))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.a))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.b))}</span></div></div>`).join("")}</div></section>` : ""}
+    ${next.length ? `<section class="stack" style="gap:8px"><h3>Next up</h3><div class="mlist">${next.map(m => `<div class="match ro"><div class="meta"><span>${esc(matchContext(t, m))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.a))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.b))}</span></div></div>`).join("")}</div></section>` : ""}
     ${(t.brackets || []).map(b => `<section class="panel stack" style="gap:8px"><h3>${esc(b.name)}</h3>${bracketGrid(t, b, ms)}</section>`).join("")}
     ${table && !(t.brackets || []).length ? `<section class="panel stack" style="gap:8px"><h3>Standings</h3>${table}</section>` : ""}
+    ${pools ? `<div class="pools">${pools}</div>` : ""}
     <div class="disp-memorial">SN Pétanque · In loving memory of Steve Noel</div>
   </div>`;
 }
