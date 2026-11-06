@@ -491,7 +491,7 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* live streaming: the overlay (transparent page, boxes placed by percentage) and the live desk */
 body.stream,body.desk{padding-bottom:0}
-body.stream{background:transparent}body.stream header.app,body.stream #roundalert,body.stream #toast{display:none}
+body.stream{background:transparent}body.stream header.app,body.stream #roundalert,body.stream #toast,body.stream #foot{display:none}
 body.stream main{max-width:none;padding:0;margin:0}
 body.desk header.app{display:none}
 .ov{position:fixed;inset:0;overflow:hidden;color:#fff;font-family:var(--body);pointer-events:none;--pan:rgba(10,14,22,.86);--mute:#b9c2cf}
@@ -3898,7 +3898,7 @@ function drawPage() {
   const restore = () => { document.querySelectorAll("[data-scroll-key]").forEach(el => { const v = scrolls[el.dataset.scrollKey]; if (v) { el.scrollLeft = v[0]; el.scrollTop = v[1]; } }); };
   applyCompTheme(S.liveRoute && !S.liveRoute.tid ? null : T()); brandWatch(); hofWatch();
   document.body.classList.toggle("stream", S.liveRoute?.view === "stream"); document.body.classList.toggle("desk", S.liveRoute?.view === "desk");
-  if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lm = S.matches[S.liveRoute.mid]; scheduleCardTick(S.liveRoute.view === "stream" && lm ? liveOf(lm) : null); return; }
+  if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lc = S.liveRoute.view === "stream" && S.loaded ? liveCtx() : null; scheduleCardTick(lc ? lc.L : null); return; }
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
