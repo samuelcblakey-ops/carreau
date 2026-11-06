@@ -17,7 +17,7 @@ const SUITES = {
       /swiss R1 edit: corrected=true modal closed=true/,
       /KO entrants 8 duels 8/, /tie prompt shown/, /shoot final done true winner \["p\d+"\]/,
       /final standings: (Shoot final · Standings )?Standings Final WINNER/,
-      /archived visible locally: true/, /restored: true/, /^errs \[\]$/m,
+      /archived visible locally: true/, /restored: true/, /swiss top8\+plate then barrage: plan is barrage default/, /^errs \[\]$/m,
     ],
     'app-shoot-live.js': [
       /next up shown: true/, /live opens by default: true first prompt: Shooter \d Shot 1 of 20 A1 · Lone boule 6 m/,

@@ -4881,7 +4881,8 @@ document.addEventListener("click", async e => {
   if (setb && setb.dataset.set === "st-format") { const st = S.streams[S.liveRoute?.sid]; if (st && streamCan(st)) { st.format = setb.dataset.val; st.updated = Date.now(); render(); try { await S.store.setStream(st); } catch (err) { console.error(err); } } return; }
   if (setb && canEdit() && setb.dataset.set === "plan-seeding") { const v = setb.dataset.val; await savePlan(pl => pl.seeding = v); return; }
   if (setb && canEdit() && setb.dataset.set === "accent" && setb.dataset.val && !isHex(setb.dataset.val)) return;
-  if (setb && canEdit()) { const t = clone(T()); t[setb.dataset.set] = setb.dataset.val; if (setb.dataset.set === "entry" && t.entry === "shooting") { t.system = "knockout"; t.shootFormat = t.shootFormat || "ko8"; t.format = "singles"; }
+  if (setb && canEdit()) { const t = clone(T()); t[setb.dataset.set] = setb.dataset.val; if (setb.dataset.set === "system" && T().system !== t.system && !(t.brackets || []).length) delete t.koPlan; // the old ranges mean something else under the new system
+    if (setb.dataset.set === "entry" && t.entry === "shooting") { t.system = "knockout"; t.shootFormat = t.shootFormat || "ko8"; t.format = "singles"; }
     if (setb.dataset.set === "entry" && t.entry === "melee") t.system = "swiss"; await guard(() => saveT(t)); if (S.onFieldSet) await S.onFieldSet(t, setb.dataset.set, setb.dataset.val); return; }
   const a = e.target.closest("[data-act]"); if (!a) return;
   const act = a.dataset.act;
