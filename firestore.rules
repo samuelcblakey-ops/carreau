@@ -10,7 +10,10 @@ rules_version = '2';
 //  - Only the admin can delete a competition; organisers archive instead.
 //  - Team score entry (config/site.teamScoring: false, 'admin' = only admin-registered competitions, true = everyone): a team link makes a device a 'team' member; it can only
 //    propose a score for its own game, or confirm/dispute the other team's. An organiser's screen publishes results.
-//  - Visitors only list their own competitions plus the examples (listed); examples are view-only.
+//  - Visitors only list their own competitions plus the examples (listed); examples are view-only. Only the admin makes
+//    or unmakes an example. A competition's organisers (not open-testing visitors) can feature it (featured: shown on the
+//    front page, above the examples); a featured competition is otherwise an ordinary one: not view-only, and it can go
+//    in the Hall of Fame.
 //  - Live streaming: each streamed game has a small live doc (running score, ends, boules, player stats, overlay layout).
 //    Anyone can read it (the overlay needs no account). Organisers and scorers write it, and so can a phone that joined
 //    with the competition's stream code (role 'live'), which can do nothing else.
@@ -45,6 +48,12 @@ service cloud.firestore {
     function canEdit(tid) { return isAdmin() || role(tid) == 'edit'
                                    || (loginOn() ? orgEdits(tid)
                                                  : (owns(tid) || (signedIn() && openTesting() && get(tdoc(tid)).data.get('listed', false) != true))); }
+    // the competition's own organisers: the device that made it (organiser login off), an organiser link, or its organiser code
+    function organiser(tid) { return role(tid) == 'edit' || (loginOn() ? orgEdits(tid) : owns(tid)); }
+    // listed (example) is the admin's alone; featured is for the admin or the competition's organisers, and must be true or false
+    function flagsOk(tid) { return (isAdmin() || request.resource.data.get('listed', false) == resource.data.get('listed', false))
+                                   && request.resource.data.get('featured', false) is bool
+                                   && (isAdmin() || organiser(tid) || request.resource.data.get('featured', false) == resource.data.get('featured', false)); }
     function canScore(tid) { return canEdit(tid) || role(tid) == 'score'; }
     // archived competitions are hidden from everyone except the admin
     function notArchived(tid) { return get(tdoc(tid)).data.get('archived', false) != true; }
@@ -88,8 +97,9 @@ service cloud.firestore {
       allow get: if resource.data.get('archived', false) != true || isAdmin();
       allow list: if isAdmin() || resource.data.archived == false;
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
-                    && (!loginOn() || isAdmin() || (orgValid() && request.resource.data.get('orgCode', '') == myCode()));
-      allow update: if ((canEdit(tid) && resource.data.get('archived', false) != true) || isAdmin())
+                    && (!loginOn() || isAdmin() || (orgValid() && request.resource.data.get('orgCode', '') == myCode()))
+                    && (isAdmin() || request.resource.data.get('listed', false) != true) && request.resource.data.get('featured', false) is bool;
+      allow update: if ((canEdit(tid) && resource.data.get('archived', false) != true) || isAdmin()) && flagsOk(tid)
                     && request.resource.data.ownerUid == resource.data.ownerUid
                     && (isAdmin() || request.resource.data.get('orgCode', '') == resource.data.get('orgCode', ''));
       // organisers can only archive; deleting a competition is admin-only
