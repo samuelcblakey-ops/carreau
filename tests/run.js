@@ -336,6 +336,7 @@ const SUITES = {
     'web-team-scoring.js': [/flag off, no score entry choice: true/, /admin switch shows off: true/, /admin mode, organiser sees no choice: true/, /admin mode, admin sees choice: true/, /score entry guide link: team-scores/,
       /competition registered: true \| organiser still no choice: true/, /team links: 4/, /qr shown alone: true \| decodes to team link: true/, /qr hidden again: true/, /unregistered comp, team propose: permission-denied/, /re-registered, team propose: WROTE/, /eurocup team panel: games 2 \| can enter mixed triple true/, /eurocup mixed triple sent: pending/, /everyone mode, organiser sees choice: true/,
       /team panel: true \| team has no organiser tools: true/, /proposal pending: \{"sa":13,"sb":7,"status":"pending"\}/,
+      /owner opens team link: role organiser \| to check shown true \| notice shown true/, /team proposes, other team confirms: published by the owner's phone true/, /organiser-link phone opens team link: can still edit true \| notice true/,
       /team security: result permission-denied \| self-confirm permission-denied \| other game permission-denied/, /opponent asked to confirm: true/,
       /organiser screen published: true 13-7 applied/, /team sees result: true/, /organiser sees dispute: true \| not published: true/, /organiser settled: true 13-2/,
       /switched off hides it: true \| team panel gone: true/, /errs \[\]/],
