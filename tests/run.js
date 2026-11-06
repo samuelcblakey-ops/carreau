@@ -266,7 +266,7 @@ const SUITES = {
       /all on day 1: BvC@1 AvC@1 AvB@1 \| games moved true \| day 2 Day 2 Remove this day NO FIXTURES/, /added: days 3 \| buttons\/row 3/,
       /moved to 3: BvC@3 AvC@1 AvB@1 \| its games 3,3 \| context Day 3 · Bravo v Charlie/, /remove buttons: 2\n/, /day 2 removed: days 2 \| plan BvC@2 AvC@1 AvB@1 \| games follow 2,2/,
       /moved after a result: BvC@2 AvC@2 AvB@1 \| result kept true/, /pistes from any day: 2/,
-      /standings: Clubs,Results grid,Teams \| club cols 8 \| top club 1 Alpha 1 1 0 13 5 \+8 \| team row 1 Alpha 1 .* \| grid cells D1,1–0,D1,D2,0–1,D2/,
+      /standings: Clubs,Results grid,Teams \| club cols 8 \| top club 1 Alpha 1 1 0 13 5 \+8 \| team row 1 Alpha 1 .* \| grid cells D1,1–0,D1,D2,0–1,D2/, /team table note: Level teams are split by the games between them, then by the drawn lot\./,
       /rotation: days 3 \| fixtures\/day 2,2,2 \| games 54 \| labels Game 1,Game 2,Game 3 \| each meets each: true \| game headings 18/, /game 1 like for like: true \| own club never: true/,
       /all: days 1 \| games 9 \| labels true \| headings 0/, /french: Suisse,Serpent,Poules → tableau,Ligues,Inter-clubs,EuroCup,Élimination directe,Tous contre tous \| Numéro contre numéro,Rotation,Chacun rencontre tout le monde/,
       /french day: Journée 1 \| INTER-CLUBS/, /wizard saved: clubs 4/, /errs \[\]/],
