@@ -189,7 +189,7 @@ button.ptile{cursor:pointer}button.ptile:hover{border-color:var(--accent);box-sh
 .ptile.me{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent),0 0 0 1px var(--accent)}
 .pt-h{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
 .pt-n{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
-.pt-ctx{min-width:0;font-size:12px;line-height:1.25;color:var(--muted);text-align:right;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.pt-ctx{min-width:0;font-size:12px;line-height:1.25;color:var(--muted);text-align:right;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.pt-ctx.eu{font-weight:600;color:var(--ink)}.pt-lu{display:block;font-weight:400}
 .pt-s{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
 .pt-s .nm{min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.25}
 .pt-s .sc{font-family:var(--display);font-size:18px;font-weight:700}
@@ -1185,6 +1185,14 @@ Object.assign(LANG_TEXT.de, {"Triples & doubles: set points": "Triplettes und Do
 Object.assign(LANG_TEXT.nl, {"Triples & doubles: set points": "Triplets en doublets: eigen punten", "Points for a triples win": "Punten voor een gewonnen triplet", "Points for a doubles win": "Punten voor een gewonnen doublet", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Een ontmoeting is {1} punten waard: triplets {2} elk, doublets {3} elk. De eerste club met {4} wint de ontmoeting; de overige partijen worden toch gespeeld en tellen mee voor de punten.", "With an even total a tie can end level.": "Met een even totaal kan een ontmoeting gelijk eindigen.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP zijn partijpunten: {1} voor een gewonnen triplet, {2} voor doublets.", "A tie counts as won as soon as a club has more than half its points.": "Een ontmoeting telt als gewonnen zodra een club meer dan de helft van de punten heeft.", "win the tie": "wint de ontmoeting", "First to {n}": "Eerst naar {1}", "Triples & doubles": "Triplets en doublets", "Your own points for each win": "Eigen punten per overwinning", "{n} and {n} to start": "{1} en {2} om te beginnen", "Ties level": "Gelijke ontmoetingen"});
 Object.assign(LANG_TEXT.pt, {"Triples & doubles: set points": "Triplas e duplas: os seus pontos", "Points for a triples win": "Pontos por tripla ganha", "Points for a doubles win": "Pontos por dupla ganha", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Um encontro vale {1} pontos: triplas {2} cada, duplas {3} cada. O primeiro clube a chegar a {4} ganha o encontro; os jogos que faltam jogam-se na mesma e contam para os pontos.", "With an even total a tie can end level.": "Com um total par, um encontro pode terminar empatado.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP são pontos de jogo: {1} por tripla ganha, {2} por dupla.", "A tie counts as won as soon as a club has more than half its points.": "Um encontro conta como ganho assim que um clube tem mais de metade dos pontos.", "win the tie": "ganha o encontro", "First to {n}": "Primeiro a {1}", "Triples & doubles": "Triplas e duplas", "Your own points for each win": "Os seus pontos por cada vitória", "{n} and {n} to start": "{1} e {2} para começar", "Ties level": "Encontros empatados"});
 Object.assign(LANG_TEXT.th, {"Triples & doubles: set points": "ทีม 3 คนและทีม 2 คน: กำหนดแต้มเอง", "Points for a triples win": "แต้มเมื่อชนะทีม 3 คน", "Points for a doubles win": "แต้มเมื่อชนะทีม 2 คน", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "แมตช์หนึ่งมี {1} แต้ม: ทีม 3 คนเกมละ {2} ทีม 2 คนเกมละ {3} สโมสรแรกที่ได้ {4} แต้มชนะแมตช์ เกมที่เหลือยังแข่งต่อและนับแต้มด้วย", "With an even total a tie can end level.": "ถ้าแต้มรวมเป็นเลขคู่ แมตช์อาจจบด้วยการเสมอ", "GP is game points: {n} for a triples win, {n} for doubles.": "GP คือแต้มเกม: ชนะทีม 3 คนได้ {1}, ทีม 2 คน {2}", "A tie counts as won as soon as a club has more than half its points.": "แมตช์นับว่าชนะทันทีที่สโมสรได้แต้มเกินครึ่ง", "win the tie": "ชนะแมตช์", "First to {n}": "ใครถึง {1} ก่อน", "Triples & doubles": "ทีม 3 คนและทีม 2 คน", "Your own points for each win": "กำหนดแต้มเองสำหรับแต่ละเกมที่ชนะ", "{n} and {n} to start": "เริ่มต้นที่ {1} และ {2}", "Ties level": "แมตช์ที่เสมอ"});
+// correcting a morning result after the knockouts were drawn
+Object.assign(FR_TEXT, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "Les tableaux ont été tirés à partir de ce classement. Enregistrer les laisse tels quels. Pour les refaire, annulez et utilisez d'abord Annuler le tableau, tant qu'aucune partie de tableau n'est terminée.", "Save anyway": "Enregistrer quand même"});
+Object.assign(LANG_TEXT.es, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "Los cuadros se sortearon con esta clasificación. Guardar los deja como están. Para volver a sortearlos, cancela y usa antes Deshacer cuadro, mientras no haya terminado ninguna partida del cuadro.", "Save anyway": "Guardar de todos modos"});
+Object.assign(LANG_TEXT.it, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "I tabelloni sono stati sorteggiati da questa classifica. Salvando restano come sono. Per rifarli, annulla e usa prima Annulla tabellone, finché nessuna partita del tabellone è terminata.", "Save anyway": "Salva comunque"});
+Object.assign(LANG_TEXT.de, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "Die KO-Runden wurden aus dieser Tabelle ausgelost. Beim Speichern bleiben sie, wie sie sind. Um sie neu auszulosen, abbrechen und zuerst KO-Baum zurücknehmen, solange noch kein KO-Spiel beendet ist.", "Save anyway": "Trotzdem speichern"});
+Object.assign(LANG_TEXT.nl, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "De afvalschema's zijn op basis van deze stand geloot. Opslaan laat ze zoals ze zijn. Om opnieuw te loten: annuleer en gebruik eerst Afvalschema ongedaan maken, zolang er nog geen partij in het afvalschema klaar is.", "Save anyway": "Toch opslaan"});
+Object.assign(LANG_TEXT.pt, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "Os quadros foram sorteados a partir desta classificação. Guardar mantém-nos como estão. Para os sortear de novo, cancele e use primeiro Anular quadro, enquanto nenhum jogo do quadro tiver terminado.", "Save anyway": "Guardar mesmo assim"});
+Object.assign(LANG_TEXT.th, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "สายน็อคเอาท์ถูกจับจากตารางคะแนนนี้ การบันทึกจะคงสายไว้ตามเดิม หากต้องการจับใหม่ ให้ยกเลิกแล้วกด ยกเลิกสายน็อคเอาท์ ก่อน ขณะที่ยังไม่มีเกมน็อคเอาท์ใดจบ", "Save anyway": "บันทึกต่อไป"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1705,6 +1713,12 @@ function planCourts(t, ms) {
   // EuroCup games in a tie all name the same two clubs, so each game is its own "entry" here; the legs keep the order
   const keyOf = m => m.eu ? [m.id] : ents(m);
   const busyEnt = new Set(live.flatMap(keyOf));
+  // EuroCup: a club with a game live on a piste in one tie gets no games of another tie (the same players can't be on
+  // two pistes); a tie moved into a round where its clubs already play waits for the other tie
+  const tieOf = m => m.ca + "v" + m.cb, clubTie = new Map();
+  const holdClubs = m => { for (const c of [m.ca, m.cb]) clubTie.set(c, (clubTie.get(c) || new Set()).add(tieOf(m))); };
+  live.filter(m => m.eu).forEach(holdClubs);
+  const clubBusy = m => [m.ca, m.cb].some(c => [...(clubTie.get(c) || [])].some(k => k !== tieOf(m)));
   let free = active.filter(c => !busyCourts.has(c.id));
   if (t.randomCourts) free = shuffle(free);
   const ready = ms.filter(m => !m.done && !m.court && m.a && m.b).sort(byOrder);
@@ -1714,13 +1728,14 @@ function planCourts(t, ms) {
     if (!lineupOk(m)) continue; // EuroCup: waits for both line-ups
     const me = keyOf(m);
     if (me.some(e => busyEnt.has(e))) continue;
+    if (m.eu && clubBusy(m)) continue;
     const earlier = m.eu ? ms.some(o => o !== m && !o.done && o.eu && ((o.ca === m.ca && o.cb === m.cb && o.round === m.round && (o.leg || 0) < (m.leg || 0)) || ((o.round || 0) < (m.round || 0) && ents(o).some(e => ents(m).includes(e)))))
       : ms.some(o => o !== m && !o.done && (o.group === m.group || (o.stage === "melee" && m.stage === "melee")) && (o.round || 0) < (m.round || 0) && ents(o).some(e => me.includes(e)));
 
     if (earlier) continue;
     const c = free.shift();
     m.court = c.id; m.courtAt = Date.now(); out.push({ id: m.id, court: c.id });
-    me.forEach(e => busyEnt.add(e));
+    me.forEach(e => busyEnt.add(e)); if (m.eu) holdClubs(m);
   }
   return out;
 }
@@ -1995,7 +2010,9 @@ function drawClubs(t) {
   const { clubs, N } = chk; const pat = t.clubPairing || "like";
   const line = clubs.map(c => c.id); if (line.length % 2) line.push(null);
   const n = line.length, rest = line.slice(1); const out = [], fix = [];
-  const D = Math.max(1, t.clubDays || n - 1); // starting plan: the circle's rounds spread over the organiser's days
+  // starting plan: the circle's rounds spread over the organiser's days (EuroCup always uses the usual rounds:
+  // Inter-club's hidden "Number of days" would otherwise put a club in two ties in the same round)
+  const D = isEuro(t) ? n - 1 : Math.max(1, t.clubDays || n - 1);
   for (let r = 0; r < n - 1; r++) {
     const arr = [line[0], ...rest.map((_, i) => rest[(i - r + rest.length) % rest.length])];
     const day = (r % D) + 1;
@@ -2325,6 +2342,15 @@ function overrideAllowed(m) {
   return (m.round || 1) >= cur - 1;
 }
 const sameIds = (x, y) => JSON.stringify(x ?? null) === JSON.stringify(y ?? null);
+// would this (morning) result change who goes into a knockout already drawn, or their seed?
+function koChangedBy(t, m) {
+  if (m.stage === "ko" || m.stage === "shoot" || m.shoot || !(t.brackets || []).length) return false;
+  const plan = getPlan(t); const drawn = plan.brackets.filter(br => t.brackets.some(b => b.id === br.id)); if (!drawn.length) return false;
+  const seeded = plan.seeding !== "random";
+  const key = () => drawn.map(br => { const e = koEntrants(t, MS(), br).map(x => `${x.id}@${x.pool || ""}`); return (seeded ? e : e.sort()).join(","); }).join("|");
+  const prev = S.matches[m.id]; const before = key();
+  S.matches[m.id] = m; try { return key() !== before; } finally { S.matches[m.id] = prev; }
+}
 // recordResult returns true when saved, or { blocked: [descriptions] } when a correction would change
 // later games that are already finished (call again with { override: true } to reset those games).
 async function recordResult(id, sa, sb, done, opts = {}) {
@@ -2350,7 +2376,9 @@ async function recordResult(id, sa, sb, done, opts = {}) {
     if (p?.french) { poolFix = p; MS().filter(o => o.pool === m.pool && o.round > m.round && o.done).forEach(o => resets.push(o)); }
   }
   if (blocked.length) { toast("This result has already moved two rounds on, so it can't be corrected here."); return false; }
-  if (resets.length && !opts.override) return { blocked: resets.map(r => `${matchContext(t, r)}: ${sideName(t, r.a) || "?"} ${r.sa ?? ""}–${r.sb ?? ""} ${sideName(t, r.b) || "?"}`) };
+  // a morning result corrected after the knockouts were drawn from its standings: ask before saving
+  const ko = wasDone && !opts.override && koChangedBy(t, m);
+  if ((resets.length || ko) && !opts.override) return { blocked: resets.map(r => `${matchContext(t, r)}: ${sideName(t, r.a) || "?"} ${r.sa ?? ""}–${r.sb ?? ""} ${sideName(t, r.b) || "?"}`), ko };
   if (resets.length && !overrideAllowed(prev)) { toast("Only the current and previous round can be corrected."); return false; }
   const patch = { sa, sb, done, finishedAt: m.finishedAt || null };
   if (opts.win !== undefined) patch.win = opts.win || null;
@@ -2786,8 +2814,16 @@ function hofPanel(t, where) {
     ${e.levelSetBy === "admin" && !e.hidden ? `<div class="small muted">The site admin set the level. It stays the same when you update the entry.</div>` : ""}</div>`;
 }
 // top of Draw & results: once the final's score is in and it isn't published yet (or the result has changed since)
+// with afternoon knockouts planned, wait for the knockouts' last final (the morning leader isn't the winner)
+function hofKoWait(t, r) {
+  if (!t.koPlan || !PLAN_SYSTEMS.includes(t.system)) return false;
+  const brs = t.brackets || []; if (!brs.length) return true;
+  const ids = getPlan(t).brackets.map(b => b.id).filter(id => brs.some(b => b.id === id));
+  const last = ids.length ? ids[ids.length - 1] : brs[brs.length - 1].id;
+  return !r.parts.some(p => p.id === "ko-" + last && p.done);
+}
 function hofDrawPanel(t) {
-  if (!hofCan(t) || t.archived || !hofResult(t).ready) return "";
+  if (!hofCan(t) || t.archived) return ""; const r0 = hofResult(t); if (!r0.ready || hofKoWait(t, r0)) return "";
   const e = S.hof?.[t.id]; if (e === undefined) return "";
   if (e) { const r = hofResult(t); if (e.hidden || e.sig === hofSig(r.parts.filter(p => (e.parts || []).some(x => x.id === p.id)))) return ""; }
   return hofPanel(t, "draw").replace('class="panel ', 'class="panel hof-top ');
@@ -2795,7 +2831,8 @@ function hofDrawPanel(t) {
 function renderDrawPage(t) { const p = hofDrawPanel(t); return p ? `<div class="hof-top-wrap">${p}</div>` + renderDraw(t) : renderDraw(t); }
 function hofOpen(t) {
   const e = S.hof?.[t.id] || null; const r = hofResult(t);
-  const parts = {}; r.parts.forEach(p => parts[p.id] = p.done && (!e || (e.parts || []).some(x => x.id === p.id)));
+  const kept = !!e && r.parts.some(p => (e.parts || []).some(x => x.id === p.id)); // none of the entry's parts left (e.g. Swiss → knockouts): tick every finished part
+  const parts = {}; r.parts.forEach(p => parts[p.id] = p.done && (!kept || (e.parts || []).some(x => x.id === p.id)));
   S.modal = { hof: true, tid: t.id, level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: e?.region || "", note: e?.note || "", parts, err: "", busy: false };
   renderModal();
 }
@@ -3012,11 +3049,12 @@ async function hofMarkGone(tid, gone) {
   try { await S.store.updateHof(tid, { gone }); if (e) e.gone = gone; if (S.hofPage) S.hofPage.cache = {}; }
   catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
 }
-function overrideBox(list) {
+function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
-    <span>These later games were already played and will be reset so they can be replayed or re-entered:</span>
-    <ul style="margin:0;padding-left:18px">${list.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-    ${canEdit() ? `<div class="row"><button class="btn danger" data-act="override">Override and reset these games</button><button class="btn" data-act="close">Cancel</button></div>` : `<span class="small">Ask the organiser to make this correction.</span>`}</div>`;
+    ${ko ? `<span>The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.</span>` : ""}
+    ${list.length ? `<span>These later games were already played and will be reset so they can be replayed or re-entered:</span>
+    <ul style="margin:0;padding-left:18px">${list.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    ${canEdit() ? `<div class="row"><button class="btn danger" data-act="override">${list.length ? "Override and reset these games" : "Save anyway"}</button><button class="btn" data-act="close">Cancel</button></div>` : `<span class="small">Ask the organiser to make this correction.</span>`}</div>`;
 }
 
 /* ---------------- toast & modal ---------------- */
@@ -3245,7 +3283,7 @@ function drawModal() {
     ${S.modal.err ? `<div class="err">${esc(S.modal.err)}</div>` : ""}
     ${m.corrected && !m.corrected.reset ? `<p class="small muted">Corrected (was ${m.corrected.from?.[0] ?? "–"}–${m.corrected.from?.[1] ?? "–"}).</p>` : ""}
     ${m.done && canEdit() && !S.modal.blocked ? `<p class="small muted">To correct a wrong score, change it and press Update result. If the winner changes and a later game has already been played, you'll be asked to confirm an override${overrideAllowed(m) ? "" : " (only possible for the current and previous round)"}.</p>` : ""}
-    ${S.modal.blocked ? overrideBox(S.modal.blocked) : `<div class="row">
+    ${S.modal.blocked ? overrideBox(S.modal.blocked, S.modal.ko) : `<div class="row">
       ${md.mode === "quick" ? "" : `<button class="btn primary" data-act="save-final">${S.modal.team ? "Send to the other team" : m.done ? "Update result" : "Save result"}</button>`}
       ${S.modal.team ? "" : !m.done ? `<button class="btn" data-act="save-live">Save live score</button>` : `<button class="btn" data-act="reopen">Reopen match</button>`}
     </div>`}`}
@@ -3300,7 +3338,7 @@ async function modalAction(act, k, a) {
     if (md.pending?.shoot) { md.override = true; md.blocked = null; renderModal(); await saveShooting(true); return; }
     const pd = md.pending || {};
     const res = await guard(() => recordResult(md.id, pd.sa, pd.sb, pd.done !== false, { override: true, time: !!pd.time }));
-    if (res === true) { S.modal = null; renderModal(); toast("Result corrected and later games reset."); }
+    if (res === true) { S.modal = null; renderModal(); toast(md.blocked?.length ? "Result corrected and later games reset." : "Result saved."); }
     return;
   }
   readModalScores();
@@ -3322,11 +3360,16 @@ async function modalAction(act, k, a) {
     if (md.team) { const ok = await guard(() => S.teamPropose(t, S.matches[md.id], sa, sb, time)); if (ok !== false) { S.modal = null; renderModal(); toast("Sent. The other team now confirms it."); render(); } return; }
     const before = { sa: m.sa ?? null, sb: m.sb ?? null, done: !!m.done, court: m.court || null, time: !!m.time };
     const ok = await guard(() => recordResult(md.id, sa, sb, true, { time }));
-    if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa, sb, done: true, time }; renderModal(); return; }
+    if (ok && ok.blocked) { md.blocked = ok.blocked; md.ko = !!ok.ko; md.pending = { sa, sb, done: true, time }; renderModal(); return; }
     if (ok) { const id = md.id; S.modal = null; renderModal();
+      // the game that was just given this game's piste, so Undo can take it back
+      const took = before.court ? MS().find(o => o.id !== id && o.court === before.court && !o.done)?.id : null;
       toast("Result saved.", before.done ? null : async () => {
         const r = await guard(() => recordResult(id, before.sa, before.sb, false, { time: false }));
+        const tk = took && S.matches[took];
+        if (r === true && tk && tk.court === before.court && !tk.done && tk.sa == null && tk.sb == null) { tk.court = null; await S.store.updateMatch(S.tid, took, { court: null }); }
         if (r === true && before.court && !MS().some(o => o.court === before.court && !o.done)) { S.matches[id].court = before.court; await S.store.updateMatch(S.tid, id, { court: before.court }); }
+        if (r === true) await assignCourts();
         render(); toast("Result undone.");
       }); }
     return;
@@ -3343,7 +3386,7 @@ async function modalAction(act, k, a) {
   }
   if (act === "reopen") {
     const ok = await guard(() => recordResult(md.id, m.sa, m.sb, false));
-    if (ok && ok.blocked) { md.blocked = ok.blocked; md.pending = { sa: m.sa, sb: m.sb, done: false }; renderModal(); return; }
+    if (ok && ok.blocked) { md.blocked = ok.blocked; md.ko = !!ok.ko; md.pending = { sa: m.sa, sb: m.sb, done: false }; renderModal(); return; }
     if (ok) { S.modal = null; renderModal(); toast("Match reopened."); }
   }
 }
@@ -4037,7 +4080,7 @@ function wizPanel(t) {
     <label class="f"><span>Date</span><input id="wz-date" data-wz="date" type="date" value="${esc(d.date || "")}"></label><label class="f"><span>Venue (optional)</span><input id="wz-venue" data-wz="venue" value="${esc(d.venue)}" autocomplete="off"></label></div>`;
   if (st === 1) body = `<div class="wiz-grid">${opt("kind", "triples", "Triples", "Fixed teams of 3")}${opt("kind", "doubles", "Doubles", "Fixed teams of 2")}${opt("kind", "singles", "Singles", "One player each")}${opt("kind", "melee", "Mêlée", "Players drawn into new teams")}${opt("kind", "shooting", "Precision shooting", "Tir de précision")}${opt("kind", "eurocup", "EuroCup", "Club v club ties: triples, doubles, singles")}</div>`;
   // every competition system Setup offers (inter-club needs fixed teams with clubs, so not after a mêlée draw)
-  const sysPick = melee => { const sys = melee && d.system === "clubs" ? "swiss" : d.system;
+  const sysPick = melee => { if (melee && ["clubs", "eurocup"].includes(d.system)) d.system = "swiss"; const sys = d.system;
     return `<div class="wiz-grid">${opt("system", "swiss", "Swiss", "Everyone plays every round, paired by results")}${opt("system", "snake", "Snake", "Two lines; one moves along a place each round, no repeat games")}${opt("system", "pools", "Barrage → knockout", "Groups of 4, then knockouts")}${opt("system", "leagues", "Leagues", "Random leagues, each with its own table")}${melee ? "" : opt("system", "clubs", "Inter-club", "Clubs with several teams each; club v club days")}${opt("system", "roundrobin", "Round robin", "Everyone plays everyone")}${opt("system", "knockout", "Knockout", "Lose and you're out")}</div>
       ${sys === "swiss" ? `<label class="f"><span>Swiss rounds</span><input id="wz-rounds" data-wz="swissRounds" type="number" min="1" max="15" value="${d.swissRounds}"></label>` : sys === "snake" ? `<label class="f"><span>Snake rounds</span><input id="wz-snrounds" data-wz="snakeRounds" type="number" min="1" max="15" value="${d.snakeRounds || 5}"></label>` : sys === "leagues" ? `<label class="f"><span>Number of leagues</span><input id="wz-leagues" data-wz="leagueCount" type="number" min="1" max="26" value="${d.leagueCount || 2}"></label>` : sys === "clubs" ? `<label class="f"><span>Teams per club</span><input id="wz-clubteams" data-wz="clubTeams" type="number" min="1" max="12" value="${d.clubTeams || 3}"></label>` : ""}
       ${PLAN_SYSTEMS.includes(sys) ? `<p class="small muted">After these games the top teams can play afternoon knockouts. Choose who goes through in Setup.</p>` : ""}`; };
@@ -4066,7 +4109,7 @@ async function wizFinish(t) {
     if (nt.system === "leagues") nt.leagueCount = clamp(d.leagueCount, 1, 26, 2); if (nt.system === "clubs") nt.clubTeams = clamp(d.clubTeams, 1, 12, 3); };
   if (d.kind === "shooting") { nt.entry = "shooting"; nt.system = "knockout"; nt.format = "singles"; nt.shootFormat = ["ko8", "ko16", "final"].includes(d.shootFormat) ? d.shootFormat : "ko8"; if (nt.shootFormat === "final") nt.shootFinal = clamp(d.shootFinal, 2, 16, 4); }
   else if (d.kind === "melee") { nt.entry = "melee"; nt.format = d.format === "triples" ? "triples" : "doubles"; nt.meleeMode = ["rounds", "advance", "once"].includes(d.meleeMode) ? d.meleeMode : "rounds";
-    if (nt.meleeMode === "once") { nt.system = !d.system || d.system === "clubs" ? "swiss" : d.system; sysExtras(); } else { nt.system = "swiss"; nt.swissRounds = clamp(d.swissRounds, 1, 15, 4); } }
+    if (nt.meleeMode === "once") { nt.system = !d.system || ["clubs", "eurocup"].includes(d.system) ? "swiss" : d.system; sysExtras(); } else { nt.system = "swiss"; nt.swissRounds = clamp(d.swissRounds, 1, 15, 4); } }
   else if (d.kind === "eurocup") { nt.entry = "teams"; nt.format = "triples"; nt.system = "eurocup"; nt.euroFormat = ["final", "points"].includes(d.euroFormat) ? d.euroFormat : "rounds"; }
 
   else { nt.entry = "teams"; nt.format = d.kind; nt.system = d.system === "eurocup" ? "swiss" : d.system; sysExtras(); }
@@ -4548,9 +4591,13 @@ function renderCourts(t) {
   const tile = c => {
     const m = live.find(x => x.court === c.id);
     if (!m) return "";
-    const side = k => `<div class="pt-s"><span class="nm" data-notr>${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? ""}</span></div>`;
+    // EuroCup: the club, then the players it named for this game (as on Draw & results)
+    const lu = k => m.eu ? ((k === "a" ? m.la : m.lb) || []).filter(Boolean).join(", ") : "";
+    const side = k => `<div class="pt-s"><span class="nm"><span data-notr>${esc(sideName(t, m[k]))}</span>${lu(k) ? `<span class="pt-lu small muted" data-notr>${esc(lu(k))}</span>` : ""}</span><span class="sc">${m["s" + k] ?? ""}</span></div>`;
+    // EuroCup: the game first ("Open triple", "Singles 3"); the clubs are already on the tile
+    const ctx = m.eu ? `${m.label} · Round ${m.round}` : matchContext(t, m);
     return `<${tag} class="ptile ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}>
-      <div class="pt-h"><span class="pt-n" data-notr>${esc(c.name)}</span>${timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pt-ctx">${esc(matchContext(t, m))}</span>`}</div>${side("a")}${side("b")}</${tag}>`;
+      <div class="pt-h"><span class="pt-n" data-notr>${esc(c.name)}</span>${timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pt-ctx ${m.eu ? "eu" : ""}">${esc(ctx)}</span>`}</div>${side("a")}${side("b")}</${tag}>`;
   };
   const next = m => `<${tag} class="nxrow ${mine(m)}" ${ro ? "" : `type="button" data-match="${m.id}"`}><span class="nx-m"><span><b data-notr>${esc(sideName(t, m.a))}</b> v <b data-notr>${esc(sideName(t, m.b))}</b></span><span class="small muted">${esc(matchContext(t, m))}</span></span></${tag}>`;
   return `<div class="stack">

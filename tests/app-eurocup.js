@@ -173,7 +173,29 @@ const { chromium } = require('playwright');
     await w(100); C.render(); await w(40);
     L.push('table at the end: ' + prow() + ' | note ' + (txt(q('main')).match(/GP is game points: 6 for a triples win, 3 for doubles\. A tie counts as won as soon as a club has more than half its points\./) || ['none'])[0]);
     await tab('draw'); L.push('tie at the end: ' + txt(q('.fixture .fx')) + ' | tag ' + txt(q('.fixture .spread .row')));
-    // 7c. A squad player renamed after the line-ups are named: the line-ups follow, finished games keep the old name
+    // 7c. No club in two ties at once: Inter-club's hidden days don't squash the rounds, and a tie moved into a busy round waits
+    q('[data-act="new-t"]').click(); await w(100);
+    { const t = T(); Object.assign(t, { wizard: false, checkin: false, system: 'clubs', clubDays: 1, name: 'Busy' }); t.courts = Array.from({ length: 12 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true }));
+      t.teams = ['Ash', 'Birch', 'Cedar'].map(c => Object.assign({ id: 'b' + c[0], name: c, club: c, active: true }, squad(c))); await put(t); }
+    { const t = T(); t.system = 'eurocup'; await put(t); }
+    await tab('draw'); q('[data-act="first-draw"]').click(); await w(250);
+    L.push('eurocup draw after inter-club days 1: rounds ' + new Set(C.T().clubFix.map(f => f.day)).size);
+    const mv = C.T().clubFix.find(f => f.day === 2);
+    let dayBtn = q(`[data-act="fx-day"][data-fx="${mv.id}"][data-day="1"]`); if (!dayBtn) { qa('main details').forEach(d => d.open = true); C.render(); await w(60); dayBtn = q(`[data-act="fx-day"][data-fx="${mv.id}"][data-day="1"]`); }
+    dayBtn.click(); await w(250);
+    { const lu = { ot: [4, 5, 6], mt: [1, 2, 3], od1: [4, 5], od2: [6, 7], md: [1, 8] }, nm = id => C.T().teams.find(x => x.id === id).name;
+      for (const m of C.MS()) { const la = lu[m.eu].map(i => `${nm(m.a[0])} P${i}`), lb = lu[m.eu].map(i => `${nm(m.b[0])} P${i}`); Object.assign(S.matches[m.id], { la, lb }); await S.store.updateMatch(S.tid, m.id, { la, lb }); } }
+    await C.assignCourts(); await w(150);
+    const onPistes = () => C.MS().filter(m => m.court && !m.done);
+    const twoTies = () => { const by = {}; for (const m of onPistes()) for (const c of [m.ca, m.cb]) (by[c] = by[c] || new Set()).add(m.ca + 'v' + m.cb); return Object.keys(by).filter(c => by[c].size > 1).map(c => C.T().clubs.find(x => x.id === c).name); };
+    const twice = () => { const seen = {}; for (const m of onPistes()) for (const p of [...m.la, ...m.lb]) seen[p] = (seen[p] || 0) + 1; return Object.keys(seen).filter(p => seen[p] > 1); };
+    const mvOn = () => onPistes().some(m => m.ca === mv.a && m.cb === mv.b);
+    L.push('tie moved into a busy round: moved ' + (C.T().clubFix.find(f => f.id === mv.id).day === 1) + ' | clubs in two ties on pistes ' + (twoTies().join(',') || 'none') + ' | same player on two pistes ' + (twice().join(',') || 'none') + ' | moved tie on pistes ' + mvOn());
+    // the tie already playing in round 1 finishes: the moved tie gets its pistes
+    const first = C.T().clubFix.find(f => f.id !== mv.id && onPistes().some(m => m.ca === f.a && m.cb === f.b));
+    for (const leg of [1, 2]) { for (const m of C.MS().filter(m => m.ca === first.a && m.cb === first.b && m.leg === leg)) await C.recordResult(m.id, 13, 7, true); await w(100); }
+    L.push('after the first tie finishes: moved tie on pistes ' + mvOn() + ' | clubs in two ties on pistes ' + (twoTies().join(',') || 'none'));
+    // 7d. A squad player renamed after the line-ups are named: the line-ups follow, finished games keep the old name
     q('[data-act="new-t"]').click(); await w(100);
     { const t = T(); Object.assign(t, { wizard: false, checkin: false, system: 'eurocup', name: 'Rename' }); t.courts = Array.from({ length: 6 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true }));
       t.teams = [Object.assign({ id: 'na', name: 'North', club: 'North', active: true }, squad('N')), Object.assign({ id: 'nb', name: 'South', club: 'South', active: true }, squad('S'))]; await put(t); }
@@ -202,5 +224,30 @@ const { chromium } = require('playwright');
     L.push('french picker: ' + C.tr('Same as last tie') + ' | ' + C.tr('Next:') + ' | ' + C.tr('Tap a name to fill the next place. Tap a filled place to change it.') + ' | ' + C.tr("Copied from round 2. 1 player isn't in the squad any more, so that place is empty.") + ' | ' + C.tr('+ Add a player'));
     L.push('french points: ' + C.tr('Points for a triples win') + ' | ' + C.tr('A tie is worth 19 points: triples 5 each, doubles 3 each. The first club to 10 wins the tie; the rest of its games are still played and count towards the points.') + ' | ' + C.tr('win the tie') + ' | ' + C.tr('First to 10'));
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack); } return L; });
+  // 10. Pistes: twelve EuroCup games at once; each tile names its game first and the players under each club
+  const pistes = async () => p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)];
+    const txt = el => (el?.innerText || '').replace(/\s+/g, ' ').trim(), tiles = qa('.pgrid .ptile'), ms = C.MS();
+    const game = el => ms.find(m => m.id === el.dataset.match);
+    const label = tiles.every(el => { const c = el.querySelector('.pt-ctx'), m = game(el); return m && txt(c).startsWith(m.label) && c.scrollHeight <= c.clientHeight + 1; });
+    const players = tiles.every(el => { const m = game(el), lu = [...el.querySelectorAll('.pt-lu')].map(txt); return lu.length === 2 && lu[0] === m.la.join(', ') && lu[1] === m.lb.join(', '); });
+    return { distinct: new Set(tiles.map(txt)).size, n: tiles.length, label, players, width: document.scrollingElement.scrollWidth, first: txt(tiles[0]) }; });
+  const setupPistes = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
+    q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="en"]').click(); await w(80);
+    q('[data-act="new-t"]').click(); await w(100); const t = JSON.parse(JSON.stringify(C.T()));
+    Object.assign(t, { wizard: false, checkin: false, system: 'eurocup', name: 'Pistes' }); t.courts = Array.from({ length: 12 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true }));
+    t.teams = ['Riverside', 'Hillside', 'Lakeside', 'Parkside'].map((c, k) => ({ id: 'pk' + k, name: c, club: c, active: true, players: Array.from({ length: 8 }, (_, i) => `${c[0]}${i + 1}`), genders: Array.from({ length: 8 }, (_, i) => i < 3 ? 'f' : 'm') }));
+    await S.store.setTournament(t); S.tournaments[t.id] = t; C.render(); await w(60);
+    q('[data-tab="draw"]').click(); await w(60); q('[data-act="first-draw"]').click(); await w(250);
+    const ms = C.MS().sort((a, b) => a.order - b.order).slice(0, 12), club = id => C.T().teams.find(x => x.id === id[0]);
+    ms.forEach((m, i) => { const pl = (tm, off) => Array.from({ length: m.size }, (_, j) => tm.players[(off + j) % 8]);
+      Object.assign(S.matches[m.id], { la: pl(club(m.a), i), lb: pl(club(m.b), i), court: 'c' + (i + 1) }); });
+    C.render(); q('[data-tab="courts"]').click(); await w(80); return ms.length; });
+  const pw = await pistes();
+  out.push(`pistes tiles distinct: ${pw.distinct} of ${pw.n} | game label visible ${pw.label} | players shown ${pw.players} | first ${pw.first}`);
+  await p.screenshot({ path: process.env.OUT + '/eurocup-pistes.png', fullPage: true });
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(150);
+  const pn = await pistes();
+  out.push(`pistes 390: page width ${pn.width} | game label visible ${pn.label} | players shown ${pn.players}`);
+  await p.screenshot({ path: process.env.OUT + '/eurocup-pistes-390.png', fullPage: true });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
