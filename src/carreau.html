@@ -1705,6 +1705,12 @@ function planCourts(t, ms) {
   // EuroCup games in a tie all name the same two clubs, so each game is its own "entry" here; the legs keep the order
   const keyOf = m => m.eu ? [m.id] : ents(m);
   const busyEnt = new Set(live.flatMap(keyOf));
+  // EuroCup: a club with a game live on a piste in one tie gets no games of another tie (the same players can't be on
+  // two pistes); a tie moved into a round where its clubs already play waits for the other tie
+  const tieOf = m => m.ca + "v" + m.cb, clubTie = new Map();
+  const holdClubs = m => { for (const c of [m.ca, m.cb]) clubTie.set(c, (clubTie.get(c) || new Set()).add(tieOf(m))); };
+  live.filter(m => m.eu).forEach(holdClubs);
+  const clubBusy = m => [m.ca, m.cb].some(c => [...(clubTie.get(c) || [])].some(k => k !== tieOf(m)));
   let free = active.filter(c => !busyCourts.has(c.id));
   if (t.randomCourts) free = shuffle(free);
   const ready = ms.filter(m => !m.done && !m.court && m.a && m.b).sort(byOrder);
@@ -1714,13 +1720,14 @@ function planCourts(t, ms) {
     if (!lineupOk(m)) continue; // EuroCup: waits for both line-ups
     const me = keyOf(m);
     if (me.some(e => busyEnt.has(e))) continue;
+    if (m.eu && clubBusy(m)) continue;
     const earlier = m.eu ? ms.some(o => o !== m && !o.done && o.eu && ((o.ca === m.ca && o.cb === m.cb && o.round === m.round && (o.leg || 0) < (m.leg || 0)) || ((o.round || 0) < (m.round || 0) && ents(o).some(e => ents(m).includes(e)))))
       : ms.some(o => o !== m && !o.done && (o.group === m.group || (o.stage === "melee" && m.stage === "melee")) && (o.round || 0) < (m.round || 0) && ents(o).some(e => me.includes(e)));
 
     if (earlier) continue;
     const c = free.shift();
     m.court = c.id; m.courtAt = Date.now(); out.push({ id: m.id, court: c.id });
-    me.forEach(e => busyEnt.add(e));
+    me.forEach(e => busyEnt.add(e)); if (m.eu) holdClubs(m);
   }
   return out;
 }
@@ -1995,7 +2002,9 @@ function drawClubs(t) {
   const { clubs, N } = chk; const pat = t.clubPairing || "like";
   const line = clubs.map(c => c.id); if (line.length % 2) line.push(null);
   const n = line.length, rest = line.slice(1); const out = [], fix = [];
-  const D = Math.max(1, t.clubDays || n - 1); // starting plan: the circle's rounds spread over the organiser's days
+  // starting plan: the circle's rounds spread over the organiser's days (EuroCup always uses the usual rounds:
+  // Inter-club's hidden "Number of days" would otherwise put a club in two ties in the same round)
+  const D = isEuro(t) ? n - 1 : Math.max(1, t.clubDays || n - 1);
   for (let r = 0; r < n - 1; r++) {
     const arr = [line[0], ...rest.map((_, i) => rest[(i - r + rest.length) % rest.length])];
     const day = (r % D) + 1;
