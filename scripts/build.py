@@ -46,7 +46,7 @@ html = f"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Run petanque competitions live: draws, courts and scores for everyone.">
+<meta name="description" content="Run petanque competitions live: draws, pistes and scores for everyone.">
 <meta name="theme-color" content="#1d6a54">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
