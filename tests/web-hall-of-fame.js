@@ -53,6 +53,12 @@ const { chromium } = require('playwright');
   log('hidden: visitor read', await raw(B, 'get', 'hallOfFame/' + tid), '| visitor list has it', (await raw(B, 'hofShown')).split(',').includes(tid), '| owner read', await raw(A, 'get', 'hallOfFame/' + tid), '| admin list', (await raw(AD, 'hofAll')).split(',').includes(tid));
   log('reason: owner', await raw(A, 'get', 'hallOfFame/' + tid + '/private/admin'), '| visitor', await raw(B, 'get', 'hallOfFame/' + tid + '/private/admin'), '| owner write', await raw(A, 'set', 'hallOfFame/' + tid + '/private/admin', { reason: '' }));
   log('owner unhide:', await raw(A, 'update', 'hallOfFame/' + tid, { hidden: false }), '| relevel:', await raw(A, 'update', 'hallOfFame/' + tid, { level: 'national' }), '| keep level:', await raw(A, 'update', 'hallOfFame/' + tid, { note: 'Still mine', level: 'open' }));
+  // #admin: bulk "Archive selected" marks the entry gone (no link to the competition); the list's Restore links it again
+  const gone = () => AD.evaluate(async t => (await window.__testRaw.get('hallOfFame/' + t))?.gone, tid);
+  await AD.click(`#adm-comps [data-act="adm-sel"][data-id="${tid}"]`); await w(300); await AD.click('#adm-comps [data-act="adm-bulk-arch"]'); await w(2500);
+  log('admin bulk archive: entry link hidden', await gone() === true, '| archived', await AD.evaluate(t => window.__carreau.S.tournaments[t]?.archived, tid));
+  await AD.click(`#adm-comps [data-act="admin-restore"][data-id="${tid}"]`); await w(2500);
+  log('admin list restore: entry link shown', await gone() === false, '| archived', await AD.evaluate(t => window.__carreau.S.tournaments[t]?.archived, tid));
   await A.reload(); await w(3500); await A.click('[data-tab="standings"]'); await w(1500);
   log('owner panel hidden:', await A.evaluate(() => document.querySelector('[data-hof-panel]')?.textContent.replace(/\s+/g, ' ').trim()));
   await A.click('[data-hof-panel] [data-act="hof-remove"]'); await w(200); await A.click('[data-act="hof-remove-yes"]'); await w(1500);
