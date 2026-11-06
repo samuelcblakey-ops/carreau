@@ -86,6 +86,24 @@ const { chromium } = require('playwright');
     document.querySelector('[data-set="system"][data-val="pools"]').click(); await w(80);
     const t9 = C.T(), after = pr(C.getPlan(t9).brackets);
     log.push('plan before '+before+' after '+after); log.push('swiss top8+plate then barrage: plan is '+(t9.system==='pools'&&!t9.koPlan&&/B knockout/.test(after)?'barrage default':'kept'));
+    // 8. CSV export: playing order, readable status, accents kept in the file name, BOM
+    await mk({system:'swiss', swissRounds:2, seeding:'entry', name:"Concours de l'Été à Hitchin", koPlan:{seeding:'seeded', brackets:[{id:'A', name:'Main knockout', from:1, to:4, third:false}]}}, 8);
+    document.querySelector('[data-act="first-draw"]').click(); await w(400); await play(m=>m.round===1); await w(200);
+    document.querySelector('[data-act="next-round"]').click(); await w(250); await play(m=>m.round===2); await w(200);
+    document.querySelector('[data-tab="draw"]').click(); await w(40); document.querySelector('[data-act="start-kos"]').click(); await w(300);
+    const sf1 = C.MS().filter(m=>m.stage==='ko'&&m.a&&m.b).sort((x,y)=>x.order-y.order)[0]; await C.recordResult(sf1.id,13,4,true); await w(100);
+    const sfOn = C.MS().find(m=>m.stage==='ko'&&m.a&&m.b&&!m.done); if (sfOn && !sfOn.court) { sfOn.court = C.T().courts[0].id; } const got = []; S.downloads = { save: async f => got.push(f) }; C.render(); await w(40);
+    const csvRows = f => f.data.replace(/^\uFEFF/,'').split('\n').slice(1).map(r => r.slice(1,-1).split('","'));
+    const uniq = a => a.filter((v,i)=>a.indexOf(v)===i);
+    document.querySelector('[data-act="export"]').click(); await w(150);
+    const f1 = got[0], r1 = csvRows(f1);
+    log.push('csv order: '+uniq(r1.map(r=>r[0].split(' · ').pop())).join(', '));
+    log.push('csv status: '+uniq(r1.map(r=>r[7])).join(' | '));
+    log.push('csv file name: '+f1.filename);
+    log.push('csv bom: '+(f1.data.charCodeAt(0)===0xFEFF));
+    const lang = async l => { document.querySelector('[data-act="lang-menu"]').click(); await w(60); document.querySelector(`[data-lang="${l}"]`).click(); await w(300); };
+    await lang('fr'); document.querySelector('[data-act="export"]').click(); await w(150); await lang('en');
+    log.push('csv status fr: '+uniq(csvRows(got[1]).map(r=>r[7])).join(' | '));
     } catch(e) { log.push('ERR '+e.message+' | modal: '+document.querySelector('#modal').innerText.slice(0,200)+' | main: '+document.querySelector('main').innerText.slice(0,200)); }
     return log;
   });

@@ -18,6 +18,7 @@ const SUITES = {
       /KO entrants 8 duels 8/, /tie prompt shown/, /shoot final done true winner \["p\d+"\]/,
       /final standings: (Shoot final · Standings )?Standings Final WINNER/,
       /archived visible locally: true/, /restored: true/, /swiss top8\+plate then barrage: plan is barrage default/, /^errs \[\]$/m,
+      /csv order: Round 1, Round 2, Semi-finals, Final$/m, /csv status: Finished \| Playing \| Waiting$/m, /csv file name: Concours de l'Été à Hitchin\.csv$/m, /csv bom: true/, /csv status fr: Terminée \| En jeu \| En attente$/m,
     ],
     'app-big-screen.js': [/big screen barrage: tables 3 \| Barrage A,Barrage B,Barrage C \| columns #,Team,W,L,For,Agst,\+\/-/, /big screen barrage rows: 12 \| font 20px/,
       /big screen leagues: tables 2 \| League A,League B/, /big screen melee in advance after 2 results: Round 1 \| next up round 1 only \(shown 2, round 1 waiting 2/,

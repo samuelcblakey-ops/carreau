@@ -1232,6 +1232,13 @@ Object.assign(LANG_TEXT.de, {"Bye this round.": "Freilos in dieser Runde."});
 Object.assign(LANG_TEXT.nl, {"Bye this round.": "Vrijloting deze ronde."});
 Object.assign(LANG_TEXT.pt, {"Bye this round.": "Isento nesta ronda."});
 Object.assign(LANG_TEXT.th, {"Bye this round.": "รอบนี้ได้บาย"});
+Object.assign(FR_TEXT, {"Waiting": "En attente"});
+Object.assign(LANG_TEXT.es, {"Waiting": "En espera"});
+Object.assign(LANG_TEXT.it, {"Waiting": "In attesa"});
+Object.assign(LANG_TEXT.de, {"Waiting": "Wartet"});
+Object.assign(LANG_TEXT.nl, {"Waiting": "Wacht"});
+Object.assign(LANG_TEXT.pt, {"Waiting": "Em espera"});
+Object.assign(LANG_TEXT.th, {"Waiting": "รอแข่ง"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -5203,9 +5210,15 @@ document.addEventListener("keydown", e => {
 
 async function exportCsv() {
   const t = T(); const rows = [["Stage", "Round", "Piste", isIndiv(t) ? "Side A" : "Team A", "Score A", "Score B", isIndiv(t) ? "Side B" : "Team B", "Status"]];
-  MS().sort(byOrder).forEach(m => rows.push([matchContext(t, m), m.round, m.courtUsed || m.court ? courtName(t, m.courtUsed || m.court) : "", sideName(t, m.a) || "", m.sa ?? "", m.sb ?? "", m.bye ? "BYE" : sideName(t, m.b) || "", mStatus(m)]));
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
-  try { await S.downloads.save({ filename: `${t.name.replace(/[^\w\- ]+/g, "").trim() || "results"}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
+  // playing order: the morning rounds first, then each knockout (in the order they were drawn) round by round
+  const bi = m => m.stage === "ko" ? 1 + Math.max(0, (t.brackets || []).findIndex(b => b.id === m.bracket)) : 0;
+  const csvStatus = m => tr({ done: "Finished", playing: "Playing" }[mStatus(m)] || "Waiting");
+  MS().sort((x, y) => bi(x) - bi(y) || byOrder(x, y)).forEach(m => rows.push([matchContext(t, m), m.round, m.courtUsed || m.court ? courtName(t, m.courtUsed || m.court) : "", sideName(t, m.a) || "", m.sa ?? "", m.sb ?? "", m.bye ? "BYE" : sideName(t, m.b) || "", csvStatus(m)]));
+  // a BOM first so Excel reads the file as UTF-8 (accented names)
+  const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  // keep accents and spaces in the file name; drop only what file names can't hold
+  const fname = (t.name || "").replace(/[\/\\:*?"<>|\u0000-\u001f]+/g, "").replace(/\s+/g, " ").trim().replace(/^\.+/, "") || "results";
+  try { await S.downloads.save({ filename: `${fname}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
 }
 
 /* ---------------- boot ---------------- */
