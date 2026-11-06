@@ -19,6 +19,9 @@ const SUITES = {
       /final standings: (Shoot final · Standings )?Standings Final WINNER/,
       /archived visible locally: true/, /restored: true/, /^errs \[\]$/m,
     ],
+    'app-big-screen.js': [/big screen barrage: tables 3 \| Barrage A,Barrage B,Barrage C \| columns #,Team,W,L,For,Agst,\+\/-/, /big screen barrage rows: 12 \| font 20px/,
+      /big screen leagues: tables 2 \| League A,League B/, /big screen melee in advance after 2 results: Round 1 \| next up round 1 only \(shown 2, round 1 waiting 2/,
+      /fr big screen name: exactly as typed \| date 26 oct\. 2026/, /en big screen date: Club house · Oct 26, 2026/, /phone sideways scroll: false/, /^errs \[\]$/m],
     'app-shoot-live.js': [
       /next up shown: true/, /live opens by default: true first prompt: Shooter \d Shot 1 of 20 A1 · Lone boule 6 m/,
       /after undo, still shot 20: true/, /progress saved per shot: true/, /grid has no drop-downs: true/, /grid edit: true/, /first done: true total 96/,
