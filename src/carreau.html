@@ -1285,6 +1285,21 @@ Object.assign(LANG_TEXT.de, {"Reset clears the score and mènes for the next gam
 Object.assign(LANG_TEXT.nl, {"Reset clears the score and mènes for the next game; the overlay layout is kept.": "Resetten wist de stand en de mènes voor de volgende partij; de indeling van de overlay blijft."});
 Object.assign(LANG_TEXT.pt, {"Reset clears the score and mènes for the next game; the overlay layout is kept.": "Repor apaga o marcador e as mãos para o jogo seguinte; o layout do overlay mantém-se."});
 Object.assign(LANG_TEXT.th, {"Reset clears the score and mènes for the next game; the overlay layout is kept.": "รีเซ็ตจะล้างคะแนนและเอนด์สำหรับเกมถัดไป โดยยังคงเลย์เอาต์โอเวอร์เลย์ไว้"});
+// live desk toasts
+Object.assign(LANG_TEXT.es, {"Ready for the next game.": "Listo para la siguiente partida.", "Game over. Press Finish game when the handshake's done.": "Partida acabada. Pulsa Terminar partida después del apretón de manos.", "Game over. Press Finish game to put the result on the board.": "Partida acabada. Pulsa Terminar partida para poner el resultado en el cuadro.", "Game finished.": "Partida terminada."});
+Object.assign(LANG_TEXT.it, {"Ready for the next game.": "Pronto per la prossima partita.", "Game over. Press Finish game when the handshake's done.": "Partita finita. Tocca Termina partita dopo la stretta di mano.", "Game over. Press Finish game to put the result on the board.": "Partita finita. Tocca Termina partita per mettere il risultato nel tabellone.", "Game finished.": "Partita terminata."});
+Object.assign(LANG_TEXT.de, {"Ready for the next game.": "Bereit für das nächste Spiel.", "Game over. Press Finish game when the handshake's done.": "Spiel aus. Tippe nach dem Handschlag auf Spiel beenden.", "Game over. Press Finish game to put the result on the board.": "Spiel aus. Tippe auf Spiel beenden, um das Ergebnis einzutragen.", "Game finished.": "Spiel beendet."});
+Object.assign(LANG_TEXT.nl, {"Ready for the next game.": "Klaar voor de volgende partij.", "Game over. Press Finish game when the handshake's done.": "Partij voorbij. Tik na de handdruk op Partij afsluiten.", "Game over. Press Finish game to put the result on the board.": "Partij voorbij. Tik op Partij afsluiten om de uitslag op het bord te zetten.", "Game finished.": "Partij afgesloten."});
+Object.assign(LANG_TEXT.pt, {"Ready for the next game.": "Pronto para o próximo jogo.", "Game over. Press Finish game when the handshake's done.": "Jogo acabado. Toque em Terminar jogo depois do aperto de mão.", "Game over. Press Finish game to put the result on the board.": "Jogo acabado. Toque em Terminar jogo para pôr o resultado no quadro.", "Game finished.": "Jogo terminado."});
+Object.assign(LANG_TEXT.th, {"Ready for the next game.": "พร้อมสำหรับเกมถัดไป", "Game over. Press Finish game when the handshake's done.": "จบเกมแล้ว กด จบเกม หลังจับมือกัน", "Game over. Press Finish game to put the result on the board.": "จบเกมแล้ว กด จบเกม เพื่อบันทึกผลลงตาราง", "Game finished.": "จบเกมแล้ว"});
+// live desk: two phones recorded the same mène at once
+Object.assign(FR_TEXT, {"Another phone just recorded this mène.": "Un autre téléphone vient d'enregistrer cette mène."});
+Object.assign(LANG_TEXT.es, {"Another phone just recorded this mène.": "Otro teléfono acaba de anotar esta mano."});
+Object.assign(LANG_TEXT.it, {"Another phone just recorded this mène.": "Un altro telefono ha appena segnato questa mano."});
+Object.assign(LANG_TEXT.de, {"Another phone just recorded this mène.": "Ein anderes Handy hat diese Aufnahme gerade eingetragen."});
+Object.assign(LANG_TEXT.nl, {"Another phone just recorded this mène.": "Een andere telefoon heeft deze mène net ingevoerd."});
+Object.assign(LANG_TEXT.pt, {"Another phone just recorded this mène.": "Outro telemóvel acabou de registar esta mão."});
+Object.assign(LANG_TEXT.th, {"Another phone just recorded this mène.": "โทรศัพท์อีกเครื่องเพิ่งบันทึกเอนด์นี้แล้ว"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -3587,19 +3602,50 @@ function liveWatch() {
   if (S.liveKey === key) return;
   S.unsubL?.(); S.unsubL = null; S.liveKey = key; if (!r || key === "hof") return; // the Hall of Fame loads its own list
   if (key === "streams") { watchStreams(); return; }
-  if (r.sid) { S.unsubL = S.store.watchStream(r.sid, st => { if (S.liveKey !== key) return; if (st) S.streams[r.sid] = st; else delete S.streams[r.sid]; S.streamsLoaded = true; render(); }, e => console.error(e)); return; }
-  S.unsubL = S.store.watchLive(r.tid, r.mid, L => { if (S.liveKey !== key) return; if (L) S.live[r.mid] = normLive(r.mid, L); else delete S.live[r.mid]; render(); }, e => console.error(e));
+  if (r.sid) { S.unsubL = S.store.watchStream(r.sid, st => { if (S.liveKey !== key) return; if (st) S.streams[r.sid] = st; else delete S.streams[r.sid]; noteEnds(key, st?.live); S.streamsLoaded = true; render(); }, e => console.error(e)); return; }
+  S.unsubL = S.store.watchLive(r.tid, r.mid, L => { if (S.liveKey !== key) return; if (L) S.live[r.mid] = normLive(r.mid, L); else delete S.live[r.mid]; noteEnds(key, L); render(); }, e => console.error(e));
 }
-async function saveLive(L) {
-  const r = S.liveRoute; if (!r) return;
-  L.updated = Date.now(); if (L.events.length > 200) L.events = L.events.slice(-200); if (L.hist.length > 20) L.hist = L.hist.slice(-20);
-  if (r.sid) { const st = S.streams[r.sid]; if (!st) return; st.live = L; st.updated = Date.now(); render();
-    try { await S.store.setStream(st); } catch (e) { console.error(e); toast(e?.code === "permission-denied" ? "This phone isn't allowed to run this live desk. Ask for the live desk link." : "That change didn't save. Check your connection and try again."); } return; }
-  S.live[r.mid] = L; render();
-  try { await S.store.setLive(r.tid, r.mid, L); } catch (e) { console.error(e); toast(e?.code === "permission-denied" ? "This phone isn't allowed to run the live desk. Ask the organiser for the live desk link." : "That change didn't save. Check your connection and try again."); }
-  // organisers and scorers: the running score also shows on Draw & results and the big screen
-  const m = S.matches[r.mid];
-  if (m && !m.done && canScore() && (m.sa !== L.sa || m.sb !== L.sb)) { try { Object.assign(m, { sa: L.sa, sb: L.sb }); await S.store.updateMatch(r.tid, r.mid, { sa: L.sa, sb: L.sb }); } catch (e) { console.error(e); } }
+// A tap on the live desk is a change to the live score: mutate(L) changes L, or returns false when there's nothing to do.
+// It's drawn on this phone's copy straight away. On the website it's then applied to the server's latest live score in a
+// transaction, so two phones scoring at once both count. Offline, or with no transactions (from disk), this phone's copy
+// is written as before. Resolves to the live score as saved, or null when nothing changed.
+const trimLive = L => { L.updated = Date.now(); if (L.events.length > 200) L.events = L.events.slice(-200); if (L.hist.length > 20) L.hist = L.hist.slice(-20); return L; };
+const applyLive = (L0, mutate) => { const L = clone(L0); return mutate(L) === false ? null : trimLive(L); };
+const liveOffline = e => navigator.onLine === false || e?.code === "unavailable";
+async function saveLive(mutate) {
+  const r = S.liveRoute; const c = liveCtx(); if (!r || !c) return null;
+  const L = applyLive(c.L, mutate); if (!L) return null;
+  if (r.sid) { const sid = r.sid, st = S.streams[sid]; st.live = L; st.updated = Date.now(); render();
+    const err = e => { console.error(e); toast(e?.code === "permission-denied" ? "This phone isn't allowed to run this live desk. Ask for the live desk link." : "That change didn't save. Check your connection and try again."); return null; };
+    if (S.store.changeStream && navigator.onLine !== false) {
+      try { const res = await S.store.changeStream(sid, prev => applyLive(normLive("game", prev || {}), mutate)); const cur = S.streams[sid];
+        if (cur) { cur.live = normLive("game", res.L || {}); if (res.updated) cur.updated = res.updated; } render(); return res.wrote ? res.L : null; }
+      catch (e) { if (!liveOffline(e)) { render(); return err(e); } }
+    }
+    try { await S.store.setStream(S.streams[sid] || st); } catch (e) { return err(e); } return L; }
+  const mid = r.mid; S.live[mid] = L; render();
+  const err = e => { console.error(e); toast(e?.code === "permission-denied" ? "This phone isn't allowed to run the live desk. Ask the organiser for the live desk link." : "That change didn't save. Check your connection and try again."); return null; };
+  let saved = L;
+  if (S.store.changeLive && navigator.onLine !== false) {
+    const fresh = () => { const m = S.matches[mid]; return Object.assign(newLive(mid), { sa: m?.sa ?? 0, sb: m?.sb ?? 0 }); };
+    try { const res = await S.store.changeLive(r.tid, mid, prev => applyLive(prev ? normLive(mid, prev) : fresh(), mutate));
+      if (res.L) S.live[mid] = normLive(mid, res.L); else delete S.live[mid]; render(); if (!res.wrote) return null; saved = res.L; }
+    catch (e) { if (!liveOffline(e)) { render(); return err(e); } try { await S.store.setLive(r.tid, mid, L); } catch (e2) { return err(e2); } }
+  } else { try { await S.store.setLive(r.tid, mid, L); } catch (e) { return err(e); } }
+  // organisers and scorers: the running score (as saved) also shows on Draw & results and the big screen
+  const m = S.matches[mid];
+  if (m && !m.done && canScore() && (m.sa !== saved.sa || m.sb !== saved.sb)) { try { Object.assign(m, { sa: saved.sa, sb: saved.sb }); await S.store.updateMatch(r.tid, mid, { sa: saved.sa, sb: saved.sb }); } catch (e) { console.error(e); } }
+  return saved;
+}
+// Two scorers watching one game: a mène another phone recorded moments before this tap is the same mène, entered twice.
+// "Moments" is measured on this phone's own clock from when it first saw that mène (phones' clocks can disagree), or the
+// mène hadn't reached this phone yet at all; the other phone's time on it is only a sanity check against a stale copy.
+const SAME_MENE_MS = 2000;
+const noteEnds = (key, L) => { const n = L?.ends?.length || 0; if (!S.endSeen || S.endSeen.key !== key || S.endSeen.n !== n) S.endSeen = { key, n, at: Date.now() }; };
+function sameMene(L, me, seen, tap) {
+  const e = L.ends[L.ends.length - 1]; if (!me || !e || !e.by || e.by === me || Math.abs(tap - (+e.at || 0)) > 10000) return false;
+  if (L.ends.length > seen) return true; // recorded on another phone, not yet on this one when it was tapped
+  const sn = S.endSeen; return !!sn && sn.key === S.liveKey && sn.n === L.ends.length && tap - sn.at < SAME_MENE_MS;
 }
 const liveSnap = L => ({ sa: L.sa, sb: L.sb, ends: L.ends.length, thrown: { ...L.thrown }, holding: L.holding, events: L.events.length });
 function pushHist(L) { L.hist.push(liveSnap(L)); }
@@ -3705,34 +3751,38 @@ async function deskAction(act, a) {
   if (act === "lv-layout") { d.layout = !d.layout; render(); return; }
   if (act === "lv-lo") { d.lo = a.dataset.lo; render(); return; }
   if (!c.can) return;
-  if (act === "lv-newgame") { if (!c.standalone) return; const L = clone(c.L); const keep = L.layout; Object.assign(L, newLive("game"), { layout: keep }); d.win = null; await saveLive(L); toast("Ready for the next game."); return; }
+  if (act === "lv-newgame") { if (!c.standalone) return; d.win = null; if (await saveLive(L => { const keep = L.layout; Object.assign(L, newLive("game"), { layout: keep }); })) toast("Ready for the next game."); return; }
   if (c.over) return;
-  const L = clone(c.L);
-  if (act === "lv-boule") { const k = a.dataset.side; const tot = sideBoules(t, m, k); if ((L.thrown[k] || 0) >= tot) return; pushHist(L); L.thrown[k] = (L.thrown[k] || 0) + 1; await saveLive(L); return; }
-  if (act === "lv-hold") { const k = a.dataset.side; pushHist(L); L.holding = L.holding === k ? null : k; await saveLive(L); return; }
+  // each tap is a change applied to the latest live score (the server's, on the website), so two phones' taps both count
+  if (act === "lv-boule") { const k = a.dataset.side; const tot = sideBoules(t, m, k); if ((c.L.thrown[k] || 0) >= tot) return;
+    await saveLive(L => { if ((L.thrown[k] || 0) >= tot) return false; pushHist(L); L.thrown[k] = (L.thrown[k] || 0) + 1; }); return; }
+  if (act === "lv-hold") { const k = a.dataset.side; const to = c.L.holding === k ? null : k; await saveLive(L => { pushHist(L); L.holding = to; }); return; }
   if (act === "lv-win") { d.win = d.win === a.dataset.side ? null : a.dataset.side; render(); return; }
   if (act === "lv-pts") {
-    const k = d.win; const n = Math.min(+a.dataset.n, t.target - L[k === "a" ? "sa" : "sb"]); if (!k || !(n > 0)) return; d.win = null;
-    pushHist(L); L[k === "a" ? "sa" : "sb"] += n; L.ends.push({ w: k, n, at: Date.now() }); L.thrown = { a: 0, b: 0 }; L.holding = null;
-    await saveLive(L); if (Math.max(L.sa, L.sb) >= t.target) toast(c.standalone ? "Game over. Press Finish game when the handshake's done." : c.score ? "Game over. Press Finish game to put the result on the board." : "Game over."); return;
+    const k = d.win, key = k === "a" ? "sa" : "sb"; if (!k || !(Math.min(+a.dataset.n, t.target - c.L[key]) > 0)) return; d.win = null;
+    const me = S.me?.() || "", tap = Date.now(), seen = c.L.ends.length; let dup = false;
+    const L = await saveLive(L => { dup = sameMene(L, me, seen, tap); if (dup) return false;
+      const n = Math.min(+a.dataset.n, t.target - L[key]); if (!(n > 0)) return false; // the points stop at the target, from the latest score
+      pushHist(L); L[key] += n; L.ends.push(Object.assign({ w: k, n, at: tap }, me ? { by: me } : {})); L.thrown = { a: 0, b: 0 }; L.holding = null; });
+    if (dup) { toast("Another phone just recorded this mène."); return; }
+    if (L && Math.max(L.sa, L.sb) >= t.target) toast(c.standalone ? "Game over. Press Finish game when the handshake's done." : c.score ? "Game over. Press Finish game to put the result on the board." : "Game over."); return;
   }
   if (act === "lv-ev") {
-    const k = a.dataset.k, ty = a.dataset.t, rr = a.dataset.r; const name = sidePlayers(t, m[k[0]])[+k.slice(1)] || "";
-    pushHist(L); L.events.push({ k, t: ty, r: rr, at: Date.now() });
-    if (rr === "carreau") L.card = { k, text: "Carreau", sub: name, at: Date.now() };
-    await saveLive(L); return;
+    const k = a.dataset.k, ty = a.dataset.t, rr = a.dataset.r; const name = sidePlayers(t, m[k[0]])[+k.slice(1)] || ""; const at = Date.now();
+    await saveLive(L => { pushHist(L); L.events.push({ k, t: ty, r: rr, at }); if (rr === "carreau") L.card = { k, text: "Carreau", sub: name, at }; }); return;
   }
-  if (act === "lv-undo") {
-    const h = L.hist.pop(); if (!h) return;
-    L.sa = h.sa; L.sb = h.sb; L.ends = L.ends.slice(0, h.ends); L.thrown = { ...h.thrown }; L.holding = h.holding; L.events = L.events.slice(0, h.events); L.card = null; d.win = null;
-    await saveLive(L); toast("Undone."); return;
+  if (act === "lv-undo") { // the latest thing recorded on this desk, whichever phone recorded it
+    if (!c.L.hist.length) return; d.win = null;
+    if (await saveLive(L => { const h = L.hist.pop(); if (!h) return false;
+      L.sa = h.sa; L.sb = h.sb; L.ends = L.ends.slice(0, h.ends); L.thrown = { ...h.thrown }; L.holding = h.holding; L.events = L.events.slice(0, h.events); L.card = null; })) toast("Undone.");
+    return;
   }
-  if (act === "lv-lay-reset") { delete L.layout[d.lo]; await saveLive(L); return; }
+  if (act === "lv-lay-reset") { const lo = d.lo; await saveLive(L => { delete L.layout[lo]; }); return; }
   if (act === "lv-finish") {
-    if (!c.score || Math.max(L.sa, L.sb) < t.target || L.sa === L.sb) return;
-    if (c.standalone) { L.done = true; await saveLive(L); toast("Game finished."); return; }
+    const L = c.L; if (!c.score || Math.max(L.sa, L.sb) < t.target || L.sa === L.sb) return;
+    if (c.standalone) { if (await saveLive(L => { L.done = true; })) toast("Game finished."); return; }
     const ok = await guard(() => recordResult(m.id, L.sa, L.sb, true));
-    if (ok === true) { L.done = true; await saveLive(L); toast("Result saved."); }
+    if (ok === true) { await saveLive(L => { L.done = true; }); toast("Result saved."); }
     else if (ok && ok.blocked) toast("This game was already corrected on the desk. Enter the result from Draw & results.");
   }
 }
@@ -3748,7 +3798,7 @@ document.addEventListener("pointermove", e => {
   chip.style.left = x.toFixed(1) + "%"; chip.style.top = y.toFixed(1) + "%"; lvDrag.pos = [+x.toFixed(1), +y.toFixed(1)];
 });
 const lvDrop = async () => { if (!lvDrag) return; const dr = lvDrag; lvDrag = null; if (!dr.pos) return;
-  const c = liveCtx(); if (!c) return; const L = clone(c.L); L.layout = L.layout || {}; (L.layout[S.desk.lo] ||= {})[dr.k] = dr.pos; await saveLive(L); };
+  const lo = S.desk.lo; await saveLive(L => { L.layout = L.layout || {}; (L.layout[lo] ||= {})[dr.k] = dr.pos; }); };
 document.addEventListener("pointerup", lvDrop); document.addEventListener("pointercancel", lvDrop);
 let lvResize = null; addEventListener("resize", () => { if (S.liveRoute?.view === "stream" && !S.liveRoute.o) { clearTimeout(lvResize); lvResize = setTimeout(render, 150); } });
 /* Setup → Streaming: links for each game on a piste */
