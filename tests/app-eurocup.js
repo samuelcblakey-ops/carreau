@@ -41,6 +41,14 @@ const { chromium } = require('playwright');
     q('[data-act="eu-edit"]').click(); await w(80);
     L.push('edit big squad: rows ' + qa('#add-form .sq-row').length + ' | all there ' + (q('#nt-p14').value === 'R15') + ' | eyebrow ' + txt(q('#add-form .eyebrow')));
     q('[data-act="eu-edit-cancel"]').click(); await w(60);
+    // paste gets the form's checks: nothing is added when a line fails
+    const paste = async v => { q('#bulk').value = v; q('#bulk-form').requestSubmit(); await w(100); return txt(q('#toast')); };
+    { const n0 = C.T().teams.length; const a = await paste('riverside: A1 (W), A2 (M), A3 (M), A4 (M), A5 (M), A6 (M)'), b = await paste('Newside: N1 (W), N2 (M), N3 (M), N4 (M), N5 (M), N6 (M)\nnewside: M1 (W), M2 (M), M3 (M), M4 (M), M5 (M), M6 (M)');
+      L.push('paste same club twice: ' + (a === 'That club is already entered.' && b === a && C.T().teams.length === n0 ? 'refused' : 'toasts ' + a + ' / ' + b) + ' | clubs ' + C.T().teams.length);
+      const d = await paste('Dupside: D1 (W), D2 (M), D3 (M), d2 (M), D5 (M), D6 (M)');
+      L.push('paste duplicate player: ' + (C.T().teams.length === n0 && /^d2 is in the squad twice\./.test(d) ? 'refused' : 'toast ' + d + ' | clubs ' + C.T().teams.length));
+      const m = await paste('Bigside: ' + Array.from({ length: 45 }, (_, i) => 'B' + (i + 1) + (i ? ' (M)' : ' (W)')).join(', '));
+      L.push('paste 45 players: ' + (C.T().teams.length === n0 ? 'refused' : 'added') + ' | message ' + m + ' | bulk kept ' + (q('#bulk').value.length > 0)); }
     // paste a list with genders
     q('#bulk').value = 'Hillside: H1 (W), H2 (M), H3 M, H4 (M), H5 (W), H6 (M)\nLakeside: L1 (M), L2 (M), L3 (M), L4 (M), L5 (M), L6 (M)'; q('#bulk-form').requestSubmit(); await w(120);
     L.push('pasted: ' + C.T().teams.slice(1).map(x => x.name + ' ' + x.genders.join('')).join(','));

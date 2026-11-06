@@ -218,6 +218,7 @@ const SUITES = {
       /edit form: Edit squad \| filled R5 m/, /edited: 8 fmmmmfmm \| pill 8 PLAYERS · 2 ♀ 6 ♂/,
       /add a player: rows 9 → 10 \| typed kept R9 m \| new place focused true/, /after a redraw: R9 \| rows 10/,
       /big squad: 15 \| last R15 \| pill 15 PLAYERS · 2 ♀ 13 ♂/, /edit big squad: rows 16 \| all there true \| eyebrow SQUAD · AT LEAST 6 PLAYERS/,
+      /paste same club twice: refused \| clubs 1/, /paste duplicate player: refused/, /paste 45 players: refused \| message A club can have up to 40 players\./,
       /pasted: Hillside fmmmfm,Lakeside mmmmmm/,
       /blocked: true \| Not ready to draw yet Lakeside: the squad needs at least one man and one woman for the mixed games\./, /ready: Draw the ties \| 4 clubs → 6 fixtures/,
       /drawn: ties 6 \| rounds 1,2,3 \| games 30 \| per tie Open triple:1,Mixed triple:1,Open double 1:1,Open double 2:1,Mixed double:1 \| on pistes 0/,
