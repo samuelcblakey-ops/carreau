@@ -26,6 +26,8 @@ const { chromium } = require('playwright');
   log('competition registered:', await A.evaluate(() => window.__carreau.S.teamScoringOn(window.__carreau.T())), '| organiser still no choice:', !(await has(A, '[data-set="scoreMode"]')));
   await AD.click('[data-act="team-links-make"]'); await w(1500);
   const links = await AD.evaluate(() => Object.fromEntries([...document.querySelectorAll('#team-links input[id^="tl-"]')].map(i => [i.id.slice(3), i.value])));
+  await A.click('[data-tab="draw"]'); await w(200); await A.click('[data-tab="setup"]'); await w(500);
+  const editLink = await A.inputValue('#share-edit');
   log('team links:', Object.keys(links).length);
   // per-team QR code: shown on its own, encodes that team's link, hides again
   const firstTeam = Object.keys(links)[0];
@@ -43,6 +45,14 @@ const { chromium } = require('playwright');
   await T1.click('.team-panel [data-act="team-score"]'); await w(300);
   await T1.click('[data-act="qlose"][data-k="sb"][data-n="7"]'); await w(1500);
   log('proposal pending:', await T1.evaluate(id => JSON.stringify((({ sa, sb, status }) => ({ sa, sb, status }))(window.__carreau.S.matches[id].proposal || {})), g1.id));
+  // the owner taps a team's link on their own phone: it stays the organiser's phone
+  const roleOf = p => p.evaluate(() => { const C = window.__carreau, t = C.T(); return C.S.permFn(t).edit && !C.S.myTeam(t) ? 'organiser' : C.S.myTeam(t) ? 'team' : 'viewer'; });
+  const NOTICE = "You run this competition, so this phone stays an organiser. Open the team link on the team's phone.";
+  await A.goto(links[g1.b]); await w(1500);
+  const aToast = await A.textContent('#toast'); await A.click('[data-tab="draw"]'); await w(500);
+  log('owner opens team link: role', await roleOf(A), '| to check shown', await has(A, '.check-panel'), '| notice shown', aToast.includes(NOTICE));
+  if (process.env.OUT) await A.screenshot({ path: process.env.OUT + '/owner-team-link.png' });
+  await AD.evaluate(() => { location.hash = 'admin'; }); await w(1500); // only the owner's phone is left to publish
   const sec = await T1.evaluate(async ([g1, g2]) => { const C = window.__carreau, S = C.S, t = C.T(); const out = [];
     try { await S.store.updateMatch(t.id, g1, { sa: 13, sb: 0, done: true }); out.push('result WROTE'); } catch (e) { out.push('result ' + e.code); }
     try { await S.teamRespond(t, S.matches[g1], 'confirmed'); out.push('self-confirm WROTE'); } catch (e) { out.push('self-confirm ' + e.code); }
@@ -54,7 +64,17 @@ const { chromium } = require('playwright');
   await T2.screenshot({ path: process.env.OUT + '/team-confirm.png' });
   await T2.click('[data-act="team-confirm"]'); await w(4000);
   log('organiser screen published:', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb + ' ' + m.proposal.status; }, g1.id));
+  log("team proposes, other team confirms: published by the owner's phone", await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done === true && m.proposal.status === 'applied'; }, g1.id));
+  await AD.evaluate(id => { location.hash = id; }, tid); await w(2000);
   await w(1500); log('team sees result:', (await T1.textContent('.team-panel')).replace(/\s+/g, ' ').includes('Won 13–7'));
+  // a phone with the organiser link opens a team link: it can still edit
+  const O = await mk('organiserLink', 390); await O.goto(editLink); await w(4500);
+  await O.goto(links[g2.b]); await w(1500);
+  const oToast = await O.textContent('#toast');
+  if (process.env.OUT) await O.screenshot({ path: process.env.OUT + '/organiser-link-team-link.png' });
+  await O.click('[data-tab="draw"]'); await w(500);
+  log('organiser-link phone opens team link: can still edit', (await roleOf(O)) === 'organiser' && await has(O, '[data-tab="setup"]'), '| notice', oToast.includes(NOTICE));
+  await O.context().close();
   // dispute on game 2
   const T3 = await mk('teamC', 390); await T3.goto(links[g2.a]); await w(4500);
   await T3.click('.team-panel [data-act="team-score"]'); await w(300);
@@ -75,6 +95,28 @@ const { chromium } = require('playwright');
   log('unregistered comp, team propose:', await tryPropose());
   await setReg(true); await w(2000);
   log('re-registered, team propose:', await tryPropose());
+  // a team phone's console can't send a score the dialog wouldn't: the rules check the numbers and the server's clock
+  const consoleTry = (how) => T1.evaluate(async how => { const C = window.__carreau, S = C.S, t = C.T(); const me = S.myTeam(t); const m = C.MS().find(m => !m.done && m.a && m.b && (m.a.includes(me) || m.b.includes(me)));
+    try { if (how.at0) await S.store.updateMatch(t.id, m.id, { proposal: { sa: 13, sb: 7, by: me, at: 0, status: 'pending' } }); else await S.teamPropose(t, m, how.sa, how.sb, how.time); return 'accepted'; }
+    catch (e) { return e.code === 'permission-denied' ? 'refused' : e.code; } }, how);
+  log('console at 0', await consoleTry({ at0: true }));
+  log('console 99-0', await consoleTry({ sa: 99, sb: 0 }));
+  log('console 7-7 time', await consoleTry({ sa: 7, sb: 7, time: true }));
+  log('console 13-14', await consoleTry({ sa: 13, sb: 14 }));
+  log('valid 13-7', await consoleTry({ sa: 13, sb: 7 }));
+  log('valid ended on time 9-7', await consoleTry({ sa: 9, sb: 7, time: true }));
+  // a bad proposal that got in anyway (written here by the admin) is left for the organiser to check, not published
+  const bad = await AD.evaluate(async () => { const C = window.__carreau, t = C.T(); const m = C.MS().find(m => !m.done && m.a && m.b && m.proposal);
+    await C.S.store.updateMatch(t.id, m.id, { proposal: { sa: 99, sb: 0, by: m.a[0], at: Date.now(), status: 'confirmed', confirmedBy: m.b[0] } }); return m.id; });
+  await w(4000);
+  log("organiser's phone skips an invalid proposal:", await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return !m.done && m.proposal.sa === 99 && m.proposal.status === 'confirmed' && !!document.querySelector(`.check-panel [data-act="check-accept"][data-id="${id}"]`); }, bad));
+  // auto-confirm runs on the server's time: not published at once, published once the wait (3 s here) is over
+  await AD.evaluate(async id => { const C = window.__carreau, t = JSON.parse(JSON.stringify(C.T())); Object.assign(t, { scoreMode: 'teams-auto', autoConfirmMin: 0.05 });
+    await C.S.store.setTournament(t); await C.S.store.updateMatch(t.id, id, { proposal: null }); }, bad); await w(2000);
+  await consoleTry({ sa: 13, sb: 5 }); await w(500);
+  const early = await A.evaluate(id => !!window.__carreau.S.matches[id].done, bad); await w(5000);
+  log('auto-confirm on server time: early', early, '| after the wait', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb + ' ' + m.proposal.status; }, bad));
+  await AD.evaluate(async () => { const C = window.__carreau, t = JSON.parse(JSON.stringify(C.T())); t.scoreMode = 'teams'; delete t.autoConfirmMin; await C.S.store.setTournament(t); }); await w(1500);
   // EuroCup: a club plays both triples of a tie at once, so its link lists every game on a piste
   const eid = await AD.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
     q('[data-act="new-t"]').click(); await w(2500);

@@ -34,15 +34,19 @@ const newCode = () => { const a = new Uint32Array(8); crypto.getRandomValues(a);
 
 // writes: count what's waiting for the server (for the connection light); when offline, don't make the
 // screen wait for the server to answer: the change is already in the local cache and syncs when back online
-const NET = { pending: 0 };
-const netChanged = () => { try { renderNet(); } catch {} };
+// the count is also kept on the device, so a reload while still offline shows what's still waiting from before
+// (carried: writes from before the reload; cleared once Firestore says its queue has reached the server, see boot)
+const NET_KEY = "carreau-waiting";
+const NET = { pending: 0, carried: Math.max(0, parseInt(lsGet(NET_KEY), 10) || 0) };
+const waiting = () => NET.pending + NET.carried;
+const netChanged = () => { lsSet(NET_KEY, String(waiting())); try { renderNet(); } catch {} };
 const track = p => {
   NET.pending++; netChanged();
   const done = () => { NET.pending = Math.max(0, NET.pending - 1); netChanged(); }; p.then(done, done);
   if (navigator.onLine === false) { p.catch(e => { console.error(e); toast("A change made offline couldn't be saved."); }); return Promise.resolve(); }
   return p;
 };
-S.connState = () => !FB ? null : navigator.onLine === false ? { k: "off", label: NET.pending ? `Offline · ${NET.pending} waiting to sync` : "Offline" } : NET.pending ? { k: "sync", label: "Saving…" } : { k: "live", label: "Live" };
+S.connState = () => !FB ? null : navigator.onLine === false ? { k: "off", label: waiting() ? `Offline · ${waiting()} waiting to sync` : "Offline" } : waiting() ? { k: "sync", label: "Saving…" } : { k: "live", label: "Live" };
 addEventListener("online", netChanged); addEventListener("offline", netChanged);
 function fbStore() {
   const { db } = FB;
@@ -74,7 +78,7 @@ function fbStore() {
       new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
-    watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data()), { remote: !s.metadata.hasPendingWrites }), onErr); },
+    watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(matchData), { remote: !s.metadata.hasPendingWrites }), onErr); },
     async setTournament(t) {
       const isNew = !!t._new; const body = clone(t); delete body._new; body.updated = Date.now();
       await track(setDoc(doc(db, "tournaments", t.id), body));
@@ -137,6 +141,8 @@ function fbStore() {
   };
 }
 
+// matches as the app uses them: a proposal's server timestamp becomes milliseconds (an estimate until the server confirms it)
+const matchData = d => { const m = d.data({ serverTimestamps: "estimate" }); const at = m.proposal?.at; if (at && typeof at.toMillis === "function") m.proposal.at = at.toMillis(); return m; };
 const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);
 S.permFn = t => {
   if (!AUTH.user || !t) return { edit: false, score: false };
@@ -191,10 +197,11 @@ S.onFieldSet = async (t, k, v) => {
 };
 S.viewAllTabs = t => !!t.listed; // examples show every tab, locked
 S.myTeam = t => TEAM[t.id] || null;
+// a proposal's time is the server's (the rules insist), so a phone can't backdate it to skip the other team's wait
 S.teamPropose = async (t, m, sa, sb, time) => {
   const me = TEAM[t.id]; if (!me) return false;
-  const proposal = { sa, sb, by: me, at: Date.now(), status: "pending" }; if (time) proposal.time = true;
-  await track(updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal })); S.matches[m.id].proposal = proposal; return true;
+  const proposal = { sa, sb, by: me, at: serverTimestamp(), status: "pending" }; if (time) proposal.time = true;
+  await track(updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal })); S.matches[m.id].proposal = { ...proposal, at: Date.now() }; return true;
 };
 S.teamRespond = async (t, m, status) => {
   const me = TEAM[t.id]; const p = m.proposal; if (!me || !p) return false;
@@ -232,6 +239,13 @@ function teamLinksPanel(t) {
   </div>`;
 }
 // organisers archive; only the admin can delete a competition (also enforced in firestore.rules)
+// the admin's archive and restore in #admin do what the organiser's buttons do (hofMarkGone in the page): an archived
+// competition's Hall of Fame entry stays, without its link; restoring links it again. No entry is fine.
+async function hofGone(tid, gone) {
+  const e = S.hof?.[tid]; if (e === null || (e && !!e.gone === gone)) return;
+  try { await S.store.updateHof(tid, { gone }); if (e) e.gone = gone; if (S.hofPage) S.hofPage.cache = {}; }
+  catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
+}
 S.canDelete = () => isAdmin();
 S.canSeeArchived = () => isAdmin();
 S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.device = deviceLabel(); nt.listed = false; nt._new = true; if (loginMode() && orgActive() && !isAdmin()) nt.orgCode = ORG.code; remember(nt.id); };
@@ -268,7 +282,7 @@ S.headerExtra = () => {
   if (TEAM[t.id]) return `<span class="pill done">Team</span>`;
   if (p.edit) return `<span class="pill done">Organiser</span>`;
   if (p.score) return `<span class="pill done">Scorer</span>`;
-  return `<button class="btn sm ghost" data-act="enter-code">Organiser code</button>`;
+  return `<button class="btn sm ghost code-btn" data-act="enter-code" aria-label="Organiser code" title="Organiser code"><svg class="code-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></svg><span class="hide-sm">Organiser code</span></button>`;
 };
 // start screen when this visitor can't create: with organiser login on, running a competition starts by logging in
 S.startLogin = () => loginMode() ? `<button type="button" class="start-card go" data-act="org-page"><b>Run a competition</b><span>Log in with your organiser code</span></button>` : "";
@@ -304,7 +318,7 @@ S.extraAction = async (act, a) => {
   if (act === "admin-del") { S.adminConfirm = a.dataset.id; render(); return; }
   if (act === "admin-del-yes") { const id = a.dataset.id; S.adminConfirm = null; try { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; toast("Competition deleted."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); } render(); return; }
   if (act === "admin-restore") {
-    try { await updateDoc(doc(FB.db, "tournaments", a.dataset.id), { archived: false, archivedAt: null }); toast("Competition restored."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); }
+    try { await updateDoc(doc(FB.db, "tournaments", a.dataset.id), { archived: false, archivedAt: null }); await hofGone(a.dataset.id, false); toast("Competition restored."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); }
     return;
   }
   if (act === "open-testing") {
@@ -371,8 +385,17 @@ function openCodeBox() {
 function closeCodeBox() { document.getElementById("modal").innerHTML = ""; }
 document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "code-input") { e.preventDefault(); document.querySelector('[data-act="code-submit"]')?.click(); } });
 
+// a phone that already runs the competition (owner, organiser link or code, admin) keeps that role when it opens a team link
+async function runsComp(tid) {
+  if (isAdmin() || ROLE[tid] === "edit") return true;
+  let t = S.tournaments[tid];
+  if (!t) { try { const d = await getDocFromServer(doc(FB.db, "tournaments", tid)); t = d.exists() ? d.data() : null; } catch {} }
+  if (t && ((isOwner(t) && !loginMode()) || (orgActive() && !!t.orgCode && t.orgCode === ORG.code))) return true;
+  try { const d = await getDocFromServer(doc(FB.db, "tournaments", tid, "members", AUTH.user.uid)); return d.exists() && d.data().role === "edit"; } catch { return false; }
+}
 async function joinTeam(tid, teamId, code) {
   const ref = doc(FB.db, "tournaments", tid, "members", AUTH.user.uid);
+  if (await runsComp(tid)) { S.tab = "draw"; render(); toast("You run this competition, so this phone stays an organiser. Open the team link on the team's phone."); return true; }
   try { await setDoc(ref, { role: "team", teamId, code, joinedAt: Date.now() }); TEAM[tid] = teamId; remember(tid); restart(); S.tab = "draw"; render();
     const t = S.tournaments[tid]; const nm = t?.teams?.find(e => e.id === teamId)?.name; toast(`This phone now enters scores for ${nm || "your team"}.`); return true; }
   catch (e) { console.error(e); toast("That team link didn't work. Ask the organiser for a new one."); return false; }
@@ -751,14 +774,16 @@ function usagePanel() {
     <div class="row"><button class="btn sm" data-act="adm-usage-refresh" ${USAGE.busy ? "disabled" : ""}>Refresh now</button>
       <a class="btn sm" href="https://console.firebase.google.com/project/${P}/firestore/usage" target="_blank" rel="noopener">Firebase usage page</a></div>`);
 }
+// search ignores accents and capitals, folded as the picker does (hofNorm in the page): "melee" finds "Mêlée du jeudi"
+const fold = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 function adminView() {
   if (isAdmin()) watchNames();
   const all = Object.values(S.tournaments);
   const cs = creators(all); const cOf = Object.fromEntries(cs.map(c => [c.uid, c]));
   const counts = { all: all.length, examples: all.filter(t => t.listed).length, visitors: all.filter(t => !t.listed).length, empty: all.filter(t => !t.listed && !entriesOf(t)).length, archived: all.filter(t => t.archived).length };
-  const q = ADM.q.trim().toLowerCase();
+  const q = fold(ADM.q.trim());
   const shown = all.filter(t => (ADM.filter === "all" || (ADM.filter === "examples" && t.listed) || (ADM.filter === "visitors" && !t.listed) || (ADM.filter === "empty" && !t.listed && !entriesOf(t)) || (ADM.filter === "archived" && t.archived))
-    && (!ADM.creator || (t.ownerUid || "unknown") === ADM.creator) && (!q || (t.name || "").toLowerCase().includes(q)))
+    && (!ADM.creator || (t.ownerUid || "unknown") === ADM.creator) && (!q || fold(t.name).includes(q)))
     .sort((x, y) => (!!y.listed - !!x.listed) || (y.created || 0) - (x.created || 0));
   [...ADM.sel].forEach(id => { if (!S.tournaments[id]) ADM.sel.delete(id); });
   const nSel = ADM.sel.size; const allShownSel = shown.length && shown.every(t => ADM.sel.has(t.id));
@@ -809,7 +834,7 @@ function adminView() {
             : `<button class="btn sm danger" data-act="adm-bulk-del">Delete selected</button><button class="btn sm" data-act="adm-bulk-arch">Archive selected</button><button class="btn sm ghost" data-act="adm-sel-none">Clear</button>`}` : ""}
         ${ADM.busy ? `<span class="small muted">${esc(ADM.busy)}</span>` : ""}
       </div>
-      <div>${shown.map(t => { const c = cOf[t.ownerUid || "unknown"]; return `<div class="erow" data-name="${esc((t.name || "").toLowerCase())}">
+      <div>${shown.map(t => { const c = cOf[t.ownerUid || "unknown"]; return `<div class="erow" data-name="${esc(fold(t.name))}">
         <input type="checkbox" data-act="adm-sel" data-id="${t.id}" ${ADM.sel.has(t.id) ? "checked" : ""} aria-label="Select ${esc(t.name)}">
         <div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(c?.label || "Unknown")} · created ${when(t.created)}${t.updated ? ` · changed ${when(t.updated)}` : ""} · ${entriesOf(t)} ${t.entry === "melee" || t.entry === "shooting" ? "players" : "teams"}</span></div>
         <span class="pill ${statusOf(t) === "Empty" ? "" : "playing"}">${statusOf(t)}</span>
@@ -906,7 +931,7 @@ async function adminAction(act, a) {
   if (act === "adm-bulk-del-yes" || act === "adm-bulk-arch") {
     const ids = [...ADM.sel]; ADM.confirm = null; let ok = 0, failed = 0; const del = act === "adm-bulk-del-yes";
     const one = async id => {
-      try { if (del) { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; } else await updateDoc(doc(FB.db, "tournaments", id), { archived: true }); ok++; ADM.sel.delete(id); }
+      try { if (del) { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; } else { await hofGone(id, true); await updateDoc(doc(FB.db, "tournaments", id), { archived: true }); } ok++; ADM.sel.delete(id); }
       catch (e) { console.error(e); failed++; }
       ADM.busy = `${del ? "Deleting" : "Archiving"}… ${ok + failed} of ${ids.length} done`; render();
     };
@@ -925,7 +950,7 @@ async function adminAction(act, a) {
 }
 S.overlayInput = el => {
   if (el.id !== "adm-q") return false;
-  ADM.q = el.value; const q = ADM.q.trim().toLowerCase(); let n = 0;
+  ADM.q = el.value; const q = fold(ADM.q.trim()); let n = 0;
   document.querySelectorAll("#adm-comps [data-name]").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
   const c = document.getElementById("adm-count"); if (c) c.textContent = `${n} shown`;
   return true;
@@ -1058,6 +1083,8 @@ function boot() {
   onAuthStateChanged(FB.auth, async u => {
     if (!u) { try { await signInAnonymously(FB.auth); } catch (e) { console.error(e); toast("Couldn't connect. Check your internet connection and reload."); } return; }
     AUTH.user = u; AUTH.ready = true; watchSite(); watchOrg(); restart(); render();
+    // changes made before a reload are still in this user's offline queue: count them until it has all reached the server
+    if (NET.carried && !NET.watching) { NET.watching = true; waitForPendingWrites(FB.db).then(() => { NET.carried = 0; netChanged(); }, e => console.warn(e)); }
     await handleHash();
   });
 }
