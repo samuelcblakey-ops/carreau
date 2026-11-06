@@ -491,7 +491,7 @@ tr.me td{background:var(--accent-soft)}tr.me td:first-child{box-shadow:inset 3px
 .empty{padding:28px;text-align:center;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
 /* live streaming: the overlay (transparent page, boxes placed by percentage) and the live desk */
 body.stream,body.desk{padding-bottom:0}
-body.stream{background:transparent}body.stream header.app,body.stream #roundalert,body.stream #toast{display:none}
+body.stream{background:transparent}body.stream header.app,body.stream #roundalert,body.stream #toast,body.stream #foot{display:none}
 body.stream main{max-width:none;padding:0;margin:0}
 body.desk header.app{display:none}
 .ov{position:fixed;inset:0;overflow:hidden;color:#fff;font-family:var(--body);pointer-events:none;--pan:rgba(10,14,22,.86);--mute:#b9c2cf}
@@ -1308,6 +1308,9 @@ function trCore(t, depth = 0) {
   }
   return null;
 }
+// a sentence around a name that stays as typed: the whole sentence translates by its "{x}" key (word order and all),
+// then the name goes in as html of its own (e.g. a data-notr span), so a name with " · " can't stop the translation
+const trAround = (en, html) => { const ph = "\u0007"; return esc(tr(en.replace("{x}", ph))).replace(ph, html); };
 // translate by a key of its own while English shows plain text, e.g. the overlay's "Final" (final score) vs a knockout's "Final"
 const trAs = (key, en) => { if (I18N.lang === "en") return en; const r = tr(key); return r === key ? en : r; };
 function tr(s) {
@@ -2896,9 +2899,9 @@ function hofPanel(t, where) {
     ${e.levelSetBy === "admin" && !e.hidden ? `<div class="small muted">The site admin set the level. It stays the same when you update the entry.</div>` : ""}</div>`;
 }
 // top of Draw & results: once the final's score is in and it isn't published yet (or the result has changed since)
-// with afternoon knockouts planned, wait for the knockouts' last final (the morning leader isn't the winner)
+// with afternoon knockouts planned (saved or the default plan), wait for the knockouts' last final (the morning leader isn't the winner)
 function hofKoWait(t, r) {
-  if (!t.koPlan || !PLAN_SYSTEMS.includes(t.system)) return false;
+  if (!PLAN_SYSTEMS.includes(t.system)) return false;
   const brs = t.brackets || []; if (!brs.length) return true;
   const ids = getPlan(t).brackets.map(b => b.id).filter(id => brs.some(b => b.id === id));
   const last = ids.length ? ids[ids.length - 1] : brs[brs.length - 1].id;
@@ -3903,7 +3906,7 @@ function drawPage() {
   const restore = () => { document.querySelectorAll("[data-scroll-key]").forEach(el => { const v = scrolls[el.dataset.scrollKey]; if (v) { el.scrollLeft = v[0]; el.scrollTop = v[1]; } }); };
   applyCompTheme(S.liveRoute && !S.liveRoute.tid ? null : T()); brandWatch(); hofWatch();
   document.body.classList.toggle("stream", S.liveRoute?.view === "stream"); document.body.classList.toggle("desk", S.liveRoute?.view === "desk");
-  if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lm = S.matches[S.liveRoute.mid]; scheduleCardTick(S.liveRoute.view === "stream" && lm ? liveOf(lm) : null); return; }
+  if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lc = S.liveRoute.view === "stream" && S.loaded ? liveCtx() : null; scheduleCardTick(lc ? lc.L : null); return; }
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
@@ -4143,11 +4146,11 @@ function renderSetup(t) {
   ${hofPanel(t, "setup")}
   ${canEdit() ? `<div class="panel spread">
     <div><h3>${t.archived ? "Archived" : "Archive competition"}</h3><p class="small muted">${t.archived ? "Only the site admin can see this competition. Restore it to make it visible again." : `Once the competition has finished, archive it to hide it from everyone except the site admin.${MS().some(m => !m.done && m.a && (m.b || m.stage === "shoot")) ? " Some games aren't finished yet." : ""}`}</p></div>
-    ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">Archive “${esc(t.name)}”? Only the admin will be able to see it.</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
+    ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">${trAround("Archive “{x}”? Only the admin will be able to see it.", `<span data-notr>${esc(t.name)}</span>`)}</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
   </div>` : ""}
   ${S.canDelete && !S.canDelete(t) ? "" : `<div class="panel spread">
     <div><h3>Delete competition</h3><p class="small muted">Removes the competition, its entries and every result.</p></div>
-    ${S.confirmDelete ? `<div class="row"><span class="err">Delete “${esc(t.name)}” for everyone?</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
+    ${S.confirmDelete ? `<div class="row"><span class="err">${trAround("Delete “{x}” for everyone?", `<span data-notr>${esc(t.name)}</span>`)}</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
   </div>`}
   </div>`;
 }

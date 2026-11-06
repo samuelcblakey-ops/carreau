@@ -228,6 +228,13 @@ function teamLinksPanel(t) {
   </div>`;
 }
 // organisers archive; only the admin can delete a competition (also enforced in firestore.rules)
+// the admin's archive and restore in #admin do what the organiser's buttons do (hofMarkGone in the page): an archived
+// competition's Hall of Fame entry stays, without its link; restoring links it again. No entry is fine.
+async function hofGone(tid, gone) {
+  const e = S.hof?.[tid]; if (e === null || (e && !!e.gone === gone)) return;
+  try { await S.store.updateHof(tid, { gone }); if (e) e.gone = gone; if (S.hofPage) S.hofPage.cache = {}; }
+  catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
+}
 S.canDelete = () => isAdmin();
 S.canSeeArchived = () => isAdmin();
 S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.device = deviceLabel(); nt.listed = false; nt._new = true; if (loginMode() && orgActive() && !isAdmin()) nt.orgCode = ORG.code; remember(nt.id); };
@@ -299,7 +306,7 @@ S.extraAction = async (act, a) => {
   if (act === "admin-del") { S.adminConfirm = a.dataset.id; render(); return; }
   if (act === "admin-del-yes") { const id = a.dataset.id; S.adminConfirm = null; try { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; toast("Competition deleted."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); } render(); return; }
   if (act === "admin-restore") {
-    try { await updateDoc(doc(FB.db, "tournaments", a.dataset.id), { archived: false, archivedAt: null }); toast("Competition restored."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); }
+    try { await updateDoc(doc(FB.db, "tournaments", a.dataset.id), { archived: false, archivedAt: null }); await hofGone(a.dataset.id, false); toast("Competition restored."); } catch (e) { console.error(e); toast("That change didn't save. Check your connection and try again."); }
     return;
   }
   if (act === "open-testing") {
@@ -910,7 +917,7 @@ async function adminAction(act, a) {
   if (act === "adm-bulk-del-yes" || act === "adm-bulk-arch") {
     const ids = [...ADM.sel]; ADM.confirm = null; let ok = 0, failed = 0; const del = act === "adm-bulk-del-yes";
     const one = async id => {
-      try { if (del) { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; } else await updateDoc(doc(FB.db, "tournaments", id), { archived: true }); ok++; ADM.sel.delete(id); }
+      try { if (del) { await S.store.deleteTournament(id); delete S.tournaments[id]; if (S.tid === id) S.tid = null; } else { await hofGone(id, true); await updateDoc(doc(FB.db, "tournaments", id), { archived: true }); } ok++; ADM.sel.delete(id); }
       catch (e) { console.error(e); failed++; }
       ADM.busy = `${del ? "Deleting" : "Archiving"}… ${ok + failed} of ${ids.length} done`; render();
     };

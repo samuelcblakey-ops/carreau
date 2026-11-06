@@ -48,6 +48,16 @@ const { chromium } = require('playwright');
     const items = [...document.querySelectorAll('#modal li')].map(txt);
     L.push(`fr override box: ${items.join(' ; ')} | team names kept ${items.every(x => /Team [A-D]/.test(x))}`);
     q('#modal [data-act="close"]')?.click(); await w(60);
+    // the Archive and Delete confirmations translate whatever the name, the name kept as typed (" · " can't stop it)
+    const nm = 'Club day · Hitchin'; const ac = C.T(); ac.name = nm; await S.store.setTournament(ac); await w(60); C.render(); await w(60);
+    q('[data-tab="setup"]').click(); await w(80);
+    q('[data-act="archive"]').click(); await w(80); let ce = q('.err'); let ct = txt(ce);
+    L.push(`fr archive confirm, name with ·: translated ${/^Archiver « .+ » \? Seul l'administrateur pourra le voir\.$/.test(ct)} | name ${ce?.querySelector('[data-notr]')?.textContent === nm ? 'as typed' : 'changed: ' + ct}`);
+    q('[data-act="archive-no"]').click(); await w(60);
+    q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="de"]').click(); await w(80);
+    q('[data-act="del-t"]').click(); await w(80); ce = q('.err'); ct = txt(ce);
+    L.push(`de delete confirm, name with ·: translated ${/^„.+“ für alle löschen\?$/.test(ct)} | name ${ce?.querySelector('[data-notr]')?.textContent === nm ? 'as typed' : 'changed: ' + ct}`);
+    q('[data-act="del-t-no"]').click(); await w(60);
     q('[data-lang="en"]').click(); await w(60); L.push('back to english: ' + q('.memorial').textContent);
     } catch (e) { L.push('ERR ' + e.message); } return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
