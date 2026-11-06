@@ -70,6 +70,8 @@ function fbStore() {
       if (isAdmin()) subQ("all", query(tc, limit(300)));
       else {
         subQ("listed", query(tc, where("listed", "==", true), where("archived", "==", false), limit(100)));
+        // featured: an organiser chose to show it on the front page; it stays an ordinary competition (not an example)
+        subQ("featured", query(tc, where("featured", "==", true), where("archived", "==", false), limit(100)));
         if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), where("archived", "==", false), limit(200)));
         if (ORG.code) subQ("org", query(tc, where("orgCode", "==", ORG.code), where("archived", "==", false), limit(200)));
       }
@@ -156,6 +158,8 @@ S.permFn = t => {
     : isOwner(t) || (SITE.openTesting && !t.listed) ? "edit" : ROLE[t.id];
   return { edit: r === "edit", score: r === "edit" || r === "score" };
 };
+// this person runs the competition (made it, has its organiser link, or its organiser code): a featured one stays under "Your competitions"
+S.isMine = t => !!t && (isOwner(t) || ROLE[t.id] === "edit" || (orgActive() && !!t.orgCode && t.orgCode === ORG.code));
 S.canCreate = () => !!AUTH.user && (!loginMode() || isAdmin() || orgActive());
 // Hall of Fame: only the competition's organiser (the device that made it, an organiser link, or an organiser code that
 // made it) or the admin can publish its winners, even while open testing lets everyone run it (enforced in firestore.rules)
@@ -259,7 +263,7 @@ function deviceLabel() {
   return br ? `${dev} · ${br}` : dev;
 }
 // the admin's own competition menu only shows their competitions and the examples; everything else lives in #admin
-S.menuFilter = t => !isAdmin() || t.listed || isOwner(t);
+S.menuFilter = t => !isAdmin() || t.listed || t.featured || isOwner(t);
 
 const base = () => `${location.origin}${location.pathname}`;
 const links = t => ({ watch: `${base()}#${t.id}`, edit: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].edit}` : "", score: CODES[t.id] ? `${base()}#${t.id}.${CODES[t.id].score}` : "" });
@@ -304,7 +308,8 @@ const sharingPanel = t => {
     <h3>Sharing</h3>
     ${copyRow("share-watch", "Link for players and spectators", l.watch, "Anyone with this link can follow the draw, results, standings and big screen live. They can't change anything.")}
     ${l.edit ? `${copyRow("share-edit", "Organiser link", l.edit, `Gives full control, including registration, setup, draws and scores. Keep it to your organising team, and keep a copy for yourself in case you change device. Organiser code: <b>${esc(CODES[t.id].edit)}</b>`)}` : `<p class="small muted">Loading the private codes…</p>`}
-    <label class="chk"><input type="checkbox" data-check="listed" ${t.listed ? "checked" : ""}> Show this competition on the site's front page</label>
+    <label class="chk"><input type="checkbox" data-check="featured" ${t.featured ? "checked" : ""}> Show this competition on the site's front page</label>
+    <p class="small muted">It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.</p>
   </div>`;
 };
 S.extraAction = async (act, a) => {
@@ -962,21 +967,43 @@ async function backfillArchived() {
   if (!isAdmin() || S.backfilled) return; S.backfilled = true;
   for (const t of Object.values(S.tournaments)) if (t.archived === undefined) { try { await updateDoc(doc(FB.db, "tournaments", t.id), { archived: false }); } catch (e) { console.error(e); } }
 }
+// One-off move (Nov 2026). Ticking "Show this competition on the site's front page" used to set listed, which made the
+// competition an Example (view-only). Inter Regionals 2026 (tai2wt9p) was listed that way by its organiser; it becomes
+// featured instead. The 13 other listed competitions are the admin's examples and stay as they are. It runs once, from
+// the admin's browser, and only changes the two flags on the competition document: its games and results live in the
+// matches subcollection and aren't read or written. config/site.featuredMoved records that it ran (and what it moved),
+// so it never runs again, even if the admin later makes the competition an example on purpose.
+const FEATURED_MOVE = ["tai2wt9p"];
+let featuredMoving = false;
+async function moveToFeatured() {
+  if (!FB || !isAdmin() || !SITE.loaded || SITE.featuredMoved || featuredMoving) return;
+  featuredMoving = true; const moved = [];
+  try {
+    for (const id of FEATURED_MOVE) {
+      const d = await getDocFromServer(doc(FB.db, "tournaments", id)); // the server's copy, not the offline cache
+      if (d.exists() && d.data().listed === true && d.data().featured !== true) { await updateDoc(d.ref, { listed: false, featured: true }); moved.push(id); }
+    }
+    await setDoc(doc(FB.db, "config", "site"), { featuredMoved: { at: Date.now(), ids: moved } }, { merge: true });
+    SITE.featuredMoved = { ids: moved };
+  } catch (e) { console.error("featured move", e); }
+  featuredMoving = false;
+}
 function watchSite() {
   if (unsubSite || !FB) return;
   unsubSite = onSnapshot(doc(FB.db, "config", "site"), d => {
     const was = SITE.openTesting, wasLogin = SITE.organiserLogin;
     SITE.organiserLogin = d.exists() ? d.data().organiserLogin === true : false;
     SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() ? (d.data().teamScoring === true ? true : d.data().teamScoring === "admin" ? "admin" : false) : false; SITE.teamComps = d.exists() ? (d.data().teamScoringComps || {}) : {}; SITE.streaming = d.exists() ? (d.data().streaming === true ? true : d.data().streaming === "admin" ? "admin" : false) : false;
+    SITE.featuredMoved = d.exists() ? (d.data().featuredMoved || null) : null;
     SITE.cleanupAuto = d.exists() ? d.data().cleanupAuto === true : false; SITE.cleanupLast = d.exists() ? (d.data().cleanupLast || null) : null; SITE.loaded = true;
-    autoCleanup();
+    autoCleanup(); moveToFeatured();
     if (was !== SITE.openTesting || wasLogin !== SITE.organiserLogin) startWatching();
     render();
   }, () => { SITE.loaded = true; });
 }
 S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
 S.onHome = () => history.replaceState(null, "", location.pathname); // the start screen has no competition in the address
-S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); autoCleanup(); };
+S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); autoCleanup(); moveToFeatured(); };
 
 // links look like #<competition id> or #<competition id>.<code>; stream overlays and live desks: #<competition id>.stream.<game> / .desk.<game>[.<stream code>]
 function readHash() { const [tid, code] = location.hash.slice(1).split("?")[0].split("."); return { tid: tid || null, code: code || null }; }

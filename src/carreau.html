@@ -1053,6 +1053,14 @@ Object.assign(LANG_TEXT.de, {"Pétanque competitions, run from your phone": "Pé
 Object.assign(LANG_TEXT.nl, {"Pétanque competitions, run from your phone": "Petanquetoernooien, geregeld vanaf je telefoon", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Lotingen, banen, live uitslagen en standen voor Zwitsers systeem, barrage, competities, knock-outs, mêlée, interclub en precisieschieten. Spelers volgen alles op hun eigen telefoon.", "Run a competition": "Een toernooi organiseren", "Set it up in four quick steps": "Klaar in vier korte stappen", "Follow a competition": "Een toernooi volgen", "Open the link or scan the QR code the organiser shares": "Open de link of scan de QR-code die de organisator deelt", "Stream a game": "Een partij streamen", "A live score overlay for Facebook Live or YouTube": "Een live scorebalk voor Facebook Live of YouTube", "Look around a competition in each format. Nothing can be changed.": "Bekijk een toernooi in elk formaat. Er kan niets worden gewijzigd.", "New": "Nieuw"});
 Object.assign(LANG_TEXT.pt, {"Pétanque competitions, run from your phone": "Competições de petanca, geridas a partir do telemóvel", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Sorteios, campos, resultados em direto e classificações para suíço, barrage, ligas, quadros, mêlée, interclubes e tiro de precisão. Os jogadores acompanham no próprio telemóvel.", "Run a competition": "Organizar uma competição", "Set it up in four quick steps": "Pronta em quatro passos rápidos", "Follow a competition": "Seguir uma competição", "Open the link or scan the QR code the organiser shares": "Abra a ligação ou leia o código QR que o organizador partilha", "Stream a game": "Transmitir um jogo", "A live score overlay for Facebook Live or YouTube": "Um marcador em direto para Facebook Live ou YouTube", "Look around a competition in each format. Nothing can be changed.": "Veja uma competição em cada formato. Nada pode ser alterado.", "New": "Nova"});
 Object.assign(LANG_TEXT.th, {"Pétanque competitions, run from your phone": "จัดการแข่งขันเปตองได้จากมือถือ", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "จับสลาก จัดสนาม ผลสด และตารางคะแนน สำหรับระบบสวิส บาราจ ลีก น็อกเอาต์ เมเล่ อินเตอร์คลับ และการยิงแม่นยำ ผู้เล่นติดตามได้จากมือถือของตัวเอง", "Run a competition": "จัดการแข่งขัน", "Set it up in four quick steps": "ตั้งค่าเสร็จใน 4 ขั้นตอน", "Follow a competition": "ติดตามการแข่งขัน", "Open the link or scan the QR code the organiser shares": "เปิดลิงก์หรือสแกน QR โค้ดที่ผู้จัดแชร์", "Stream a game": "ถ่ายทอดสดเกม", "A live score overlay for Facebook Live or YouTube": "แถบคะแนนสดสำหรับ Facebook Live หรือ YouTube", "Look around a competition in each format. Nothing can be changed.": "ดูการแข่งขันตัวอย่างในแต่ละรูปแบบ แก้ไขอะไรไม่ได้", "New": "ใหม่"});
+// featured competitions (front page)
+Object.assign(FR_TEXT, {"Featured": "À la une", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Il figure dans « À la une », au-dessus des exemples. Rien d'autre ne change : vous gérez le concours comme avant, et les spectateurs ne peuvent rien modifier."});
+Object.assign(LANG_TEXT.es, {"Featured": "Destacados", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Aparece en Destacados, encima de los ejemplos. Nada más cambia: lo gestionas como antes y los espectadores no pueden cambiar nada."});
+Object.assign(LANG_TEXT.it, {"Featured": "In evidenza", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Compare in «In evidenza», sopra gli esempi. Non cambia nient'altro: la gestisci come prima e gli spettatori non possono modificare nulla."});
+Object.assign(LANG_TEXT.de, {"Featured": "Hervorgehoben", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Es erscheint unter „Hervorgehoben“, über den Beispielen. Sonst ändert sich nichts: Du leitest es wie bisher, und Zuschauer können nichts ändern."});
+Object.assign(LANG_TEXT.nl, {"Featured": "Uitgelicht", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Het staat onder Uitgelicht, boven de voorbeelden. Verder verandert er niets: je leidt het toernooi zoals voorheen en toeschouwers kunnen niets wijzigen."});
+Object.assign(LANG_TEXT.pt, {"Featured": "Em destaque", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Aparece em «Em destaque», acima dos exemplos. Nada mais muda: gere o torneio como antes e os espectadores não podem alterar nada."});
+Object.assign(LANG_TEXT.th, {"Featured": "แนะนำ", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "การแข่งขันนี้จะแสดงในหมวดแนะนำ เหนือตัวอย่าง นอกนั้นไม่มีอะไรเปลี่ยน คุณจัดการได้เหมือนเดิม และผู้ชมเปลี่ยนแปลงอะไรไม่ได้"});
 Object.assign(FR_TEXT, {"SN Pétanque: start screen": "SN Pétanque : écran d'accueil"});
 Object.assign(LANG_TEXT.es, {"SN Pétanque: start screen": "SN Pétanque: pantalla de inicio"});
 Object.assign(LANG_TEXT.it, {"SN Pétanque: start screen": "SN Pétanque: schermata iniziale"});
@@ -3975,9 +3983,12 @@ function compMeta(t) {
   const unit = isIndiv(t) ? "player" : isEuro(t) ? "club" : "team";
   return [d, kind, `${n} ${unit}${n === 1 ? "" : "s"}`, stage].filter(Boolean).join(" · ");
 }
+// featured (website): an organiser showed it on the front page. It's an ordinary competition, listed above the examples
+// for everyone but the people who run it, who keep it under their own competitions.
+const isFeatured = t => !!t.featured && !(t.listed || t.example) && !(S.isMine && S.isMine(t));
 function renderPicker(list) {
   const ex = t => t.listed || t.example;
-  const groups = [["Your competitions", list.filter(t => !ex(t) && !t.archived)], ["Examples", list.filter(t => ex(t) && !t.archived)], ["Archived", list.filter(t => t.archived)]].filter(g => g[1].length);
+  const groups = [["Your competitions", list.filter(t => !ex(t) && !isFeatured(t) && !t.archived)], ["Featured", list.filter(t => isFeatured(t) && !t.archived)], ["Examples", list.filter(t => ex(t) && !t.archived)], ["Archived", list.filter(t => t.archived)]].filter(g => g[1].length);
   return `<div class="picker" role="group" aria-label="Choose a competition">
     ${list.length > 6 ? `<input id="picker-q" type="search" placeholder="Search competitions" autocomplete="off">` : ""}
     <div class="picker-list">${groups.map(([label, ts]) => `<div class="pick-group"><div class="eyebrow">${label} <span class="muted">${ts.length}</span></div>
@@ -4031,7 +4042,7 @@ function drawHeader() {
 function renderWelcome() {
   const all = Object.values(S.tournaments).filter(t => !t.archived), isEx = t => t.listed || t.example;
   const byNew = (a, b) => (b.created || 0) - (a.created || 0);
-  const mine = all.filter(t => !isEx(t)).sort(byNew), ex = all.filter(isEx).sort(byNew);
+  const mine = all.filter(t => !isEx(t) && !isFeatured(t)).sort(byNew), feat = all.filter(t => !isEx(t) && isFeatured(t)).sort(byNew), ex = all.filter(isEx).sort(byNew);
   const card = t => `<button type="button" class="ex-card" data-act="pick-t" data-id="${t.id}"><b data-notr>${esc(t.name)}</b><span class="small muted">${esc(compMeta(t))}</span></button>`;
   return `<div class="start stack">
     <section class="start-hero"><h1>Pétanque competitions, run from your phone</h1>
@@ -4044,6 +4055,7 @@ function renderWelcome() {
       ${S.guideLink ? `<button type="button" class="start-card" data-act="guide-play" data-id="first"><b>Watch how it works</b><span>A 2½-minute walk-through of a first competition</span></button>` : ""}
     </div>
     ${mine.length ? `<section class="stack" style="gap:10px"><h2>Your competitions</h2><div class="ex-grid">${mine.map(card).join("")}</div></section>` : ""}
+    ${feat.length ? `<section class="stack" style="gap:10px" data-featured><h2>Featured</h2><div class="ex-grid">${feat.map(card).join("")}</div></section>` : ""}
     ${ex.length ? `<section class="stack" style="gap:10px"><h2>Examples</h2><p class="small muted">Look around a competition in each format. Nothing can be changed.</p><div class="ex-grid">${ex.map(card).join("")}</div></section>` : ""}
   </div>`;
 }
@@ -5307,7 +5319,7 @@ function startWatching() {
     S.loaded = true;
     // on load (or when the open competition goes away): the newest of this person's own competitions (not a half-written
     // one still waiting on the server); none → the start screen
-    if ((!S.tid || !S.tournaments[S.tid]) && !S.home && S.roleKnown()) { const first = list.filter(t => !t.archived && !(t.listed || t.example) && Array.isArray(t.teams) && (!S.menuFilter || S.menuFilter(t))).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
+    if ((!S.tid || !S.tournaments[S.tid]) && !S.home && S.roleKnown()) { const first = list.filter(t => !t.archived && !(t.listed || t.example) && !isFeatured(t) && Array.isArray(t.teams) && (!S.menuFilter || S.menuFilter(t))).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
     if (T() && S.roleKnown() && !canEdit() && !viewAll(T()) && (S.tab === "setup" || S.tab === "entries")) S.tab = canScore() ? "courts" : "draw";
     S.onTournaments?.();
     if (meta?.remote && !firstLoad) renderSoon(); else render();
