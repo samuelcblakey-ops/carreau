@@ -1300,6 +1300,9 @@ function trCore(t, depth = 0) {
   }
   return null;
 }
+// a sentence around a name that stays as typed: the whole sentence translates by its "{x}" key (word order and all),
+// then the name goes in as html of its own (e.g. a data-notr span), so a name with " · " can't stop the translation
+const trAround = (en, html) => { const ph = "\u0007"; return esc(tr(en.replace("{x}", ph))).replace(ph, html); };
 // translate by a key of its own while English shows plain text, e.g. the overlay's "Final" (final score) vs a knockout's "Final"
 const trAs = (key, en) => { if (I18N.lang === "en") return en; const r = tr(key); return r === key ? en : r; };
 function tr(s) {
@@ -4135,11 +4138,11 @@ function renderSetup(t) {
   ${hofPanel(t, "setup")}
   ${canEdit() ? `<div class="panel spread">
     <div><h3>${t.archived ? "Archived" : "Archive competition"}</h3><p class="small muted">${t.archived ? "Only the site admin can see this competition. Restore it to make it visible again." : `Once the competition has finished, archive it to hide it from everyone except the site admin.${MS().some(m => !m.done && m.a && (m.b || m.stage === "shoot")) ? " Some games aren't finished yet." : ""}`}</p></div>
-    ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">Archive “${esc(t.name)}”? Only the admin will be able to see it.</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
+    ${t.archived ? (S.canSeeArchived() ? `<button class="btn" data-act="restore">Restore</button>` : "") : S.confirmArchive ? `<div class="row"><span class="err">${trAround("Archive “{x}”? Only the admin will be able to see it.", `<span data-notr>${esc(t.name)}</span>`)}</span><button class="btn" data-act="archive-yes">Archive</button><button class="btn" data-act="archive-no">Keep it</button></div>` : `<button class="btn" data-act="archive">Archive…</button>`}
   </div>` : ""}
   ${S.canDelete && !S.canDelete(t) ? "" : `<div class="panel spread">
     <div><h3>Delete competition</h3><p class="small muted">Removes the competition, its entries and every result.</p></div>
-    ${S.confirmDelete ? `<div class="row"><span class="err">Delete “${esc(t.name)}” for everyone?</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
+    ${S.confirmDelete ? `<div class="row"><span class="err">${trAround("Delete “{x}” for everyone?", `<span data-notr>${esc(t.name)}</span>`)}</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
   </div>`}
   </div>`;
 }
