@@ -571,6 +571,7 @@ body.desk header.app{display:none}
 .disp .court .side .nm{font-size:20px}
 .disp .court .side .sc{font-size:34px}
 .disp h2{font-size:38px}
+.disp .pools{grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr))}.disp .disp-pool table{font-size:20px}.disp .disp-pool th{font-size:15px}
 @media (max-width:560px){h2{font-size:22px}.stepper button{width:40px;height:40px}}
 @media (prefers-reduced-motion:no-preference){.match,.btn{transition:border-color .12s}}
 </style>
@@ -1145,6 +1146,14 @@ Object.assign(LANG_TEXT.de, {"A club can have up to {n} players.": "Ein Verein k
 Object.assign(LANG_TEXT.nl, {"A club can have up to {n} players.": "Een club kan tot {1} spelers hebben."});
 Object.assign(LANG_TEXT.pt, {"A club can have up to {n} players.": "Um clube pode ter até {1} jogadores."});
 Object.assign(LANG_TEXT.th, {"A club can have up to {n} players.": "สโมสรหนึ่งมีผู้เล่นได้ไม่เกิน {1} คน"});
+// competition summary line for a EuroCup: "4 Nov 2026 · EuroCup · 4 clubs · Ties drawn"
+Object.assign(FR_TEXT, {"{n} clubs": "{1} clubs", "Ties drawn": "Rencontres tirées"});
+Object.assign(LANG_TEXT.es, {"{n} clubs": "{1} clubes", "Ties drawn": "Encuentros sorteados"});
+Object.assign(LANG_TEXT.it, {"{n} clubs": "{1} club", "Ties drawn": "Incontri sorteggiati"});
+Object.assign(LANG_TEXT.de, {"{n} clubs": "{1} Vereine", "Ties drawn": "Begegnungen ausgelost"});
+Object.assign(LANG_TEXT.nl, {"{n} clubs": "{1} clubs", "Ties drawn": "Ontmoetingen geloot"});
+Object.assign(LANG_TEXT.pt, {"{n} clubs": "{1} clubes", "Ties drawn": "Encontros sorteados"});
+Object.assign(LANG_TEXT.th, {"{n} clubs": "{1} สโมสร", "Ties drawn": "จับสลากแมตช์แล้ว"});
 Object.assign(FR_TEXT, {"Single tie": "Rencontre unique"});
 Object.assign(LANG_TEXT.es, {"Single tie": "Encuentro único"});
 Object.assign(LANG_TEXT.it, {"Single tie": "Incontro unico"});
@@ -1200,6 +1209,14 @@ Object.assign(LANG_TEXT.de, {"The knockouts were drawn from these standings. Sav
 Object.assign(LANG_TEXT.nl, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "De afvalschema's zijn op basis van deze stand geloot. Opslaan laat ze zoals ze zijn. Om opnieuw te loten: annuleer en gebruik eerst Afvalschema ongedaan maken, zolang er nog geen partij in het afvalschema klaar is.", "Save anyway": "Toch opslaan"});
 Object.assign(LANG_TEXT.pt, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "Os quadros foram sorteados a partir desta classificação. Guardar mantém-nos como estão. Para os sortear de novo, cancele e use primeiro Anular quadro, enquanto nenhum jogo do quadro tiver terminado.", "Save anyway": "Guardar mesmo assim"});
 Object.assign(LANG_TEXT.th, {"The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.": "สายน็อคเอาท์ถูกจับจากตารางคะแนนนี้ การบันทึกจะคงสายไว้ตามเดิม หากต้องการจับใหม่ ให้ยกเลิกแล้วกด ยกเลิกสายน็อคเอาท์ ก่อน ขณะที่ยังไม่มีเกมน็อคเอาท์ใดจบ", "Save anyway": "บันทึกต่อไป"});
+// Find my game: a team with the bye this round
+Object.assign(FR_TEXT, {"Bye this round.": "Exempt ce tour-ci."});
+Object.assign(LANG_TEXT.es, {"Bye this round.": "Exento en esta ronda."});
+Object.assign(LANG_TEXT.it, {"Bye this round.": "Riposo in questo turno."});
+Object.assign(LANG_TEXT.de, {"Bye this round.": "Freilos in dieser Runde."});
+Object.assign(LANG_TEXT.nl, {"Bye this round.": "Vrijloting deze ronde."});
+Object.assign(LANG_TEXT.pt, {"Bye this round.": "Isento nesta ronda."});
+Object.assign(LANG_TEXT.th, {"Bye this round.": "รอบนี้ได้บาย"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1227,7 +1244,7 @@ function frCompile() {
   const exact = {}, re = [];
   for (const [k, v] of Object.entries(I18N.lang === "fr" ? FR_TEXT : LANG_TEXT[I18N.lang] || {})) {
     if (/\{[nx]\}/.test(k)) {
-      const src = k.replace(/[.*+?^$()|[\]\\]/g, "\\$&").replace(/\{n\}/g, "([+\\-−]?\\d+)").replace(/\{x\}/g, "(.+?)");
+      const src = k.replace(/[.*+?^$()|[\]\\]/g, "\\$&").replace(/\{n\}/g, "([+\\-−]?\\d+)").replace(/\{x\}/g, "((?:(?! · ).)+?)"); // {x} never spans a " · ", so a line of parts translates part by part
       re.push([new RegExp("^" + src + "$"), v, k.replace(/\{[nx]\}/g, "").length]);
     } else exact[k] = v;
   }
@@ -1590,9 +1607,12 @@ function gameLine(t, id) {
   if (cur) { const opp = sideName(t, (cur.a || []).includes(id) ? cur.b : cur.a); const a = (cur.a || []).includes(id);
     const live = cur.sa != null && cur.sb != null && (cur.sa || cur.sb) ? ` · ${a ? cur.sa : cur.sb}–${a ? cur.sb : cur.sa} now` : "";
     return `<div><b>v ${esc(opp)}</b></div><div class="small muted">${esc(matchContext(t, cur))} · ${cur.court ? `<span class="court-tag">Piste ${esc(courtName(t, cur.court))}</span>` : "waiting for a piste"}${live}</div>`; }
+  const latest = MS().filter(m => inMatch(m, id)).sort(byOrder).slice(-1)[0];
+  if (latest?.bye) return `<div class="small muted">Bye this round.</div>`;
   const last = ms.filter(m => m.done).slice(-1)[0];
   if (last) { const a = (last.a || []).includes(id); const won = winnerSide(last)?.includes(id);
-    return `<div class="small muted">No game right now. Last game: ${won ? "Won" : "Lost"} ${a ? last.sa : last.sb}–${a ? last.sb : last.sa} v ${esc(sideName(t, a ? last.b : last.a) || "bye")}</div>`; }
+    // "Won"/"Lost" sit in the translatable text node; score and opponent are kept as they are
+    return `<div class="small muted">No game right now. Last game: ${won ? "Won" : "Lost"} <span data-notr>${a ? last.sa : last.sb}–${a ? last.sb : last.sa} v ${esc(sideName(t, a ? last.b : last.a) || "bye")}</span></div>`; }
   return `<div class="small muted">No game drawn yet.</div>`;
 }
 function findResults(t, q) {
@@ -2203,9 +2223,13 @@ function planPresets(t) {
       ["Everyone → one knockout", [["Main knockout", 1, ps]]]
     ];
   }
-  const out = [["Final (top 2)", [["Final", 1, 2]]], ["Semi-finals (top 4)", [["Semi-finals", 1, 4]]], ["Quarter-finals (top 8)", [["Main knockout", 1, 8]]], ["Top 8 + Plate (9–16)", [["Main knockout", 1, 8], ["Plate", 9, 16]]], ["Top 16", [["Main knockout", 1, 16]]], ["Top 16 + Plate (17–32)", [["Main knockout", 1, 16], ["Plate", 17, 32]]]];
+  const out = [["Final (top 2)", [["Main knockout", 1, 2]]], ["Semi-finals (top 4)", [["Main knockout", 1, 4]]], ["Quarter-finals (top 8)", [["Main knockout", 1, 8]]], ["Top 8 + Plate (9–16)", [["Main knockout", 1, 8], ["Plate", 9, 16]]], ["Top 16", [["Main knockout", 1, 16]]], ["Top 16 + Plate (17–32)", [["Main knockout", 1, 16], ["Plate", 17, 32]]]];
   return out;
 }
+// the knockout names the app fills in itself: the plan editor shows them in the chosen language and saves them back in English
+const KO_DEFAULT_NAMES = ["Main knockout", "Plate", "Silver", "Final", "Knockout", "A knockout (Championnat)", "B knockout (Consolante)", ..."ABCDEF".split("").map(x => `${x} knockout`)];
+const koNameShown = name => KO_DEFAULT_NAMES.includes(name) ? tr(name) : name;
+const koNameSaved = (v, was) => [was, ...KO_DEFAULT_NAMES].find(d => KO_DEFAULT_NAMES.includes(d) && tr(d) === v) || v;
 function koEntrants(t, ms, br) {
   if (isGroups(t)) {
     const act = new Set(activeIds(t)); // withdrawn teams stay out, as in Swiss
@@ -2252,7 +2276,7 @@ function renderPlanEditor(t, { locked, compact } = {}) {
     <div class="stack" style="gap:6px"><div class="eyebrow">Draw for the knockouts</div>${seg("plan-seeding", plan.seeding, [["seeded", isLeagues(t) ? "Seeded (league winners kept apart)" : t.system === "pools" ? "Seeded (barrage winners kept apart)" : "Seeded by standings (1 v 8, 2 v 7…)"], ["random", "Random draw (tirage au sort)"]], locked || !canEdit())}</div>
     <div class="tw"><table class="plan"><thead><tr><th>Knockout</th><th>${unit}</th><th>3rd-place game</th><th><span class="sr-only">Remove</span></th></tr></thead><tbody>
     ${plan.brackets.map((b, i) => `<tr>
-      <td class="wrap"><input type="text" id="pl-name-${i}" data-plan="name" data-i="${i}" value="${esc(b.name)}" ${dis} aria-label="Knockout name"><div class="small muted" style="margin-top:4px">${bracketShape(count(b))}</div></td>
+      <td class="wrap"><input type="text" id="pl-name-${i}" data-plan="name" data-i="${i}" value="${esc(koNameShown(b.name))}" ${dis} aria-label="Knockout name"><div class="small muted" style="margin-top:4px">${bracketShape(count(b))}</div></td>
       <td>${b.silver ? `<span class="muted">${isGroups(t) ? "Every place" : "Everyone"} from ${b.from} down</span>` : `<div class="row" style="flex-wrap:nowrap;gap:6px"><input type="number" min="1" id="pl-from-${i}" data-plan="from" data-i="${i}" value="${b.from}" style="width:64px" ${dis} aria-label="From"><span>to</span><input type="number" min="1" id="pl-to-${i}" data-plan="to" data-i="${i}" value="${b.to}" style="width:64px" ${dis} aria-label="To"></div>`}</td>
       <td><input type="checkbox" data-plan="third" data-i="${i}" ${b.third ? "checked" : ""} ${dis} aria-label="Third-place play-off"></td>
       <td>${!locked && canEdit() && plan.brackets.length > 1 ? `<button class="btn sm ghost" data-act="plan-del" data-i="${i}" aria-label="Remove knockout">✕</button>` : ""}</td>
@@ -2362,7 +2386,7 @@ function koChangedBy(t, m) {
   const prev = S.matches[m.id]; const before = key();
   S.matches[m.id] = m; try { return key() !== before; } finally { S.matches[m.id] = prev; }
 }
-// recordResult returns true when saved, or { blocked: [descriptions] } when a correction would change
+// recordResult returns true when saved, or { blocked: [{ ctx, game }] } when a correction would change
 // later games that are already finished (call again with { override: true } to reset those games).
 async function recordResult(id, sa, sb, done, opts = {}) {
   const t = T(); const prev = S.matches[id]; const m = clone(prev);
@@ -2389,7 +2413,7 @@ async function recordResult(id, sa, sb, done, opts = {}) {
   if (blocked.length) { toast("This result has already moved two rounds on, so it can't be corrected here."); return false; }
   // a morning result corrected after the knockouts were drawn from its standings: ask before saving
   const ko = wasDone && !opts.override && koChangedBy(t, m);
-  if ((resets.length || ko) && !opts.override) return { blocked: resets.map(r => `${matchContext(t, r)}: ${sideName(t, r.a) || "?"} ${r.sa ?? ""}–${r.sb ?? ""} ${sideName(t, r.b) || "?"}`), ko };
+  if ((resets.length || ko) && !opts.override) return { blocked: resets.map(r => ({ ctx: matchContext(t, r), game: `${sideName(t, r.a) || "?"} ${r.sa ?? ""}–${r.sb ?? ""} ${sideName(t, r.b) || "?"}` })), ko };
   if (resets.length && !overrideAllowed(prev)) { toast("Only the current and previous round can be corrected."); return false; }
   const patch = { sa, sb, done, finishedAt: m.finishedAt || null };
   if (opts.win !== undefined) patch.win = opts.win || null;
@@ -3064,7 +3088,7 @@ function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
     ${ko ? `<span>The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.</span>` : ""}
     ${list.length ? `<span>These later games were already played and will be reset so they can be replayed or re-entered:</span>
-    <ul style="margin:0;padding-left:18px">${list.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    <ul style="margin:0;padding-left:18px">${list.map(x => `<li><span>${esc(x.ctx)}</span>: <span data-notr>${esc(x.game)}</span></li>`).join("")}</ul>` : ""}
     ${canEdit() ? `<div class="row"><button class="btn danger" data-act="override">${list.length ? "Override and reset these games" : "Save anyway"}</button><button class="btn" data-act="close">Cancel</button></div>` : `<span class="small">Ask the organiser to make this correction.</span>`}</div>`;
 }
 
@@ -3302,7 +3326,7 @@ function drawModal() {
   localize(el);
 }
 function matchContext(t, m) {
-  if (m.stage === "ko") { const b = (t.brackets || []).find(b => b.id === m.bracket); return `${b?.name || "Knockout"} · ${m.third ? "Third-place game" : roundLabel(b?.rounds || 1, m.round)}`; }
+  if (m.stage === "ko") { const b = (t.brackets || []).find(b => b.id === m.bracket); const rl = m.third ? "Third-place game" : roundLabel(b?.rounds || 1, m.round); const nm = b?.name || "Knockout"; return nm === rl ? rl : `${nm} · ${rl}`; } // a bracket named "Semi-finals" (an older preset) doesn't read "Semi-finals · Semi-finals"
   if (m.stage === "pool") { const p = (t.pools || []).find(p => p.id === m.pool); return `${p?.name || (isLeagues(t) ? "League" : "Barrage")} · ${m.label || "Game " + m.round}`; }
   if (m.stage === "rr") return `Round robin · Round ${m.round}`;
   if (m.stage === "club") return `${clubUnit(t) === "round" ? "Round" : "Day"} ${m.round} · ${clubName(t, m.ca)} v ${clubName(t, m.cb)}${m.label ? " · " + m.label : ""}`;
@@ -3843,15 +3867,21 @@ function drawPage() {
   localize($("header.app")); localize(main);
   fitBrackets(); restore();
 }
-const SYS_NAME = { swiss: "Swiss", snake: "Snake", pools: "Barrage", leagues: "Leagues", clubs: "Inter-club", roundrobin: "Round robin", knockout: "Knockout", melee: "Mêlée", shooting: "Precision shooting" };
+const SYS_NAME = { swiss: "Swiss", snake: "Snake", pools: "Barrage", leagues: "Leagues", clubs: "Inter-club", eurocup: "EuroCup", roundrobin: "Round robin", knockout: "Knockout", melee: "Mêlée", shooting: "Precision shooting" };
 function compMeta(t) {
   const n = (isIndiv(t) ? t.players : t.teams || []).length;
-  const kind = isShoot(t) ? "Precision shooting" : isMelee(t) ? "Mêlée" : `${t.format ? t.format[0].toUpperCase() + t.format.slice(1) : ""} · ${SYS_NAME[t.system] || ""}`;
+  // EuroCup is always triples-based ties between clubs, so its own name stands in for format · system
+  const kind = isShoot(t) ? "Precision shooting" : isMelee(t) ? "Mêlée" : isEuro(t) ? "EuroCup" : [t.format ? t.format[0].toUpperCase() + t.format.slice(1) : "", SYS_NAME[t.system] || ""].filter(Boolean).join(" · ");
   const rnds = (t.draws || []).filter(d => d.kind === "round").length, drew = id => (t.draws || []).some(d => d.id === id);
+  // mêlée drawn in advance has every round drawn at once: the round in play is the lowest one with games still to play
+  // (matches are only loaded for the open competition; for the others, say all the rounds are drawn)
+  const adv = isMelee(t) && meleeMode(t) === "advance" && rnds, mine = adv && t.id === S.tid ? MS().filter(m => m.stage === "melee" && !m.bye) : [];
+  const inPlay = mine.filter(m => !m.done).sort((x, y) => x.round - y.round)[0]?.round;
+  const round = adv ? (mine.length ? `Round ${inPlay || rnds}` : `All ${rnds} rounds drawn`) : `Round ${rnds}`;
   const stage = t.archived ? "Archived" : (t.brackets || []).length ? "Knockout" : (t.pools || []).length ? (isLeagues(t) ? "Leagues" : "Barrage")
-    : drew("CL") ? (drew("CL2") ? "Day 2" : "Fixtures drawn") : rnds ? `Round ${rnds}` : (t.draws || []).length ? "Schedule drawn" : n ? "Registration" : "Not started";
+    : drew("CL") ? (drew("CL2") ? "Day 2" : isEuro(t) ? "Ties drawn" : "Fixtures drawn") : rnds ? round : (t.draws || []).length ? "Schedule drawn" : n ? "Registration" : "Not started";
   const d = t.date ? new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" }) : "";
-  return [d, kind, `${n} ${isIndiv(t) ? "players" : "teams"}`, stage].filter(Boolean).join(" · ");
+  return [d, kind, `${n} ${isIndiv(t) ? "players" : isEuro(t) ? "clubs" : "teams"}`, stage].filter(Boolean).join(" · ");
 }
 function renderPicker(list) {
   const ex = t => t.listed || t.example;
@@ -4824,23 +4854,33 @@ function renderStandings(t) {
 /* big screen */
 function renderDisplay(t) {
   const ms = MS(); const live = ms.filter(m => !m.done && m.court);
-  const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder).slice(0, 8);
+  const waiting = ms.filter(m => mStatus(m) === "ready").sort(byOrder);
   const sys = sysOf(t);
   let table = "";
   if ((sys === "swiss" || sys === "melee" || sys === "snake") && ms.some(m => m.stage === sys)) table = standingsTable(t, overallTable(t, sys).slice(0, 12), { buch: sys !== "melee" });
   else if (sys === "roundrobin" && ms.length) table = standingsTable(t, overallTable(t, "rr").slice(0, 12));
   else if (sys === "shooting" && ms.length) table = shootStandings(t);
   else if (isClubs(t) && ms.some(m => m.stage === "club")) table = clubTableHtml(t, clubTable(t, ms));
-  const curRound = t.draws.filter(d => d.kind === "round").length;
+  // barrage and leagues: one table per group, the same columns as on Draw & results
+  const pools = isGroups(t) && !(t.brackets || []).length ? (t.pools || []).map(p => { const rk = poolRanking(t, p, ms), pl = getPlan(t).brackets[0];
+    return `<section class="panel stack disp-pool" style="gap:8px"><h3>${esc(p.name)}</h3><div class="tw"><table><thead><tr><th>#</th><th>${isIndiv(t) ? "Player" : "Team"}</th><th class="n" title="Wins">W</th><th class="n" title="Losses">L</th><th class="n" title="Points for">For</th><th class="n" title="Points against">Agst</th><th class="n" title="Points difference">+/-</th></tr></thead><tbody>
+      ${rk.rows.map((r, i) => `<tr class="${!r.unplaced && rk.complete && i >= pl.from - 1 && i < pl.to ? "q" : ""}"><td>${r.unplaced ? "–" : i + 1}</td><td class="wrap">${esc(entName(t, r.id))}</td><td class="n"><b>${r.w}</b></td><td class="n">${r.l}</td><td class="n">${r.pf}</td><td class="n">${r.pa}</td><td class="n">${r.diff > 0 ? "+" : ""}${r.diff}</td></tr>`).join("")}</tbody></table></div></section>`; }).join("") : "";
+  // mêlée with every round drawn in advance: the round in play is the lowest one with games left
+  const advance = sys === "melee" && meleeMode(t) === "advance";
+  const openRounds = advance ? ms.filter(m => m.stage === "melee" && !m.done).map(m => m.round) : [];
+  const curRound = openRounds.length ? Math.min(...openRounds) : t.draws.filter(d => d.kind === "round").length;
+  const next = (advance && openRounds.length ? waiting.filter(m => m.stage !== "melee" || m.round === curRound) : waiting).slice(0, 8);
+  const date = t.date ? new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" }) : "";
   return `<div class="disp">
-    <div class="spread"><div class="row" style="flex-wrap:nowrap;gap:16px;align-items:center">${logoSrc(t.id) ? `<img class="disp-logo" src="${esc(logoSrc(t.id))}" alt="">` : ""}<div><div class="eyebrow">${esc(t.venue || "")}${t.venue ? " · " : ""}${esc(t.date || "")}</div><h2>${esc(t.name)}</h2></div></div>
+    <div class="spread"><div class="row" style="flex-wrap:nowrap;gap:16px;align-items:center">${logoSrc(t.id) ? `<img class="disp-logo" src="${esc(logoSrc(t.id))}" alt="">` : ""}<div><div class="eyebrow"><span data-notr>${esc(t.venue || "")}</span>${t.venue ? " · " : ""}${esc(date)}</div><h2 data-notr>${esc(t.name)}</h2></div></div>
       <div class="row">${(t.brackets || []).length ? `<span class="pill playing" style="font-size:15px;padding:4px 12px">Knockouts</span>` : curRound ? `<span class="pill playing" style="font-size:15px;padding:4px 12px">Round ${curRound}</span>` : ""}<button class="btn sm" data-act="fullscreen">Full screen</button></div></div>
     <div class="courts">${t.courts.filter(c => c.active !== false).map(c => { const m = live.find(x => x.court === c.id);
       return m ? `<div class="court"><div class="cn">${esc(c.name)}<span class="small muted" style="font-family:var(--body);font-size:12px;font-weight:600">${esc(matchContext(t, m))}</span></div>${["a", "b"].map(k => `<div class="side"><span class="nm">${esc(sideName(t, m[k]))}</span><span class="sc">${m["s" + k] ?? 0}</span></div>`).join("")}</div>`
         : `<div class="court free"><div class="cn">${esc(c.name)}</div><span class="muted">Free</span></div>`; }).join("")}</div>
-    ${waiting.length ? `<section class="stack" style="gap:8px"><h3>Next up</h3><div class="mlist">${waiting.map(m => `<div class="match ro"><div class="meta"><span>${esc(matchContext(t, m))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.a))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.b))}</span></div></div>`).join("")}</div></section>` : ""}
+    ${next.length ? `<section class="stack" style="gap:8px"><h3>Next up</h3><div class="mlist">${next.map(m => `<div class="match ro"><div class="meta"><span>${esc(matchContext(t, m))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.a))}</span></div><div class="side"><span class="nm">${esc(sideName(t, m.b))}</span></div></div>`).join("")}</div></section>` : ""}
     ${(t.brackets || []).map(b => `<section class="panel stack" style="gap:8px"><h3>${esc(b.name)}</h3>${bracketGrid(t, b, ms)}</section>`).join("")}
     ${table && !(t.brackets || []).length ? `<section class="panel stack" style="gap:8px"><h3>Standings</h3>${table}</section>` : ""}
+    ${pools ? `<div class="pools">${pools}</div>` : ""}
     <div class="disp-memorial">SN Pétanque · In loving memory of Steve Noel</div>
   </div>`;
 }
@@ -5040,7 +5080,7 @@ document.addEventListener("change", async e => {
   if (el.closest("#modal")) return;
   if (S.extraChange && await S.extraChange(el)) return;
   if (el.dataset.plansilver !== undefined) { const on = el.checked; await savePlan(pl => { pl.brackets = pl.brackets.filter(b => !b.silver); if (on) pl.brackets.push({ id: "S", name: "Silver", silver: true, from: 1, to: 9999, third: false }); }); return; }
-  if (el.dataset.plan) { const i = +el.dataset.i, f = el.dataset.plan; const v = f === "third" ? el.checked : f === "name" ? (el.value.trim() || "Knockout") : parseInt(el.value, 10); if (f !== "name" && f !== "third" && isNaN(v)) return; await savePlan(pl => pl.brackets[i][f] = v); return; }
+  if (el.dataset.plan) { const i = +el.dataset.i, f = el.dataset.plan; const v = f === "third" ? el.checked : f === "name" ? (el.value.trim() || "Knockout") : parseInt(el.value, 10); if (f !== "name" && f !== "third" && isNaN(v)) return; await savePlan(pl => pl.brackets[i][f] = f === "name" ? koNameSaved(v, pl.brackets[i].name) : v); return; }
   const t = clone(T());
   if (el.dataset.field) {
     let v = el.value; if (el.dataset.num !== undefined) { v = parseInt(v, 10); if (isNaN(v)) return; }
