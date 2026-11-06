@@ -4999,8 +4999,8 @@ document.addEventListener("input", e => {
   if (e.target.dataset?.hof && S.modal?.hof) { hofInput(e.target); return; }
   if (e.target.id === "hof-q") { hofPage().q = e.target.value; hofPaint(); return; }
   if (e.target.id === "picker-q") {
-    const q = e.target.value.trim().toLowerCase(); let n = 0;
-    document.querySelectorAll(".pick-row").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
+    const q = hofNorm(e.target.value.trim()); let n = 0;
+    document.querySelectorAll(".pick-row[data-id]").forEach(r => { r.hidden = !!q && !hofNorm(r.dataset.name).includes(q); if (!r.hidden) n++; });
     document.querySelectorAll(".pick-group").forEach(g => g.hidden = !g.querySelector(".pick-row:not([hidden])"));
     const none = document.querySelector(".pick-none"); if (none) none.hidden = n > 0; return;
   }
@@ -5052,7 +5052,7 @@ document.addEventListener("submit", async e => {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && (S.langMenu || S.themeMenu)) { const was = S.themeMenu ? ".theme-btn" : ".lang-btn"; S.langMenu = S.themeMenu = false; renderHeader(); localize($("header.app")); $(was)?.focus(); return; }
   if (e.key === "Escape" && S.picker) { S.picker = false; renderHeader(); localize($("header.app")); $(".picker-btn")?.focus(); return; }
-  if (e.key === "Enter" && e.target.id === "picker-q") { const first = [...document.querySelectorAll(".pick-row")].find(r => !r.hidden); if (first) pickCompetition(first.dataset.id); return; }
+  if (e.key === "Enter" && e.target.id === "picker-q") { const first = [...document.querySelectorAll(".pick-row[data-id]")].find(r => !r.hidden); if (first) pickCompetition(first.dataset.id); return; }
   if (e.key === "Escape" && S.modal) { S.modal = null; renderModal(); }
   if (e.key === "Tab") { const dlg = $("#guide-modal .modal") || (S.modal ? $("#modal .modal") : null); if (!dlg) return;
     const f = [...dlg.querySelectorAll('a[href], button, input, select, textarea, video[controls], [tabindex]:not([tabindex="-1"])')].filter(canFocus), ae = document.activeElement;
