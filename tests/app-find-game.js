@@ -40,6 +40,22 @@ const { chromium } = require('playwright');
     q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300);
     const bye = C.MS().find(m => m.bye); const byeName = t2.teams.find(e => e.id === bye.a[0]).name;
     L.push('bye team in round 1: ' + (await find(byeName)).replace(/^.*?(Bye this round\.|No game drawn yet\.).*$/, '$1'));
+    // Swiss, 7 teams, 2 rounds, final for the top 2: the round-2 bye team, not in the final
+    document.activeElement?.blur(); q('[data-act="new-t"]').click(); await w(60); const t3 = JSON.parse(JSON.stringify(C.T()));
+    Object.assign(t3, { name: 'Bye final', system: 'swiss', checkin: false, swissRounds: 2 });
+    ['Lima', 'Mike', 'November', 'Oscar', 'Papa', 'Quebec', 'Romeo'].forEach((n, i) => t3.teams.push({ id: 'c' + i, name: n, players: ['Lou ' + n], active: true }));
+    await S.store.setTournament(t3); S.tournaments[t3.id] = t3; await w(30);
+    await C.savePlan(pl => { pl.brackets = [{ id: 'A', name: 'Final', from: 1, to: 2, third: false }]; }); await w(60);
+    q('[data-tab="draw"]').click(); await w(40); q('[data-act="first-draw"]').click(); await w(300);
+    const playOpen = async () => { for (const m of C.MS().filter(m => m.a && m.b && !m.done && !m.bye)) await C.recordResult(m.id, 13, 6, true); await w(100); };
+    await playOpen(); await C.addDraw(C.drawSwissRound(C.T(), C.MS())); await w(200);
+    const bye2 = C.MS().find(m => m.bye && m.round === 2); const bye2Name = C.T().teams.find(e => e.id === bye2.a[0]).name;
+    // one round-2 game finished, the rest still being played
+    const r2open = C.MS().filter(m => m.round === 2 && m.a && m.b && !m.done); await C.recordResult(r2open[0].id, 13, 6, true); await w(60);
+    L.push('bye team in its bye round: ' + (await find(bye2Name)).replace(/^.*?(Bye this round\.|No game right now\. Last game: .*|No game drawn yet\.)$/, '$1'));
+    await playOpen(); await C.startKnockouts(); await w(300); q('[data-tab="draw"]').click(); await w(60);
+    const fin = C.MS().find(m => m.stage === 'ko'); L.push('final drawn: ' + !!(fin?.a && fin?.b) + ' | bye team in it ' + [...(fin?.a || []), ...(fin?.b || [])].includes(bye2.a[0]));
+    L.push('bye team during the final: ' + (await find(bye2Name)).replace(/^.*?(Bye this round\.|No game right now\. Last game: .*|No game drawn yet\.)$/, '$1'));
     // last game in French: back on the first competition, round 2 played 13–7, no round 3 yet
     document.activeElement?.blur(); S.tid = t.id; S.matches = {}; C.watchMatches ? C.watchMatches() : 0; C.render(); await w(100); q('[data-tab="draw"]').click(); await w(60);
     for (const m of C.MS().filter(m => m.a && m.b && !m.done && !m.bye)) await C.recordResult(m.id, 13, 7, true);
