@@ -762,14 +762,16 @@ function usagePanel() {
     <div class="row"><button class="btn sm" data-act="adm-usage-refresh" ${USAGE.busy ? "disabled" : ""}>Refresh now</button>
       <a class="btn sm" href="https://console.firebase.google.com/project/${P}/firestore/usage" target="_blank" rel="noopener">Firebase usage page</a></div>`);
 }
+// search ignores accents and capitals, folded as the picker does (hofNorm in the page): "melee" finds "Mêlée du jeudi"
+const fold = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 function adminView() {
   if (isAdmin()) watchNames();
   const all = Object.values(S.tournaments);
   const cs = creators(all); const cOf = Object.fromEntries(cs.map(c => [c.uid, c]));
   const counts = { all: all.length, examples: all.filter(t => t.listed).length, visitors: all.filter(t => !t.listed).length, empty: all.filter(t => !t.listed && !entriesOf(t)).length, archived: all.filter(t => t.archived).length };
-  const q = ADM.q.trim().toLowerCase();
+  const q = fold(ADM.q.trim());
   const shown = all.filter(t => (ADM.filter === "all" || (ADM.filter === "examples" && t.listed) || (ADM.filter === "visitors" && !t.listed) || (ADM.filter === "empty" && !t.listed && !entriesOf(t)) || (ADM.filter === "archived" && t.archived))
-    && (!ADM.creator || (t.ownerUid || "unknown") === ADM.creator) && (!q || (t.name || "").toLowerCase().includes(q)))
+    && (!ADM.creator || (t.ownerUid || "unknown") === ADM.creator) && (!q || fold(t.name).includes(q)))
     .sort((x, y) => (!!y.listed - !!x.listed) || (y.created || 0) - (x.created || 0));
   [...ADM.sel].forEach(id => { if (!S.tournaments[id]) ADM.sel.delete(id); });
   const nSel = ADM.sel.size; const allShownSel = shown.length && shown.every(t => ADM.sel.has(t.id));
@@ -820,7 +822,7 @@ function adminView() {
             : `<button class="btn sm danger" data-act="adm-bulk-del">Delete selected</button><button class="btn sm" data-act="adm-bulk-arch">Archive selected</button><button class="btn sm ghost" data-act="adm-sel-none">Clear</button>`}` : ""}
         ${ADM.busy ? `<span class="small muted">${esc(ADM.busy)}</span>` : ""}
       </div>
-      <div>${shown.map(t => { const c = cOf[t.ownerUid || "unknown"]; return `<div class="erow" data-name="${esc((t.name || "").toLowerCase())}">
+      <div>${shown.map(t => { const c = cOf[t.ownerUid || "unknown"]; return `<div class="erow" data-name="${esc(fold(t.name))}">
         <input type="checkbox" data-act="adm-sel" data-id="${t.id}" ${ADM.sel.has(t.id) ? "checked" : ""} aria-label="Select ${esc(t.name)}">
         <div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(c?.label || "Unknown")} · created ${when(t.created)}${t.updated ? ` · changed ${when(t.updated)}` : ""} · ${entriesOf(t)} ${t.entry === "melee" || t.entry === "shooting" ? "players" : "teams"}</span></div>
         <span class="pill ${statusOf(t) === "Empty" ? "" : "playing"}">${statusOf(t)}</span>
@@ -936,7 +938,7 @@ async function adminAction(act, a) {
 }
 S.overlayInput = el => {
   if (el.id !== "adm-q") return false;
-  ADM.q = el.value; const q = ADM.q.trim().toLowerCase(); let n = 0;
+  ADM.q = el.value; const q = fold(ADM.q.trim()); let n = 0;
   document.querySelectorAll("#adm-comps [data-name]").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
   const c = document.getElementById("adm-count"); if (c) c.textContent = `${n} shown`;
   return true;

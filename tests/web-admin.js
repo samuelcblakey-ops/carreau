@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
   const A = await mk('A'); await A.goto(process.env.WEB_URL); await w(3500);
   await newComp(A, 'Adm A1 empty', 0); await newComp(A, 'Adm A2 full', 6);
   const B = await mk('B'); await B.goto(process.env.WEB_URL); await w(3500);
-  await newComp(B, 'Adm B1', 4);
+  await newComp(B, 'Adm B1', 4); await newComp(B, 'Mêlée du jeudi', 2);
   const AD = await mk('admin'); await AD.goto(process.env.WEB_URL + '#admin'); await w(3000);
   await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(4000);
   const txt = async (sel) => (await AD.textContent(sel)).replace(/\s+/g, ' ');
@@ -26,6 +26,11 @@ const { chromium } = require('playwright');
   await AD.fill('#adm-q', 'Adm B'); await w(300);
   const srch = await AD.evaluate(() => [...document.querySelectorAll('#adm-comps .erow')].filter(r => r.offsetParent !== null).map(r => r.textContent).join('|'));
   log('search:', srch.includes('Adm B1') && !srch.includes('Adm A1'));
+  // accents and capitals don't matter, as in the picker's search
+  await AD.fill('#adm-q', 'MELEE'); await w(300); await AD.fill('#adm-q', 'melee'); await w(300);
+  const fold = await AD.evaluate(() => [...document.querySelectorAll('#adm-comps .erow')].filter(r => r.offsetParent !== null).map(r => r.querySelector('b')?.textContent));
+  log('admin search melee finds Mêlée du jeudi:', fold.join('|') === 'Mêlée du jeudi', '| count', await AD.textContent('#adm-count'));
+  await AD.screenshot({ path: process.env.OUT + '/admin-search-melee.png' });
   await AD.fill('#adm-q', ''); await w(200);
   // nickname the creator of A's comps
   const aUid = await A.evaluate(() => window.__carreau.S.tournaments[window.__carreau.S.tid].ownerUid);
