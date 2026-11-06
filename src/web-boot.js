@@ -819,8 +819,11 @@ function adminView() {
 const CLEAN_DAYS = 7, DAY_MS = 864e5;
 const CLEAN = { confirm: false, busy: "", ran: false, open: false };
 const lastTouched = t => Math.max(t.updated || 0, t.created || 0);
+// local date as "YYYY-MM-DD", the same form as t.date
+const localDay = ms => { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 const isAbandoned = (t, now = Date.now()) => !!t && !t.listed && !t.example && !t.template && !entriesOf(t)
   && !(t.draws || []).length && !(t.pools || []).length && !(t.brackets || []).length && !(t.clubFix || []).length
+  && !(t.date && t.date >= localDay(now)) // set up early for a day still to come: kept however long it waits
   && lastTouched(t) > 0 && now - lastTouched(t) >= CLEAN_DAYS * DAY_MS;
 const abandoned = () => Object.values(S.tournaments).filter(t => isAbandoned(t)).sort((x, y) => lastTouched(x) - lastTouched(y));
 async function runCleanup(auto) {
@@ -860,6 +863,7 @@ async function cleanupAction(act, a) {
 }
 function cleanupPanel() {
   const list = abandoned(), n = list.length, L = SITE.cleanupLast;
+  const day = t => t.date ? `· ${new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" })} ` : "";
   const ago = t => { const d = Math.floor((Date.now() - lastTouched(t)) / DAY_MS); return `${d} day${d === 1 ? "" : "s"}`; };
   return `<div class="panel stack" id="adm-clean">
     <div class="spread"><h3>Clean-up</h3><span class="pill ${SITE.cleanupAuto ? "playing" : ""}">${SITE.cleanupAuto ? "Automatic" : "Manual"}</span></div>
@@ -872,7 +876,7 @@ function cleanupPanel() {
         : CLEAN.confirm ? `<span class="err">Delete ${n} empty competition${n === 1 ? "" : "s"} for good?</span><button class="btn sm danger" data-act="adm-clean-yes">Yes, delete</button><button class="btn sm" data-act="adm-clean-cancel">Cancel</button>`
         : `<span><b>${n}</b> ready to delete</span><button class="btn sm danger" data-act="adm-clean">Delete ${n} now</button><button class="btn sm ghost" data-act="adm-clean-list" aria-expanded="${CLEAN.open}">${CLEAN.open ? "Hide list" : "Show list"}</button>`}
     </div>
-    ${n && CLEAN.open && !CLEAN.busy ? `<ul class="small" id="adm-clean-list" style="margin:0;padding-left:18px">${list.slice(0, 50).map(t => `<li><span data-notr>${esc(t.name || "Untitled")}</span> <span class="muted">· untouched ${ago(t)}${t.archived ? " · archived" : ""}</span></li>`).join("")}${n > 50 ? `<li class="muted">and ${n - 50} more</li>` : ""}</ul>` : ""}
+    ${n && CLEAN.open && !CLEAN.busy ? `<ul class="small" id="adm-clean-list" style="margin:0;padding-left:18px">${list.slice(0, 50).map(t => `<li><span data-notr>${esc(t.name || "Untitled")}</span> <span class="muted">${esc(day(t))}· untouched ${ago(t)}${t.archived ? " · archived" : ""}</span></li>`).join("")}${n > 50 ? `<li class="muted">and ${n - 50} more</li>` : ""}</ul>` : ""}
     ${L ? `<p class="small muted" id="adm-clean-last">Last clean-up ${esc(when(L.at))}: ${L.deleted} deleted${L.auto ? " (automatic)" : ""}.</p>` : ""}
   </div>`;
 }
