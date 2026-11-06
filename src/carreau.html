@@ -2355,7 +2355,13 @@ function handleWriteError(e) {
 }
 async function guard(fn) { try { return await fn(); } catch (e) { handleWriteError(e); } }
 async function saveT(t) { t.updated = Date.now(); S.tournaments[t.id] = t; render(); await S.store.setTournament(t); }
-async function writeMatches(list) { list.forEach(m => S.matches[m.id] = m); for (let i = 0; i < list.length; i += 20) await Promise.all(list.slice(i, i + 20).map(m => S.store.setMatch(S.tid, m))); }
+// games (and, for a draw, the competition) in one write where the store can (the website: a batch), so no screen ever shows part of a round
+async function writeMatches(list, t) {
+  list.forEach(m => S.matches[m.id] = m);
+  if (S.store.setMatches && !t?._new) { if (t) { t.updated = Date.now(); S.tournaments[t.id] = t; render(); } return S.store.setMatches(S.tid, list, t); }
+  const games = (async () => { for (let i = 0; i < list.length; i += 20) await Promise.all(list.slice(i, i + 20).map(m => S.store.setMatch(S.tid, m))); })();
+  await Promise.all([games, t && saveT(t)]);
+}
 async function assignCourts() {
   const t = T(); const ms = MS().map(clone);
   const plan = planCourts(t, ms);
@@ -2377,10 +2383,8 @@ async function addDraw(res) {
   if (res.clubs) { t.clubs = res.clubs; t.clubFix = res.clubFix; t.clubSched = []; t.clubDays = res.clubDayCount; }
   if (res.clubFixAdd) { t.clubFix = [...clubFixtures(t), ...res.clubFixAdd]; t.clubSched = []; t.clubDays = Math.max(t.clubDays || 0, ...res.clubFixAdd.map(f => f.day)); }
   if (res.bracket) t.brackets = [...(t.brackets || []), res.bracket];
-  // the games first, so this screen (and every other one) never shows the new round without its games
-  const games = writeMatches(res.matches);
-  const saved = saveT(t);
-  await Promise.all([games, saved]);
+  // the games and the competition together, so this screen (and every other one) goes from no round to the whole round in one step
+  await writeMatches(res.matches, t);
   toast(res.note || `${res.draw.label} drawn.`);
   } finally { S.drawing = false; }
 }

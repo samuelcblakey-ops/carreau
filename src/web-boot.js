@@ -124,6 +124,12 @@ function fbStore() {
     async deleteStream(sid) { try { await deleteDoc(doc(db, "streams", sid, "private", "code")); } catch {} await deleteDoc(doc(db, "streams", sid)); },
     setLive(tid, mid, L) { return track(setDoc(doc(db, "tournaments", tid, "live", mid), clone(L))); },
     setMatch(tid, m) { return track(setDoc(doc(db, "tournaments", tid, "matches", m.id), clone(m))); },
+    // a draw: all its games and the competition in one batch (Firestore allows 500 writes per batch; the competition goes in the last one)
+    async setMatches(tid, list, t) {
+      const ops = list.map(m => [doc(db, "tournaments", tid, "matches", m.id), clone(m)]);
+      if (t) { const body = clone(t); delete body._new; body.updated = Date.now(); ops.push([doc(db, "tournaments", t.id), body]); }
+      for (let i = 0; i < ops.length; i += 500) { const b = writeBatch(db); ops.slice(i, i + 500).forEach(([r, d]) => b.set(r, d)); await track(b.commit()); }
+    },
     updateMatch(tid, id, patch) { return track(updateDoc(doc(db, "tournaments", tid, "matches", id), clone(patch))); },
     deleteMatch(tid, id) { return track(deleteDoc(doc(db, "tournaments", tid, "matches", id))); }
   };

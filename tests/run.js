@@ -338,6 +338,7 @@ const SUITES = {
     'web-live.js': [/streaming panel: true \| desk link has code: true \| overlay link: true/, /overlay: true rgba\(0, 0, 0, 0\) [A-Za-z' ]+ v [A-Za-z' ]+ 0-0/, /viewer write: permission-denied/,
       /helper joined: #\S+\.desk\.\S+ true canScore false/, /helper end: 2-0 ends 1 \| no finish button: true/, /helper match write: permission-denied/, /overlay follows: 2-0 end 2 dots 6/,
       /organiser desk: true 2-0/, /organiser finish: Finish game · 13–0/, /result: true 13-0 \| overlay final: Final 13-0/, /errs \[\]/],
+    'web-big-draw.js': [/round 1 games done: 30/, /spectator counts seen: 0 → 30$/m, /organiser counts seen: 30 only/, /spectator round 2 shown: true/, /errs \[\]/],
     'web-streams.js': [/admin switch default off: true/, /off: stream tab open to all: true \| competition games hidden: true \| no big screen tab: true/, /off: live write denied: permission-denied/, /admin only: organiser still hidden: true/,
       /everyone: competition games shown: true/, /stream links: true true/, /viewer overlay: Les Carreaux v Boule d'Or 0-0/, /viewer write: permission-denied/, /helper joined: #s\.\S+\.desk can true/, /helper end: 3-0 ends 1/, /helper rename denied: permission-denied/,
       /overlay follows: 3-0 \| Club friendly/, /owner list: Les Carreaux v Boule d'Or/, /off again: standalone still live: 3-2 \| competition live write: permission-denied/, /errs \[\]/],
