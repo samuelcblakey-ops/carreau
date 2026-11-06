@@ -39,6 +39,13 @@ const { chromium } = require('playwright');
         teams: ['Riverside', 'Hilltop', 'Lakeside', 'Seaview'].map((n, i) => ({ id: 'e' + i, name: n, players: ['A', 'B', 'C'], active: true })), draws: [{ id: 'CL', kind: 'schedule', label: 'EuroCup ties' }] });
       await S.store.setTournament(t); S.tournaments[t.id] = t; C.render(); await w(50);
       q('.picker-btn').click(); await w(60); L.push('eurocup summary: ' + meta(t.id)); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await w(40); }
+    // one entry: "1 club" and "1 team", not "1 clubs"
+    { const t = JSON.parse(JSON.stringify(C.T())); t.teams = t.teams.slice(0, 1); await S.store.setTournament(t); S.tournaments[t.id] = t; C.render(); await w(50);
+      q('.picker-btn').click(); await w(60); L.push('summary one club: ' + (meta(t.id).match(/\b1 clubs?\b/) || ['none'])[0] + ' | ' + meta(t.id));
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await w(40);
+      Object.assign(t, { system: 'swiss', format: 'doubles' }); await S.store.setTournament(t); S.tournaments[t.id] = t; C.render(); await w(50);
+      q('.picker-btn').click(); await w(60); L.push('summary one team: ' + (meta(t.id).match(/\b1 teams?\b/) || ['none'])[0] + ' | ' + meta(t.id));
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await w(40); }
     q('[data-act="new-t"]').click(); await w(60);
     { const t = JSON.parse(JSON.stringify(C.T())); Object.assign(t, { name: 'Advance summary', entry: 'melee', checkin: false, meleeMode: 'advance', format: 'doubles', swissRounds: 4, wizard: false });
       t.players = Array.from({ length: 16 }, (_, i) => ({ id: 'p' + i, name: 'Player ' + i, active: true })); await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30); C.render(); await w(40);
