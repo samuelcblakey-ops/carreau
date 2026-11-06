@@ -3,6 +3,8 @@ const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1100, height: 900 } });
   const errs = []; p.on('pageerror', e => errs.push(e.message));
+  // phone-width pictures of the level final, taken mid-test
+  await p.exposeFunction('snap', async n => { await p.setViewportSize({ width: 390, height: 900 }); await p.waitForTimeout(100); await p.screenshot({ path: (process.env.OUT || 'test-results') + '/' + n + '.png', fullPage: true }); await p.setViewportSize({ width: 1100, height: 900 }); });
   await p.goto(process.env.APP_URL); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(300);
   const out = await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)]; const L = []; try {
     const AT = ['A1', 'A2', 'A3', 'A4', 'A5'];
@@ -56,6 +58,25 @@ const { chromium } = require('playwright');
     for (let i = 0; i < 10; i++) { q(`[data-act="so-pick"][data-v="${i % 2 ? 5 : 0}"]`).click(); await w(10); }
     q('[data-act="shoot-save"][data-final="1"]').click(); await w(120);
     d = C.MS().find(m => m.id === duel.id); L.push(`duel by shoot-out: win ${d.win} so ${d.soA.join('')}/${d.soB.join('')}`);
+    // 5. a level final: no winner on Standings or the big screen until the shoot-out is scored
+    await mk({ shootFormat: 'final', shootFinal: 3, name: 'Final tie' }, 5);
+    { const t = JSON.parse(JSON.stringify(C.T())); ['Ann', 'Bob', 'Cat', 'Dan', 'Eve'].forEach((n, i) => t.players[i].name = n); await S.store.setTournament(t); S.tournaments[t.id] = t; await w(40); }
+    await tab('draw'); q('[data-act="first-draw"]').click(); await w(120);
+    await scoreQ('Q', [shots(12, 0), shots(11, 0), shots(10, 0), shots(9, 0), shots(8, 0)]);
+    await tab('draw'); q('[data-act="shoot-next"]').click(); await w(150);
+    const fin = { p0: shots(10, 0), p1: shots(12, 2), p2: shots(12, 2) };
+    for (const m of C.MS().filter(m => m.phase === 'F')) await S.store.updateMatch(S.tid, m.id, { shots: fin[m.a[0]], sa: C.shotTotal(fin[m.a[0]]), sb: 0, done: true });
+    await w(60); C.render(); await w(40);
+    const finalTxt = () => [...document.querySelectorAll('main .panel')].find(x => x.querySelector('h3')?.textContent === 'Final')?.innerText.replace(/\s+/g, ' ') || '';
+    await tab('standings'); let ft = finalTxt();
+    L.push('final tie standings: ' + (/Winner|Runner-up/i.test(ft) ? 'winner shown' : 'no winner') + ' | ' + (ft.match(/Shoot-out needed · (\w+, \w+)/) ? 'shoot-out needed ' + ft.match(/Shoot-out needed · (\w+, \w+)/)[1] : 'no alert') + ' | order ' + (ft.match(/(Ann|Bob|Cat)(?= · \d+ pts)/g) || []).join(','));
+    await window.snap('shoot-final-tie-standings'); S.tab = 'display'; C.render(); await w(60); ft = q('.disp')?.innerText.replace(/\s+/g, ' ') || '';
+    L.push('final tie big screen: ' + (/Winner|Runner-up/i.test(ft) ? 'winner shown' : 'no winner') + ' | alert ' + ft.includes('Shoot-out needed'));
+    await window.snap('shoot-final-tie-display'); await tab('draw'); q('[data-act="so-open"][data-ph="F"]').click(); await w(60);
+    for (let i = 0; i < 10; i++) { q(`[data-act="so-pick"][data-v="${i < 5 ? 0 : 5}"]`).click(); await w(10); } // Bob 0, Cat 25
+    q('[data-act="so-save"]').click(); await w(120);
+    await tab('standings'); ft = finalTxt();
+    await window.snap('shoot-final-decided'); L.push('after shoot-out: ' + (ft.match(/Winner (\w+)/i) ? 'winner ' + ft.match(/Winner (\w+)/i)[1] : 'no winner') + ' | runner-up ' + (ft.match(/Runner-up (\w+)/i)?.[1] || '') + ' | alert ' + ft.includes('Shoot-out needed'));
     // 4. French
     localStorage.setItem('carreau-lang', 'fr'); q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80); await tab('setup');
     L.push('french: ' + q('.so-setup .eyebrow').textContent + ' | ' + q('[data-set="shootTie"][data-val="countback"]').textContent);

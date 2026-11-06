@@ -2650,7 +2650,12 @@ function renderShooting(t) {
 function shootStandings(t) {
   const ms = MS(); let html = "";
   const f = shootRanking(t, "F");
-  if (f.length) html += `<div class="panel stack" style="gap:6px"><h3>Final</h3>${f.every(r => r.done) ? `<div>${MEDAL[1]}<span class="eyebrow">Winner</span> <b>${esc(entName(t, f[0].id))}</b> · ${f[0].total} pts</div>${f[1] ? `<div>${MEDAL[2]}<span class="eyebrow">Runner-up</span> ${esc(entName(t, f[1].id))} · ${f[1].total} pts</div>` : ""}${f[2] ? `<div>${MEDAL[3]}<span class="eyebrow">Third</span> ${esc(entName(t, f[2].id))} · ${f[2].total} pts</div>` : ""}` : `<span class="muted">In progress.</span>`}</div>`;
+  // a level podium place waits for its shoot-out: no Winner/Runner-up for it yet, just the final in points order
+  const fTies = f.length && f.every(r => r.done) ? shootTies(t, "F") : [];
+  const open = new Set(fTies.flatMap(g => g.rows.map((r, k) => g.start + k)));
+  const place = (i, label) => f[i] ? `<div>${open.has(i) ? `<b>${esc(entName(t, f[i].id))}</b>` : `${MEDAL[i + 1]}<span class="eyebrow">${label}</span> ${i ? esc(entName(t, f[i].id)) : `<b>${esc(entName(t, f[i].id))}</b>`}`} · ${f[i].total} pts</div>` : "";
+  const fTieLine = fTies.map(g => `<div class="notice so-alert"><b>Shoot-out needed</b> · <span data-notr>${g.rows.map(r => esc(entName(t, r.id))).join(", ")}</span></div>`).join("");
+  if (f.length) html += `<div class="panel stack" style="gap:6px"><h3>Final</h3>${f.every(r => r.done) ? `${fTieLine}${place(0, "Winner")}${place(1, "Runner-up")}${place(2, "Third")}` : `<span class="muted">In progress.</span>`}</div>`;
   const q = shootRanking(t, "Q");
   if (!q.length) return html + `<div class="empty">Standings appear once the qualifying round starts.</div>`;
   return html + `<div class="panel"><div class="tw st ${S.allCols ? "all" : ""}"><table><thead><tr><th>#</th><th>Shooter</th>${ATELIERS.map((a, i) => `<th class="n x" title="${a[1]}">A${i + 1}</th>`).join("")}<th class="n">Total</th></tr></thead><tbody>
