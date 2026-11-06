@@ -321,7 +321,7 @@ const SUITES = {
     ],
     'web-admin.js': [
       /creators panel has visitors: true \| device recorded: true/, /admin menu hides visitor comps: true/,
-      /row shows creator, teams, status: true/, /empty filter: true/, /search: true/, /nickname shown: true/,
+      /row shows creator, teams, status: true/, /empty filter: true/, /search: true/, /admin search melee finds Mêlée du jeudi: true \| count 1 shown/, /nickname shown: true/,
       /visitor cannot read nicknames: true/, /show theirs: true/, /confirm shown: true/,
       /bulk delete toast: 2 competitions deleted\./, /A comps gone, B kept: true/, /A list after delete: 0/, /errs \[\]/,
     ],
