@@ -3840,6 +3840,7 @@ function drawHeader() {
   if (t && !canScore() && !viewAll(t) && !SPECTATOR_TABS.includes(S.tab)) S.tab = "draw";
   const onTab = S.overlayView || S.liveRoute ? null : S.tab; // guides, login and the streams page aren't one of the tabs
   $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
+  localize($("header.app")); // every caller (menus, outside taps, Hall of Fame, streams) gets the header in the chosen language
 }
 // the start screen: first visit, or the logo tapped. Run, follow or stream, then your competitions and the examples.
 function renderWelcome() {
