@@ -104,6 +104,13 @@ const { chromium } = require('playwright');
     const koBox = q('#modal [data-hof="part"][data-id="ko-A"]'); q('#modal [data-act="hof-save"]').click(); await w(250);
     L.push(`update after knockouts: knockout ticked ${!!koBox?.checked} | saved ${!q('#modal .modal') && (S.hof[C.T().id]?.parts || []).some(x => x.id === 'ko-A')} | ${txt(q('#toast'))}`);
 
+    // 2c. Quick setup → Swiss: no saved plan, so the default plan's knockouts are still to come
+    await mk({ system: 'swiss', swissRounds: 1, name: 'Quick swiss' }, 4);
+    await playAll(); q('[data-tab="standings"]').click(); await w(100); q('[data-tab="draw"]').click(); await w(200);
+    L.push(`quick setup swiss, morning done: draw panel shows publish ${!!q('.hof-top [data-act="hof-open"]')} | no plan ${!C.T().koPlan} | draw knockouts ${!!q('[data-act="start-kos"]')}`);
+    await C.startKnockouts(); await w(300); await playAll(); q('[data-tab="standings"]').click(); await w(100); q('[data-tab="draw"]').click(); await w(200);
+    L.push(`quick setup swiss, after the final: draw panel shows publish ${!!q('.hof-top [data-act="hof-open"]')}`);
+
     // 3. round robin
     await mk({ system: 'roundrobin', name: 'RR' }, 4); await playAll(); L.push(`round robin: ready ${res().ready} | ${show(res())}`);
 
