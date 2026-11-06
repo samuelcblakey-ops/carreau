@@ -95,6 +95,28 @@ const { chromium } = require('playwright');
   log('unregistered comp, team propose:', await tryPropose());
   await setReg(true); await w(2000);
   log('re-registered, team propose:', await tryPropose());
+  // a team phone's console can't send a score the dialog wouldn't: the rules check the numbers and the server's clock
+  const consoleTry = (how) => T1.evaluate(async how => { const C = window.__carreau, S = C.S, t = C.T(); const me = S.myTeam(t); const m = C.MS().find(m => !m.done && m.a && m.b && (m.a.includes(me) || m.b.includes(me)));
+    try { if (how.at0) await S.store.updateMatch(t.id, m.id, { proposal: { sa: 13, sb: 7, by: me, at: 0, status: 'pending' } }); else await S.teamPropose(t, m, how.sa, how.sb, how.time); return 'accepted'; }
+    catch (e) { return e.code === 'permission-denied' ? 'refused' : e.code; } }, how);
+  log('console at 0', await consoleTry({ at0: true }));
+  log('console 99-0', await consoleTry({ sa: 99, sb: 0 }));
+  log('console 7-7 time', await consoleTry({ sa: 7, sb: 7, time: true }));
+  log('console 13-14', await consoleTry({ sa: 13, sb: 14 }));
+  log('valid 13-7', await consoleTry({ sa: 13, sb: 7 }));
+  log('valid ended on time 9-7', await consoleTry({ sa: 9, sb: 7, time: true }));
+  // a bad proposal that got in anyway (written here by the admin) is left for the organiser to check, not published
+  const bad = await AD.evaluate(async () => { const C = window.__carreau, t = C.T(); const m = C.MS().find(m => !m.done && m.a && m.b && m.proposal);
+    await C.S.store.updateMatch(t.id, m.id, { proposal: { sa: 99, sb: 0, by: m.a[0], at: Date.now(), status: 'confirmed', confirmedBy: m.b[0] } }); return m.id; });
+  await w(4000);
+  log("organiser's phone skips an invalid proposal:", await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return !m.done && m.proposal.sa === 99 && m.proposal.status === 'confirmed' && !!document.querySelector(`.check-panel [data-act="check-accept"][data-id="${id}"]`); }, bad));
+  // auto-confirm runs on the server's time: not published at once, published once the wait (3 s here) is over
+  await AD.evaluate(async id => { const C = window.__carreau, t = JSON.parse(JSON.stringify(C.T())); Object.assign(t, { scoreMode: 'teams-auto', autoConfirmMin: 0.05 });
+    await C.S.store.setTournament(t); await C.S.store.updateMatch(t.id, id, { proposal: null }); }, bad); await w(2000);
+  await consoleTry({ sa: 13, sb: 5 }); await w(500);
+  const early = await A.evaluate(id => !!window.__carreau.S.matches[id].done, bad); await w(5000);
+  log('auto-confirm on server time: early', early, '| after the wait', await A.evaluate(id => { const m = window.__carreau.S.matches[id]; return m.done + ' ' + m.sa + '-' + m.sb + ' ' + m.proposal.status; }, bad));
+  await AD.evaluate(async () => { const C = window.__carreau, t = JSON.parse(JSON.stringify(C.T())); t.scoreMode = 'teams'; delete t.autoConfirmMin; await C.S.store.setTournament(t); }); await w(1500);
   // EuroCup: a club plays both triples of a tie at once, so its link lists every game on a piste
   const eid = await AD.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
     q('[data-act="new-t"]').click(); await w(2500);

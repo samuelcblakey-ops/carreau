@@ -56,6 +56,14 @@ service cloud.firestore {
                                        || (get(cfg()).data.get('teamScoring', false) == 'admin'
                                            && get(cfg()).data.get('teamScoringComps', {}).get(tid, false) == true))
                                    && get(tdoc(tid)).data.get('scoreMode', 'organiser') in ['teams', 'teams-auto']; }
+    // a proposed score must be a real one: whole numbers from 0 to the winning score (t.target, 13 unless set), exactly one
+    // side on the winning score, or with time (ended on time) different scores both below it; at is the server's clock
+    function realScore(tid, p) {
+      let w = get(tdoc(tid)).data.get('target', 13);
+      return p.sa is int && p.sb is int && p.sa >= 0 && p.sb >= 0 && p.sa <= w && p.sb <= w
+        && (p.get('time', false) == true ? (p.sa != p.sb && p.sa < w && p.sb < w) : ((p.sa == w) != (p.sb == w)))
+        && p.at == request.time;
+    }
     // a team may only touch the proposal on its own unfinished game: propose a score, or confirm/dispute the other team's
     function teamUpdate(tid) {
       let me = myTeam(tid);
@@ -64,7 +72,7 @@ service cloud.firestore {
       return me != '' && teamScoringOn(tid) && notArchived(tid) && resource.data.get('done', false) != true
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['proposal'])
         && (me in resource.data.get('a', []) || me in resource.data.get('b', []))
-        && ((p.status == 'pending' && p.by == me && p.keys().hasOnly(['sa', 'sb', 'by', 'at', 'status', 'time']) && p.get('time', false) is bool
+        && ((p.status == 'pending' && p.by == me && p.keys().hasOnly(['sa', 'sb', 'by', 'at', 'status', 'time']) && p.get('time', false) is bool && realScore(tid, p)
              && (old == null || old.by == me || old.status in ['disputed', 'applied', 'auto']))
          || (old != null && old.status == 'pending' && old.by != me && p.sa == old.sa && p.sb == old.sb && p.by == old.by
              && p.status in ['confirmed', 'disputed'] && p.confirmedBy == me));

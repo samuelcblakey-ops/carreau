@@ -72,7 +72,7 @@ function fbStore() {
       new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
-    watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(d => d.data()), { remote: !s.metadata.hasPendingWrites }), onErr); },
+    watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(matchData), { remote: !s.metadata.hasPendingWrites }), onErr); },
     async setTournament(t) {
       const isNew = !!t._new; const body = clone(t); delete body._new; body.updated = Date.now();
       await track(setDoc(doc(db, "tournaments", t.id), body));
@@ -135,6 +135,8 @@ function fbStore() {
   };
 }
 
+// matches as the app uses them: a proposal's server timestamp becomes milliseconds (an estimate until the server confirms it)
+const matchData = d => { const m = d.data({ serverTimestamps: "estimate" }); const at = m.proposal?.at; if (at && typeof at.toMillis === "function") m.proposal.at = at.toMillis(); return m; };
 const isOwner = t => !!(AUTH.user && t && t.ownerUid === AUTH.user.uid);
 S.permFn = t => {
   if (!AUTH.user || !t) return { edit: false, score: false };
@@ -187,10 +189,11 @@ S.onFieldSet = async (t, k, v) => {
 };
 S.viewAllTabs = t => !!t.listed; // examples show every tab, locked
 S.myTeam = t => TEAM[t.id] || null;
+// a proposal's time is the server's (the rules insist), so a phone can't backdate it to skip the other team's wait
 S.teamPropose = async (t, m, sa, sb, time) => {
   const me = TEAM[t.id]; if (!me) return false;
-  const proposal = { sa, sb, by: me, at: Date.now(), status: "pending" }; if (time) proposal.time = true;
-  await track(updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal })); S.matches[m.id].proposal = proposal; return true;
+  const proposal = { sa, sb, by: me, at: serverTimestamp(), status: "pending" }; if (time) proposal.time = true;
+  await track(updateDoc(doc(FB.db, "tournaments", t.id, "matches", m.id), { proposal })); S.matches[m.id].proposal = { ...proposal, at: Date.now() }; return true;
 };
 S.teamRespond = async (t, m, status) => {
   const me = TEAM[t.id]; const p = m.proposal; if (!me || !p) return false;
