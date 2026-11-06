@@ -36,6 +36,14 @@ const { chromium } = require('playwright');
     L.push(`melee once: ${tt.entry} ${tt.meleeMode} ${tt.format} ${tt.system}`);
     tt = await runWiz('melee', async () => { sel('meleeMode', 'advance').click(); await w(40); q('#wz-rounds').value = '3'; });
     L.push(`melee advance: ${tt.entry} ${tt.meleeMode} ${tt.system} rounds ${tt.swissRounds}`);
+    // a EuroCup competition re-run through Quick setup as a mêlée drawn once falls back to Swiss
+    await runWiz('eurocup', async () => {}); q('[data-tab="setup"]').click(); await w(60); q('[data-act="wiz-again"]').click(); await w(150);
+    q('[data-act="wiz-next"]').click(); await w(50); sel('kind', 'melee').click(); await w(40); q('[data-act="wiz-next"]').click(); await w(50);
+    sel('meleeMode', 'once').click(); await w(40); const onSys = q('.wiz-opt.on[data-k="system"]')?.dataset.v;
+    q('[data-act="wiz-next"]').click(); await w(50); q('[data-act="wiz-next"]').click(); await w(200);
+    { const t = JSON.parse(JSON.stringify(C.T())); t.checkin = false; for (let i = 0; i < 6; i++) t.players.push({ id: 'em' + i, name: 'Player ' + i, active: true });
+      await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30); q('[data-tab="draw"]').click(); await w(60);
+      L.push(`wizard eurocup → melee once: system ${C.T().system} | draw button ${!!q('[data-act="melee-teams"]')}`); L.push('wizard eurocup → melee once highlights: ' + onSys); }
     tt = await runWiz('shooting', async () => { sel('shootFormat', 'final').click(); await w(40); q('#wz-sfinal').value = '6'; });
     L.push(`shooting: ${tt.entry} ${tt.shootFormat} final ${tt.shootFinal}`);
     // skip path
