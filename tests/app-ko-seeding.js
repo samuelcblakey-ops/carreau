@@ -45,6 +45,23 @@ const { chromium } = require('playwright');
     const col = [...document.querySelectorAll('.bk .bk-col')][0], rows = col ? [...col.querySelectorAll('.bkm-row')] : [];
     const line = r => r ? [...r.children].map(c => c.textContent.trim()).filter(Boolean).join(' ') : '';
     L.push(`drawn: top line ${line(rows[0])} | bottom line ${line(rows[rows.length - 1])}`);
+    // knockout plan names: the default names show translated in the editor and save back in English; no "Semi-finals · Semi-finals"
+    q('[data-act="new-t"]').click(); await w(80); const t3 = JSON.parse(JSON.stringify(C.T())); Object.assign(t3, { system: 'swiss', name: 'Plan names', checkin: false, wizard: false });
+    for (let i = 1; i <= 8; i++) t3.teams.push({ id: 'n' + i, name: 'Name ' + i, players: ['a'], active: true }); await S.store.setTournament(t3); S.tournaments[t3.id] = t3; await w(40);
+    const preset = async label => { q('[data-tab="setup"]').click(); await w(60); const btn = [...document.querySelectorAll('[data-act="plan-preset"]')].find(x => x.textContent.trim() === label) || document.querySelectorAll('[data-act="plan-preset"]')[{ 'Semi-finals (top 4)': 1, 'Top 8 + Plate (9–16)': 3 }[label]]; btn.click(); await w(80); };
+    q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="fr"]').click(); await w(80);
+    await preset('Top 8 + Plate (9–16)'); q('[data-tab="setup"]').click(); await w(60);
+    L.push(`fr plan editor names: ${q('#pl-name-0').value} | ${q('#pl-name-1').value}`);
+    for (const i of [0, 1]) { q('#pl-name-' + i).dispatchEvent(new Event('change', { bubbles: true })); await w(60); }
+    q('#pl-name-1').value = 'Coupe des amis'; q('#pl-name-1').dispatchEvent(new Event('change', { bubbles: true })); await w(60);
+    L.push(`fr saved back: ${C.getPlan(C.T()).brackets.map(b => b.name).join(' | ')}`);
+    q('[data-act="lang-menu"]').click(); await w(40); q('[data-lang="en"]').click(); await w(80);
+    await preset('Semi-finals (top 4)');
+    const pn = C.getPlan(C.T()).brackets[0].name; await C.addDraw(C.createBracket(C.T(), 'A', pn, ['n1', 'n2', 'n3', 'n4'])); await w(80);
+    const lab = bid => C.MS().filter(m => m.bracket === bid && !m.third).sort((x, y) => x.round - y.round).map(m => C.matchContext(C.T(), m)).filter((v, i, a) => a.indexOf(v) === i);
+    L.push(`preset top 4 game labels: ${lab('A').join(' | ')}`);
+    await C.addDraw(C.createBracket(C.T(), 'B', 'Semi-finals', ['n5', 'n6', 'n7', 'n8'])); await w(80);
+    const old = lab('B'); L.push(`existing semi-finals named bracket: ${old[0]} | ${old.some(x => /Semi-finals · Semi-finals/.test(x)) ? 'doubled' : 'no doubling'} | ${old.join(' / ')}`);
     } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\n')[1]); } return L; });
   console.log(out.join('\n')); console.log('errs', errs); await b.close();
 })();
