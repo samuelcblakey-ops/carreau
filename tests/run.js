@@ -384,6 +384,7 @@ const SUITES = {
       /publish someone else's: denied \S+ \| own create hidden: denied \S+ \| own create: ok/, /admin hide: ok \| reason: ok/,
       /hidden: visitor read denied \S+ \| visitor list has it false \| owner read read open \| admin list true/, /reason: owner read doc \| visitor denied \S+ \| owner write denied \S+/,
       /owner unhide: denied \S+ \| relevel: denied \S+ \| keep level: ok/, /owner panel hidden: Hall of Fame Hidden from the Hall of Fame by the site admin · Open England Remove Questions\? Contact Info@FoundryITadvisory\.com\./,
+      /admin bulk archive: entry link hidden true \| archived true/, /admin list restore: entry link shown true \| archived false/,
       /owner removed: none \| toast Removed from the Hall of Fame\./, /errs \[\]/],
     'web-hall-of-fame-page.js': [/published: Published to the Hall of Fame\. \| view link true/, /links: true true true/,
       /opens on the grid: true/, /page: Hall of Fame \| country GB-ENG \| has the card true \| view link true \| no competition watched true/, /all countries: has the card true/,
