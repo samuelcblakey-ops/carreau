@@ -34,15 +34,19 @@ const newCode = () => { const a = new Uint32Array(8); crypto.getRandomValues(a);
 
 // writes: count what's waiting for the server (for the connection light); when offline, don't make the
 // screen wait for the server to answer: the change is already in the local cache and syncs when back online
-const NET = { pending: 0 };
-const netChanged = () => { try { renderNet(); } catch {} };
+// the count is also kept on the device, so a reload while still offline shows what's still waiting from before
+// (carried: writes from before the reload; cleared once Firestore says its queue has reached the server, see boot)
+const NET_KEY = "carreau-waiting";
+const NET = { pending: 0, carried: Math.max(0, parseInt(lsGet(NET_KEY), 10) || 0) };
+const waiting = () => NET.pending + NET.carried;
+const netChanged = () => { lsSet(NET_KEY, String(waiting())); try { renderNet(); } catch {} };
 const track = p => {
   NET.pending++; netChanged();
   const done = () => { NET.pending = Math.max(0, NET.pending - 1); netChanged(); }; p.then(done, done);
   if (navigator.onLine === false) { p.catch(e => { console.error(e); toast("A change made offline couldn't be saved."); }); return Promise.resolve(); }
   return p;
 };
-S.connState = () => !FB ? null : navigator.onLine === false ? { k: "off", label: NET.pending ? `Offline · ${NET.pending} waiting to sync` : "Offline" } : NET.pending ? { k: "sync", label: "Saving…" } : { k: "live", label: "Live" };
+S.connState = () => !FB ? null : navigator.onLine === false ? { k: "off", label: waiting() ? `Offline · ${waiting()} waiting to sync` : "Offline" } : waiting() ? { k: "sync", label: "Saving…" } : { k: "live", label: "Live" };
 addEventListener("online", netChanged); addEventListener("offline", netChanged);
 function fbStore() {
   const { db } = FB;
@@ -1052,6 +1056,8 @@ function boot() {
   onAuthStateChanged(FB.auth, async u => {
     if (!u) { try { await signInAnonymously(FB.auth); } catch (e) { console.error(e); toast("Couldn't connect. Check your internet connection and reload."); } return; }
     AUTH.user = u; AUTH.ready = true; watchSite(); watchOrg(); restart(); render();
+    // changes made before a reload are still in this user's offline queue: count them until it has all reached the server
+    if (NET.carried && !NET.watching) { NET.watching = true; waitForPendingWrites(FB.db).then(() => { NET.carried = 0; netChanged(); }, e => console.warn(e)); }
     await handleHash();
   });
 }
