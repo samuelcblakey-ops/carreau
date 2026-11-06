@@ -1646,7 +1646,9 @@ function gameLine(t, id) {
     const live = cur.sa != null && cur.sb != null && (cur.sa || cur.sb) ? ` · ${a ? cur.sa : cur.sb}–${a ? cur.sb : cur.sa} now` : "";
     return `<div><b>v ${esc(opp)}</b></div><div class="small muted">${esc(matchContext(t, cur))} · ${cur.court ? `<span class="court-tag">Piste ${esc(courtName(t, cur.court))}</span>` : "waiting for a piste"}${live}</div>`; }
   const latest = MS().filter(m => inMatch(m, id)).sort(byOrder).slice(-1)[0];
-  if (latest?.bye) return `<div class="small muted">Bye this round.</div>`;
+  // the bye only counts while its round is still being played (other games of that round not finished)
+  const sameRound = m => m.stage === latest.stage && m.round === latest.round && (m.bracket || null) === (latest.bracket || null) && (m.pool || null) === (latest.pool || null);
+  if (latest?.bye && MS().some(m => !m.bye && !m.done && sameRound(m))) return `<div class="small muted">Bye this round.</div>`;
   const last = ms.filter(m => m.done).slice(-1)[0];
   if (last) { const a = (last.a || []).includes(id); const won = winnerSide(last)?.includes(id);
     // "Won"/"Lost" sit in the translatable text node; score and opponent are kept as they are
