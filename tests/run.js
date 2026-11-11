@@ -167,6 +167,8 @@ const SUITES = {
       /after back: true \| #\w+ \| Stream \| stream page false \| stream tab current stream/, /streams list back: ‹ Competitions/, /after list back: true \| stream page false/,
       /browser back: #streams \| stream page true/, /new competition from stream page: true \| true \| #\w+ \| Quick setup \| stream page false/,
       /picker from stream page: true \| true \| #\w+ \| Registration \| stream page false/, /errs \[\]/],
+    'app-overlay-layout.js': [/landscape default at 390: overlaps none/, /portrait default at 390: overlaps none/,
+      /drag moves box: l bar moved \| l line moved \| l card moved \| p bar moved \| p line moved \| p card moved/, /errs \[\]/],
     'app-overlay-names.js': [/landscape 1280x720: truncated none \| holding dot visible true/, /portrait 720x1280: truncated none \| holding dot visible true/, /errs \[\]/],
     'app-streams.js': [/desk: Who won the mène\? \| label MÈNE/, /overlay: Mène 3 \| bar label Mène/, /fr desk: Mène \| Qui a gagné la mène \?/, /welcome link: true/, /tabs: entries,setup,draw,courts,standings,stream \| no big screen tab true/, /stream tab: Stream \| new stream true \| comp games panel true \| big screen button true/, /big screen: true tab highlighted none true/,
       /home: true picker closed true \| Stream a game/, /created: true true \| title Team A v Team B \| player boxes 2/, /saved: Les Carreaux \/ Marc Dupont\+Sophie Martin v Boule d'Or \/ Pierre Lefèvre\+Aline Rossi \| Club friendly piste 3 to 11 \| title Les Carreaux v Boule d'Or/,
