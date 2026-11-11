@@ -446,6 +446,9 @@ const GUIDES = [
   { id: "team-scores", title: "Teams enter their own scores", len: "1 min", file: "videos/team-scores",
     desc: "Team links and QR codes, then one team enters the score on its phone, the other confirms, and the next game goes onto the free piste.",
     cta: "Teams entering scores? Watch how it works (1 min)." },
+  { id: "stream", title: "Streaming a game", len: "2 min", file: "videos/stream-a-game",
+    desc: "Set up a stream, add the overlay to your phone's streaming app, then tap in the game on the live desk: boules, holding, mènes and stats.",
+    cta: "Filming a game? Watch how to stream it (2 min)." },
 ];
 const guideOf = id => GUIDES.find(g => g.id === id);
 S.guideLink = id => { const g = guideOf(id); return g ? `<button type="button" class="btn sm ghost guide-btn" data-act="guide-play" data-id="${g.id}"><span class="gi" aria-hidden="true">▶</span><span>${g.cta}</span></button>` : ""; };
