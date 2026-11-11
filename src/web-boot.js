@@ -1075,8 +1075,10 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__
 }
 
 function boot() {
-  const h = readHash(); if (h.tid && !["admin", "login", "guides", "halloffame"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
-  const lr = parseLiveHash(); if (lr) { if (lr.tid) S.tid = lr.tid; S.liveRoute = lr; }
+  // a stream link (#s.<id>.stream, #streams, #halloffame) names no competition: reading it as one ("s") watched a competition
+  // that doesn't exist, which the rules refuse ("Missing or insufficient permissions")
+  const h = readHash(), lr = parseLiveHash(); if (!lr && h.tid && !["admin", "login", "guides", "halloffame"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
+  if (lr) { if (lr.tid) S.tid = lr.tid; S.liveRoute = lr; }
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
   // keep a copy of what this device has seen (IndexedDB): competitions open instantly next time and keep working offline
@@ -1102,7 +1104,9 @@ function boot() {
   if (S.tid) { watchSite(); startWatching(); render(); }
   onAuthStateChanged(FB.auth, async u => {
     if (!u) { try { await signInAnonymously(FB.auth); } catch (e) { console.error(e); toast("Couldn't connect. Check your internet connection and reload."); } return; }
-    AUTH.user = u; AUTH.ready = true; watchSite(); watchOrg(); restart(); render();
+    // an overlay or desk listener made before sign-in is made again now: Firestore restarts its connection when the
+    // sign-in lands, and a listener caught by that restart could miss the desk's changes until a reload
+    AUTH.user = u; AUTH.ready = true; S.liveRewatch?.(); watchSite(); watchOrg(); restart(); render();
     // changes made before a reload are still in this user's offline queue: count them until it has all reached the server
     if (NET.carried && !NET.watching) { NET.watching = true; waitForPendingWrites(FB.db).then(() => { NET.carried = 0; netChanged(); }, e => console.warn(e)); }
     await handleHash();

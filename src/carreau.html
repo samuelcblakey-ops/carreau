@@ -3610,9 +3610,16 @@ function liveWatch() {
   if (S.liveKey === key) return;
   S.unsubL?.(); S.unsubL = null; S.liveKey = key; if (!r || key === "hof") return; // the Hall of Fame loads its own list
   if (key === "streams") { watchStreams(); return; }
-  if (r.sid) { S.unsubL = S.store.watchStream(r.sid, st => { if (S.liveKey !== key) return; if (st) S.streams[r.sid] = st; else delete S.streams[r.sid]; noteEnds(key, st?.live); S.streamsLoaded = true; render(); }, e => console.error(e)); return; }
-  S.unsubL = S.store.watchLive(r.tid, r.mid, L => { if (S.liveKey !== key) return; if (L) S.live[r.mid] = normLive(r.mid, L); else delete S.live[r.mid]; noteEnds(key, L); render(); }, e => console.error(e));
+  // a listener that stops with an error is made again (after 2 s, then longer), so an open overlay never goes quiet for good
+  const lost = e => { console.warn("live score listener stopped", e?.code || e); if (S.liveKey !== key || e?.code === "permission-denied") return;
+    const n = S.liveRetry = (S.liveRetry || 0) + 1; setTimeout(() => { if (S.liveKey === key) liveRewatch(); }, Math.min(30000, 2000 * n)); };
+  const ok = () => { S.liveRetry = 0; };
+  if (r.sid) { S.unsubL = S.store.watchStream(r.sid, st => { if (S.liveKey !== key) return; ok(); if (st) S.streams[r.sid] = st; else delete S.streams[r.sid]; noteEnds(key, st?.live); S.streamsLoaded = true; render(); }, lost); return; }
+  S.unsubL = S.store.watchLive(r.tid, r.mid, L => { if (S.liveKey !== key) return; ok(); if (L) S.live[r.mid] = normLive(r.mid, L); else delete S.live[r.mid]; noteEnds(key, L); render(); }, lost);
 }
+// make the overlay's or desk's listener again (the website calls this once the device has signed in)
+function liveRewatch() { if (!S.liveKey || S.liveKey === "streams" || S.liveKey === "hof") return; S.liveKey = null; liveWatch(); }
+S.liveRewatch = liveRewatch;
 // A tap on the live desk is a change to the live score: mutate(L) changes L, or returns false when there's nothing to do.
 // It's drawn on this phone's copy straight away. On the website it's then applied to the server's latest live score in a
 // transaction, so two phones scoring at once both count. Offline, or with no transactions (from disk), this phone's copy
