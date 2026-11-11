@@ -16,8 +16,20 @@ const { chromium } = require('playwright');
     await Promise.all([...document.querySelectorAll('.guide-card img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
     return { h: document.querySelector('main h2')?.textContent, cards: cards.map(c => c.querySelector('b').textContent), imgs: [...document.querySelectorAll('.guide-card img')].every(i => i.naturalWidth > 0) }; });
   log(`guides page: ${page.h} | ${page.cards.join(' / ')} | posters ${page.imgs}`);
-  const files = await p.evaluate(async () => Promise.all(['videos/first-competition.mp4', 'videos/shooting-competition.mp4', 'videos/team-scores.mp4'].map(async u => { const r = await fetch(u); const n = (await r.arrayBuffer()).byteLength; return `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`; })));
+  const files = await p.evaluate(async () => Promise.all(['videos/first-competition.mp4', 'videos/shooting-competition.mp4', 'videos/team-scores.mp4', 'videos/stream-a-game.mp4'].map(async u => { const r = await fetch(u); const n = (await r.arrayBuffer()).byteLength; return `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`; })));
   log('video files:', files.join(' | '));
+  // the streaming guide: its poster shows and its video loads (size and length), and the Stream a game page links to it
+  const sg = await p.evaluate(async () => { const img = document.querySelector('#guide-stream img'); const v = document.createElement('video'); v.muted = true; v.preload = 'metadata';
+    const can = !!v.canPlayType('video/mp4; codecs="avc1.4d401f"'); let size = 'n/a', long = 'n/a';
+    if (can) { v.src = 'videos/stream-a-game.mp4'; await new Promise(r => { v.onloadedmetadata = r; v.onerror = r; setTimeout(r, 8000); }); size = v.videoWidth + 'x' + v.videoHeight; long = Math.round(v.duration) > 120; }
+    return { poster: !!img && img.naturalWidth > 0 && /stream-a-game\.jpg$/.test(img.getAttribute('src') || ''), size, long }; });
+  await p.evaluate(() => { location.hash = 'streams'; }); await w(600);
+  const sl = await p.evaluate(() => document.querySelector('main [data-act="guide-play"]')?.dataset.id || 'none');
+  log(`stream guide: poster ${sg.poster} | video ${sg.size} | long ${sg.long} | streams page link: ${sl}`);
+  await p.click('main [data-act="guide-play"][data-id="stream"]'); await w(500);
+  log('streams page opens:', await p.evaluate(() => document.querySelector('#guide-modal video')?.getAttribute('src') + ' | ' + document.querySelector('#guide-modal h3')?.textContent));
+  await p.click('#guide-modal [data-act="guide-close"]'); await w(300);
+  await p.evaluate(() => { location.hash = 'guides'; }); await w(600);
   await p.click('.guide-card [data-act="guide-play"][data-id="shooting"]'); await w(800);
   const modal = await p.evaluate(async () => { const v = document.querySelector('#guide-modal video'); if (!v) return null;
     const can = !!v.canPlayType('video/mp4; codecs="avc1.4d401f"'); let dur = 'n/a';
