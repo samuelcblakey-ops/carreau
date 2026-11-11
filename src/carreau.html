@@ -561,9 +561,14 @@ body.desk header.app{display:none}
 .dk-foot{display:flex;gap:10px;align-items:center}.dk-foot .btn.primary{flex:1}
 .lay-prev{position:relative;aspect-ratio:16/9;width:100%;border-radius:10px;background:radial-gradient(ellipse at 50% 70%,#b3a287,#6f6252);overflow:hidden;touch-action:none;user-select:none}
 .lay-prev.port{aspect-ratio:9/16;width:min(100%,260px);margin:0 auto}
-.lay-chip{position:absolute;transform:translate(-50%,-50%);padding:6px 12px;border-radius:8px;background:rgba(10,14,22,.86);color:#fff;font-size:12px;font-weight:600;cursor:grab;white-space:nowrap;touch-action:none}
-.lay-chip.lay-bar{padding:10px 26px;font-size:13px}.lay-chip.lay-card{border-left:4px solid #F2B134}
-.lay-prev.port .lay-chip.lay-bar{padding:14px 18px}
+.lay-chip{position:absolute;transform:translate(-50%,-50%);padding:6px 12px;border-radius:8px;background:rgba(10,14,22,.86);color:#fff;font-size:12px;font-weight:600;cursor:grab;white-space:nowrap;touch-action:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1}
+.lay-chip.lay-card{border-left:4px solid #F2B134}
+/* the score bar and info line chips have their boxes' real size on the picture, so they only overlap where the boxes
+   would: the bar is wide and easy to grab, the thin info line fits in the gap under it (landscape 62.5% x 11%, portrait 91% x 14%) */
+.lay-chip.lay-bar{width:62.5%;height:11%;padding:0 8px;font-size:12px;border-radius:6px}
+.lay-chip.lay-line{height:7.4%;padding:0 26px;font-size:11px;border-radius:99px}
+.lay-prev.port .lay-chip.lay-bar{width:91%;height:14%}
+.lay-prev.port .lay-chip.lay-line{height:5.6%}
 /* colours and logo */
 .swatches{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .swatch{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0;position:relative;display:inline-flex;align-items:center;justify-content:center;overflow:hidden}
