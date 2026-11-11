@@ -169,6 +169,7 @@ const SUITES = {
       /picker from stream page: true \| true \| #\w+ \| Registration \| stream page false/, /errs \[\]/],
     'app-overlay-layout.js': [/landscape default at 390: overlaps none/, /portrait default at 390: overlaps none/,
       /drag moves box: l bar moved \| l line moved \| l card moved \| p bar moved \| p line moved \| p card moved/, /errs \[\]/],
+    'app-overlay-names.js': [/landscape 1280x720: truncated none \| holding dot visible true/, /portrait 720x1280: truncated none \| holding dot visible true/, /errs \[\]/],
     'app-streams.js': [/desk: Who won the mène\? \| label MÈNE/, /overlay: Mène 3 \| bar label Mène/, /fr desk: Mène \| Qui a gagné la mène \?/, /welcome link: true/, /tabs: entries,setup,draw,courts,standings,stream \| no big screen tab true/, /stream tab: Stream \| new stream true \| comp games panel true \| big screen button true/, /big screen: true tab highlighted none true/,
       /home: true picker closed true \| Stream a game/, /created: true true \| title Team A v Team B \| player boxes 2/, /saved: Les Carreaux \/ Marc Dupont\+Sophie Martin v Boule d'Or \/ Pierre Lefèvre\+Aline Rossi \| Club friendly piste 3 to 11 \| title Les Carreaux v Boule d'Or/,
       /triples: triples boxes 3/, /links: s\.\S+\.stream \| desk href s\.\S+\.desk/, /more links: 5/, /desk: true \| Club friendly · Piste 3 \| Les Carreaux v Boule d'Or \| to to 11 \| boules Boule thrown · 6 left \/ Boule thrown · 6 left/,

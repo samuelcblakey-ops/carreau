@@ -502,9 +502,9 @@ body.desk header.app{display:none}
 .ov-team{display:flex;align-items:center;gap:1.1vw;min-width:0}
 .ov-tab{flex:none;align-self:stretch;display:block}
 .ov-tinfo{display:flex;flex-direction:column;min-width:0}
-.ov-name{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.03em;line-height:1;display:flex;align-items:center;min-width:0}
+.ov-name{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.03em;line-height:1;display:flex;align-items:center;min-width:0;max-width:100%}
 .ov-name>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.ov-jack{display:inline-block;border-radius:50%;background:#e8702a;flex:none}
+.ov-jack{display:inline-block;border-radius:50%;background:#e8702a;flex:none}.ov-jack.off{visibility:hidden}
 .ov-sub{display:flex;align-items:center;color:var(--mute)}
 .ov-dots{display:inline-flex;align-items:center}
 .ov-dot{display:inline-block;border-radius:50%;border:.12em solid rgba(255,255,255,.45);box-sizing:border-box}
@@ -521,7 +521,7 @@ body.desk header.app{display:none}
 @keyframes ovcard{from{opacity:0;transform:translate(-50%,-50%) translateX(-1.5vw)}to{opacity:1}}
 /* landscape (16:9): sizes in vw so the overlay scales with the widget */
 .ov-l .ov-bar{width:62.5vw;height:6.25vw}
-.ov-l .ov-team{flex:1 1 0;padding:0 1.2vw 0 1.6vw}.ov-l .ov-team.b{flex-direction:row-reverse;padding:0 1.6vw 0 1.2vw}.ov-l .ov-team.b .ov-tinfo{align-items:flex-end}.ov-l .ov-team.b .ov-sub{flex-direction:row-reverse}
+.ov-l .ov-team{flex:1 1 0;padding:0 1.2vw 0 1.6vw}.ov-l .ov-team.b{flex-direction:row-reverse;padding:0 1.6vw 0 1.2vw}.ov-l .ov-team.b .ov-tinfo{align-items:flex-end}.ov-l .ov-team.b .ov-sub,.ov-l .ov-team.b .ov-name{flex-direction:row-reverse}
 .ov-l .ov-tab{width:.8vw}
 .ov-l .ov-tinfo{gap:.45vw;flex:1}.ov-l .ov-name{font-size:2.3vw;gap:.7vw}.ov-l .ov-jack{width:.95vw;height:.95vw}
 .ov-l .ov-sub{font-size:1.1vw;gap:.8vw}.ov-l .ov-dots{gap:.4vw}.ov-l .ov-dot{width:.85vw;height:.85vw}
@@ -3703,7 +3703,7 @@ function renderStream(c) {
   const at = (k, extra = "") => { const [x, y] = livePos(L, o, k); return `style="left:${x}%;top:${y}%;${extra}"`; };
   const team = k => { const tot = sideBoules(t, m, k); const left = Math.max(0, tot - (L.thrown?.[k] || 0)); const ps = sidePlayers(t, m[k]);
     return `<div class="ov-team ${k}"><i class="ov-tab" style="background:${K[k]}"></i>
-      <div class="ov-tinfo"><div class="ov-name" data-notr><span>${esc(sideName(t, m[k]))}</span>${L.holding === k && !m.done ? `<i class="ov-jack" title="Holding the point"></i>` : ""}</div>
+      <div class="ov-tinfo"><div class="ov-name" data-notr><span>${esc(sideName(t, m[k]))}</span>${L.holding === k && !m.done ? `<i class="ov-jack" title="Holding the point"></i>` : `<i class="ov-jack off" aria-hidden="true"></i>`}</div>
         <div class="ov-sub">${!isIndiv(t) && ps.length ? `<span data-notr>${esc(ps.map(lastName).join(" · "))}</span>` : ""}<span class="ov-dots">${Array.from({ length: tot }, (_, i) => `<i class="ov-dot ${i < left ? "on" : ""}" style="${i < left ? `background:${K[k]};border-color:${K[k]}` : ""}"></i>`).join("")}</span></div></div>
       <div class="ov-score" style="background:${K[k]};color:${K.ink[k]}">${sc[k]}</div></div>`; };
   const end = L.ends.length + 1;
@@ -3716,6 +3716,15 @@ function renderStream(c) {
     ${parts.includes("card") ? card : ""}
   </div>`;
 }
+// the holding dot always keeps its room next to the name, and a name too long for its box is shrunk to fit (down to 55%)
+// rather than cut off, so a long name stays whole whether or not its team holds the point
+function fitOvNames() {
+  document.querySelectorAll(".ov-name>span").forEach(s => { s.style.fontSize = ""; const need = s.scrollWidth, have = s.clientWidth;
+    if (!have || need <= have + 0.5) return; let f = Math.max(0.55, Math.floor(have / need * 100) / 100); s.style.fontSize = f + "em";
+    while (f > 0.55 && s.scrollWidth > s.clientWidth + 0.5) { f = Math.max(0.55, f - 0.02); s.style.fontSize = f + "em"; } });
+}
+addEventListener("resize", () => { if (S.liveRoute?.view === "stream") fitOvNames(); });
+document.fonts?.ready?.then(() => { if (S.liveRoute?.view === "stream") fitOvNames(); });
 function scheduleCardTick(L) {
   clearTimeout(cardTimer); cardTimer = null;
   if (L?.card && cardLive(L)) cardTimer = setTimeout(render, Math.max(50, 6050 - (Date.now() - L.card.at)));
@@ -4026,7 +4035,7 @@ function drawPage() {
   const restore = () => { document.querySelectorAll("[data-scroll-key]").forEach(el => { const v = scrolls[el.dataset.scrollKey]; if (v) { el.scrollLeft = v[0]; el.scrollTop = v[1]; } }); };
   applyCompTheme(S.liveRoute && !S.liveRoute.tid ? null : T()); brandWatch(); hofWatch();
   document.body.classList.toggle("stream", S.liveRoute?.view === "stream"); document.body.classList.toggle("desk", S.liveRoute?.view === "desk");
-  if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lc = S.liveRoute.view === "stream" && S.loaded ? liveCtx() : null; scheduleCardTick(lc ? lc.L : null); return; }
+  if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lc = S.liveRoute.view === "stream" && S.loaded ? liveCtx() : null; if (lc) fitOvNames(); scheduleCardTick(lc ? lc.L : null); return; }
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
