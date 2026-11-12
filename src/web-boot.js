@@ -151,6 +151,10 @@ function fbStore() {
       for (let i = 0; i < ops.length; i += 500) { const b = writeBatch(db); ops.slice(i, i + 500).forEach(([r, d, upd]) => upd ? b.update(r, d) : b.set(r, d)); await track(b.commit()); }
     },
     updateMatch(tid, id, patch) { return track(updateDoc(doc(db, "tournaments", tid, "matches", id), clone(patch))); },
+    // several games' fields in one go (a round's clock): [{ id, patch }], 450 updates per batch
+    async updateMatches(tid, list) {
+      for (let i = 0; i < list.length; i += 450) { const b = writeBatch(db); list.slice(i, i + 450).forEach(({ id, patch }) => b.update(doc(db, "tournaments", tid, "matches", id), clone(patch))); await track(b.commit()); }
+    },
     deleteMatch(tid, id) { return track(deleteDoc(doc(db, "tournaments", tid, "matches", id))); }
   };
 }
