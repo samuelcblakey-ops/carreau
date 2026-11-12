@@ -1865,15 +1865,20 @@ function clockPanel(t) {
     ${rounds.some(r => r.clk) ? `<div class="clk-sound">${SND.on ? "" : `<button type="button" class="btn" data-act="sound-on">Turn on the beep</button>`}<p class="small muted">Keep this phone unlocked with the volume up to hear the beep.</p></div>` : ""}</div>`;
 }
 // organisers start and stop a round's clock: one field on each game, so a score saved on another phone meanwhile isn't overwritten
+// the whole round in one write where the store can (Firestore batches), else game by game
+async function saveClocks(ids, at) {
+  if (S.store.updateMatches) return S.store.updateMatches(S.tid, ids.map(id => ({ id, patch: { clockAt: at } })));
+  for (const id of ids) await S.store.updateMatch(S.tid, id, { clockAt: at });
+}
 async function clockStart(t, key) {
   const at = Date.now(), ids = MS().filter(m => roundKey(m) === key && !m.done && !m.bye).map(m => m.id);
   ids.forEach(id => { S.matches[id].clockAt = at; }); render();
-  await guard(async () => { for (const id of ids) await S.store.updateMatch(S.tid, id, { clockAt: at }); });
+  await guard(() => saveClocks(ids, at));
 }
 async function clockStop(t, key) {
   const ids = MS().filter(m => roundKey(m) === key && m.clockAt).map(m => m.id);
   S.clockAsk = null; ids.forEach(id => { S.matches[id].clockAt = null; }); render();
-  await guard(async () => { for (const id of ids) await S.store.updateMatch(S.tid, id, { clockAt: null }); });
+  await guard(() => saveClocks(ids, null));
 }
 // every second: the digits count down in place; the page redraws once when one reaches 0:00 (badges, the red row)
 function tickClocks() {
