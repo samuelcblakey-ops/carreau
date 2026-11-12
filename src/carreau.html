@@ -1809,7 +1809,8 @@ const TIME_EXTRA_OPTS = [[1, "+1 mène"], [2, "+2 mènes"]];
 const TIME_EXTRA_HELP = { 1: "Players finish the mène in progress and play one more. If it's still level, they play one extra mène.", 2: "Players finish the mène in progress and play two more. If it's still level, they play one extra mène." };
 // round clock: an organiser starts it for each round (clockAt on the round's games). A round is every game with the same
 // group and round; its clock is the earliest clockAt among them. A game that only gets its piste later is timed from then.
-const roundKey = m => `${m.group}|${m.round}`;
+// Club games are split by game number too: a EuroCup leg (triples, doubles, singles) or a rotation game each has its own clock.
+const roundKey = m => m.stage === "club" ? `${m.group}|${m.round}|${m.game || 1}` : `${m.group}|${m.round}`;
 let ROUND_CLOCKS = null; // worked out once per redraw, not once per game card
 function roundClocks() {
   if (ROUND_CLOCKS) return ROUND_CLOCKS; const r = {};
@@ -1824,7 +1825,9 @@ function roundName(t, m) {
   if (m.stage === "pool") return `${isLeagues(t) ? "Leagues" : "Barrage"} · Round ${m.round}`;
   if (m.stage === "rr") return `Round robin · Round ${m.round}`;
   if (m.stage === "snake") return `Snake · Round ${m.round}`;
-  if (m.stage === "club") return `${clubUnit(t) === "round" ? "Round" : "Day"} ${m.round}`;
+  if (m.stage === "club") { const base = `${clubUnit(t) === "round" ? "Round" : "Day"} ${m.round}`;
+    if (isEuro(t)) { const leg = euroFmt(t).legs.find(l => l.leg === m.leg); return leg ? `${base} · ${leg.name}` : base; }
+    return t.clubPairing === "rotation" && m.group === "CL" && m.game ? `${base} · Game ${m.game}` : base; }
   return `Round ${m.round}`;
 }
 const TIME_UP_SAY = { 1: "Finish the mène in progress and play one more. If it's still level, play one extra mène.", 2: "Finish the mène in progress and play two more. If it's still level, play one extra mène." };
