@@ -137,6 +137,102 @@ const { chromium } = require('playwright');
       L.push('phone 390: no sideways scroll ' + noScroll() + ' | start button 44+ px ' + (q('[data-act="clock-start"]').getBoundingClientRect().height >= 44));`);
     await P.close();
   }
+  // ---- which games the time limit covers: Setup, Draw & results, Quick setup ----
+  {
+    const P = await c.newPage(); P.on('pageerror', e => errs.push(e.message));
+    await P.goto(process.env.APP_URL); await P.evaluate(() => localStorage.clear()); await P.reload(); await P.waitForTimeout(300);
+    const run = async fn => { const r = await P.evaluate(new Function(`return (async () => { ${helpers}
+      const qa = s => [...document.querySelectorAll(s)], txts = s => qa(s).map(x => x.textContent).join(' / ');
+      const shown = () => !!q('.time-scope'), pick = (k, v) => q('[data-set="' + k + '"][data-val="' + v + '"]').click();
+      const put = async patch => { const t = JSON.parse(JSON.stringify(C.T())); Object.assign(t, patch); await S.store.setTournament(t); S.tournaments[t.id] = t; C.render(); await w(60); };
+      const rows = () => qa('.clk-row .clk-head b').map(b => b.textContent), none = () => q('.clk-none')?.textContent || 'none';
+      // the Time badges on the Pistes tab (the bracket cards on Draw & results don't show them)
+      const badges = async () => { q('[data-tab="courts"]').click(); await w(80); const n = qa('main .pill.timeup').length; q('[data-tab="draw"]').click(); await w(60); return n; };
+      const finish = async ids => { for (const id of ids) await C.recordResult(id, 13, 7, true); await w(100); await C.assignCourts(); await w(150); C.render(); await w(60); };
+      // the knockout games on pistes started 2 hours ago, so any the limit covers show Time
+      const stamp = async () => { const at = Date.now() - 2 * 3600000; for (const m of C.MS().filter(m => m.stage === 'ko' && !m.done)) { Object.assign(S.matches[m.id], { clockAt: at, courtAt: at }); await S.store.updateMatch(S.tid, m.id, { clockAt: at, courtAt: at }); } C.render(); await w(60); };
+      const mk = async (extra, n) => { q('[data-act="new-t"]').click(); await w(150); const t = JSON.parse(JSON.stringify(C.T()));
+        Object.assign(t, { name: 'Covers', system: 'swiss', checkin: false, swissRounds: 1, timeLimit: 60, wizard: false, seeding: 'entry', courts: Array.from({ length: 4 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true })) }, extra);
+        for (let i = 0; i < n; i++) t.teams.push({ id: 'K' + i, name: 'Team ' + (i + 1), players: ['x'], active: true });
+        await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30); q('[data-tab="draw"]').click(); await w(60); q('[data-act="first-draw"]').click(); await w(300); };
+      try { ${fn} } catch (e) { L.push('ERR ' + e.message); } return L; })()`)); L.push(...r); };
+    // Setup
+    await run(`q('[data-act="new-t"]').click(); await w(150); q('[data-act="wiz-skip"]').click(); await w(150); q('[data-tab="setup"]').click(); await w(80);
+      L.push('setup time 0: covers shown ' + shown());
+      const f = q('#f-timelimit'); f.value = '60'; f.dispatchEvent(new Event('change', { bubbles: true })); await w(150);
+      L.push('setup swiss 60 min: ' + q('.time-scope .eyebrow').textContent + ' | ' + txts('[data-set="timeScope"]') + ' | pressed ' + q('[data-set="timeScope"][aria-pressed="true"]').textContent);
+      pick('system', 'knockout'); await w(150); L.push('setup straight knockout: ' + txts('[data-set="timeScope"]'));
+      pick('entry', 'melee'); await w(150); const melee = shown(); pick('entry', 'teams'); await w(150);
+      pick('system', 'clubs'); await w(150); const clubs = shown(); pick('system', 'eurocup'); await w(150); const euro = shown();
+      L.push('setup mêlée, inter-club, eurocup: covers shown ' + melee + ' ' + clubs + ' ' + euro);
+      pick('system', 'swiss'); await w(150); pick('timeScope', 'stage'); await w(150);
+      L.push('stage chosen: ' + q('.time-scope label span').textContent + ' | ' + txts('#f-kofree option') + ' | selected ' + q('#f-kofree').selectedOptions[0].textContent + ' | saved ' + C.T().timeScope + ' ' + C.T().timeKoFree + ' ' + typeof C.T().timeKoFree);
+      L.push('stage help: ' + q('.time-scope p').textContent);
+      q('.time-scope').scrollIntoView({ block: 'center' });`);
+    await P.waitForTimeout(100); await P.screenshot({ path: process.env.OUT + '/timed-covers-setup-390.png' });
+    await run(`const fr0 = [q('.time-scope .eyebrow').textContent, txts('[data-set="timeScope"]'), q('.time-scope p').textContent, q('.time-scope label span').textContent];
+      q('[data-lang="fr"]').click(); await w(100);
+      const fr = [q('.time-scope .eyebrow').textContent, txts('[data-set="timeScope"]'), q('.time-scope p').textContent, q('.time-scope label span').textContent];
+      L.push('fr setup: translated ' + fr.every((x, i) => x !== fr0[i]) + ' | ' + fr[0]); q('[data-lang="en"]').click(); await w(100);
+      L.push('phone 390: no sideways scroll ' + noScroll() + ' | options 44+ px ' + qa('[data-set="timeScope"]').every(o => o.getBoundingClientRect().height >= 44));
+      const sel = q('#f-kofree'); sel.value = '3'; sel.dispatchEvent(new Event('change', { bubbles: true })); await w(150);
+      const src = JSON.parse(JSON.stringify(C.T())); src.template = true; await S.store.setTournament(src); S.tournaments[src.id] = src; q('[data-tab="draw"]').click(); await w(80);
+      q('[data-act="use-template"]').click(); await w(200);
+      L.push('run-through keeps the choice: ' + (C.T().id !== src.id && C.T().timeScope === 'stage' && C.T().timeKoFree === 3));`);
+    // Draw & results: Swiss morning of 8 teams, then a knockout of 8 (with a third-place game), 4 pistes
+    await run(`await mk({ timeScope: 'morning', koPlan: { seeding: 'seeded', brackets: [{ id: 'A', name: 'Main knockout', from: 1, to: 8, third: true }] } }, 8);
+      L.push('morning only, swiss round on pistes: rows ' + rows().join(','));
+      q('[data-act="clock-start"]').click(); await w(150); const end = q('.clk-digits').dataset.end;
+      await put({ timeScope: 'ko' }); const gone = !q('.clk-row');
+      L.push('knockouts only, swiss round on pistes: rows ' + rows().length + ' | ' + none());
+      await put({ timeScope: 'morning' }); L.push('choice changed while a clock runs: row gone ' + gone + ' | back with the same end time ' + (q('.clk-digits')?.dataset.end === end));
+      await finish(C.MS().filter(m => !m.done && !m.bye).map(m => m.id)); await C.startKnockouts(); await w(300); await C.assignCourts(); await w(150); await stamp();
+      L.push('morning only, knockout on pistes: rows ' + rows().length + ' | ' + none() + ' | badges ' + await badges());
+      q('.clk').scrollIntoView({ block: 'center' });`);
+    await P.waitForTimeout(100); await P.screenshot({ path: process.env.OUT + '/timed-covers-none-390.png' });
+    await run(`await put({ timeScope: 'ko' }); L.push('knockouts only, knockout on pistes: rows ' + rows().length + ' | quarter-finals ' + /Quarter-finals/.test(rows().join()) + ' | badges ' + await badges());
+      // up to the semi-finals: two quarter-finals done, so a semi-final is on a piste beside the other two
+      await put({ timeScope: 'stage', timeKoFree: 2 });
+      const qf = () => C.MS().filter(m => m.stage === 'ko' && m.round === 1 && !m.done);
+      await finish(qf().slice(0, 2).map(m => m.id)); await stamp();
+      const sfOn = C.MS().some(m => m.stage === 'ko' && m.round === 2 && m.court && !m.done);
+      const qfRow = /Quarter-finals/.test(rows().join()), sfRow = sfOn ? /Semi-finals/.test(rows().join()) : 'not on a piste';
+      await finish(qf().map(m => m.id)); await finish(C.MS().filter(m => m.stage === 'ko' && m.round === 2 && !m.done).map(m => m.id)); await stamp();
+      const third = C.MS().find(m => m.third), fin = C.MS().find(m => m.stage === 'ko' && m.round === 3 && !m.third);
+      const both = !!fin.court && !!third.court && !fin.done && !third.done; // the final and the third-place game, both on pistes and 2 hours on
+      L.push('up to the semi-finals: quarter-finals row ' + qfRow + ' | semi-finals row ' + sfRow + ' | final row ' + (both ? /Final/.test(rows().join()) : 'not on a piste') + ' | third-place badge ' + (both ? await badges() > 0 : 'not on a piste'));
+      // up to the final, with a plate: the plate's semi-finals are timed, its final isn't
+      await mk({ swissRounds: 1, timeScope: 'stage', timeKoFree: 1, courts: Array.from({ length: 8 }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true })),
+        koPlan: { seeding: 'seeded', brackets: [{ id: 'A', name: 'Main knockout', from: 1, to: 8, third: false }, { id: 'B', name: 'Plate', from: 9, to: 12, third: false }] } }, 12);
+      await finish(C.MS().filter(m => !m.done && !m.bye).map(m => m.id)); await C.startKnockouts(); await w(300); await C.assignCourts(); await w(150);
+      const plateSf = rows().some(r => /Plate · Semi-finals/.test(r));
+      await finish(C.MS().filter(m => m.stage === 'ko' && m.bracket === 'B' && m.round === 1).map(m => m.id));
+      const pf = C.MS().find(m => m.bracket === 'B' && m.round === 2);
+      L.push('up to the final, plate knockout: plate semi-finals row ' + plateSf + ' | plate final row ' + (pf.court && !pf.done ? rows().some(r => /Plate · Final/.test(r)) : 'not on a piste'));`);
+    // Quick setup: the same choice on its last step
+    await run(`q('[data-act="new-t"]').click(); await w(150); q('#wz-name').value = 'Covers quick'; q('[data-act="wiz-next"]').click(); await w(60);
+      q('[data-act="wiz-set"][data-k="kind"][data-v="triples"]').click(); await w(40); q('[data-act="wiz-next"]').click(); await w(60); q('[data-act="wiz-next"]').click(); await w(60);`);
+    await P.locator('#wz-time').tap(); await P.keyboard.press('Control+A'); await P.keyboard.type('45'); await P.waitForTimeout(100);
+    await run(`const x = q('#wz-scope');
+      L.push('quick setup swiss 45 typed: covers shown ' + (!!x && !x.hidden) + ' | on ' + x.querySelector('.wiz-opt.on').textContent + ' | cursor still in the box ' + (document.activeElement && document.activeElement.id === 'wz-time'));
+      q('#wz-scope').scrollIntoView({ block: 'center' });`);
+    await P.locator('[data-act="wiz-set"][data-k="timeScope"][data-v="stage"]').tap(); await P.waitForTimeout(150);
+    await run(`const sel = q('#wz-kofree'); sel.value = '3'; L.push('quick setup options: ' + txts('#wz-scope .wiz-opt') + ' | 44+ px ' + qa('#wz-scope .wiz-opt').every(o => o.getBoundingClientRect().height >= 44) + ' | no sideways scroll ' + noScroll());
+      q('#wz-scope').scrollIntoView({ block: 'center' });`);
+    await P.waitForTimeout(100); await P.screenshot({ path: process.env.OUT + '/timed-covers-wizard-390.png' });
+    await run(`q('[data-act="wiz-next"]').click(); await w(200);
+      L.push('quick setup stage, quarter-finals, finished: scope ' + C.T().timeScope + ' | free ' + C.T().timeKoFree + ' ' + typeof C.T().timeKoFree);
+      q('[data-tab="setup"]').click(); await w(80); q('[data-act="wiz-again"]').click(); await w(150);
+      for (let i = 0; i < 3; i++) { q('[data-act="wiz-next"]').click(); await w(60); }
+      L.push('quick setup again: on ' + q('.wiz-opt.on[data-k="timeScope"]').textContent + ' | ' + q('#wz-kofree').selectedOptions[0].textContent);
+      q('[data-act="wiz-skip"]').click(); await w(100);
+      const last = async kind => { q('[data-act="new-t"]').click(); await w(150); q('#wz-name').value = kind; q('[data-act="wiz-next"]').click(); await w(60);
+        q('[data-act="wiz-set"][data-k="kind"][data-v="' + kind + '"]').click(); await w(40); q('[data-act="wiz-next"]').click(); await w(60); q('[data-act="wiz-next"]').click(); await w(60);
+        const t = q('#wz-time'); if (t) { t.value = '45'; t.dispatchEvent(new Event('input', { bubbles: true })); } await w(40);
+        const on = !!(q('#wz-scope') && !q('#wz-scope').hidden); q('[data-act="wiz-skip"]').click(); await w(100); return on; };
+      L.push('quick setup eurocup and shooting: covers shown ' + await last('eurocup') + ' ' + await last('shooting'));`);
+    await P.close();
+  }
   // ---- clock alerts: beeps (counted in window.__beeps), the Time banner, flashing and a fake screen wake lock ----
   {
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
