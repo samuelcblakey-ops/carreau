@@ -102,6 +102,14 @@ h3{font-size:19px}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
 .panel.rp-live{border-color:var(--danger);background:var(--danger-soft);box-shadow:inset 0 0 0 1px var(--danger)}
 .panel.rp-ready{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.clk-row{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--line);border-radius:10px;min-width:0}
+.clk-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px}
+.clk-row>.btn{align-self:flex-start}.clk .btn{min-height:44px}
+.clk-time{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.clk-digits{font-size:40px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums}.clk-digits.sm{font-size:20px}
+.clk-row.up{border-color:var(--danger);background:var(--danger-soft);box-shadow:inset 0 0 0 1px var(--danger)}
+.clk-up{color:var(--danger)}.clk-big{font-size:32px;line-height:1.1}
+.clk-late{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;padding-top:8px;border-top:1px dashed var(--line)}
 .rp-state{font-weight:600}.rp-live .rp-state{color:var(--danger)}.rp-ready .rp-state{color:var(--accent)}
 .btn.wait:disabled{opacity:.7;color:var(--danger);border-color:var(--danger);background:var(--surface)}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
@@ -1319,6 +1327,14 @@ Object.assign(LANG_TEXT.de, {"When time is up": "Wenn die Zeit um ist", "+1 mèn
 Object.assign(LANG_TEXT.nl, {"When time is up": "Als de tijd om is", "+1 mène": "+1 mène", "+2 mènes": "+2 mènes", "Players finish the mène in progress and play one more. If it's still level, they play one extra mène.": "De spelers maken de lopende mène af en spelen er nog één. Is het dan nog gelijk, dan spelen ze een extra mène.", "Players finish the mène in progress and play two more. If it's still level, they play one extra mène.": "De spelers maken de lopende mène af en spelen er nog twee. Is het dan nog gelijk, dan spelen ze een extra mène.", "Ended on time: enter the score once the extra mènes are played. If it's still level, play one more mène first.": "Gestopt op tijd: voer de stand in zodra de extra mènes gespeeld zijn. Is het nog gelijk, speel dan eerst nog een mène.", "Level when time ran out: play one more mène, then enter the score.": "Gelijk toen de tijd om was: speel nog een mène en voer dan de score in."});
 Object.assign(LANG_TEXT.pt, {"When time is up": "Quando o tempo acabar", "+1 mène": "+1 jogada", "+2 mènes": "+2 jogadas", "Players finish the mène in progress and play one more. If it's still level, they play one extra mène.": "Os jogadores terminam a jogada em curso e jogam mais uma. Se continuar empatado, jogam uma jogada extra.", "Players finish the mène in progress and play two more. If it's still level, they play one extra mène.": "Os jogadores terminam a jogada em curso e jogam mais duas. Se continuar empatado, jogam uma jogada extra.", "Ended on time: enter the score once the extra mènes are played. If it's still level, play one more mène first.": "Terminado por tempo: introduza o resultado quando as jogadas extra estiverem concluídas. Se continuar empatado, joguem primeiro mais uma jogada.", "Level when time ran out: play one more mène, then enter the score.": "Empate no fim do tempo: joguem mais uma jogada e depois introduza o resultado."});
 Object.assign(LANG_TEXT.th, {"When time is up": "เมื่อหมดเวลา", "+1 mène": "+1 เอนด์", "+2 mènes": "+2 เอนด์", "Players finish the mène in progress and play one more. If it's still level, they play one extra mène.": "ผู้เล่นเล่นเอนด์ที่กำลังเล่นอยู่ให้จบ แล้วเล่นต่ออีกหนึ่งเอนด์ ถ้ายังเสมอ ให้เล่นเพิ่มอีกหนึ่งเอนด์", "Players finish the mène in progress and play two more. If it's still level, they play one extra mène.": "ผู้เล่นเล่นเอนด์ที่กำลังเล่นอยู่ให้จบ แล้วเล่นต่ออีกสองเอนด์ ถ้ายังเสมอ ให้เล่นเพิ่มอีกหนึ่งเอนด์", "Ended on time: enter the score once the extra mènes are played. If it's still level, play one more mène first.": "จบเพราะหมดเวลา: กรอกคะแนนเมื่อเล่นเอนด์เพิ่มเติมครบแล้ว ถ้ายังเสมอ ให้เล่นอีกหนึ่งเอนด์ก่อน", "Level when time ran out: play one more mène, then enter the score.": "เสมอเมื่อหมดเวลา: เล่นอีกหนึ่งเอนด์ แล้วกรอกคะแนน"});
+// round clock (time-round-clock)
+Object.assign(FR_TEXT, {"Barrage · Round {n}": "Poules · Partie {1}", "Leagues · Round {n}": "Ligues · Partie {1}", "Timed games · {n} min": "Parties chronométrées · {1} min", "Start the clock": "Lancer le chrono", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Lancez-le au début du jeu. Les parties qui attendent une piste ont tout leur temps à partir du moment où on leur en donne une.", "Clock not started": "Chrono non lancé", "{n} games on pistes": "{1} parties sur les pistes", "1 game on a piste": "1 partie sur une piste", "left": "restantes", "Time at {x}": "Fin du temps à {1}", "started later": "commencée plus tard", "Time!": "Temps !", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Terminez la mène en cours et jouez-en une de plus. En cas d'égalité, jouez une mène supplémentaire.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Terminez la mène en cours et jouez-en deux de plus. En cas d'égalité, jouez une mène supplémentaire.", "Stop the clock": "Arrêter le chrono", "Stop the clock for {x}? Its games won't be timed any more.": "Arrêter le chrono de {1} ? Ses parties ne seront plus chronométrées.", "Keep it running": "Le laisser tourner"});
+Object.assign(LANG_TEXT.es, {"Barrage · Round {n}": "Grupos · Ronda {1}", "Leagues · Round {n}": "Ligas · Ronda {1}", "Timed games · {n} min": "Partidas con tiempo · {1} min", "Start the clock": "Iniciar el reloj", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Inícialo cuando empiece el juego. Las partidas que esperan pista tienen todo su tiempo desde que se les asigna una.", "Clock not started": "Reloj sin iniciar", "{n} games on pistes": "{1} partidas en pista", "1 game on a piste": "1 partida en pista", "left": "restantes", "Time at {x}": "Tiempo a las {1}", "started later": "empezada más tarde", "Time!": "¡Tiempo!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Terminad la mano en curso y jugad una más. Si sigue el empate, jugad una mano extra.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Terminad la mano en curso y jugad dos más. Si sigue el empate, jugad una mano extra.", "Stop the clock": "Parar el reloj", "Stop the clock for {x}? Its games won't be timed any more.": "¿Parar el reloj de {1}? Sus partidas dejarán de tener tiempo.", "Keep it running": "Dejarlo en marcha"});
+Object.assign(LANG_TEXT.it, {"Barrage · Round {n}": "Gironi · Turno {1}", "Leagues · Round {n}": "Campionati · Turno {1}", "Timed games · {n} min": "Partite a tempo · {1} min", "Start the clock": "Avvia il cronometro", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Avvialo quando inizia il gioco. Le partite in attesa di un campo hanno tutto il loro tempo da quando ne ricevono uno.", "Clock not started": "Cronometro non avviato", "{n} games on pistes": "{1} partite in campo", "1 game on a piste": "1 partita in campo", "left": "rimanenti", "Time at {x}": "Tempo alle {1}", "started later": "iniziata dopo", "Time!": "Tempo!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Finite la mano in corso e giocatene un'altra. Se è ancora pari, giocate una mano in più.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Finite la mano in corso e giocatene altre due. Se è ancora pari, giocate una mano in più.", "Stop the clock": "Ferma il cronometro", "Stop the clock for {x}? Its games won't be timed any more.": "Fermare il cronometro per {1}? Le sue partite non saranno più a tempo.", "Keep it running": "Lascialo andare"});
+Object.assign(LANG_TEXT.de, {"Barrage · Round {n}": "Gruppen · Runde {1}", "Leagues · Round {n}": "Ligen · Runde {1}", "Timed games · {n} min": "Spiele auf Zeit · {1} Min.", "Start the clock": "Uhr starten", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Starte sie, wenn das Spiel beginnt. Spiele, die noch auf eine Bahn warten, bekommen ihre volle Zeit ab dem Moment, in dem sie eine bekommen.", "Clock not started": "Uhr nicht gestartet", "{n} games on pistes": "{1} Spiele auf Bahnen", "1 game on a piste": "1 Spiel auf einer Bahn", "left": "übrig", "Time at {x}": "Zeitende um {1}", "started later": "später begonnen", "Time!": "Zeit!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Spielt die laufende Aufnahme zu Ende und dann eine weitere. Steht es dann noch gleich, spielt eine zusätzliche Aufnahme.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Spielt die laufende Aufnahme zu Ende und dann zwei weitere. Steht es dann noch gleich, spielt eine zusätzliche Aufnahme.", "Stop the clock": "Uhr anhalten", "Stop the clock for {x}? Its games won't be timed any more.": "Uhr für {1} anhalten? Ihre Spiele laufen dann nicht mehr auf Zeit.", "Keep it running": "Weiterlaufen lassen"});
+Object.assign(LANG_TEXT.nl, {"Barrage · Round {n}": "Poules · Ronde {1}", "Leagues · Round {n}": "Competities · Ronde {1}", "Timed games · {n} min": "Partijen op tijd · {1} min", "Start the clock": "Start de klok", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Start hem als het spel begint. Partijen die nog op een baan wachten, krijgen hun volle tijd vanaf het moment dat ze er een krijgen.", "Clock not started": "Klok niet gestart", "{n} games on pistes": "{1} partijen op banen", "1 game on a piste": "1 partij op een baan", "left": "over", "Time at {x}": "Tijd om {1}", "started later": "later begonnen", "Time!": "Tijd!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Maak de lopende mène af en speel er nog één. Is het dan nog gelijk, speel dan een extra mène.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Maak de lopende mène af en speel er nog twee. Is het dan nog gelijk, speel dan een extra mène.", "Stop the clock": "Stop de klok", "Stop the clock for {x}? Its games won't be timed any more.": "De klok voor {1} stoppen? De partijen worden dan niet meer getimed.", "Keep it running": "Laat hem lopen"});
+Object.assign(LANG_TEXT.pt, {"Barrage · Round {n}": "Grupos · Ronda {1}", "Leagues · Round {n}": "Ligas · Ronda {1}", "Timed games · {n} min": "Jogos com tempo · {1} min", "Start the clock": "Iniciar o relógio", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Inicie-o quando o jogo começar. Os jogos à espera de pista têm todo o seu tempo a partir do momento em que recebem uma.", "Clock not started": "Relógio não iniciado", "{n} games on pistes": "{1} jogos em pista", "1 game on a piste": "1 jogo em pista", "left": "restantes", "Time at {x}": "Tempo às {1}", "started later": "começou mais tarde", "Time!": "Tempo!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Terminem a jogada em curso e joguem mais uma. Se continuar empatado, joguem uma jogada extra.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Terminem a jogada em curso e joguem mais duas. Se continuar empatado, joguem uma jogada extra.", "Stop the clock": "Parar o relógio", "Stop the clock for {x}? Its games won't be timed any more.": "Parar o relógio de {1}? Os seus jogos deixam de ter tempo.", "Keep it running": "Deixar a contar"});
+Object.assign(LANG_TEXT.th, {"Barrage · Round {n}": "กลุ่ม · รอบ {1}", "Leagues · Round {n}": "ลีก · รอบ {1}", "Timed games · {n} min": "เกมจับเวลา · {1} นาที", "Start the clock": "เริ่มจับเวลา", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "เริ่มเมื่อเริ่มเล่น เกมที่ยังรอสนามจะได้เวลาเต็มนับจากตอนที่ได้สนาม", "Clock not started": "ยังไม่เริ่มจับเวลา", "{n} games on pistes": "{1} เกมอยู่บนสนาม", "1 game on a piste": "1 เกมอยู่บนสนาม", "left": "ที่เหลือ", "Time at {x}": "หมดเวลา {1}", "started later": "เริ่มทีหลัง", "Time!": "หมดเวลา!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "เล่นเอนด์ที่กำลังเล่นอยู่ให้จบ แล้วเล่นต่ออีกหนึ่งเอนด์ ถ้ายังเสมอ ให้เล่นเพิ่มอีกหนึ่งเอนด์", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "เล่นเอนด์ที่กำลังเล่นอยู่ให้จบ แล้วเล่นต่ออีกสองเอนด์ ถ้ายังเสมอ ให้เล่นเพิ่มอีกหนึ่งเอนด์", "Stop the clock": "หยุดจับเวลา", "Stop the clock for {x}? Its games won't be timed any more.": "หยุดจับเวลาของ {1} ไหม? เกมในรอบนี้จะไม่ถูกจับเวลาอีก", "Keep it running": "ให้เดินต่อ"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1679,6 +1695,7 @@ async function applyProposals() {
 setInterval(() => { try { applyProposals(); } catch {} }, 30000);
 setInterval(() => { try { const t = T(); const ae = document.activeElement;
   if (t?.timeLimit > 0 && !S.modal && S.tab === "draw" && !(ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName))) render(); } catch {} }, 60000);
+setInterval(() => { try { tickClocks(); } catch {} }, 1000);
 function teamPanel(t) {
   const me = myTeam(t); if (!me || !teamScoring(t)) return "";
   const mine = MS().filter(m => inMatch(m, me) && !m.bye).sort(byOrder);
@@ -1778,7 +1795,74 @@ const gamesLeft = n => n === 1 ? "1 game still to finish" : `${n} games still to
 const timeExtra = t => +t.timeExtra === 1 ? 1 : 2;
 const TIME_EXTRA_OPTS = [[1, "+1 mène"], [2, "+2 mènes"]];
 const TIME_EXTRA_HELP = { 1: "Players finish the mène in progress and play one more. If it's still level, they play one extra mène.", 2: "Players finish the mène in progress and play two more. If it's still level, they play one extra mène." };
-const timeUp = (t, m) => !!(t.timeLimit > 0 && !m.done && m.court && m.courtAt && Date.now() - m.courtAt >= t.timeLimit * 60000);
+// round clock: an organiser starts it for each round (clockAt on the round's games). A round is every game with the same
+// group and round; its clock is the earliest clockAt among them. A game that only gets its piste later is timed from then.
+const roundKey = m => `${m.group}|${m.round}`;
+let ROUND_CLOCKS = null; // worked out once per redraw, not once per game card
+function roundClocks() {
+  if (ROUND_CLOCKS) return ROUND_CLOCKS; const r = {};
+  for (const m of MS()) if (m.clockAt) { const k = roundKey(m); if (!r[k] || m.clockAt < r[k]) r[k] = m.clockAt; }
+  ROUND_CLOCKS = r; queueMicrotask(() => { ROUND_CLOCKS = null; }); return r;
+}
+const roundClock = key => roundClocks()[key] || null;
+const gameStart = m => { const c = roundClock(roundKey(m)); return c && m.court ? Math.max(c, m.courtAt || 0) : null; };
+const timeUp = (t, m) => { if (!(t.timeLimit > 0) || m.done || m.bye || !m.court) return false; const st = gameStart(m); return !!st && Date.now() - st >= t.timeLimit * 60000; };
+function roundName(t, m) {
+  if (m.stage === "ko") return matchContext(t, m.third ? Object.assign({}, m, { third: false }) : m); // a third-place game goes with its final
+  if (m.stage === "pool") return `${isLeagues(t) ? "Leagues" : "Barrage"} · Round ${m.round}`;
+  if (m.stage === "rr") return `Round robin · Round ${m.round}`;
+  if (m.stage === "snake") return `Snake · Round ${m.round}`;
+  if (m.stage === "club") return `${clubUnit(t) === "round" ? "Round" : "Day"} ${m.round}`;
+  return `Round ${m.round}`;
+}
+const TIME_UP_SAY = { 1: "Finish the mène in progress and play one more. If it's still level, play one extra mène.", 2: "Finish the mène in progress and play two more. If it's still level, play one extra mène." };
+const clockFmt = ms => { const sec = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`; };
+const hhmm = at => { const d = new Date(at); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+// the clock panel on Draw & results: one row per round with a game being played, for anyone who can enter scores
+function clockPanel(t) {
+  if (!(t.timeLimit > 0) || isShoot(t) || !canScore()) return "";
+  const all = MS().filter(m => !m.bye).sort(byOrder), lim = t.timeLimit * 60000, now = Date.now(), wr = canEdit();
+  const keys = [...new Set(all.filter(m => !m.done && m.a && m.b && m.court).map(roundKey))];
+  if (!keys.length) return "";
+  let waiting = false;
+  const rows = keys.map(key => {
+    const games = all.filter(m => roundKey(m) === key), on = games.filter(m => !m.done && m.a && m.b && m.court);
+    const label = roundName(t, games.find(m => !m.third) || games[0]), clk = roundClock(key);
+    if (!clk) { waiting = true;
+      return `<div class="clk-row" data-key="${esc(key)}"><div class="clk-head"><b>${esc(label)}</b><span class="small muted">${on.length === 1 ? "1 game on a piste" : `${on.length} games on pistes`}</span></div>
+        ${wr ? `<button type="button" class="btn primary" data-act="clock-start" data-k="${esc(key)}">Start the clock</button>` : `<span class="small muted clk-wait">Clock not started</span>`}</div>`; }
+    const end = clk + lim, up = now >= end;
+    const late = on.filter(m => (m.courtAt || 0) > clk).map(m => { const e = m.courtAt + lim; return `<div class="clk-late"><span>Piste ${esc(courtName(t, m.court))} · started later</span>${now >= e ? `<b class="clk-up">Time!</b>` : `<span><span class="clk-digits sm" data-notr data-end="${e}">${clockFmt(e - now)}</span> <span>left</span></span>`}</div>`; }).join("");
+    const stop = !wr ? "" : S.clockAsk === key ? `<div class="notice stack clk-ask" style="gap:8px"><span>${trAround("Stop the clock for {x}? Its games won't be timed any more.", `<span data-notr>${esc(tr(label))}</span>`)}</span>
+        <div class="row"><button type="button" class="btn danger" data-act="clock-stop" data-k="${esc(key)}">Stop the clock</button><button type="button" class="btn" data-act="clock-keep">Keep it running</button></div></div>`
+      : `<button type="button" class="btn sm ghost clk-stop" data-act="clock-stop-ask" data-k="${esc(key)}">Stop the clock</button>`;
+    return `<div class="clk-row ${up ? "up" : "run"}" data-key="${esc(key)}"><div class="clk-head"><b>${esc(label)}</b>${up ? "" : `<span class="small muted">Time at ${hhmm(end)}</span>`}</div>
+      ${up ? `<div class="stack" style="gap:4px"><b class="clk-up clk-big">Time!</b><span>${TIME_UP_SAY[timeExtra(t)]}</span><span class="small muted">${gamesLeft(games.filter(m => !m.done && m.a && m.b).length)}</span></div>`
+        : `<div class="clk-time"><span class="clk-digits" data-notr data-end="${end}">${clockFmt(end - now)}</span> <span>left</span></div>`}
+      ${late}${stop}</div>`;
+  }).join("");
+  return `<div class="panel stack clk" style="gap:12px;margin-bottom:16px"><div class="eyebrow">Timed games · ${t.timeLimit} min</div>${rows}
+    ${waiting && wr ? `<p class="small muted">Start it when play begins. Games still waiting for a piste get their full time from when they're given one.</p>` : ""}</div>`;
+}
+// organisers start and stop a round's clock: one field on each game, so a score saved on another phone meanwhile isn't overwritten
+async function clockStart(t, key) {
+  const at = Date.now(), ids = MS().filter(m => roundKey(m) === key && !m.done && !m.bye).map(m => m.id);
+  ids.forEach(id => { S.matches[id].clockAt = at; }); render();
+  await guard(async () => { for (const id of ids) await S.store.updateMatch(S.tid, id, { clockAt: at }); });
+}
+async function clockStop(t, key) {
+  const ids = MS().filter(m => roundKey(m) === key && m.clockAt).map(m => m.id);
+  S.clockAsk = null; ids.forEach(id => { S.matches[id].clockAt = null; }); render();
+  await guard(async () => { for (const id of ids) await S.store.updateMatch(S.tid, id, { clockAt: null }); });
+}
+// every second: the digits count down in place; the page redraws once when one reaches 0:00 (badges, the red row)
+function tickClocks() {
+  const els = document.querySelectorAll(".clk-digits[data-end]"); if (!els.length) return;
+  const now = Date.now(); let due = false;
+  els.forEach(el => { const left = +el.dataset.end - now; if (left <= 0) due = true; else { const v = clockFmt(left); if (el.textContent !== v) el.textContent = v; } });
+  const ae = document.activeElement;
+  if (due && !S.modal && !(ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName))) render();
+}
 function mStatus(m) { if (m.done) return "done"; if (!m.a || !m.b) return "pending"; if (m.court) return "playing"; return "ready"; }
 const ents = m => [...(m.a || []), ...(m.b || [])];
 const aWon = m => m.win ? m.win === "a" : m.sa > m.sb;
@@ -3550,7 +3634,7 @@ async function modalAction(act, k, a) {
     const c = $("#mcourt")?.value || null;
     await guard(async () => {
       const patch = { sa: md.sa, sb: md.sb };
-      if (c !== (m.court || null)) { patch.court = c; patch.courtAt = c ? Date.now() : null; }
+      if (c !== (m.court || null)) { patch.court = c; patch.courtAt = !c ? null : m.court && m.courtAt ? m.courtAt : Date.now(); }
       Object.assign(S.matches[md.id], patch);
       await S.store.updateMatch(S.tid, md.id, patch);
     });
@@ -4020,7 +4104,7 @@ function renderSoon() {
 }
 document.addEventListener("visibilitychange", () => { if (!document.hidden && S.renderHidden) render(); });
 function render() {
-  clearTimeout(S.renderTimer); S.renderTimer = null; S.renderHidden = false;
+  clearTimeout(S.renderTimer); S.renderTimer = null; S.renderHidden = false; ROUND_CLOCKS = null;
   keepFocus(drawPage);
   if (!S.pendingRender) pageMeta();
 }
@@ -4551,7 +4635,7 @@ function renderDraw(t) {
       wr ? `${sys === "melee" && meleePreview(t) ? `<p class="small muted"><b>${esc(meleePreview(t))}</b> <button type="button" class="btn sm ghost" data-tab="setup">Change in Setup</button></p>` : ""}<div><button class="btn primary" data-act="first-draw">${{ swiss: "Draw round 1", melee: "Draw round 1", roundrobin: "Generate round robin schedule", snake: "Draw snake rounds", pools: "Draw the barrage", leagues: "Draw the leagues", clubs: "Draw the fixtures", eurocup: "Draw the ties", knockout: "Draw knockout bracket" }[sys]}</button></div>` : `<p class="muted">Waiting for the organiser to make the draw.</p>`}
     </div></div>`;
   }
-  let html = findPanel(t) + teamPanel(t) + checkPanel(t) + `<div class="stack"><div class="spread"><h2>Draw & results</h2><div class="row">${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}${wr && S.downloads ? `<button class="btn sm" data-act="export">Export results (CSV)</button>` : ""}</div></div>`;
+  let html = findPanel(t) + teamPanel(t) + checkPanel(t) + `<div class="stack"><div class="spread"><h2>Draw & results</h2><div class="row">${canScore() ? `<button class="btn sm" data-act="assign">Fill free pistes</button>` : ""}${wr && S.downloads ? `<button class="btn sm" data-act="export">Export results (CSV)</button>` : ""}</div></div>` + clockPanel(t);
   // rounds (swiss / melee)
   const rounds = t.draws.filter(d => d.kind === "round").sort((a, b) => b.round - a.round);
   if (rounds.length) {
@@ -5191,6 +5275,10 @@ document.addEventListener("click", async e => {
     case "print-draw": printDraw(t); break;
     case "find-me": { lsSet(meKey(t), a.dataset.id); S.findQ = ""; document.activeElement?.blur?.(); render(); break; }
     case "find-clear": { lsSet(meKey(t), ""); render(); setTimeout(() => $("#find-q")?.focus(), 30); break; }
+    case "clock-start": if (t && canEdit()) await clockStart(t, a.dataset.k); break;
+    case "clock-stop-ask": if (canEdit()) { S.clockAsk = a.dataset.k; render(); } break;
+    case "clock-keep": S.clockAsk = null; render(); break;
+    case "clock-stop": if (t && canEdit()) await clockStop(t, a.dataset.k); break;
     case "alert-close": S.alert = null; renderAlert(); break;
     case "alert-view": S.alert = null; renderAlert(); S.tab = "draw"; render(); window.scrollTo(0, 0); break;
     case "st-cols": S.allCols = !S.allCols; render(); break;

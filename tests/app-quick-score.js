@@ -40,6 +40,10 @@ const { chromium } = require('playwright');
     const tt = JSON.parse(JSON.stringify(C.T())); tt.timeLimit = 50; await S.store.setTournament(tt); S.tournaments[tt.id] = tt; await w(30);
     S.matches[games[1].id].courtAt = Date.now() - 51 * 60000; S.matches[games[2].id].courtAt = Date.now() - 10 * 60000;
     q('[data-tab="draw"]').click(); await w(60);
+    L.push(`time badge without a clock: ${q(`[data-match="${games[1].id}"] .pill`)?.textContent.trim()}`);
+    // the round's clock was started: a game is timed from the later of the clock and its piste
+    S.matches[games[1].id].clockAt = S.matches[games[1].id].courtAt; S.matches[games[2].id].clockAt = S.matches[games[2].id].courtAt;
+    C.render(); await w(60);
     L.push(`time badge: late ${q(`[data-match="${games[1].id}"] .pill`)?.textContent} | on time ${q(`[data-match="${games[2].id}"] .pill`)?.textContent.trim()}`);
     // 6. French
     q('[data-lang="fr"]').click(); await w(60); await open(games[2].id);
