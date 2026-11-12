@@ -185,6 +185,25 @@ const { chromium } = require('playwright');
       L.push('opened after time up: beeps ' + window.__beeps);
       const shown = () => !!q('[data-act="sound-on"]'); const before = shown(); document.querySelector('main h2').click(); await w(100);
       L.push('sound locked after reload: Turn on the beep shown ' + before + ' | after tap shown ' + shown() + ' | reminder ' + /Keep this phone unlocked/.test(q('.clk').textContent));`);
+    // a restarted clock alerts again: this phone already passed this round's time up (alerts used up), then Stop and Start
+    const restart = `q('[data-act="clock-stop-ask"]').click(); await w(60); q('.clk-ask [data-act="clock-stop"]').click(); await w(100); q('[data-act="clock-start"]').click(); await w(1500); window.__beeps = 0;`; // a tick sees the new clock coming
+    await run(`q('[data-tab="draw"]').click(); await w(60); ${restart}`);
+    st = await startOf(); await forwardTo(st + 55 * 60000);
+    await run(`S.__r55 = 'beeps ' + window.__beeps + ' amber ' + row().classList.contains('warn');`);
+    await forwardTo(st + 60 * 60000);
+    await run(`L.push('restart after time up: 55 min ' + S.__r55 + ' | 60 min beeps ' + window.__beeps + ' flash ' + flashing() + ' red ' + red());`);
+    // restarted again, and this phone is on Registration at time up
+    await run(`q('[data-act="alert-close"]')?.click(); ${restart} q('[data-tab="entries"]').click(); await w(60);`);
+    st = await startOf(); await forwardTo(st + 55 * 60000); await forwardTo(st + 60 * 60000);
+    await run(`L.push('restart, on Registration at time up: banner ' + (q('#roundalert:not([hidden]) b')?.textContent || 'none')); q('[data-act="alert-close"]')?.click(); q('[data-tab="draw"]').click(); await w(60);`);
+    // restarted by another phone: a new clockAt saved on each of the round's games, as another phone's Start would
+    await run(`const at = Date.now(); // the round on screen is the only one with a clock
+      for (const m of C.MS().filter(m => !m.bye && !m.done && m.clockAt)) await S.store.updateMatch(S.tid, m.id, { clockAt: at });
+      await w(1500); window.__beeps = 0;`);
+    st = await startOf(); await forwardTo(st + 55 * 60000); await forwardTo(st + 60 * 60000);
+    await run(`L.push('restarted by another phone: 60 min beeps ' + window.__beeps);
+      window.__beeps = 0; for (let i = 0; i < 3; i++) { C.render(); await w(50); } await w(1500);
+      L.push('same clock, page redrawn: repeat beeps ' + window.__beeps);`);
     // no warning when the limit is 5 minutes or less
     await run(`await comp(4, { timeLimit: 5 }); window.__beeps = 0; q('[data-act="clock-start"]').click(); await w(1500);`);
     st = await startOf(); await forwardTo(st + 4 * 60000 + 59000);

@@ -1850,7 +1850,7 @@ function clockPanel(t) {
     if (!clk) { waiting = true;
       return `<div class="clk-row" data-key="${esc(key)}"><div class="clk-head"><b>${esc(label)}</b><span class="small muted">${on.length === 1 ? "1 game on a piste" : `${on.length} games on pistes`}</span></div>
         ${wr ? `<button type="button" class="btn primary" data-act="clock-start" data-k="${esc(key)}">Start the clock</button>` : `<span class="small muted clk-wait">Clock not started</span>`}</div>`; }
-    const end = clk + lim, up = now >= end, warnAt = clockWarnAt(t, end), warn = !up && warnAt && now >= warnAt, flash = up && (S.clockFlash?.[t.id + ":" + key] || 0) > now;
+    const end = clk + lim, up = now >= end, warnAt = clockWarnAt(t, end), warn = !up && warnAt && now >= warnAt, flash = up && (S.clockFlash?.[`${t.id}:${key}:${clk}`] || 0) > now;
     const late = on.filter(m => (m.courtAt || 0) > clk).map(m => { const e = m.courtAt + lim; return `<div class="clk-late"><span>Piste ${esc(courtName(t, m.court))} · started later</span>${now >= e ? `<b class="clk-up">Time!</b>` : `<span><span class="clk-digits sm" data-notr data-end="${e}">${clockFmt(e - now)}</span> <span>left</span></span>`}</div>`; }).join("");
     const stop = !wr ? "" : S.clockAsk === key ? `<div class="notice stack clk-ask" style="gap:8px"><span>${trAround("Stop the clock for {x}? Its games won't be timed any more.", `<span data-notr>${esc(tr(label))}</span>`)}</span>
         <div class="row"><button type="button" class="btn danger" data-act="clock-stop" data-k="${esc(key)}">Stop the clock</button><button type="button" class="btn" data-act="clock-keep">Keep it running</button></div></div>`
@@ -1912,7 +1912,7 @@ async function wakeSet(want) {
   } catch {}
 }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && WAKE.want) wakeSet(true); });
-// each alert sounds once per phone, and only for a moment crossed in the last few seconds
+// each alert sounds once per phone for each clock (a round and its start time), and only for a moment crossed in the last few seconds
 // (a phone that opens the competition after time is up stays quiet)
 function clockAlert(t, label) {
   if (S.tab === "draw") return;
@@ -1927,10 +1927,10 @@ function clockAlerts() {
   const crossed = (at, id) => { if (!at || given.has(id)) return false; if (at > now) { armed.add(id); return false; } given.add(id); return armed.has(id) && now - at <= 10000; };
   let redraw = false;
   for (const r of rounds) {
-    if (!r.clk) continue; const id = t.id + ":" + r.key;
+    if (!r.clk) continue; const id = `${t.id}:${r.key}:${r.clk}`; // per clock: a restarted clock (new start time) alerts again
     if (crossed(clockWarnAt(t, r.end), id + ":warn") && now < r.end) { beep(1); vibrate(200); redraw = true; }
     if (crossed(r.end, id + ":up")) { beep(3); vibrate([400, 150, 400, 150, 400]); (S.clockFlash ||= {})[id] = r.end + 10000; setTimeout(() => S.tab === "draw" && render(), Math.max(0, r.end + 10000 - Date.now()) + 50); clockAlert(t, r.label); redraw = true; }
-    for (const m of r.on) if ((m.courtAt || 0) > r.clk && crossed(m.courtAt + t.timeLimit * 60000, t.id + ":" + m.id + ":up")) { beep(3); vibrate([400, 150, 400, 150, 400]); clockAlert(t, `Piste ${courtName(t, m.court)}`); redraw = true; }
+    for (const m of r.on) if ((m.courtAt || 0) > r.clk && crossed(m.courtAt + t.timeLimit * 60000, `${t.id}:${m.id}:${m.courtAt}:up`)) { beep(3); vibrate([400, 150, 400, 150, 400]); clockAlert(t, `Piste ${courtName(t, m.court)}`); redraw = true; }
   }
   const ae = document.activeElement;
   if (redraw && S.tab === "draw" && !S.modal && !(ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName))) render();
