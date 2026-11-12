@@ -87,6 +87,8 @@ const SUITES = {
       /fr: start button translated true/, /phone 390: no sideways scroll true \| start button 44\+ px true/,
       /55 min: amber true \| beeps 1$/m, /60 min: beeps 4 \| flash true \| red true/, /after 10 s: flash false \| red true/, /on Registration at time up: banner Time: Round 1$/m,
       /late game time up: beeps 7 \| banner Time: Piste 1$/m, /opened after time up: beeps 0/, /limit 5 min: warning beeps 0/,
+      /restart after time up: 55 min beeps 1 amber true \| 60 min beeps 4 flash true red true/, /restart, on Registration at time up: banner Time: Round 1/,
+      /restarted by another phone: 60 min beeps 4/, /same clock, page redrawn: repeat beeps 0/,
       /wake lock: on while clock runs true \| off after round finished true \| asked again when visible true/, /spectator: beeps 0 \| wake lock false/,
       /reduced motion: flash false \| red true \| flash class on true/, /sound locked after reload: Turn on the beep shown true \| after tap shown false \| reminder true/, /errs \[\]/],
     'app-checkin.js': [/empty: check in everyone shown false/, /everyone button: primary true \| big true \| icon true \| text Check in everyone/,
