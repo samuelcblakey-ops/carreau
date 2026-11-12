@@ -216,6 +216,45 @@ const { chromium } = require('playwright');
       vis = 'visible'; document.dispatchEvent(new Event('visibilitychange')); await w(100); const again = W.req === req + 1 && !!W.active;
       for (const m of C.MS().filter(m => !m.bye && !m.done && m.court)) await quick(m.id);
       await w(1500); L.push('wake lock: on while clock runs ' + on + ' | off after round finished ' + !W.active + ' | asked again when visible ' + again);`);
+    // ---- each part of a EuroCup round, and each rotation game of an inter-club day, has its own clock ----
+    const mk = `const rowNames = () => [...document.querySelectorAll('.clk-row .clk-head b')].map(b => b.textContent).join(',');
+      const pistes = n => Array.from({ length: n }, (_, i) => ({ id: 'c' + (i + 1), name: String(i + 1), active: true }));
+      const mk = async (extra, teams) => { q('[data-act="alert-close"]')?.click(); q('[data-act="new-t"]').click(); await w(150); const t = JSON.parse(JSON.stringify(C.T()));
+        Object.assign(t, { wizard: false, checkin: false, timeLimit: 60, courts: pistes(6), teams }, extra);
+        await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30); q('[data-tab="draw"]').click(); await w(60); q('[data-act="first-draw"]').click(); await w(300); };
+      const finish = async ids => { for (const id of ids) { const p = { sa: 13, sb: 7, done: true }; Object.assign(S.matches[id], p); await S.store.updateMatch(S.tid, id, p); }
+        await C.assignCourts(); await w(150); C.render(); await w(60); };`;
+    // EuroCup: 4 clubs, line-ups written straight to round 1's games; 6 pistes, so a whole part plays at once
+    await run(mk + `const squad = c => ({ players: Array.from({ length: 8 }, (_, i) => c + ' P' + (i + 1)), genders: Array.from({ length: 8 }, (_, i) => i < 3 ? 'f' : 'm') });
+      await mk({ system: 'eurocup', name: 'Euro clock' }, ['Ash', 'Birch', 'Cedar', 'Dale'].map(c => Object.assign({ id: 'e' + c[0], name: c, club: c, active: true }, squad(c))));
+      const lu = { ot: [4, 5, 6], mt: [1, 2, 3], od1: [4, 5], od2: [6, 7], md: [1, 8] }, nm = id => C.T().teams.find(x => x.id === id).name;
+      for (const m of C.MS().filter(m => m.round === 1)) { const la = lu[m.eu].map(i => nm(m.a[0]) + ' P' + i), lb = lu[m.eu].map(i => nm(m.b[0]) + ' P' + i); Object.assign(S.matches[m.id], { la, lb }); await S.store.updateMatch(S.tid, m.id, { la, lb }); }
+      await C.assignCourts(); await w(150); C.render(); await w(60);
+      L.push('eurocup round 1: ' + rowNames() + ' | ' + row().querySelector('.clk-head .muted').textContent + ' | ' + row().querySelector('[data-act="clock-start"]').textContent);
+      q('[data-act="clock-start"]').click(); await w(1500);
+      const r1 = () => C.MS().filter(m => m.round === 1);
+      L.push('eurocup triples started: triples stamped ' + r1().filter(m => m.leg === 1 && m.clockAt).length + ' of ' + r1().filter(m => m.leg === 1).length + ' | doubles stamped ' + r1().filter(m => m.leg === 2 && m.clockAt).length);
+      await finish(r1().filter(m => m.leg === 1).map(m => m.id));
+      L.push('eurocup doubles on pistes: ' + rowNames() + ' | ' + (q('.clk-row [data-act="clock-start"]') ? 'not started' : 'running') + ' | triples row gone ' + !/Triples/.test(rowNames()));
+      q('[data-act="clock-start"]').click(); await w(1500); window.__beeps = 0;`);
+    st = await A.evaluate(() => Math.min(...window.__carreau.MS().filter(m => m.leg === 2 && m.clockAt).map(m => m.clockAt)));
+    await forwardTo(st + 55 * 60000);
+    await run(`L.push('eurocup doubles 55 min: amber ' + row().classList.contains('warn') + ' | beeps ' + window.__beeps); row().scrollIntoView({ block: 'center' });`);
+    await A.screenshot({ path: process.env.OUT + '/clock-eurocup-doubles-390.png' });
+    await run(`q('[data-tab="entries"]').click(); await w(60);`);
+    await forwardTo(st + 60 * 60000);
+    await run(`L.push('eurocup doubles time up, on Registration: banner ' + (q('#roundalert:not([hidden]) b')?.textContent || 'none'));
+      q('[data-act="alert-close"]')?.click(); q('[data-tab="draw"]').click(); await w(60);
+      q('[data-lang="fr"]').click(); await w(100); const fr = q('.clk-row .clk-head b').textContent; q('[data-lang="en"]').click(); await w(100);
+      L.push('fr eurocup row: translated ' + (fr !== 'Round 1 · Doubles' && /Doublettes/.test(fr)));`);
+    // inter-club: the rotation pairing has a clock for each game number; one game per team per day keeps one clock for the day
+    await run(mk + `const teams = []; for (const c of ['North', 'South']) for (let i = 1; i <= 3; i++) teams.push({ id: c[0] + i, name: c + ' ' + i, club: c, players: ['x'], active: true });
+      await mk({ system: 'clubs', clubPairing: 'rotation', clubTeams: 3, clubDays: 1, name: 'Rotation', courts: pistes(3) }, teams);
+      const first = rowNames(); await finish(C.MS().filter(m => m.game === 1).map(m => m.id));
+      L.push('inter-club rotation: ' + first + ' | then ' + rowNames());
+      await mk({ system: 'clubs', clubPairing: 'like', clubTeams: 3, clubDays: 1, name: 'Like for like', courts: pistes(3) }, teams);
+      L.push('inter-club default pairing: ' + rowNames());
+      await comp(4); L.push('swiss: ' + rowNames());`);
     // spectators: no sound, no wake lock
     await run(`await comp(4); q('[data-act="clock-start"]').click(); await w(200); S.permFn = () => ({ edit: false, score: false }); C.render(); window.__beeps = 0; await w(1500);`);
     st = await startOf(); await forwardTo(st + 55 * 60000); await forwardTo(st + 60 * 60000);
