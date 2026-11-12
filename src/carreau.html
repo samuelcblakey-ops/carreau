@@ -108,7 +108,11 @@ h3{font-size:19px}
 .clk-time{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .clk-digits{font-size:40px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums}.clk-digits.sm{font-size:20px}
 .clk-row.up{border-color:var(--danger);background:var(--danger-soft);box-shadow:inset 0 0 0 1px var(--danger)}
-.clk-up{color:var(--danger)}.clk-big{font-size:32px;line-height:1.1}
+.clk-up{color:var(--danger)}
+.clk-row.warn{border-color:var(--jack);background:var(--jack-soft);box-shadow:inset 0 0 0 1px var(--jack)}.clk-row.warn .clk-time .clk-digits{color:var(--jack-ink)}
+.clk-row.flash{animation:clkflash 1s steps(1) infinite}@keyframes clkflash{50%{background:var(--surface)}}
+@media (prefers-reduced-motion:reduce){.clk-row.flash{animation:none}}
+.clk-sound{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.clk-big{font-size:32px;line-height:1.1}
 .clk-late{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;padding-top:8px;border-top:1px dashed var(--line)}
 .rp-state{font-weight:600}.rp-live .rp-state{color:var(--danger)}.rp-ready .rp-state{color:var(--accent)}
 .btn.wait:disabled{opacity:.7;color:var(--danger);border-color:var(--danger);background:var(--surface)}
@@ -1335,6 +1339,14 @@ Object.assign(LANG_TEXT.de, {"Barrage · Round {n}": "Gruppen · Runde {1}", "Le
 Object.assign(LANG_TEXT.nl, {"Barrage · Round {n}": "Poules · Ronde {1}", "Leagues · Round {n}": "Competities · Ronde {1}", "Timed games · {n} min": "Partijen op tijd · {1} min", "Start the clock": "Start de klok", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Start hem als het spel begint. Partijen die nog op een baan wachten, krijgen hun volle tijd vanaf het moment dat ze er een krijgen.", "Clock not started": "Klok niet gestart", "{n} games on pistes": "{1} partijen op banen", "1 game on a piste": "1 partij op een baan", "left": "over", "Time at {x}": "Tijd om {1}", "started later": "later begonnen", "Time!": "Tijd!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Maak de lopende mène af en speel er nog één. Is het dan nog gelijk, speel dan een extra mène.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Maak de lopende mène af en speel er nog twee. Is het dan nog gelijk, speel dan een extra mène.", "Stop the clock": "Stop de klok", "Stop the clock for {x}? Its games won't be timed any more.": "De klok voor {1} stoppen? De partijen worden dan niet meer getimed.", "Keep it running": "Laat hem lopen"});
 Object.assign(LANG_TEXT.pt, {"Barrage · Round {n}": "Grupos · Ronda {1}", "Leagues · Round {n}": "Ligas · Ronda {1}", "Timed games · {n} min": "Jogos com tempo · {1} min", "Start the clock": "Iniciar o relógio", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "Inicie-o quando o jogo começar. Os jogos à espera de pista têm todo o seu tempo a partir do momento em que recebem uma.", "Clock not started": "Relógio não iniciado", "{n} games on pistes": "{1} jogos em pista", "1 game on a piste": "1 jogo em pista", "left": "restantes", "Time at {x}": "Tempo às {1}", "started later": "começou mais tarde", "Time!": "Tempo!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "Terminem a jogada em curso e joguem mais uma. Se continuar empatado, joguem uma jogada extra.", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "Terminem a jogada em curso e joguem mais duas. Se continuar empatado, joguem uma jogada extra.", "Stop the clock": "Parar o relógio", "Stop the clock for {x}? Its games won't be timed any more.": "Parar o relógio de {1}? Os seus jogos deixam de ter tempo.", "Keep it running": "Deixar a contar"});
 Object.assign(LANG_TEXT.th, {"Barrage · Round {n}": "กลุ่ม · รอบ {1}", "Leagues · Round {n}": "ลีก · รอบ {1}", "Timed games · {n} min": "เกมจับเวลา · {1} นาที", "Start the clock": "เริ่มจับเวลา", "Start it when play begins. Games still waiting for a piste get their full time from when they're given one.": "เริ่มเมื่อเริ่มเล่น เกมที่ยังรอสนามจะได้เวลาเต็มนับจากตอนที่ได้สนาม", "Clock not started": "ยังไม่เริ่มจับเวลา", "{n} games on pistes": "{1} เกมอยู่บนสนาม", "1 game on a piste": "1 เกมอยู่บนสนาม", "left": "ที่เหลือ", "Time at {x}": "หมดเวลา {1}", "started later": "เริ่มทีหลัง", "Time!": "หมดเวลา!", "Finish the mène in progress and play one more. If it's still level, play one extra mène.": "เล่นเอนด์ที่กำลังเล่นอยู่ให้จบ แล้วเล่นต่ออีกหนึ่งเอนด์ ถ้ายังเสมอ ให้เล่นเพิ่มอีกหนึ่งเอนด์", "Finish the mène in progress and play two more. If it's still level, play one extra mène.": "เล่นเอนด์ที่กำลังเล่นอยู่ให้จบ แล้วเล่นต่ออีกสองเอนด์ ถ้ายังเสมอ ให้เล่นเพิ่มอีกหนึ่งเอนด์", "Stop the clock": "หยุดจับเวลา", "Stop the clock for {x}? Its games won't be timed any more.": "หยุดจับเวลาของ {1} ไหม? เกมในรอบนี้จะไม่ถูกจับเวลาอีก", "Keep it running": "ให้เดินต่อ"});
+// round clock alerts (time-clock-alerts)
+Object.assign(FR_TEXT, {"Time: {x}": "Temps : {1}", "Turn on the beep": "Activer le bip", "Keep this phone unlocked with the volume up to hear the beep.": "Gardez ce téléphone déverrouillé, volume monté, pour entendre le bip."});
+Object.assign(LANG_TEXT.es, {"Time: {x}": "Tiempo: {1}", "Turn on the beep": "Activar el pitido", "Keep this phone unlocked with the volume up to hear the beep.": "Mantén este teléfono desbloqueado y con volumen para oír el pitido."});
+Object.assign(LANG_TEXT.it, {"Time: {x}": "Tempo: {1}", "Turn on the beep": "Attiva il bip", "Keep this phone unlocked with the volume up to hear the beep.": "Tieni questo telefono sbloccato e con il volume alto per sentire il bip."});
+Object.assign(LANG_TEXT.de, {"Time: {x}": "Zeit: {1}", "Turn on the beep": "Piepton einschalten", "Keep this phone unlocked with the volume up to hear the beep.": "Lass dieses Handy entsperrt und laut, damit du den Piepton hörst."});
+Object.assign(LANG_TEXT.nl, {"Time: {x}": "Tijd: {1}", "Turn on the beep": "Piep aanzetten", "Keep this phone unlocked with the volume up to hear the beep.": "Houd deze telefoon ontgrendeld met het volume hoog om de piep te horen."});
+Object.assign(LANG_TEXT.pt, {"Time: {x}": "Tempo: {1}", "Turn on the beep": "Ligar o bip", "Keep this phone unlocked with the volume up to hear the beep.": "Mantenha este telemóvel desbloqueado e com volume para ouvir o bip."});
+Object.assign(LANG_TEXT.th, {"Time: {x}": "หมดเวลา: {1}", "Turn on the beep": "เปิดเสียงบี๊บ", "Keep this phone unlocked with the volume up to hear the beep.": "ปลดล็อกโทรศัพท์เครื่องนี้ไว้และเปิดเสียงให้ดัง เพื่อให้ได้ยินเสียงบี๊บ"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1695,7 +1707,7 @@ async function applyProposals() {
 setInterval(() => { try { applyProposals(); } catch {} }, 30000);
 setInterval(() => { try { const t = T(); const ae = document.activeElement;
   if (t?.timeLimit > 0 && !S.modal && S.tab === "draw" && !(ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName))) render(); } catch {} }, 60000);
-setInterval(() => { try { tickClocks(); } catch {} }, 1000);
+setInterval(() => { try { tickClocks(); } catch {} try { clockAlerts(); } catch {} }, 1000);
 function teamPanel(t) {
   const me = myTeam(t); if (!me || !teamScoring(t)) return "";
   const mine = MS().filter(m => inMatch(m, me) && !m.bye).sort(byOrder);
@@ -1819,30 +1831,38 @@ const TIME_UP_SAY = { 1: "Finish the mène in progress and play one more. If it'
 const clockFmt = ms => { const sec = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`; };
 const hhmm = at => { const d = new Date(at); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
 // the clock panel on Draw & results: one row per round with a game being played, for anyone who can enter scores
+// the rounds that have a game being played, with their clocks (the panel and the alerts both use this)
+function clockRounds(t) {
+  if (!(t?.timeLimit > 0) || isShoot(t) || !canScore()) return [];
+  const all = MS().filter(m => !m.bye).sort(byOrder);
+  return [...new Set(all.filter(m => !m.done && m.a && m.b && m.court).map(roundKey))].map(key => {
+    const games = all.filter(m => roundKey(m) === key), clk = roundClock(key);
+    return { key, games, on: games.filter(m => !m.done && m.a && m.b && m.court), label: roundName(t, games.find(m => !m.third) || games[0]), clk, end: clk ? clk + t.timeLimit * 60000 : null };
+  });
+}
+// amber from 5 minutes left, when the time limit is longer than that
+const clockWarnAt = (t, end) => t.timeLimit > 5 ? end - 5 * 60000 : null;
 function clockPanel(t) {
-  if (!(t.timeLimit > 0) || isShoot(t) || !canScore()) return "";
-  const all = MS().filter(m => !m.bye).sort(byOrder), lim = t.timeLimit * 60000, now = Date.now(), wr = canEdit();
-  const keys = [...new Set(all.filter(m => !m.done && m.a && m.b && m.court).map(roundKey))];
-  if (!keys.length) return "";
+  const rounds = clockRounds(t); if (!rounds.length) return "";
+  const lim = t.timeLimit * 60000, now = Date.now(), wr = canEdit();
   let waiting = false;
-  const rows = keys.map(key => {
-    const games = all.filter(m => roundKey(m) === key), on = games.filter(m => !m.done && m.a && m.b && m.court);
-    const label = roundName(t, games.find(m => !m.third) || games[0]), clk = roundClock(key);
+  const rows = rounds.map(({ key, games, on, label, clk }) => {
     if (!clk) { waiting = true;
       return `<div class="clk-row" data-key="${esc(key)}"><div class="clk-head"><b>${esc(label)}</b><span class="small muted">${on.length === 1 ? "1 game on a piste" : `${on.length} games on pistes`}</span></div>
         ${wr ? `<button type="button" class="btn primary" data-act="clock-start" data-k="${esc(key)}">Start the clock</button>` : `<span class="small muted clk-wait">Clock not started</span>`}</div>`; }
-    const end = clk + lim, up = now >= end;
+    const end = clk + lim, up = now >= end, warnAt = clockWarnAt(t, end), warn = !up && warnAt && now >= warnAt, flash = up && (S.clockFlash?.[t.id + ":" + key] || 0) > now;
     const late = on.filter(m => (m.courtAt || 0) > clk).map(m => { const e = m.courtAt + lim; return `<div class="clk-late"><span>Piste ${esc(courtName(t, m.court))} · started later</span>${now >= e ? `<b class="clk-up">Time!</b>` : `<span><span class="clk-digits sm" data-notr data-end="${e}">${clockFmt(e - now)}</span> <span>left</span></span>`}</div>`; }).join("");
     const stop = !wr ? "" : S.clockAsk === key ? `<div class="notice stack clk-ask" style="gap:8px"><span>${trAround("Stop the clock for {x}? Its games won't be timed any more.", `<span data-notr>${esc(tr(label))}</span>`)}</span>
         <div class="row"><button type="button" class="btn danger" data-act="clock-stop" data-k="${esc(key)}">Stop the clock</button><button type="button" class="btn" data-act="clock-keep">Keep it running</button></div></div>`
       : `<button type="button" class="btn sm ghost clk-stop" data-act="clock-stop-ask" data-k="${esc(key)}">Stop the clock</button>`;
-    return `<div class="clk-row ${up ? "up" : "run"}" data-key="${esc(key)}"><div class="clk-head"><b>${esc(label)}</b>${up ? "" : `<span class="small muted">Time at ${hhmm(end)}</span>`}</div>
+    return `<div class="clk-row ${up ? "up" : warn ? "run warn" : "run"}${flash ? " flash" : ""}" data-key="${esc(key)}"><div class="clk-head"><b>${esc(label)}</b>${up ? "" : `<span class="small muted">Time at ${hhmm(end)}</span>`}</div>
       ${up ? `<div class="stack" style="gap:4px"><b class="clk-up clk-big">Time!</b><span>${TIME_UP_SAY[timeExtra(t)]}</span><span class="small muted">${gamesLeft(games.filter(m => !m.done && m.a && m.b).length)}</span></div>`
-        : `<div class="clk-time"><span class="clk-digits" data-notr data-end="${end}">${clockFmt(end - now)}</span> <span>left</span></div>`}
+        : `<div class="clk-time"><span class="clk-digits" data-notr data-end="${end}"${warnAt && !warn ? ` data-warn="${warnAt}"` : ""}>${clockFmt(end - now)}</span> <span>left</span></div>`}
       ${late}${stop}</div>`;
   }).join("");
   return `<div class="panel stack clk" style="gap:12px;margin-bottom:16px"><div class="eyebrow">Timed games · ${t.timeLimit} min</div>${rows}
-    ${waiting && wr ? `<p class="small muted">Start it when play begins. Games still waiting for a piste get their full time from when they're given one.</p>` : ""}</div>`;
+    ${waiting && wr ? `<p class="small muted">Start it when play begins. Games still waiting for a piste get their full time from when they're given one.</p>` : ""}
+    ${rounds.some(r => r.clk) ? `<div class="clk-sound">${SND.on ? "" : `<button type="button" class="btn" data-act="sound-on">Turn on the beep</button>`}<p class="small muted">Keep this phone unlocked with the volume up to hear the beep.</p></div>` : ""}</div>`;
 }
 // organisers start and stop a round's clock: one field on each game, so a score saved on another phone meanwhile isn't overwritten
 async function clockStart(t, key) {
@@ -1859,10 +1879,64 @@ async function clockStop(t, key) {
 function tickClocks() {
   const els = document.querySelectorAll(".clk-digits[data-end]"); if (!els.length) return;
   const now = Date.now(); let due = false;
-  els.forEach(el => { const left = +el.dataset.end - now; if (left <= 0) due = true; else { const v = clockFmt(left); if (el.textContent !== v) el.textContent = v; } });
+  els.forEach(el => { const left = +el.dataset.end - now; if (left <= 0 || (el.dataset.warn && now >= +el.dataset.warn)) due = true; else { const v = clockFmt(left); if (el.textContent !== v) el.textContent = v; } });
   const ae = document.activeElement;
   if (due && !S.modal && !(ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName))) render();
 }
+// ---- clock alerts: a beep at 5 minutes left, three at time up, the "Time" banner on other tabs, and the screen kept awake ----
+// sound: Web Audio, which browsers allow only after a tap; window.__beeps (a number) counts them for the tests
+const SND = { ctx: null, on: false };
+function soundOn() {
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {} // iPhone: play even with the silent switch on
+  try { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; SND.ctx = SND.ctx || new AC(); if (SND.ctx.state === "suspended") SND.ctx.resume(); SND.on = true; } catch {}
+}
+function beep(n) {
+  if (typeof window.__beeps === "number") window.__beeps += n;
+  try { const c = SND.ctx; if (!c) return; const t0 = c.currentTime + 0.02;
+    for (let i = 0; i < n; i++) { const o = c.createOscillator(), g = c.createGain(), at = t0 + i * 0.35;
+      o.type = "sine"; o.frequency.value = 880; g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.6, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
+      o.connect(g).connect(c.destination); o.start(at); o.stop(at + 0.25); } } catch {}
+}
+const vibrate = p => { try { navigator.vibrate && navigator.vibrate(p); } catch {} };
+// screen wake lock while a timed round is being played; the browser lets it go when the page is hidden, so it's asked for again
+const WAKE = { lock: null, want: false, asking: false };
+async function wakeSet(want) {
+  WAKE.want = want;
+  try {
+    if (!navigator.wakeLock) return;
+    if (want && !WAKE.lock && !WAKE.asking && document.visibilityState === "visible") {
+      WAKE.asking = true;
+      try { const l = await navigator.wakeLock.request("screen"); WAKE.lock = l; l.addEventListener?.("release", () => { if (WAKE.lock === l) WAKE.lock = null; }); if (!WAKE.want) wakeSet(false); }
+      finally { WAKE.asking = false; }
+    } else if (!want && WAKE.lock) { const l = WAKE.lock; WAKE.lock = null; await l.release(); }
+  } catch {}
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && WAKE.want) wakeSet(true); });
+// each alert sounds once per phone, and only for a moment crossed in the last few seconds
+// (a phone that opens the competition after time is up stays quiet)
+function clockAlert(t, label) {
+  if (S.tab === "draw") return;
+  S.alert = { tid: t.id, label: `Time: ${label}`, until: Date.now() + 15000 };
+  clearTimeout(S.alertTimer); S.alertTimer = setTimeout(() => { S.alert = null; renderAlert(); }, 15000); renderAlert();
+}
+function clockAlerts() {
+  const t = T(), rounds = t ? clockRounds(t) : [], now = Date.now();
+  wakeSet(rounds.some(r => r.clk));
+  const given = S.clockGiven ||= new Set(), armed = S.clockArmed ||= new Set();
+  // a moment sounds once, if this phone saw it still to come and it passed within the last 10 seconds
+  const crossed = (at, id) => { if (!at || given.has(id)) return false; if (at > now) { armed.add(id); return false; } given.add(id); return armed.has(id) && now - at <= 10000; };
+  let redraw = false;
+  for (const r of rounds) {
+    if (!r.clk) continue; const id = t.id + ":" + r.key;
+    if (crossed(clockWarnAt(t, r.end), id + ":warn") && now < r.end) { beep(1); vibrate(200); redraw = true; }
+    if (crossed(r.end, id + ":up")) { beep(3); vibrate([400, 150, 400, 150, 400]); (S.clockFlash ||= {})[id] = r.end + 10000; setTimeout(() => S.tab === "draw" && render(), Math.max(0, r.end + 10000 - Date.now()) + 50); clockAlert(t, r.label); redraw = true; }
+    for (const m of r.on) if ((m.courtAt || 0) > r.clk && crossed(m.courtAt + t.timeLimit * 60000, t.id + ":" + m.id + ":up")) { beep(3); vibrate([400, 150, 400, 150, 400]); clockAlert(t, `Piste ${courtName(t, m.court)}`); redraw = true; }
+  }
+  const ae = document.activeElement;
+  if (redraw && S.tab === "draw" && !S.modal && !(ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName))) render();
+}
+// any tap turns sound on while this phone sees a timed competition's clock
+document.addEventListener("click", () => { if (!SND.on && T()?.timeLimit > 0 && canScore()) { soundOn(); if (S.tab === "draw") setTimeout(render, 0); } }, true);
 function mStatus(m) { if (m.done) return "done"; if (!m.a || !m.b) return "pending"; if (m.court) return "playing"; return "ready"; }
 const ents = m => [...(m.a || []), ...(m.b || [])];
 const aWon = m => m.win ? m.win === "a" : m.sa > m.sb;
@@ -5275,7 +5349,8 @@ document.addEventListener("click", async e => {
     case "print-draw": printDraw(t); break;
     case "find-me": { lsSet(meKey(t), a.dataset.id); S.findQ = ""; document.activeElement?.blur?.(); render(); break; }
     case "find-clear": { lsSet(meKey(t), ""); render(); setTimeout(() => $("#find-q")?.focus(), 30); break; }
-    case "clock-start": if (t && canEdit()) await clockStart(t, a.dataset.k); break;
+    case "clock-start": soundOn(); if (t && canEdit()) await clockStart(t, a.dataset.k); break;
+    case "sound-on": soundOn(); render(); break;
     case "clock-stop-ask": if (canEdit()) { S.clockAsk = a.dataset.k; render(); } break;
     case "clock-keep": S.clockAsk = null; render(); break;
     case "clock-stop": if (t && canEdit()) await clockStop(t, a.dataset.k); break;

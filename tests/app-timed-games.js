@@ -1,5 +1,5 @@
 // Timed games: how many mènes follow the time limit (Setup and Quick setup), the "Ended on time" wording in the score box,
-// and the round clock on Draw & results (Playwright's page.clock moves time on).
+// the round clock on Draw & results, and its beeps, banner and wake lock (Playwright's page.clock moves time on).
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const c = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true }); const p = await c.newPage();
@@ -136,6 +136,80 @@ const { chromium } = require('playwright');
       q('[data-lang="en"]').click(); await w(100);
       L.push('phone 390: no sideways scroll ' + noScroll() + ' | start button 44+ px ' + (q('[data-act="clock-start"]').getBoundingClientRect().height >= 44));`);
     await P.close();
+  }
+  // ---- clock alerts: beeps (counted in window.__beeps), the Time banner, flashing and a fake screen wake lock ----
+  {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    await ctx.addInitScript(() => {
+      window.__beeps = 0; window.__wake = { req: 0, rel: 0, active: null };
+      Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: { request: async () => { const W = window.__wake; W.req++; const l = new EventTarget(); l.released = false;
+        l.release = async () => { if (l.released) return; l.released = true; W.rel++; if (W.active === l) W.active = null; l.dispatchEvent(new Event('release')); }; W.active = l; return l; } } });
+    });
+    const A = await ctx.newPage(); A.on('pageerror', e => errs.push(e.message));
+    await A.clock.install({ time: new Date('2026-11-14T14:05:00') });
+    await A.goto(process.env.APP_URL); await A.evaluate(() => localStorage.clear()); await A.reload(); await A.waitForTimeout(300);
+    const run = async (fn, page = A) => { const r = await page.evaluate(new Function(`return (async () => { ${helpers}
+      const row = () => q('.clk-row'), flashing = () => !!row() && getComputedStyle(row()).animationName !== 'none', red = () => !!row() && row().classList.contains('up');
+      const comp = async (n, extra) => { q('[data-act="new-t"]').click(); await w(150); const t = JSON.parse(JSON.stringify(C.T()));
+        Object.assign(t, { name: 'Alerts', system: 'swiss', checkin: false, swissRounds: 3, timeLimit: 60, wizard: false, courts: [{ id: 'c1', name: '1', active: true }, { id: 'c2', name: '2', active: true }] }, extra || {});
+        for (let i = 0; i < n; i++) t.teams.push({ id: 'T' + i, name: 'Team ' + 'ABCDEFGH'[i], players: ['x'], active: true });
+        await S.store.setTournament(t); S.tournaments[t.id] = t; await w(30); q('[data-tab="draw"]').click(); await w(60); q('[data-act="first-draw"]').click(); await w(300); };
+      const quick = async id => { q('[data-tab="draw"]').click(); await w(40); q('[data-match="' + id + '"]').click(); await w(80); q('[data-act="qlose"][data-k="sb"][data-n="5"]').click(); await w(300); };
+      const startAt = () => Math.min(...C.MS().filter(m => m.clockAt).map(m => m.clockAt));
+      try { ${fn} } catch (e) { L.push('ERR ' + e.message); } return L; })()`)); L.push(...r); };
+    const now = page => (page || A).evaluate(() => Date.now());
+    const forwardTo = async (ms, page = A) => { await page.clock.fastForward(Math.max(0, ms - await now(page))); await page.waitForTimeout(150); };
+    const startOf = page => (page || A).evaluate(() => Math.min(...window.__carreau.MS().filter(m => m.clockAt).map(m => m.clockAt)));
+    // a round with a late game: 55 min amber and one beep, 60 min three more and a flash, late game time up on Registration
+    await run(`await comp(6); q('[data-act="clock-start"]').click(); await w(100); window.__beeps = 0;`);
+    let st = await startOf(); await forwardTo(st + 20 * 60000);
+    await run(`const waiting = C.MS().find(m => !m.bye && !m.court && !m.done); S.__late = waiting.id; await quick(C.MS().find(m => !m.bye && m.court && !m.done).id);`);
+    await forwardTo(st + 55 * 60000);
+    await run(`L.push('55 min: amber ' + (row().classList.contains('warn') && getComputedStyle(row().querySelector('.clk-digits')).color !== getComputedStyle(document.body).color) + ' | beeps ' + window.__beeps); row().scrollIntoView({ block: 'center' });`);
+    await A.screenshot({ path: process.env.OUT + '/clock-amber-390.png' });
+    await forwardTo(st + 60 * 60000);
+    await run(`L.push('60 min: beeps ' + window.__beeps + ' | flash ' + flashing() + ' | red ' + red()); row().scrollIntoView({ block: 'center' });`);
+    await A.screenshot({ path: process.env.OUT + '/clock-red-390.png' });
+    await A.clock.fastForward(10000); await A.waitForTimeout(150);
+    await run(`L.push('after 10 s: flash ' + flashing() + ' | red ' + red()); q('[data-tab="entries"]').click(); await w(60);`);
+    await forwardTo(await A.evaluate(() => { const S = window.__carreau.S; return S.matches[S.__late].courtAt + 60 * 60000; }));
+    await run(`L.push('late game time up: beeps ' + window.__beeps + ' | banner ' + (q('#roundalert:not([hidden]) b')?.textContent || 'none'));`);
+    await A.screenshot({ path: process.env.OUT + '/clock-banner-390.png' });
+    // time up while on Registration
+    await run(`q('[data-act="alert-close"]')?.click(); await comp(4); q('[data-act="clock-start"]').click(); await w(100); q('[data-tab="entries"]').click(); await w(1500);`);
+    st = await startOf(); await forwardTo(st + 60 * 60000);
+    await run(`L.push('on Registration at time up: banner ' + (q('#roundalert:not([hidden]) b')?.textContent || 'none')); q('[data-tab="draw"]').click(); await w(60);`);
+    // a phone that opens the competition after time is up stays quiet, and sound waits for a tap
+    await A.reload(); await A.waitForTimeout(400);
+    await run(`window.__beeps = 0; S.tab = 'draw'; C.render(); await w(2500); // no tap yet: a tap would turn sound on
+      L.push('opened after time up: beeps ' + window.__beeps);
+      const shown = () => !!q('[data-act="sound-on"]'); const before = shown(); document.querySelector('main h2').click(); await w(100);
+      L.push('sound locked after reload: Turn on the beep shown ' + before + ' | after tap shown ' + shown() + ' | reminder ' + /Keep this phone unlocked/.test(q('.clk').textContent));`);
+    // no warning when the limit is 5 minutes or less
+    await run(`await comp(4, { timeLimit: 5 }); window.__beeps = 0; q('[data-act="clock-start"]').click(); await w(1500);`);
+    st = await startOf(); await forwardTo(st + 4 * 60000 + 59000);
+    await run(`L.push('limit 5 min: warning beeps ' + window.__beeps);`);
+    // the wake lock: on while a timed round is played, asked for again when the page shows again, let go once the round is finished
+    await run(`await comp(4); q('[data-act="clock-start"]').click(); await w(1500);
+      const W = window.__wake; const on = !!W.active && W.req >= 1;
+      let vis = 'hidden'; Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => vis });
+      await W.active.release(); document.dispatchEvent(new Event('visibilitychange')); await w(50); const req = W.req;
+      vis = 'visible'; document.dispatchEvent(new Event('visibilitychange')); await w(100); const again = W.req === req + 1 && !!W.active;
+      for (const m of C.MS().filter(m => !m.bye && !m.done && m.court)) await quick(m.id);
+      await w(1500); L.push('wake lock: on while clock runs ' + on + ' | off after round finished ' + !W.active + ' | asked again when visible ' + again);`);
+    // spectators: no sound, no wake lock
+    await run(`await comp(4); q('[data-act="clock-start"]').click(); await w(200); S.permFn = () => ({ edit: false, score: false }); C.render(); window.__beeps = 0; await w(1500);`);
+    st = await startOf(); await forwardTo(st + 55 * 60000); await forwardTo(st + 60 * 60000);
+    await run(`L.push('spectator: beeps ' + window.__beeps + ' | wake lock ' + !!window.__wake.active);`);
+    await A.close();
+    // reduced motion: the row turns red without flashing
+    const R = await ctx.newPage(); R.on('pageerror', e => errs.push(e.message)); await R.emulateMedia({ reducedMotion: 'reduce' });
+    await R.clock.install({ time: new Date('2026-11-14T14:05:00') });
+    await R.goto(process.env.APP_URL); await R.evaluate(() => localStorage.clear()); await R.reload(); await R.waitForTimeout(300);
+    await run(`await comp(4); q('[data-act="clock-start"]').click(); await w(1500);`, R);
+    st = await startOf(R); await forwardTo(st + 60 * 60000, R);
+    await run(`L.push('reduced motion: flash ' + flashing() + ' | red ' + red() + ' | flash class on ' + row().classList.contains('flash'));`, R);
+    await ctx.close();
   }
   console.log(L.join('\n')); console.log('errs', errs); await b.close();
 })();
