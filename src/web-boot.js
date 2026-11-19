@@ -297,7 +297,7 @@ S.headerExtra = () => {
   const t = T(); if (!CONFIGURED || !t) return "";
   const p = S.permFn(t);
   if (isAdmin()) return `<span class="pill done">Admin</span>`;
-  if (SITE.openTesting && t.listed) return `<span class="pill" title="Example competition, view only">Example</span>`;
+  if (t.listed) return `<span class="pill" title="Example competition, view only">Example</span>`; // examples stay view-only, with open testing on or off
   if (SITE.openTesting) return `<span class="pill playing" title="Open testing">Test mode</span>`;
   if (isOwner(t)) return `<span class="pill done">Organiser</span>`;
   if (TEAM[t.id]) return `<span class="pill done">Team</span>`;
