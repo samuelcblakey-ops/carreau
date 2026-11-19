@@ -6,6 +6,10 @@
 // (stood in for here; the rules are in web-calendar.js), French, and the page and a listing at 390 px.
 // Season Calendar 3 (calendar-own-events): an event run elsewhere added from the page (the sheet in event mode at 390 px),
 // its full listing (no Live now, no competition links), Edit, "Your listings" (a hidden one marked), Remove, French.
+// Season Calendar 4 (calendar-entry-form): the sheet's Entries section, the row line and "Entries open" chip, the queue maths,
+// the entry form (its checks, at 390 px), "Your entries" (a place, the waiting list, approval, Edit, Withdraw, removed by
+// the organiser), "Who's entered", five entries a device, closing, and French. On one device (the app on its own) online
+// entry is offered; the website's site switch and rules are in web-calendar.js.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, locale: 'en-GB' });
@@ -295,6 +299,125 @@ const { chromium } = require('playwright');
     const add = txt(q('[data-act="cal-ev-new"]')); q('[data-act="cal-ev-new"]').click(); await w(150);
     L.push('fr event: ' + add + ' | ' + txt(q('#modal h3')) + ' | ' + qa('#modal [data-act="cal-fmt"]').map(txt).slice(-2).join(',') + ' | ' + txt(q('#modal [data-act="cal-save"]')) + ' | ' + txt(q('#cal-mine h3')));
     q('#modal [data-act="close"]').click(); await w(60);
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
+  `));
+
+  // ---- Season Calendar 4 (calendar-entry-form) ----
+  out.push(...await run2(`
+    const Q = C.calQueue, st = C.calEntState, E = (id, status, queuedAt, at) => ({ id, status, queuedAt, at });
+    const list = [E('b_1', 'in', 20, 20), E('a_1', 'in', 10, 10), E('c_1', 'pending', 0, 5), E('d_1', 'in', 20, 20), E('e_1', 'in', 15, 30)];
+    const qq = Q({ places: 2 }, list);
+    L.push('queue maths: order ' + qq.ins.map(x => x.id).join(',') + ' | ' + qq.ins.concat(list.filter(x => x.status === 'pending')).map(x => st(x, qq)).join(' / ') + ' | wait ' + qq.wait);
+    const q0 = Q({ places: 0 }, list), q1 = Q({ places: 2 }, list.filter(x => x.id !== 'a_1'));
+    L.push('queue maths more: no limit ' + st(list[0], q0) + ' | withdraw moves up ' + st(list[0], q1) + ' / ' + st(list[3], q1));
+    const open = { online: true, fmt: 'doubles', status: 'on', closesAt: Date.now() + 864e5, places: 32 };
+    L.push('places line: ' + [C.calPlacesLine(open, Q(open, Array.from({ length: 20 }, (_, i) => E('x_' + i, 'in', i, i)))).replace(/close .*/, 'close <day>'),
+      ...[{ places: 2 }, { places: 0 }, { closesAt: Date.now() - 1 }].map(x => { const o = Object.assign({}, open, x); return C.calPlacesLine(o, Q(o, list)); })].join(' / '));
+    // an event taking entries online: doubles, 2 places, closing tomorrow, names shown
+    const ev = (id, extra) => Object.assign({ kind: 'event', id, name: 'Sandy Spring Doubles', date: day(6), checkin: '', start: '10:00', venue: 'Sandy PC', address: '', country: 'GB-ENG', region: '', level: 'open', fmt: 'doubles', formatNote: '',
+      who: ['open'], fee: '', prizes: '', howTo: '', contact: '', note: '', status: 'on', lang: 'en', ownerUid: '', orgCode: '', byUid: '', byCode: '', createdAt: 1, updatedAt: 1, hidden: false,
+      online: true, places: 2, closesAt: new Date(day(1) + 'T23:59:59.999').getTime(), approve: false, showEntrants: true }, extra);
+    await S.store.setCal('cEnt', ev('cEnt')); await S.store.setCal('cEnt2', ev('cEnt2', { name: 'Biggleswade Singles', fmt: 'singles', online: false }));
+    S.calPage.cache = {}; await go('calendar'); await w(300);
+    L.push('row line: ' + txt(q('#cal-cEnt .cal-ent-line')).replace(/closes .*/, 'closes <day>') + ' | day ' + /closes [A-Z][a-z]{2} \\d{1,2} [A-Z][a-z]{2}$/.test(txt(q('#cal-cEnt .cal-ent-line'))) + ' | other row ' + !!q('#cal-cEnt2 .cal-ent-line'));
+    const rowsN = () => qa('#cal-results .cal-row').length, n0 = rowsN();
+    q('[data-act="cal-filter-open"]').click(); await w(150);
+    L.push('chip: ' + txt(q('[data-act="cal-filter-open"]')) + ' | pressed ' + q('[data-act="cal-filter-open"]').getAttribute('aria-pressed') + ' | rows ' + n0 + ' -> ' + rowsN() + ' | only ' + qa('#cal-results .cal-row').map(r => r.id).join(','));
+    q('[data-act="cal-filter-open"]').click(); await w(100);
+    await go('calendar.cEnt'); await w(300);
+    const card = () => q('#cal-cEnt.cal-card');
+    L.push('listing: ' + txt(card().querySelector('.cal-places')).replace(/close .*/, 'close <day>') + ' | meter ' + !!card().querySelector('.cal-ent .meter') + ' | button ' + txt(card().querySelector('[data-act="cal-ent-new"]')) + ' | your entries ' + !!card().querySelector('.cal-mine-ent'));
+    card().querySelector('[data-act="cal-ent-new"]').click(); await w(150);
+    L.push('form: ' + txt(q('#modal h3')) + ' | ' + qa('#modal label.f > span').map(txt).join(',') + ' | ' + txt(q('#modal .cal-ent-privacy')) + ' | ' + qa('#modal .row .btn').map(txt).join(','));
+    q('#modal [data-act="cal-ent-send"]').click(); await w(100); const e1 = txt(q('#modal .err'));
+    type('#modal [data-calent="p0"]', 'Ann Lee'); q('#modal [data-act="cal-ent-send"]').click(); await w(100); const e2 = txt(q('#modal .err'));
+    type('#modal [data-calent="p1"]', 'Bob Fox'); q('#modal [data-act="cal-ent-send"]').click(); await w(100); const e3 = txt(q('#modal .err'));
+    L.push('form checks: ' + e1 + ' | ' + e2 + ' | ' + e3);
+    type('#modal [data-calent="name"]', 'Les Copains'); type('#modal [data-calent="club"]', 'Sandy PC'); type('#modal [data-calent="contact"]', '07700 900111');
+  `));
+  out.push('form 390: no sideways scroll ' + await p2.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1) + ' | box font ' + await p2.evaluate(() => getComputedStyle(document.querySelector('#modal [data-calent="contact"]')).fontSize)
+    + ' | boxes under 44 ' + await p2.evaluate(() => [...document.querySelectorAll('#modal [data-calent]')].filter(x => x.getBoundingClientRect().height < 44).length));
+  await p2.screenshot({ path: 'test-results/calendar-entry-form-390.png' });
+  out.push(...await run2(`
+    const card = () => q('#cal-cEnt.cal-card'), mineT = () => qa('#cal-cEnt .cal-ent-row').map(r => txt(r.querySelector('b')) + ': ' + txt(r.querySelector('.cal-ent-state'))).join(' / ');
+    const enter = async (players, team) => { card().querySelector('[data-act="cal-ent-new"]').click(); await w(150); if (team) type('#modal [data-calent="name"]', team);
+      players.forEach((v, i) => type('#modal [data-calent="p' + i + '"]', v)); type('#modal [data-calent="contact"]', 'me@example.com'); q('#modal [data-act="cal-ent-send"]').click(); await w(250); };
+    q('#modal [data-act="cal-ent-send"]').click(); await w(300);
+    const c = JSON.parse(localStorage.getItem('carreau-local-v1')).ce.cEnt;
+    L.push('sent: ' + txt(q('#toast')) + ' | modal closed ' + !q('#modal .modal') + ' | ids ' + Object.keys(c.entries).join(',') + ' | status ' + c.entries.local_1.status + ' | team ' + JSON.stringify(c.teams.local_1) + ' | contact ' + c.contacts.local_1.contact
+      + ' | listing untouched ' + !JSON.stringify(await S.store.getCal('cEnt')).includes('07700'));
+    L.push('your entries: ' + mineT() + ' | places ' + txt(card().querySelector('.cal-places')).replace(/close .*/, 'close <day>'));
+    await enter(['Cat Ray', 'Dan Oak']); await enter(['Eve Ash', 'Fay Elm'], 'Third Team');
+    L.push('waiting list: ' + mineT() + ' | places ' + txt(card().querySelector('.cal-places')) + ' | meter ' + card().querySelector('.meter span').style.width);
+    window.__ent = 1;
+  `));
+  await p2.evaluate(() => document.querySelector('#cal-cEnt .cal-mine-ent')?.scrollIntoView()); await p2.screenshot({ path: 'test-results/calendar-your-entries-390.png' });
+  out.push(...await run2(`
+    const card = () => q('#cal-cEnt.cal-card'), mineT = () => qa('#cal-cEnt .cal-ent-row').map(r => txt(r.querySelector('b')) + ': ' + txt(r.querySelector('.cal-ent-state'))).join(' / ');
+    const who = () => ({ inn: qa('#cal-cEnt .cal-who-list .cal-who-ol')[0] ? qa('#cal-cEnt .cal-who-list .cal-who-ol')[0].querySelectorAll('li').length : 0, wait: !!q('#cal-cEnt .cal-wait-h'),
+      text: txt(q('#cal-cEnt .cal-who-list')) });
+    q('#cal-cEnt .cal-who-list summary').click(); await w(100);
+    const w1 = who(); q('#cal-cEnt .cal-who-list').scrollIntoView(); await w(100); L.push("who's entered: " + w1.inn + ' listed | waiting list heading ' + w1.wait + ' | ' + w1.text);
+  `));
+  await p2.screenshot({ path: 'test-results/calendar-whos-entered-390.png' });
+  out.push(...await run2(`
+    const card = () => q('#cal-cEnt.cal-card'), mineT = () => qa('#cal-cEnt .cal-ent-row').map(r => txt(r.querySelector('b')) + ': ' + txt(r.querySelector('.cal-ent-state'))).join(' / ');
+    // Edit (names and contact read back), then Withdraw the first
+    q('#cal-cEnt [data-act="cal-ent-edit"][data-eid="local_1"]').click(); await w(200);
+    L.push('edit: ' + [q('#modal [data-calent="name"]').value, q('#modal [data-calent="p0"]').value, q('#modal [data-calent="p1"]').value, q('#modal [data-calent="club"]').value, q('#modal [data-calent="contact"]').value].join(' | '));
+    type('#modal [data-calent="club"]', 'Sandy Pétanque Club'); q('#modal [data-act="cal-ent-send"]').click(); await w(300);
+    L.push('edited: ' + txt(q('#toast')) + ' | club ' + JSON.parse(localStorage.getItem('carreau-local-v1')).ce.cEnt.teams.local_1.club + ' | ids ' + Object.keys(JSON.parse(localStorage.getItem('carreau-local-v1')).ce.cEnt.entries).join(','));
+    q('#cal-cEnt [data-act="cal-ent-withdraw"][data-eid="local_1"]').click(); await w(100);
+    L.push('withdraw confirm: ' + txt(q('#cal-cEnt .cal-ent-row .err')) + ' | ' + qa('#cal-cEnt .cal-ent-row[data-eid="local_1"] .btn').map(txt).join(','));
+    q('#cal-cEnt [data-act="cal-ent-withdraw-yes"]').click(); await w(300);
+    L.push('withdrawn: ' + txt(q('#toast')) + ' | ' + mineT() + ' | gone notice ' + !!q('#cal-cEnt .cal-ent-gone'));
+    // five a device
+    await (async () => { for (let i = 0; i < 4; i++) { card().querySelector('[data-act="cal-ent-new"]').click(); await w(150); type('#modal [data-calent="p0"]', 'P' + i); type('#modal [data-calent="p1"]', 'Q' + i);
+      type('#modal [data-calent="contact"]', '0' + i); q('#modal [data-act="cal-ent-send"]').click(); await w(250); } })();
+    L.push('sixth: ' + txt(q('#modal .err')) + ' | entries ' + qa('#cal-cEnt .cal-ent-row').length);
+    q('#modal [data-act="close"]').click(); await w(100);
+    // the organiser removes one: shown once
+    await S.store.withdrawCalEntry('cEnt', 'local_2'); await w(250);
+    const gone1 = txt(q('#cal-cEnt .cal-ent-gone'));
+    q('#cal-cEnt [data-act="cal-close-entry"]').click(); await w(150); q('#cal-cEnt').click(); await w(250);
+    L.push('removed by organiser: ' + gone1 + ' | shown again ' + !!q('#cal-cEnt .cal-ent-gone'));
+    // approval on: a new entry waits
+    await S.store.setCal('cEnt', Object.assign(await S.store.getCal('cEnt'), { approve: true })); await w(100);
+    await S.store.withdrawCalEntry('cEnt', 'local_3'); await w(200); q('#cal-cEnt [data-act="cal-close-entry"]').click(); await w(150); q('#cal-cEnt').click(); await w(250);
+    card().querySelector('[data-act="cal-ent-new"]').click(); await w(150); type('#modal [data-calent="p0"]', 'Gus'); type('#modal [data-calent="p1"]', 'Hal'); type('#modal [data-calent="contact"]', '01');
+    q('#modal [data-act="cal-ent-send"]').click(); await w(300);
+    const pend = qa('#cal-cEnt .cal-ent-row').find(r => txt(r.querySelector('b')) === 'Gus & Hal');
+    L.push('approve on: ' + txt(pend?.querySelector('.cal-ent-state')) + ' | status ' + JSON.parse(localStorage.getItem('carreau-local-v1')).ce.cEnt.entries[pend?.dataset.eid]?.status + ' | not in who\\'s entered ' + !txt(q('#cal-cEnt .cal-who-list')).includes('Gus'));
+    // closed: no form, no Edit; Withdraw stays
+    await S.store.setCal('cEnt', Object.assign(await S.store.getCal('cEnt'), { closesAt: Date.now() - 1000 })); S.calPage.cache = {}; S.calPage.deepFor = null; S.calPage.deepItem = null; S.calPage.open = null; await go('calendar'); await w(200);
+    const rowClosed = txt(q('#cal-cEnt .cal-ent-line')); q('#cal-cEnt').click(); await w(250);
+    L.push('closed: row ' + rowClosed + ' | places ' + txt(card().querySelector('.cal-places')) + ' | Enter online ' + !!card().querySelector('[data-act="cal-ent-new"]') + ' | Edit ' + !!card().querySelector('[data-act="cal-ent-edit"]') + ' | Withdraw ' + !!card().querySelector('[data-act="cal-ent-withdraw"]'));
+  `));
+  out.push(...await run2(`
+    // the sheet: the event's Entries section as saved; another format has none
+    await S.store.setCal('cEnt', Object.assign(await S.store.getCal('cEnt'), { closesAt: new Date(day(1) + 'T23:59:59.999').getTime() }));
+    S.calPage.cache = {}; S.calPage.deepFor = null; await go('calendar'); await go('calendar.cEnt'); await w(250);
+    q('#cal-cEnt [data-act="cal-ev-edit"]').click(); await w(150);
+    L.push('sheet entries: ' + txt(q('#modal .cal-ent-set .eyebrow')) + ' | ticks ' + qa('#modal .cal-ent-set input[type="checkbox"]').map(x => txt(x.parentElement) + '=' + x.checked).join(',') + ' | places ' + q('#modal [data-cal="places"]').value
+      + ' | closes ' + (q('#modal [data-cal="closes"]').value === day(1)) + ' | max ' + (q('#modal [data-cal="closes"]').max === day(6)) + ' | placeholder ' + q('#modal [data-cal="places"]').placeholder);
+    q('#modal [data-cal="closes"]').value = day(9); q('#modal [data-cal="closes"]').dispatchEvent(new Event('input', { bubbles: true }));
+    type('#modal [data-cal="places"]', '');
+    q('#modal [data-act="cal-save"]').click(); await w(300);
+    const e5 = await S.store.getCal('cEnt');
+    L.push('sheet saved: places ' + e5.places + ' | closes clamped to the event ' + (calYmd => calYmd === day(6))((d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'))(new Date(e5.closesAt))) + ' | approve ' + e5.approve + ' | shown ' + e5.showEntrants);
+    S.calPage.deepFor = null; await go('calendar'); await go('calendar.cEnt'); await w(250);
+    L.push('no limit: ' + txt(q('#cal-cEnt .cal-places')) + ' | meter ' + !!q('#cal-cEnt .cal-ent .meter'));
+    q('#cal-cEnt [data-act="cal-ev-edit"]').click(); await w(150); q('#modal [data-act="cal-fmt"][data-k="other"]').click(); await w(100);
+    L.push('other format: ' + txt(q('#modal .cal-ent-set')) + ' | tick ' + !!q('#modal [data-cal="online"]'));
+    q('#modal [data-act="close"]').click(); await w(60);
+    // a new event: unticked; ticking it shows the rest, closing the day before
+    q('[data-act="cal-ev-new"]').click(); await w(150); q('#modal [data-act="cal-fmt"][data-k="triples"]').click(); await w(60); type('#modal [data-cal="date"]', day(8));
+    const before = !!q('#modal [data-cal="places"]'); q('#modal [data-cal="online"]').click(); await w(100);
+    L.push('new event sheet: online ' + q('#modal [data-cal="online"]').checked + ' | fields before tick ' + before + ' | closes default ' + (q('#modal [data-cal="closes"]').value === day(7)));
+    q('#modal [data-act="close"]').click(); await w(60);
+    // French
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="fr"]').click(); await w(200);
+    L.push('fr entries: ' + txt(q('#cal-cEnt .cal-places')) + ' | ' + txt(q('#cal-cEnt [data-act="cal-ent-new"]')) + ' | ' + txt(q('#cal-cEnt .cal-mine-ent h4')) + ' | ' + qa('#cal-cEnt .cal-ent-state').map(txt).join(' / '));
     q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
   `));
   console.log(out.join('\n'));

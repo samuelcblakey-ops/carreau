@@ -6,6 +6,8 @@
 // admin's hide from the page: allowed for the admin, refused for anyone else; the organiser's Setup panel says so.
 // Season Calendar 3 (calendar-own-events): an event added from the page, its organiser link (join, wrong code), "Your listings"
 // (hidden ones marked), and the event rules, with organiser login off and on.
+// Season Calendar 4 (calendar-entry-form): the #admin site switch (Off by default), the entry form, "Your entries", the queue,
+// approval, "Who's entered", and the rules for entries, teams and contacts (written together in one batch).
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -216,5 +218,96 @@ const { chromium } = require('playwright');
   await E.click('#cal-' + cid + ' [data-act="cal-page-remove"]'); await w(300); await E.click('#cal-' + cid + ' [data-act="cal-page-remove-yes"]');
   const removed = await toastOf(E, /Taken off|organisers|didn't save/); await w(1500);
   log('web event remove: ' + removed + ' | read', await raw(AD, 'get', 'calendar/' + cid), '| code', await raw(AD, 'get', 'calendar/' + cid + '/private/code'));
+
+  // ---- Season Calendar 4 (calendar-entry-form): players enter online ----
+  const okB = (p, ops) => p.evaluate(async ops => { try { await window.__testRaw.batch(ops); return true; } catch (e) { return false; } }, ops);
+  const entOps = (c, eid, uid, status, players = ['Raw One', 'Raw Two']) => [['set', `calendar/${c}/entries/${eid}`, Object.assign({ uid, at: '__now', status }, status === 'in' ? { queuedAt: '__now' } : {})],
+    ['set', `calendar/${c}/teams/${eid}`, { name: '', players, club: '' }], ['set', `calendar/${c}/contacts/${eid}`, { contact: '07700 900000' }]];
+  const entFields = { online: true, places: 2, closesAt: Date.now() + 2 * 864e5, approve: false, showEntrants: false };
+  const EO = await mk('entryOrganiser'); await EO.goto(W + '#calendar'); await w(3500); const eoUid = await EO.evaluate(() => window.__testUid());
+  log('entry listing:', await raw(EO, 'set', 'calendar/cEnt1', evDoc('cEnt1', eoUid, Object.assign({ name: 'Henlow Entry Doubles', fmt: 'doubles' }, entFields))));
+  const P1 = await mk('player1', 390); const p1Uid = await (async () => { await P1.goto(W + '#calendar.cEnt1'); await w(4500); return P1.evaluate(() => window.__testUid()); })();
+  const shown = p => p.evaluate(() => !!document.querySelector('#cal-cEnt1 [data-act="cal-ent-new"]'));
+  log('switch off: Enter online shown', await shown(P1), '| create refused', !(await okB(P1, entOps('cEnt1', p1Uid + '_1', p1Uid, 'in'))));
+  // the admin turns it on in #admin (Off until then)
+  await AD.goto(W + '#admin'); await AD.reload(); await w(4500);
+  const swOff = await txt(AD, '#adm-cal-entry .pill');
+  await AD.click('#adm-cal-entry [data-act="cal-entry-mode"][data-mode="all"]'); const swToast = await toastOf(AD, /online entry/); await w(1000);
+  log('admin switch: default ' + swOff + ' | ' + swToast + ' | saved', (await AD.evaluate(() => window.__testRaw.get('config/site'))).calendarEntry, '| pill', await txt(AD, '#adm-cal-entry .pill'));
+  const openCard = async p => { await p.goto(W + '#calendar.cEnt1'); await p.reload(); await w(4500); };
+  const enter = async (p, players, team) => {
+    await p.click('#cal-cEnt1 [data-act="cal-ent-new"]'); await w(400);
+    if (team) await p.fill('#modal [data-calent="name"]', team);
+    for (let i = 0; i < players.length; i++) await p.fill(`#modal [data-calent="p${i}"]`, players[i]);
+    await p.fill('#modal [data-calent="contact"]', 'player@example.com');
+    await p.click('#modal [data-act="cal-ent-send"]'); const t = await toastOf(p, /Entry sent|closed|didn't save|already/); await w(1500); return t; };
+  const states = p => p.evaluate(() => [...document.querySelectorAll('#cal-cEnt1 .cal-ent-row')].map(r => r.dataset.eid.split('_').pop() + ' ' + r.querySelector('.cal-ent-state').textContent.trim()));
+  await openCard(P1);
+  await P1.click('#cal-cEnt1 [data-act="cal-ent-new"]'); await w(400);
+  await P1.fill('#modal [data-calent="name"]', 'Les Boulistes'); await P1.fill('#modal [data-calent="p0"]', 'Ann Lee'); await P1.fill('#modal [data-calent="p1"]', 'Bob Fox'); await P1.fill('#modal [data-calent="contact"]', '07700 900111');
+  const wide = await P1.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+  if (process.env.OUT) await P1.screenshot({ path: process.env.OUT + '/calendar-entry-form-web-390.png' });
+  await P1.click('#modal [data-act="cal-ent-send"]'); const sent = await toastOf(P1, /Entry sent|closed|didn't save/); await w(2000);
+  const e1 = await P1.evaluate(id => window.__testRaw.get('calendar/cEnt1/entries/' + id), p1Uid + '_1');
+  log('entry: ' + sent + ' | status ' + e1?.status + ' | place ' + ((await states(P1))[0] || '').replace(/^1 You have a place \((\d+) of (\d+)\)$/, '$1 of $2'));
+  log('entry more: at server time', typeof e1?.at?.toMillis === 'function' || typeof e1?.at?.seconds === 'number', '| listing has no contact', !JSON.stringify(await raw(P1, 'get', 'calendar/cEnt1')).includes('07700'),
+    '| team', JSON.stringify(await P1.evaluate(id => window.__testRaw.get('calendar/cEnt1/teams/' + id), p1Uid + '_1')));
+  log('phone 390: form no sideways scroll', !wide);
+  await enter(P1, ['Cat Ray', 'Dan Oak']); await enter(P1, ['Eve Ash', 'Fay Elm'], 'Third Team');
+  const third = (await states(P1)).find(x => x.startsWith('3 ')) || '';
+  await P1.evaluate(() => document.querySelector('#cal-cEnt1 .cal-mine-ent')?.scrollIntoView()); await w(300);
+  if (process.env.OUT) await P1.screenshot({ path: process.env.OUT + '/calendar-your-entries-web-390.png' });
+  await P1.click(`#cal-cEnt1 [data-act="cal-ent-withdraw"][data-eid="${p1Uid}_1"]`); await w(200); await P1.click('#cal-cEnt1 [data-act="cal-ent-withdraw-yes"]');
+  const wd = await toastOf(P1, /withdrawn|didn't save/); await w(2000);
+  log('queue: third entry ' + third.slice(2) + ' | first withdraws: third has a place', (await states(P1)).includes('3 You have a place (2 of 2)'), '| ' + wd + ' | docs gone',
+    await raw(P1, 'get', `calendar/cEnt1/entries/${p1Uid}_1`), await raw(P1, 'get', `calendar/cEnt1/teams/${p1Uid}_1`), await raw(P1, 'get', `calendar/cEnt1/contacts/${p1Uid}_1`));
+  // privacy (names not shown yet)
+  const bTeamOff = await ok(B, 'get', `calendar/cEnt1/teams/${p1Uid}_2`);
+  // approval on: a new entry waits until the organiser accepts it
+  log('approve on listing:', await ok(EO, 'update', 'calendar/cEnt1', { approve: true, updatedAt: Date.now() }));
+  const P2 = await mk('player2', 390); await openCard(P2); const p2Uid = await P2.evaluate(() => window.__testUid());
+  await enter(P2, ['Gus Hay', 'Hal Ivy'], 'Waiting Team');
+  const pend = (await P2.evaluate(id => window.__testRaw.get('calendar/cEnt1/entries/' + id), p2Uid + '_1'))?.status;
+  const pendState = ((await states(P2))[0] || '').slice(2);
+  const selfIn = await okB(P2, [['update', `calendar/cEnt1/entries/${p2Uid}_1`, { status: 'in', queuedAt: '__now' }]]);
+  const accept = await okB(EO, [['update', `calendar/cEnt1/entries/${p2Uid}_1`, { status: 'in', queuedAt: '__now' }]]);
+  log('approve on: status ' + pend + ' | ' + pendState + ' | organiser accepts: ' + (accept ? (await EO.evaluate(id => window.__testRaw.get('calendar/cEnt1/entries/' + id), p2Uid + '_1'))?.status : 'refused') + ' | entrant sets in itself', selfIn);
+  // another pending entry, then names shown on the listing
+  const P3 = await mk('player3', 390); await openCard(P3); const p3Uid = await P3.evaluate(() => window.__testUid());
+  await enter(P3, ['Ida Jay', 'Jon Kim'], 'Pending Team');
+  await ok(EO, 'update', 'calendar/cEnt1', { showEntrants: true, updatedAt: Date.now() });
+  log('privacy: stranger reads contact', await ok(B, 'get', `calendar/cEnt1/contacts/${p1Uid}_2`), '| stranger reads team (shown off)', bTeamOff, '| stranger reads team (shown on)', await ok(B, 'get', `calendar/cEnt1/teams/${p1Uid}_2`),
+    '| organiser reads contact', await ok(EO, 'get', `calendar/cEnt1/contacts/${p1Uid}_2`), '| entrant reads own contact', await ok(P1, 'get', `calendar/cEnt1/contacts/${p1Uid}_2`));
+  log('privacy more: stranger lists contacts', await B.evaluate(async () => { try { await window.__testRaw.list('calendar/cEnt1/contacts'); return true; } catch { return false; } }),
+    '| organiser lists contacts', await EO.evaluate(async () => { try { return (await window.__testRaw.list('calendar/cEnt1/contacts')).length; } catch { return 'refused'; } }),
+    '| entrant reads another contact', await ok(P2, 'get', `calendar/cEnt1/contacts/${p1Uid}_2`));
+  await openCard(B); await B.click('#cal-cEnt1 .cal-who-list summary'); await w(500);
+  const who = await B.evaluate(() => { const l = document.querySelector('#cal-cEnt1 .cal-who-list'); return { n: l?.querySelector('.cal-who-ol')?.children.length || 0, wait: !!l?.querySelector('.cal-wait-h'), text: (l?.textContent || '') }; });
+  log("who's entered: " + who.n + ' listed | waiting list heading ' + who.wait + ' | pending not listed ' + (!who.text.includes('Pending Team') && who.text.includes('Waiting Team')));
+  await B.evaluate(() => document.querySelector('#cal-cEnt1 .cal-who-list')?.scrollIntoView()); await w(300);
+  if (process.env.OUT) await B.screenshot({ path: process.env.OUT + '/calendar-whos-entered-web.png' });
+  // limits
+  const sixth = await okB(P1, entOps('cEnt1', p1Uid + '_6', p1Uid, 'pending'));
+  const otherUid = await okB(P1, entOps('cEnt1', p2Uid + '_4', p1Uid, 'pending'));
+  await ok(AD, 'update', 'calendar/cEnt1', { hidden: true, hiddenAt: Date.now() });
+  const onHidden = await okB(P2, entOps('cEnt1', p2Uid + '_2', p2Uid, 'pending'));
+  await ok(AD, 'update', 'calendar/cEnt1', { hidden: false });
+  await ok(EO, 'update', 'calendar/cEnt1', { closesAt: Date.now() - 1000, updatedAt: Date.now() });
+  const afterClose = await okB(P2, entOps('cEnt1', p2Uid + '_2', p2Uid, 'pending'));
+  const editClosed = await okB(P1, [['set', `calendar/cEnt1/teams/${p1Uid}_2`, { name: 'Late', players: ['Cat Ray', 'Dan Oak'], club: '' }]]);
+  const withdrawClosed = await okB(P3, [['del', `calendar/cEnt1/entries/${p3Uid}_1`], ['del', `calendar/cEnt1/teams/${p3Uid}_1`], ['del', `calendar/cEnt1/contacts/${p3Uid}_1`]]);
+  await ok(EO, 'update', 'calendar/cEnt1', { closesAt: Date.now() + 2 * 864e5, updatedAt: Date.now() });
+  // a EuroCup competition's listing can't take entries online
+  await A.goto(W); await w(3500); const tid7 = await newComp(A, { name: 'EuroCup listing', date: day(14) });
+  const Leu = Object.assign({}, L, { tid: tid7, name: 'EuroCup listing', date: day(14), fmt: 'eurocup', updatedAt: Date.now() }, entFields); delete Leu.hiddenAt;
+  const euOn = await ok(A, 'set', 'calendar/' + tid7, Leu), euOff = await ok(A, 'set', 'calendar/' + tid7, Object.assign({}, Leu, { online: false }));
+  log('limits: sixth entry from one device', sixth, '| entry after close', afterClose, '| entry on hidden listing', onHidden, '| eurocup listing online', euOn);
+  log('limits more: eurocup listing without online entry', euOff, '| another device\'s id', otherUid, '| withdraw after close', withdrawClosed,
+    '| entry without a contact', await okB(P2, entOps('cEnt1', p2Uid + '_3', p2Uid, 'pending').slice(0, 2)), '| team with 4 players', await okB(P2, entOps('cEnt1', p2Uid + '_3', p2Uid, 'pending', ['a', 'b', 'c', 'd'])),
+    '| status in on an approve listing', await okB(P2, entOps('cEnt1', p2Uid + '_3', p2Uid, 'in')));
+  log('entrant edits after close', editClosed, '| entrant changes status', await okB(P1, [['update', `calendar/cEnt1/entries/${p1Uid}_2`, { status: 'pending' }]]),
+    '| stranger deletes another entry', await ok(B, 'del', `calendar/cEnt1/entries/${p1Uid}_2`));
+  log('organiser removes an entry', await okB(EO, [['del', `calendar/cEnt1/entries/${p1Uid}_2`], ['del', `calendar/cEnt1/teams/${p1Uid}_2`], ['del', `calendar/cEnt1/contacts/${p1Uid}_2`]]),
+    '| entrant sees: ' + await (async () => { await openCard(P1); return txt(P1, '#cal-cEnt1 .cal-ent-gone'); })());
   log('errs', errs); await b.close();
 })();

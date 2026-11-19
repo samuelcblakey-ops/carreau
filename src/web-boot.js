@@ -5,7 +5,7 @@
 // Helpers open a link containing the code (or type it in) and their device is remembered as a member.
 const ADMIN_EMAILS = ["samuelcblakey@gmail.com"]; // site admins (enforced in firestore.rules too)
 const isAdmin = () => !!(AUTH.user && !AUTH.user.isAnonymous && ADMIN_EMAILS.includes((AUTH.user.email || "").toLowerCase()));
-const SITE = { openTesting: true, teamScoring: false, teamComps: {}, streaming: false, organiserLogin: false, cleanupAuto: false, cleanupLast: null, loaded: false }; // streaming: false | "admin" | true // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
+const SITE = { openTesting: true, teamScoring: false, teamComps: {}, streaming: false, calendarEntry: false, organiserLogin: false, cleanupAuto: false, cleanupLast: null, loaded: false }; // calendarEntry: false | "admin" | true (Season Calendar online entry, off by default) // streaming: false | "admin" | true // teamScoring: false | "admin" | true // site settings (config/site); open testing is the beta default
 const CONFIGURED = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("PASTE");
 const AUTH = { user: null, ready: false };
 // organiser login (site switch, off by default): this device's code and what it unlocks; the admin's list of codes
@@ -164,6 +164,30 @@ function fbStore() {
     // the events this device added, hidden ones included ("Your listings")
     listMyCal() { return AUTH.user ? getDocs(query(collection(db, "calendar"), where("ownerUid", "==", AUTH.user.uid), limit(100))).then(s => s.docs.map(d => d.data())) : Promise.resolve([]); },
     async deleteCalEvent(cid) { try { await deleteDoc(doc(db, "calendar", cid, "private", "code")); } catch {} await track(deleteDoc(doc(db, "calendar", cid))); calForget(cid); },
+    // online entries (calendar-entry-form): the public entry documents (no names; times are the server's, in ms), and the team
+    // names when the listing shows who's entered (the rules refuse them otherwise)
+    watchCalEntries(cid, cb, onErr) {
+      const ms = v => v && typeof v.toMillis === "function" ? v.toMillis() : typeof v === "number" ? v : 0;
+      return onSnapshot(collection(db, "calendar", cid, "entries"), s => cb(s.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" });
+        return { id: d.id, uid: x.uid || "", status: x.status || "", at: ms(x.at), queuedAt: ms(x.queuedAt) }; }), { fromCache: s.metadata.fromCache }), onErr);
+    },
+    watchCalTeams(cid, cb, onErr) { return onSnapshot(collection(db, "calendar", cid, "teams"), s => { const m = {}; s.docs.forEach(d => { m[d.id] = d.data(); }); cb(m); }, onErr); },
+    // this device's own entry, to edit it: its names and contact
+    async getCalEntry(cid, eid) {
+      const [tm, c] = await Promise.all([getDocFromServer(doc(db, "calendar", cid, "teams", eid)), getDocFromServer(doc(db, "calendar", cid, "contacts", eid))]);
+      return tm.exists() ? { team: tm.data(), contact: c.exists() ? c.data().contact || "" : "" } : null;
+    },
+    // the three documents in one batch (the rules check each against the others with existsAfter)
+    addCalEntry(cid, eid, entry, team, contact) {
+      const b = writeBatch(db), now = serverTimestamp();
+      b.set(doc(db, "calendar", cid, "entries", eid), Object.assign({ uid: entry.uid, at: now, status: entry.status }, entry.status === "in" ? { queuedAt: now } : {}));
+      b.set(doc(db, "calendar", cid, "teams", eid), clone(team)); b.set(doc(db, "calendar", cid, "contacts", eid), { contact });
+      return track(b.commit());
+    },
+    updateCalEntry(cid, eid, team, contact) {
+      const b = writeBatch(db); b.set(doc(db, "calendar", cid, "teams", eid), clone(team)); b.set(doc(db, "calendar", cid, "contacts", eid), { contact }); return track(b.commit());
+    },
+    withdrawCalEntry(cid, eid) { const b = writeBatch(db); ["entries", "teams", "contacts"].forEach(k => b.delete(doc(db, "calendar", cid, k, eid))); return track(b.commit()); },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },
@@ -227,6 +251,8 @@ S.calAdmin = () => isAdmin();
 S.calJoined = calJoined;
 S.calCanEdit = e => !!(AUTH.user && e && e.kind === "event") && (isAdmin() || calJoined().includes(e.id)
   || (loginMode() ? orgActive() && !!e.orgCode && e.orgCode === ORG.code : e.ownerUid === AUTH.user.uid));
+// Season Calendar online entry is a site switch: Off / Admin only / Everyone (config/site.calendarEntry, enforced in firestore.rules)
+S.calEntryOn = () => SITE.calendarEntry === true || (SITE.calendarEntry === "admin" && isAdmin());
 S.hofWho = () => ({ byUid: AUTH.user?.uid || "", byCode: orgActive() ? ORG.code : "" });
 // live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
 S.liveRole = t => !!(t && ROLE[t.id] === "live");
@@ -407,6 +433,12 @@ S.extraAction = async (act, a) => {
   if (act === "streaming-mode") {
     const mode = a.dataset.mode; const on = mode === "all" ? true : mode === "admin" ? "admin" : false;
     try { await setDoc(doc(FB.db, "config", "site"), { streaming: on, updated: Date.now() }, { merge: true }); toast(on === true ? "Competition game overlays are on for everyone." : on === "admin" ? "Competition game overlays are on for you only." : "Competition game overlays are switched off."); }
+    catch (e) { console.error(e); toast("That setting didn't save."); }
+    return;
+  }
+  if (act === "cal-entry-mode") {
+    const mode = a.dataset.mode; const on = mode === "all" ? true : mode === "admin" ? "admin" : false;
+    try { await setDoc(doc(FB.db, "config", "site"), { calendarEntry: on, updated: Date.now() }, { merge: true }); toast(on === true ? "Season Calendar online entry is on for everyone." : on === "admin" ? "Season Calendar online entry is on for you only." : "Season Calendar online entry is switched off."); }
     catch (e) { console.error(e); toast("That setting didn't save."); }
     return;
   }
@@ -882,6 +914,11 @@ function adminView() {
       <p class="muted">The Stream tab (stand-alone streams: type two team names, get the overlay and live desk) is open to everyone. This switch adds the competition's own games to that tab, with overlays and live desks fed by the competition's scores. ${SITE.streaming === true ? "Currently on for every organiser." : SITE.streaming === "admin" ? "Currently only you see it." : "Currently hidden, and the rules refuse live-score writes on competition games."}</p>
       <div class="seg" role="group" aria-label="Streaming">${[["off", "Off"], ["admin", "Admin only"], ["all", "Everyone"]].map(([m, l]) => `<button type="button" data-act="streaming-mode" data-mode="${m}" aria-pressed="${(SITE.streaming === true ? "all" : SITE.streaming === "admin" ? "admin" : "off") === m}">${l}</button>`).join("")}</div>
     </div>
+    <div class="panel stack" id="adm-cal-entry">
+      <div class="spread"><h3>Season Calendar online entry</h3><span class="pill ${SITE.calendarEntry ? "playing" : ""}">${SITE.calendarEntry === true ? "Everyone" : SITE.calendarEntry === "admin" ? "Admin only" : "Off"}</span></div>
+      <p class="muted">Players enter a competition from its Season Calendar listing and see whether they have a place. ${SITE.calendarEntry === true ? "Currently on for everyone." : SITE.calendarEntry === "admin" ? "Currently only you see it." : "Currently hidden, and the rules refuse entries."}</p>
+      <div class="seg" role="group" aria-label="Season Calendar online entry">${[["off", "Off"], ["admin", "Admin only"], ["all", "Everyone"]].map(([m, l]) => `<button type="button" data-act="cal-entry-mode" data-mode="${m}" aria-pressed="${(SITE.calendarEntry === true ? "all" : SITE.calendarEntry === "admin" ? "admin" : "off") === m}">${l}</button>`).join("")}</div>
+    </div>
     ${usagePanel()}
     ${cleanupPanel()}
     <div class="panel stack" style="gap:6px" id="adm-creators">
@@ -1062,6 +1099,7 @@ function watchSite() {
     const was = SITE.openTesting, wasLogin = SITE.organiserLogin;
     SITE.organiserLogin = d.exists() ? d.data().organiserLogin === true : false;
     SITE.openTesting = d.exists() ? d.data().openTesting !== false : true; SITE.teamScoring = d.exists() ? (d.data().teamScoring === true ? true : d.data().teamScoring === "admin" ? "admin" : false) : false; SITE.teamComps = d.exists() ? (d.data().teamScoringComps || {}) : {}; SITE.streaming = d.exists() ? (d.data().streaming === true ? true : d.data().streaming === "admin" ? "admin" : false) : false;
+    SITE.calendarEntry = d.exists() ? (d.data().calendarEntry === true ? true : d.data().calendarEntry === "admin" ? "admin" : false) : false;
     SITE.featuredMoved = d.exists() ? (d.data().featuredMoved || null) : null;
     SITE.cleanupAuto = d.exists() ? d.data().cleanupAuto === true : false; SITE.cleanupLast = d.exists() ? (d.data().cleanupLast || null) : null; SITE.loaded = true;
     autoCleanup(); moveToFeatured();
@@ -1155,6 +1193,10 @@ function boot() {
     // raw reads and writes, to check the security rules directly
     window.__testRaw = { set: (path, data) => setDoc(doc(FB.db, ...path.split("/")), data), update: (path, data) => updateDoc(doc(FB.db, ...path.split("/")), data),
       get: path => getDocFromServer(doc(FB.db, ...path.split("/"))).then(d => d.exists() ? d.data() : null), del: path => deleteDoc(doc(FB.db, ...path.split("/"))),
+      // several writes in one batch: [[op, path, data]], op "set" | "update" | "del"; a value "__now" becomes the server time
+      batch: ops => { const b = writeBatch(FB.db), now = v => v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, x === "__now" ? serverTimestamp() : x])) : v;
+        ops.forEach(([op, path, data]) => { const r = doc(FB.db, ...path.split("/")); if (op === "del") b.delete(r); else if (op === "update") b.update(r, now(data)); else b.set(r, now(data)); }); return b.commit(); },
+      list: path => getDocs(collection(FB.db, ...path.split("/"))).then(s => s.docs.map(d => d.id)),
       hofShown: () => getDocs(query(collection(FB.db, "hallOfFame"), where("hidden", "==", false), limit(20))).then(s => s.docs.map(d => d.id)),
       hofAll: () => getDocs(query(collection(FB.db, "hallOfFame"), limit(20))).then(s => s.docs.map(d => d.id)) };
   }
