@@ -136,6 +136,8 @@ function fbStore() {
         return new Promise((res, rej) => { let u = null; u = onSnapshot(doc(db, "calendar", cid), d => { setTimeout(() => u && u()); res(d.exists() ? d.data() : null); }, rej); });
       });
     },
+    // one competition, read once (the Season Calendar's listing checks whether it has a draw yet)
+    getTournament(tid) { return getDocFromServer(doc(db, "tournaments", tid)).then(d => d.exists() ? d.data() : null); },
     // shown listings only (the rules refuse anything else), for one country or all; equality filters only, so no index is needed
     listCal({ country } = {}) {
       const c = [where("hidden", "==", false)]; if (country) c.push(where("country", "==", country));
@@ -197,6 +199,8 @@ S.canCreate = () => !!AUTH.user && (!loginMode() || isAdmin() || orgActive());
 S.hofCanPublish = t => !!(AUTH.user && t) && (isAdmin() || (!t.archived && !t.listed && (isOwner(t) || ROLE[t.id] === "edit" || (orgActive() && !!t.orgCode && t.orgCode === ORG.code))));
 // Season Calendar: the same people list a competition (enforced in firestore.rules, match /calendar/{cid})
 S.calCanPublish = t => S.hofCanPublish(t);
+// the Season Calendar page: the admin can hide a listing, or show it again (firestore.rules lets only the admin change hidden)
+S.calAdmin = () => isAdmin();
 S.hofWho = () => ({ byUid: AUTH.user?.uid || "", byCode: orgActive() ? ORG.code : "" });
 // live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
 S.liveRole = t => !!(t && ROLE[t.id] === "live");
@@ -1049,7 +1053,7 @@ async function handleHash() {
   const lr = parseLiveHash(); S.liveRoute = lr; S.overlayView = null; S.picker = false;
   if (lr) {
     if (lr.sid) { if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingStreamJoin = { sid: lr.sid, code: lr.code }; } watchStream(lr.sid); liveWatch(); render(); return; }
-    if (lr.view === "streams" || lr.view === "hof") { liveWatch(); render(); return; }
+    if (lr.view === "streams" || lr.view === "hof" || lr.view === "cal") { liveWatch(); render(); return; }
     if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingLiveJoin = { tid: lr.tid, code: lr.code }; }
     if (lr.tid !== S.tid) { S.tid = lr.tid; S.matches = {}; restart(); } else if (S.pendingLiveJoin) watchRole();
     liveWatch(); render(); return;
@@ -1099,9 +1103,9 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__
 }
 
 function boot() {
-  // a stream link (#s.<id>.stream, #streams, #halloffame) names no competition: reading it as one ("s") watched a competition
+  // a stream link (#s.<id>.stream, #streams, #halloffame, #calendar) names no competition: reading it as one ("s") watched a competition
   // that doesn't exist, which the rules refuse ("Missing or insufficient permissions")
-  const h = readHash(), lr = parseLiveHash(); if (!lr && h.tid && !["admin", "login", "guides", "halloffame"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
+  const h = readHash(), lr = parseLiveHash(); if (!lr && h.tid && !["admin", "login", "guides", "halloffame", "calendar"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
   if (lr) { if (lr.tid) S.tid = lr.tid; S.liveRoute = lr; }
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);

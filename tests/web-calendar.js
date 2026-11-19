@@ -2,6 +2,8 @@
 // with the organiser link can update it; another visitor (even with open testing on) can read a shown listing but can't
 // list, change or remove it; an organiser can't hide a listing, list an example or an archived competition, or save a bad
 // level. Archiving marks the listing gone; the admin's restore in #admin unmarks it.
+// Season Calendar 2 (calendar-page): a visitor's page and listing (Follow the draw once the competition is drawn), and the
+// admin's hide from the page: allowed for the admin, refused for anyone else; the organiser's Setup panel says so.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -89,5 +91,43 @@ const { chromium } = require('playwright');
   await A.goto(process.env.WEB_URL + '#' + tid); await w(3500); await A.click('[data-tab="setup"]'); await w(1500);
   await A.click('[data-cal-panel] [data-act="cal-remove"]'); await w(200); await A.click('[data-act="cal-remove-yes"]'); await w(1500);
   log('web remove:', await txt(A, '#toast'), '| read', await raw(A, 'get', 'calendar/' + tid));
+
+  // ---- Season Calendar 2 (calendar-page): the public page, its link to the competition, and the admin's hide ----
+  const tid5 = await newComp(A, { name: 'Baldock Autumn Triples', venue: 'Baldock PC', date: day(6), format: 'triples' });
+  const L5 = Object.assign({}, L, { tid: tid5, name: 'Baldock Autumn Triples', venue: 'Baldock PC', date: day(6), howTo: 'Enter at the club bar', note: '', updatedAt: Date.now() });
+  delete L5.hiddenAt;
+  log('web page listing:', await raw(A, 'set', 'calendar/' + tid5, L5));
+  const V = await mk('visitor', 390); await V.goto(process.env.WEB_URL + '#calendar'); await w(4500);
+  const onPage = p => p.evaluate(t => !!document.querySelector('#cal-' + t), tid5);
+  log('web page: title', await txt(V, 'main h2'), '| listed', await onPage(V), '| no competition watched', await V.evaluate(() => !window.__carreau.S.tid), '| wide', await V.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1));
+  await V.click('#cal-' + tid5); await w(2000);
+  const fd = () => V.evaluate(t => { const c = document.querySelector('#cal-' + t + '.cal-card'); return { follow: !!c?.querySelector('a.primary[href="#' + t + '"]'), view: !!c?.querySelector('a.btn[href="#' + t + '"]:not(.primary)'), how: c?.querySelector('h4')?.textContent }; }, tid5);
+  const before = await fd();
+  await A.evaluate(t => window.__testRaw.update('tournaments/' + t, { draws: [{ id: 'R1', kind: 'round', at: Date.now() }] }), tid5); await w(800);
+  await V.click(`#cal-${tid5} [data-act="cal-close-entry"]`); await w(200); await V.click('#cal-' + tid5); await w(2000);
+  const after = await fd();
+  log('web open listing: How to enter', before.how === 'How to enter', '| Follow the draw', before.follow, 'before draw | view', before.view, '| Follow the draw', after.follow, 'after draw');
+  if (process.env.OUT) await V.screenshot({ path: process.env.OUT + '/calendar-web-listing-390.png' });
+  await V.goto(process.env.WEB_URL + '#calendar.' + tid5); await V.reload(); await w(4000);
+  log('web deep link: opens', await V.evaluate(t => !!document.querySelector('#cal-' + t + '.cal-card.hof-focus'), tid5), '| strip for visitor', await V.evaluate(() => !!document.querySelector('.cal-admin')));
+  // a stranger can't hide it; the admin hides it from the page, and it drops off at once
+  const strangerHide = await ok(V, 'update', 'calendar/' + tid5, { hidden: true, hiddenAt: Date.now() });
+  await AD.goto(process.env.WEB_URL + '#calendar.' + tid5); await w(4000);
+  const strip = await txt(AD, '#cal-' + tid5 + ' .cal-admin');
+  await AD.click(`#cal-${tid5} [data-act="cal-hide"]`); await w(2000);
+  const H = await AD.evaluate(t => window.__testRaw.get('calendar/' + t), tid5);
+  const goneAdmin = !(await onPage(AD));
+  await V.goto(process.env.WEB_URL + '#calendar'); await V.reload(); await w(4000); const goneV = !(await onPage(V));
+  await V.goto(process.env.WEB_URL + '#calendar.' + tid5); await V.reload(); await w(3500); const notice = await txt(V, 'main .notice');
+  await A.goto(process.env.WEB_URL + '#' + tid5); await w(3500); await A.click('[data-tab="setup"]'); await w(1500);
+  const panel = await txt(A, '[data-cal-panel]');
+  log('admin hide: hidden', H.hidden === true && typeof H.hiddenAt === 'number', '| gone from page', goneAdmin && goneV, '| organiser notice', panel.includes('Hidden from the Season Calendar by the site admin.'), '| stranger hides', strangerHide);
+  log('admin hide more: strip', strip, '| visitor link', notice, '| organiser panel', panel);
+  log('rules hide: admin bad hiddenAt', await ok(AD, 'update', 'calendar/' + tid5, { hiddenAt: 'yesterday' }), '| organiser unhides', await ok(A, 'update', 'calendar/' + tid5, { hidden: false }), '| stranger unhides', await ok(V, 'update', 'calendar/' + tid5, { hidden: false }));
+  // the admin shows it again from its link; the organiser can still remove a listing
+  await AD.goto(process.env.WEB_URL + '#calendar.' + tid5); await AD.reload(); await w(4500);
+  const showBtn = await txt(AD, `#cal-${tid5} [data-act="cal-hide"]`);
+  await AD.click(`#cal-${tid5} [data-act="cal-hide"]`); await w(2000);
+  log('admin show again:', showBtn, '| hidden', (await AD.evaluate(t => window.__testRaw.get('calendar/' + t), tid5)).hidden, '| organiser removes', await ok(A, 'del', 'calendar/' + tid5));
   log('errs', errs); await b.close();
 })();
