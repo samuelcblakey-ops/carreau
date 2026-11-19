@@ -27,12 +27,32 @@ const { chromium } = require('playwright');
   await seed('cuTpl', 'CU old template', 40, { template: true });
   await seed('cuDrawn', 'CU old drawn', 15, { brackets: [{ id: 'k1', name: 'Main' }] });
   await seed('cuStale', 'CU stale copy', 9);
+  // Season Calendar (calendar-cleanup): listings dated more than 30 days ago go with everything under them, hidden ones too.
+  // Clear any old listing left by an earlier run or another test first, so the count is this test's own.
+  const docPath = n => n.slice(n.indexOf('/documents/') + 11);
+  const cut = ymd(now - 30 * DAY);
+  for (const d of ((await (await fetch(`${REST}/calendar?pageSize=300`, { headers: H })).json()).documents || []))
+    if ((d.fields?.date?.stringValue || '9') < cut) await fetch(`${REST}/${docPath(d.name)}`, { method: 'DELETE', headers: H });
+  const putDoc = (path, f) => fetch(`${REST}/${path}`, { method: 'PATCH', headers: H, body: JSON.stringify({ fields: Object.fromEntries(Object.entries(f).map(([k, v]) => [k, val(v)])) }) });
+  const calDoc = (id, days, extra = {}) => putDoc('calendar/' + id, { kind: 'event', id, name: 'CU listing ' + id, date: ymd(now + days * DAY), country: 'GB', hidden: false, ownerUid: 'visitor-x', orgCode: '', ...extra });
+  await seed('cuCalComp', 'CU calendar competition', 41, { teams: [team(1), team(2)], date: ymd(now - 40 * DAY) });
+  await putDoc('calendar/cuCalComp', { kind: 'comp', tid: 'cuCalComp', name: 'CU calendar competition', date: ymd(now - 40 * DAY), country: 'GB', hidden: true });
+  for (const k of ['entries', 'teams', 'contacts']) await putDoc(`calendar/cuCalComp/${k}/visitor-x_1`, k === 'entries' ? { uid: 'visitor-x', status: 'in' } : k === 'teams' ? { name: '', players: ['Ann Lea'] } : { contact: '07700 900000' });
+  await putDoc('calendar/cuCalComp/members/visitor-y', { role: 'edit', code: 'ABCDEF', joinedAt: now });
+  await putDoc('calendar/cuCalComp/private/code', { code: 'ABCDEF' });
+  await calDoc('cuCal29', -29); await calDoc('cuCalFut', 10);
+  const calN = async k => ((await (await fetch(`${REST}/calendar/cuCalComp/${k}`, { headers: H })).json()).documents || []).length;
+  const calHas = async p => (await fetch(`${REST}/calendar/${p}`, { headers: H })).status === 200;
+  const anon = async (m, p) => (await fetch(`${REST}/calendar/${p}`, { method: m })).status;
+  log('calendar cleanup rules: stranger lists contacts ' + await anon('GET', 'cuCalComp/contacts') + ' | members ' + await anon('GET', 'cuCalComp/members')
+    + ' | reads code ' + await anon('GET', 'cuCalComp/private/code') + ' | deletes listing ' + await anon('DELETE', 'cuCalComp') + ' | still there ' + await calHas('cuCalComp'));
 
   const AD = await mk('admin'); await AD.goto(base + '#admin'); await w(3000);
   await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(4000);
   const txt = async sel => ((await AD.textContent(sel).catch(() => '')) || '').replace(/\s+/g, ' ').trim();
   log('panel:', await txt('#adm-clean .spread'), '|', /Manual/.test(await txt('#adm-clean [aria-pressed="true"]')));
   log('ready:', await txt('#adm-clean-now'));
+  log('calendar cleanup line:', await txt('#adm-clean-cal'));
   await AD.click('[data-act="adm-clean-list"]'); await w(300);
   const list = await txt('#adm-clean-list');
   log('list:', ['CU old empty ·', 'CU old empty melee', 'CU old empty archived', 'CU stale copy'].every(n => list.includes(n)),
@@ -55,6 +75,8 @@ const { chromium } = require('playwright');
   log('toast:', await AD.textContent('#toast'));
   const st = {}; for (const id of ['cuOld', 'cuMelee', 'cuArch', 'cuNew', 'cuFull', 'cuPlayers', 'cuEx', 'cuTpl', 'cuDrawn', 'cuStale']) st[id] = await exists(id);
   log('future kept by Delete now:', await exists('cuFuture'));
+  log(`calendar cleanup: old listing gone ${!(await calHas('cuCalComp'))} | its entries ${await calN('entries')} | teams ${await calN('teams')} | contacts ${await calN('contacts')} | code gone ${!(await calHas('cuCalComp/private/code'))} | members ${await calN('members')}`);
+  log(`calendar cleanup keeps: listing 29 days ago ${await calHas('cuCal29')} | future listing ${await calHas('cuCalFut')} | competition of old listing ${await exists('cuCalComp')}`);
   log('deleted:', !st.cuOld && !st.cuMelee && !st.cuArch, '| kept:', st.cuNew && st.cuFull && st.cuPlayers && st.cuEx && st.cuTpl && st.cuDrawn && st.cuStale);
   await w(800);
   log('after:', await txt('#adm-clean-now'), '|', await txt('#adm-clean-last'));

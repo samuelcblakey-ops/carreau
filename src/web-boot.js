@@ -201,6 +201,17 @@ function fbStore() {
       const refs = [...ids].flatMap(id => subs.map(k => doc(db, "calendar", cid, k, id)));
       for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await track(b.commit()); }
     },
+    // the admin's clean-up (calendar-cleanup): every listing, hidden ones included (the rules let only the admin list them all)
+    listAllCal() { return getDocs(collection(db, "calendar")).then(s => s.docs.map(d => Object.assign(d.data(), { cid: d.id }))); },
+    // a listing with everything under it: entries, teams, contacts, members and the private code in batches of up to 450,
+    // then the listing last, so a failure part-way never leaves entries without their listing ("private" can't be listed:
+    // its only document is "code")
+    async purgeCal(cid) {
+      const refs = [doc(db, "calendar", cid, "private", "code")];
+      for (const k of ["entries", "teams", "contacts", "members"]) (await getDocs(collection(db, "calendar", cid, k))).docs.forEach(d => refs.push(d.ref));
+      for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await track(b.commit()); }
+      await track(deleteDoc(doc(db, "calendar", cid)));
+    },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },
@@ -977,7 +988,7 @@ function adminView() {
    own each time the admin opens #admin. Each one is re-read from the server first, so a stale offline copy can
    never delete a competition someone has since filled in. */
 const CLEAN_DAYS = 7, DAY_MS = 864e5;
-const CLEAN = { confirm: false, busy: "", ran: false, open: false };
+const CLEAN = { confirm: false, busy: "", ran: false, open: false, cal: null, calLoading: false };
 const lastTouched = t => Math.max(t.updated || 0, t.created || 0);
 // local date as "YYYY-MM-DD", the same form as t.date
 const localDay = ms => { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
@@ -986,10 +997,25 @@ const isAbandoned = (t, now = Date.now()) => !!t && !t.listed && !t.example && !
   && !(t.date && t.date >= localDay(now)) // set up early for a day still to come: kept however long it waits
   && lastTouched(t) > 0 && now - lastTouched(t) >= CLEAN_DAYS * DAY_MS;
 const abandoned = () => Object.values(S.tournaments).filter(t => isAbandoned(t)).sort((x, y) => lastTouched(x) - lastTouched(y));
+// Season Calendar listings (hidden ones too) dated more than CAL_KEEP_DAYS days ago go with their entries and contact
+// details, as the privacy section promises; a competition's listing goes, the competition stays (its own rules above)
+const CAL_KEEP_DAYS = 30;
+const oldCal = (all, now = Date.now()) => { const cut = localDay(now - CAL_KEEP_DAYS * DAY_MS);
+  return all.filter(L => typeof L.date === "string" && /^\d{4}-\d\d-\d\d$/.test(L.date) && L.date < cut); };
+// the count for the panel, read when #admin opens (CLEAN.cal: null = not read yet)
+function calOldLoad() {
+  if (CLEAN.calLoading || !isAdmin() || !S.store?.listAllCal) return;
+  CLEAN.calLoading = true;
+  S.store.listAllCal().then(all => { CLEAN.cal = oldCal(all).length; }, e => { console.error(e); CLEAN.cal = 0; })
+    .finally(() => { CLEAN.calLoading = false; render(); });
+}
 async function runCleanup(auto) {
   if (!isAdmin() || CLEAN.busy) return;
-  const ids = abandoned().map(t => t.id); if (!ids.length) { if (!auto) toast("Nothing to tidy."); return; }
-  let ok = 0, kept = 0, failed = 0; CLEAN.busy = `Tidying… 0 of ${ids.length}`; render();
+  const ids = abandoned().map(t => t.id);
+  let cal = []; try { cal = oldCal(await S.store.listAllCal()).map(L => L.cid); } catch (e) { console.error(e); }
+  if (!ids.length && !cal.length) { CLEAN.cal = 0; if (!auto) toast("Nothing to tidy."); return; }
+  const total = ids.length + cal.length;
+  let ok = 0, kept = 0, failed = 0, calOk = 0; CLEAN.busy = `Tidying… 0 of ${total}`; render();
   const one = async id => {
     try {
       const d = await getDocFromServer(doc(FB.db, "tournaments", id)); // the server's copy, not the offline cache
@@ -997,14 +1023,19 @@ async function runCleanup(auto) {
       else if (!isAbandoned(d.data())) kept++;
       else { await S.store.deleteTournament(id); delete S.tournaments[id]; ADM.sel.delete(id); if (S.tid === id) S.tid = null; ok++; }
     } catch (e) { console.error(e); failed++; }
-    CLEAN.busy = `Tidying… ${ok + kept + failed} of ${ids.length}`; render();
+    CLEAN.busy = `Tidying… ${ok + kept + failed + calOk} of ${total}`; render();
   };
   const queue = ids.slice(); await Promise.all(Array.from({ length: Math.min(4, ids.length) }, async () => { while (queue.length) await one(queue.shift()); }));
-  CLEAN.busy = "";
-  try { await setDoc(doc(FB.db, "config", "site"), { cleanupLast: { at: Date.now(), deleted: ok, auto: !!auto }, updated: Date.now() }, { merge: true }); } catch (e) { console.error(e); }
+  for (const cid of cal) {
+    try { await S.store.purgeCal(cid); calOk++; } catch (e) { console.error(e); failed++; }
+    CLEAN.busy = `Tidying… ${ok + kept + failed + calOk} of ${total}`; render();
+  }
+  CLEAN.busy = ""; CLEAN.cal = cal.length - calOk;
+  try { await setDoc(doc(FB.db, "config", "site"), { cleanupLast: { at: Date.now(), deleted: ok, cal: calOk, auto: !!auto }, updated: Date.now() }, { merge: true }); } catch (e) { console.error(e); }
   render();
-  if (ok || failed || !auto) toast(failed ? `${ok} empty competition${ok === 1 ? "" : "s"} deleted, ${failed} didn't go. Check your connection and try again.`
-    : `${auto ? "Clean-up: " : ""}${ok} empty competition${ok === 1 ? "" : "s"} deleted.${kept ? ` ${kept} kept (changed since).` : ""}`);
+  const done = [ids.length || !cal.length ? `${ok} empty competition${ok === 1 ? "" : "s"} deleted.${kept ? ` ${kept} kept (changed since).` : ""}` : "",
+    cal.length ? `${calOk} old Season Calendar listing${calOk === 1 ? "" : "s"} deleted.` : ""].filter(Boolean).join(" ");
+  if (ok || calOk || failed || !auto) toast(failed ? `${done} ${failed} didn't go. Check your connection and try again.` : `${auto ? "Clean-up: " : ""}${done}`);
 }
 // automatic: once per visit to #admin, after the site settings and the full competition list have arrived
 function autoCleanup() {
@@ -1023,6 +1054,8 @@ async function cleanupAction(act, a) {
 }
 function cleanupPanel() {
   const list = abandoned(), n = list.length, L = SITE.cleanupLast;
+  if (CLEAN.cal === null) calOldLoad(); const c = CLEAN.cal || 0;
+  const what = [n ? `${n} empty competition${n === 1 ? "" : "s"}` : "", c ? `${c} old Season Calendar listing${c === 1 ? "" : "s"}` : ""].filter(Boolean).join(" and ");
   const day = t => t.date ? `· ${new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" })} ` : "";
   const ago = t => { const d = Math.floor((Date.now() - lastTouched(t)) / DAY_MS); return `${d} day${d === 1 ? "" : "s"}`; };
   return `<div class="panel stack" id="adm-clean">
@@ -1032,12 +1065,14 @@ function cleanupPanel() {
     <div class="seg" role="group" aria-label="Automatic clean-up">${[["0", "Manual"], ["1", "Automatic"]].map(([v, l]) => `<button type="button" data-act="adm-clean-auto" data-on="${v}" aria-pressed="${(SITE.cleanupAuto ? "1" : "0") === v}">${l}</button>`).join("")}</div>
     <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center" id="adm-clean-now">
       ${CLEAN.busy ? `<span class="small muted">${esc(CLEAN.busy)}</span>`
-        : !n ? `<span class="small muted">Nothing to tidy right now.</span>`
-        : CLEAN.confirm ? `<span class="err">Delete ${n} empty competition${n === 1 ? "" : "s"} for good?</span><button class="btn sm danger" data-act="adm-clean-yes">Yes, delete</button><button class="btn sm" data-act="adm-clean-cancel">Cancel</button>`
+        : !n && !c ? `<span class="small muted">Nothing to tidy right now.</span>`
+        : CLEAN.confirm ? `<span class="err">Delete ${what} for good?</span><button class="btn sm danger" data-act="adm-clean-yes">Yes, delete</button><button class="btn sm" data-act="adm-clean-cancel">Cancel</button>`
+        : !n ? `<button class="btn sm danger" data-act="adm-clean">Delete now</button>`
         : `<span><b>${n}</b> ready to delete</span><button class="btn sm danger" data-act="adm-clean">Delete ${n} now</button><button class="btn sm ghost" data-act="adm-clean-list" aria-expanded="${CLEAN.open}">${CLEAN.open ? "Hide list" : "Show list"}</button>`}
     </div>
+    ${c && !CLEAN.busy ? `<p class="small" id="adm-clean-cal" style="margin:0">Season Calendar: ${c} listings from more than ${CAL_KEEP_DAYS} days ago, with their entries and contact details</p>` : ""}
     ${n && CLEAN.open && !CLEAN.busy ? `<ul class="small" id="adm-clean-list" style="margin:0;padding-left:18px">${list.slice(0, 50).map(t => `<li><span data-notr>${esc(t.name || "Untitled")}</span> <span class="muted">${esc(day(t))}· untouched ${ago(t)}${t.archived ? " · archived" : ""}</span></li>`).join("")}${n > 50 ? `<li class="muted">and ${n - 50} more</li>` : ""}</ul>` : ""}
-    ${L ? `<p class="small muted" id="adm-clean-last">Last clean-up ${esc(when(L.at))}: ${L.deleted} deleted${L.auto ? " (automatic)" : ""}.</p>` : ""}
+    ${L ? `<p class="small muted" id="adm-clean-last">Last clean-up ${esc(when(L.at))}: ${L.deleted} deleted${L.auto ? " (automatic)" : ""}.${L.cal ? ` ${L.cal} old Season Calendar listing${L.cal === 1 ? "" : "s"} deleted.` : ""}</p>` : ""}
   </div>`;
 }
 async function adminAction(act, a) {
@@ -1143,7 +1178,7 @@ async function handleHash() {
     liveWatch(); render(); return;
   }
   const { tid, code } = readHash();
-  if (tid === "admin") { CLEAN.ran = false; S.overlayView = adminView; render(); autoCleanup(); return; }
+  if (tid === "admin") { CLEAN.ran = false; CLEAN.cal = null; S.overlayView = adminView; render(); autoCleanup(); return; }
   if (tid === "guides") { S.overlayView = guidesView; render(); return; }
   if (tid === "login") { if (code) { ORG.prefill = code; history.replaceState(null, "", "#login"); if (AUTH.user && loginMode() && !orgActive()) await orgLogin(code); } S.overlayView = loginView; render(); return; }
   if (!tid) { render(); return; }
