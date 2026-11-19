@@ -452,6 +452,7 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .cal-desk-n{flex:none;min-width:2em;text-align:right;font-weight:700;color:var(--muted)}.cal-desk-n.pill{min-width:0;max-width:40%;text-align:left;white-space:normal}
 .cal-desk-main{flex:1;min-width:0;overflow-wrap:anywhere}.cal-desk-main .row{margin-top:4px}.cal-desk-main .row .err,.cal-reg-row .err{flex-basis:100%}.cal-desk-meta a{color:var(--accent);font-weight:600}
 @media (max-width:560px),(pointer:coarse){.cal-desk .btn,.cal-reg .btn{min-height:44px}}
+@media (max-width:560px),(pointer:coarse){.cal-share .btn,.cal-ent-row .btn{min-height:44px}} /* Season Calendar 7: Add to calendar, Open in Maps, Share */
 @media (max-width:560px){.cal-facts{grid-template-columns:1fr;gap:2px}.cal-facts dd{margin-bottom:6px}.cal-row{gap:10px;padding:9px 10px}.cal-date{width:52px}}
 /* Hall of Fame: the header link, the start-screen card and the page */
 .hof-btn,.cal-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;flex:none;white-space:nowrap}
@@ -1340,6 +1341,14 @@ Object.assign(LANG_TEXT.de, {"Going ahead": "Findet statt", "Postponed": "Versch
 Object.assign(LANG_TEXT.nl, {"Going ahead": "Gaat door", "Postponed": "Uitgesteld", "Cancelled": "Afgelast", "Reason (optional)": "Reden (optioneel)", "e.g. Rained off": "bijv. Regen", "Postponed: {x}": "Uitgesteld: {1}", "Cancelled: {x}": "Afgelast: {1}", "A new date will be shown here when the organiser sets one.": "De nieuwe datum verschijnt hier zodra de organisator die vastlegt.", "Entries are paused": "Inschrijving gepauzeerd", "This competition has been postponed.": "Dit toernooi is uitgesteld.", "This competition has been cancelled.": "Dit toernooi is afgelast."});
 Object.assign(LANG_TEXT.pt, {"Going ahead": "Confirmado", "Postponed": "Adiado", "Cancelled": "Cancelado", "Reason (optional)": "Motivo (opcional)", "e.g. Rained off": "ex. Chuva", "Postponed: {x}": "Adiado: {1}", "Cancelled: {x}": "Cancelado: {1}", "A new date will be shown here when the organiser sets one.": "A nova data aparecerá aqui quando o organizador a definir.", "Entries are paused": "Inscrições suspensas", "This competition has been postponed.": "Este torneio foi adiado.", "This competition has been cancelled.": "Este torneio foi cancelado."});
 Object.assign(LANG_TEXT.th, {"Going ahead": "จัดตามกำหนด", "Postponed": "เลื่อนออกไป", "Cancelled": "ยกเลิก", "Reason (optional)": "เหตุผล (ไม่บังคับ)", "e.g. Rained off": "เช่น ฝนตก", "Postponed: {x}": "เลื่อนออกไป: {1}", "Cancelled: {x}": "ยกเลิก: {1}", "A new date will be shown here when the organiser sets one.": "วันที่ใหม่จะแสดงที่นี่เมื่อผู้จัดกำหนดแล้ว", "Entries are paused": "หยุดรับสมัครชั่วคราว", "This competition has been postponed.": "การแข่งขันนี้ถูกเลื่อนออกไป", "This competition has been cancelled.": "การแข่งขันนี้ถูกยกเลิก"});
+// Season Calendar 7 (calendar-share)
+Object.assign(FR_TEXT, {"Add to calendar": "Ajouter à l'agenda", "Open in Maps": "Ouvrir dans Maps"});
+Object.assign(LANG_TEXT.es, {"Add to calendar": "Añadir al calendario", "Open in Maps": "Abrir en Maps"});
+Object.assign(LANG_TEXT.it, {"Add to calendar": "Aggiungi al calendario", "Open in Maps": "Apri in Maps"});
+Object.assign(LANG_TEXT.de, {"Add to calendar": "Zum Kalender hinzufügen", "Open in Maps": "In Maps öffnen"});
+Object.assign(LANG_TEXT.nl, {"Add to calendar": "Toevoegen aan agenda", "Open in Maps": "Openen in Maps"});
+Object.assign(LANG_TEXT.pt, {"Add to calendar": "Adicionar ao calendário", "Open in Maps": "Abrir no Maps"});
+Object.assign(LANG_TEXT.th, {"Add to calendar": "เพิ่มลงในปฏิทิน", "Open in Maps": "เปิดในแผนที่"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -3824,6 +3833,7 @@ function calCard(e, close) {
     </dl>
     ${e.howTo || e.contact || e.note ? `<div class="cal-how stack"><h4>How to enter</h4>${e.howTo ? `<p data-notr>${esc(e.howTo)}</p>` : ""}
       <dl class="cal-facts">${fact("Contact", esc(e.contact || ""))}${fact("Note", esc(e.note || ""))}</dl></div>` : ""}
+    ${calShareRow(e)}
     ${org && e.hidden ? `<div class="notice small err cal-hidden-mark">Hidden by the site admin</div>` : ""}
     ${calEntHtml(e)}
     <div class="row">${link}${org ? `${ev && e.hidden ? "" : `<button type="button" class="btn sm" data-act="${ev ? "cal-ev-edit" : "cal-edit"}" data-id="${esc(id)}">Edit</button>`}${confirm
@@ -3832,6 +3842,53 @@ function calCard(e, close) {
     ${ev && org ? calOrgLinkBox(id) : ""}
     ${calAdmin() ? `<div class="cal-admin spread"><span class="small"><b>Only you see this</b></span><button type="button" class="btn sm${e.hidden ? "" : " danger"}" data-act="cal-hide" data-id="${esc(id)}" data-on="${e.hidden ? "0" : "1"}">${e.hidden ? "Show again" : "Hide from the Season Calendar"}</button></div>` : ""}
   </article>`;
+}
+/* Season Calendar 7 (calendar-share): Add to calendar (an .ics file), Open in Maps and Share on the full listing */
+const calLink = id => `${liveBase()}#calendar.${id}`;
+// the event file: CRLF lines, text escaped (\\ ; , and new lines), lines folded at 75 bytes (never inside a character), and
+// floating local times (no Z, no time zone): the times are the venue's, as typed. It starts at check-in, else the start,
+// and lasts until 18:00 (or 23:59 when it starts later); with no time it's all day.
+const calIcsTxt = s => String(s ?? "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r\n|\r|\n/g, "\\n");
+function calIcsFold(line) {
+  const enc = new TextEncoder(), out = []; let cur = "", n = 0;
+  for (const ch of line) { const b = enc.encode(ch).length; if (n + b > (out.length ? 74 : 75)) { out.push(cur); cur = ""; n = 0; } cur += ch; n += b; }
+  out.push(cur); return out.join("\r\n ");
+}
+function calIcs(e, now = Date.now()) {
+  const id = calId(e), ymd = String(e.date || "").replace(/-/g, ""), hm = [e.checkin, e.start].map(v => String(v || "").match(/^(\d{1,2}):(\d{2})$/)).find(Boolean);
+  const pad = v => String(v).padStart(2, "0"), d = new Date(now);
+  const stamp = `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+  const next = new Date(e.date + "T12:00"); next.setDate(next.getDate() + 1);
+  const t0 = hm ? pad(hm[1]) + hm[2] : "";
+  const when = hm ? [`DTSTART:${ymd}T${t0}00`, `DTEND:${ymd}T${t0 < "1800" ? "180000" : "235900"}`]
+    : [`DTSTART;VALUE=DATE:${ymd}`, `DTEND;VALUE=DATE:${calYmd(next.getTime()).replace(/-/g, "")}`];
+  const how = [e.howTo, e.contact ? `${tr("Contact")}: ${e.contact}` : "", e.note].filter(x => String(x || "").trim());
+  const desc = [calLink(id), how.length ? `${tr("How to enter")}:\n${how.join("\n")}` : ""].filter(Boolean).join("\n\n");
+  const where = [e.venue, e.address].filter(Boolean).join(", ");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//SN Petanque//Season Calendar//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT", // i18n-ok
+    `UID:${id}@snpetanque.com`, `DTSTAMP:${stamp}`, ...when, `SUMMARY:${calIcsTxt(e.name)}`, where ? `LOCATION:${calIcsTxt(where)}` : "",
+    `DESCRIPTION:${calIcsTxt(desc)}`, `URL:${calLink(id)}`, "END:VEVENT", "END:VCALENDAR"].filter(Boolean).map(calIcsFold).join("\r\n") + "\r\n";
+}
+async function calIcsSave(id) {
+  const e = calFind(id); if (!e || !S.downloads || calSt(e) === "cancelled") return;
+  try { await S.downloads.save({ filename: `${fileBase(e.name, "competition")}.ics`, data: calIcs(e) }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
+}
+// Google Maps search: the address, or else the venue and region
+const calMapsUrl = e => { const q = String(e.address || "").trim() || [e.venue, e.region].filter(x => String(x || "").trim()).join(", ");
+  return q ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}` : ""; };
+// on phones the share sheet; elsewhere the link is copied (as hofShare)
+async function calShare(id) {
+  const e = calFind(id), url = calLink(id);
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+    try { await navigator.share({ title: e?.name || tr("Season Calendar"), url }); return; } catch (err) { if (err?.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(url); toast("Link copied."); } catch { toast(url); }
+}
+// a cancelled listing (or a device that can't save files) has no Add to calendar
+const calIcsBtn = e => S.downloads && calSt(e) !== "cancelled" ? `<button type="button" class="btn sm" data-act="cal-ics" data-id="${esc(calId(e))}">Add to calendar</button>` : "";
+function calShareRow(e) {
+  const maps = e.address || e.venue ? calMapsUrl(e) : "";
+  return `<div class="row cal-share">${calIcsBtn(e)}${maps ? `<a class="btn sm cal-maps" href="${esc(maps)}" target="_blank" rel="noopener">Open in Maps</a>` : ""}<button type="button" class="btn sm" data-act="cal-share" data-id="${esc(calId(e))}">Share</button></div>`;
 }
 function calResultsHtml() {
   const P = calPage(), c = P.cache[P.country || "all"];
@@ -4088,7 +4145,7 @@ function calMyEntHtml(e, w, q, open) {
       return `<div class="cal-ent-row stack" data-eid="${esc(x.id)}" style="gap:4px"><div><b data-notr>${esc(nm)}</b></div><div class="small cal-ent-state">${esc(calEntState(x, q))}</div>
         <div class="row">${S.calEntConfirm === x.id ? `<span class="err">Withdraw this entry? Your place goes to the next team.</span>
           <button type="button" class="btn sm danger" data-act="cal-ent-withdraw-yes" data-id="${esc(id)}" data-eid="${esc(x.id)}"><span data-notr>${esc(trAs("Withdraw my entry", "Withdraw"))}</span></button><button type="button" class="btn sm" data-act="cal-ent-keep">Keep it</button>`
-          : `${open ? `<button type="button" class="btn sm" data-act="cal-ent-edit" data-id="${esc(id)}" data-eid="${esc(x.id)}">Edit</button>` : ""}<button type="button" class="btn sm" data-act="cal-ent-withdraw" data-eid="${esc(x.id)}"><span data-notr>${esc(trAs("Withdraw my entry", "Withdraw"))}</span></button>`}</div></div>`; }).join("")}</div>`;
+          : `${open ? `<button type="button" class="btn sm" data-act="cal-ent-edit" data-id="${esc(id)}" data-eid="${esc(x.id)}">Edit</button>` : ""}${calIcsBtn(e)}<button type="button" class="btn sm" data-act="cal-ent-withdraw" data-eid="${esc(x.id)}"><span data-notr>${esc(trAs("Withdraw my entry", "Withdraw"))}</span></button>`}</div></div>`; }).join("")}</div>`;
 }
 // the teams in queue order, then the waiting list; entries waiting for approval aren't listed
 function calWhoHtml(w, q) {
@@ -6206,6 +6263,8 @@ document.addEventListener("click", async e => {
     case "hof-clear": Object.assign(hofPage(), { q: "", level: "all", fmt: "all" }); hofRedraw(); break;
     case "hof-retry": hofLoad(true); hofRedraw(); break;
     case "hof-share": await hofShare(a.dataset.id); break;
+    case "cal-ics": await calIcsSave(a.dataset.id); break;
+    case "cal-share": await calShare(a.dataset.id); break;
     case "hof-view": if (HOF_VIEWS.some(x => x[0] === a.dataset.k)) { hofPage().view = a.dataset.k; hofPage().open = null; lsSet("carreau-hof-view", a.dataset.k); } hofRedraw(); break;
     case "hof-open-entry": hofPage().open = a.dataset.id; hofPaint(); document.querySelector(`#hof-${CSS.escape(a.dataset.id)} [data-act="hof-close-entry"]`)?.focus({ preventScroll: true }); break;
     case "hof-close-entry": { const id = a.dataset.id; hofPage().open = null; if (hofPage().hl === id) hofPage().hl = null; hofPaint(); document.getElementById("hof-" + id)?.focus({ preventScroll: true }); break; }
@@ -6499,10 +6558,10 @@ async function exportCsv() {
 // apostrophe before a cell starting with =, @, + or - so a spreadsheet can't run it as a formula (not before a phone number)
 const csvGuard = s => /^[=@+\-]/.test(s) && !/^\+[\d ]+$/.test(s) ? "'" + s : s;
 const csvText = (rows, guard) => "\uFEFF" + rows.map(r => r.map(v => `"${(guard ? csvGuard(String(v)) : String(v)).replace(/"/g, '""')}"`).join(",")).join("\n");
+// keep accents and spaces in a file name; drop only what file names can't hold
+const fileBase = (name, dflt) => (name || "").replace(/[\/\\:*?"<>|\u0000-\u001f]+/g, "").replace(/\s+/g, " ").trim().replace(/^\.+/, "") || dflt;
 async function csvSave(name, csv) {
-  // keep accents and spaces in the file name; drop only what file names can't hold
-  const fname = (name || "").replace(/[\/\\:*?"<>|\u0000-\u001f]+/g, "").replace(/\s+/g, " ").trim().replace(/^\.+/, "") || "results";
-  try { await S.downloads.save({ filename: `${fname}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
+  try { await S.downloads.save({ filename: `${fileBase(name, "results")}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
 }
 
 /* ---------------- boot ---------------- */
@@ -6550,6 +6609,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns, calQueue, calEntState, calPlacesLine, csvText };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns, calQueue, calEntState, calPlacesLine, csvText, calIcs, calMapsUrl };
 })();
 </script>

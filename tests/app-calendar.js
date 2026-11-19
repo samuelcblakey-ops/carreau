@@ -10,6 +10,8 @@
 // the entry form (its checks, at 390 px), "Your entries" (a place, the waiting list, approval, Edit, Withdraw, removed by
 // the organiser), "Who's entered", five entries a device, closing, and French. On one device (the app on its own) online
 // entry is offered; the website's site switch and rules are in web-calendar-entry.js.
+// Season Calendar 7 (calendar-share): Add to calendar (the .ics file), Open in Maps and Share on the full listing and in
+// "Your entries", a cancelled listing without Add to calendar, French, and the listing with its buttons at 390 px and desktop.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, locale: 'en-GB' });
@@ -154,13 +156,13 @@ const { chromium } = require('playwright');
     // the full listing, opened in place
     q('#cal-' + tid).click(); await w(150);
     const card = q('#cal-' + tid + '.cal-card');
-    L.push('open listing: How to enter ' + (txt(card?.querySelector('h4')) === 'How to enter') + ' | Follow the draw ' + !!card?.querySelector('a[href="#' + tid + '"].primary') + ' before draw | view ' + txt(card?.querySelector('a.btn')));
+    L.push('open listing: How to enter ' + (txt(card?.querySelector('h4')) === 'How to enter') + ' | Follow the draw ' + !!card?.querySelector('a[href="#' + tid + '"].primary') + ' before draw | view ' + txt(card?.querySelector('a.btn:not(.cal-maps)')));
     L.push('listing: ' + txt(card.querySelector('.hof-where')) + ' | ' + qa('#cal-' + tid + ' dt').map(d => d.textContent + '=' + txt(d.nextElementSibling)).join(' ; '));
-    L.push('listing buttons: ' + qa('#cal-' + tid + ' .row .btn').map(txt).join(',') + ' | close focused ' + (document.activeElement?.dataset?.act === 'cal-close-entry') + ' | other rows ' + qa('#cal-results .cal-row').length);
+    L.push('listing buttons: ' + qa('#cal-' + tid + ' .row:not(.cal-share) .btn').map(txt).join(',') + ' | close focused ' + (document.activeElement?.dataset?.act === 'cal-close-entry') + ' | other rows ' + qa('#cal-results .cal-row').length);
     q('#cal-' + tid + ' [data-act="cal-close-entry"]').click(); await w(150);
     L.push('closed: ' + !!q('#cal-' + tid + '.cal-row') + ' | focus back ' + (document.activeElement?.id === 'cal-' + tid));
     // a listing whose competition isn't on this device: no organiser buttons, no link (there's no competition to read)
-    q('#cal-c2').click(); await w(200); L.push('stranger listing: buttons ' + qa('#cal-c2 .row .btn').map(txt).join(','));
+    q('#cal-c2').click(); await w(200); L.push('stranger listing: buttons ' + qa('#cal-c2 .row:not(.cal-share) .btn').map(txt).join(','));
     q('#cal-c2 [data-act="cal-close-entry"]').click(); await w(100);
     // the competition is drawn: Follow the draw
     await setC({ draws: [{ id: 'R1', kind: 'round', at: Date.now() }] });
@@ -265,7 +267,7 @@ const { chromium } = require('playwright');
     L.push('add event: ' + txt(q('#toast')) + ' | kind ' + e.kind + ' | fmt ' + e.fmt + ' | on page ' + !!q('#cal-' + id + '.cal-card'));
     L.push('event listing: id ' + (e.id === id && /^c[a-z0-9]+$/.test(id)) + ' | tid ' + ('tid' in e) + ' | ' + e.formatNote + ' | ' + e.level + ' | ' + e.who.join(',') + ' | hidden ' + e.hidden + ' | orgCode "' + e.orgCode + '" | sheet closed ' + !q('#modal .modal'));
     const card = q('#cal-' + id + '.cal-card'), fmtDd = qa('#cal-' + id + ' dt').find(d => d.textContent === 'Format')?.nextElementSibling;
-    L.push('event card: format ' + txt(fmtDd) + ' | buttons ' + qa('#cal-' + id + ' .row .btn').map(txt).join(',') + ' | live now ' + !!card.querySelector('.cal-live') + ' | competition links ' + !!card.querySelector('a.btn'));
+    L.push('event card: format ' + txt(fmtDd) + ' | buttons ' + qa('#cal-' + id + ' .row:not(.cal-share) .btn').map(txt).join(',') + ' | live now ' + !!card.querySelector('.cal-live') + ' | competition links ' + !!card.querySelector('a.btn:not(.cal-maps)'));
     q('#cal-' + id + ' [data-act="cal-close-entry"]').click(); await w(150);
     L.push('event row: ' + txt(q('#cal-' + id + ' .cal-main')) + ' | live now ' + !!q('#cal-' + id + ' .cal-live'));
     q('#cal-' + id).click(); await w(150); q('#cal-' + id + ' [data-act="cal-ev-edit"]').click(); await w(150);
@@ -285,7 +287,7 @@ const { chromium } = require('playwright');
     L.push('your listings: event ' + !!q('#calmine-' + id) + ' | competition listing ' + !!q('#calmine-' + tid) + ' | hidden marked ' + (txt(q('#calmine-cHid .cal-hidden-mark')) === 'Hidden by the site admin'));
     L.push('your listings more: ' + txt(mine?.querySelector('h3')) + ' | before tools ' + !!(mine && mine.compareDocumentPosition(q('.hof-tools')) & Node.DOCUMENT_POSITION_FOLLOWING) + ' | hidden in main list ' + !!q('#cal-cHid'));
     q('#calmine-cHid').click(); await w(300);
-    L.push('mine opens hidden: ' + location.hash + ' | card ' + !!q('#cal-cHid.cal-card') + ' | mark ' + txt(q('#cal-cHid .cal-hidden-mark')) + ' | buttons ' + qa('#cal-cHid .row .btn').map(txt).join(','));
+    L.push('mine opens hidden: ' + location.hash + ' | card ' + !!q('#cal-cHid.cal-card') + ' | mark ' + txt(q('#cal-cHid .cal-hidden-mark')) + ' | buttons ' + qa('#cal-cHid .row:not(.cal-share) .btn').map(txt).join(','));
     // someone who isn't one of its organisers (the website's S.calCanEdit, stood in for here)
     await go('calendar.' + id); await w(250); S.calCanEdit = () => false; C.render(); await w(100);
     L.push('stranger stand-in: Edit ' + !!q('#cal-' + id + ' [data-act="cal-ev-edit"]') + ' | Remove ' + !!q('#cal-' + id + ' [data-act="cal-page-remove"]'));
@@ -509,6 +511,71 @@ const { chromium } = require('playwright');
     L.push('remove listing ask: ' + txt(q('[data-cal-panel] .err')));
     q('[data-cal-panel] [data-act="cal-remove-yes"]').click(); await w(300);
     L.push('remove listing with entries: listing gone ' + ((await S.store.getCal(tid)) === null) + ' | entries left ' + !!JSON.parse(localStorage.getItem('carreau-local-v1')).ce?.[tid] + ' | ' + txt(q('#toast')));
+  `));
+  // ---- Season Calendar 7 (calendar-share): Add to calendar, Open in Maps, Share ----
+  const p4 = await ctx.newPage(); p4.on('pageerror', e => errs.push('share: ' + e.message));
+  await p4.setViewportSize({ width: 1100, height: 900 });
+  await p4.goto(process.env.APP_URL); await p4.evaluate(() => localStorage.clear()); await p4.reload(); await p4.waitForTimeout(300);
+  const run4 = body => p4.evaluate(new Function(`return (async () => { ${pre}
+    const go = async h => { document.activeElement?.blur?.(); location.hash = h; await w(250); };
+    const card = id => q('#cal-' + id + '.cal-card'), btns = id => qa('#cal-' + id + ' .cal-share .btn').map(txt).join(',');
+    const open = async id => { await go('calendar'); await go('calendar.' + id); for (let i = 0; i < 40 && !card(id); i++) await w(100); };
+    const mk = (cid, o) => Object.assign({ kind: 'event', id: cid, name: '', date: day(6), checkin: '', start: '', venue: '', address: '', country: 'GB-ENG', region: '', level: 'open', fmt: 'doubles', formatNote: '',
+      who: ['open'], fee: '', prizes: '', howTo: '', contact: '', note: '', status: 'on', statusNote: '', lang: 'en', ownerUid: '', createdAt: Date.now(), updatedAt: Date.now(), hidden: false }, o);
+    const L = []; try { ${body} } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\\n')[1]); } return L; })();`));
+  out.push(...await run4(`
+    window.__file = null; S.downloads = { save: async f => { window.__file = f; } };
+    window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async v => { window.__copied = v; } } });
+    await S.store.setCal('cShare', mk('cShare', { name: 'Letchworth Spring Open', checkin: '09:15', start: '10:00', venue: 'Letchworth PC', address: 'Norton Common, Letchworth SG6 1AA', region: 'Chiltern',
+      howTo: 'Enter by text; pay on the day\\nDoors open at 8:30, bring a packed lunch and your own boules, and please arrive early to check in with the desk', contact: 'Ann, 07700 900222' }));
+    await S.store.setCal('cDay', mk('cDay', { name: 'Hitchin Club Day', venue: 'Hitchin PC', region: 'Chiltern' }));
+    await S.store.setCal('cNone', mk('cNone', { name: 'Somewhere TBC' }));
+    await open('cShare');
+    L.push('share buttons: ' + btns('cShare') + ' | under the details ' + !!(card('cShare').querySelector('.cal-how')?.compareDocumentPosition(card('cShare').querySelector('.cal-share')) & Node.DOCUMENT_POSITION_FOLLOWING));
+    q('#cal-cShare [data-act="cal-ics"]').click(); await w(200);
+    const f = window.__file || {}, ics = f.data || '', lines = ics.split('\\r\\n'), un = ics.replace(/\\r\\n /g, ''), ul = un.split('\\r\\n');
+    const pick = k => ul.find(l => l.startsWith(k)) || '';
+    L.push('ics: ' + [lines[0], pick('SUMMARY:'), pick('DTSTART'), pick('LOCATION:'), pick('URL:').replace(/^URL:.*(#calendar\\.)/, 'URL:...$1')].join(' | '));
+    L.push('ics file: ' + f.filename + ' | crlf ' + (!/[^\\r]\\n/.test(ics) && ics.endsWith('\\r\\n')) + ' | longest ' + Math.max(...lines.map(l => new TextEncoder().encode(l).length)) + ' | folded ' + lines.some(l => l.startsWith(' '))
+      + ' | ' + pick('UID:') + ' | stamp ' + /^DTSTAMP:\\d{8}T\\d{6}Z$/.test(pick('DTSTAMP:')) + ' | ' + pick('DTEND') + ' | floating ' + !/^DT(START|END).*Z$/m.test(un) + ' | ends ' + ul[ul.length - 2]);
+    L.push('ics description: ' + pick('DESCRIPTION:').replace(/^DESCRIPTION:\\S*(#calendar\\.)/, 'DESCRIPTION:...$1').slice(0, 120));
+    const e = await S.store.getCal('cShare');
+    L.push('ics start: ' + [C.calIcs(Object.assign({}, e, { checkin: '' })), C.calIcs(Object.assign({}, e, { checkin: '', start: '19:30' }))].map(x => x.split('\\r\\n').filter(l => /^DT(START|END)/.test(l)).join(' ')).join(' / '));
+    const allDay = C.calIcs(await S.store.getCal('cDay')).split('\\r\\n');
+    L.push('ics all day: ' + allDay.filter(l => /^DT(START|END)/.test(l)).join(' | ') + ' | location ' + allDay.find(l => l.startsWith('LOCATION:')));
+    L.push('maps: ' + q('#cal-cShare a.cal-maps')?.getAttribute('href') + ' | new tab ' + q('#cal-cShare a.cal-maps')?.target);
+    L.push('share desktop: ' + (q('#cal-cShare [data-act="cal-share"]').click(), await w(150), txt(q('#toast'))) + ' | copied ' + (window.__copied || '').replace(/^.*(#calendar\\.)/, '...$1'));
+    window.__shared = null; const mm = window.matchMedia; Object.defineProperty(navigator, 'share', { configurable: true, value: async o => { window.__shared = o; } });
+    window.matchMedia = x => /coarse/.test(x) ? { matches: true } : mm.call(window, x);
+    q('#cal-cShare [data-act="cal-share"]').click(); await w(150);
+    L.push('share phone: ' + (window.__shared?.title || '') + ' | ' + (window.__shared?.url || '').replace(/^.*(#calendar\\.)/, '...$1'));
+    window.matchMedia = mm; delete navigator.share;
+    await open('cDay'); L.push('venue only: ' + btns('cDay') + ' | ' + q('#cal-cDay a.cal-maps')?.getAttribute('href'));
+    await open('cNone'); L.push('no venue or address: ' + btns('cNone'));
+    // "Your entries": Add to calendar next to each entry
+    await S.store.setCal('cShare', Object.assign(e, { online: true, places: 8, closesAt: Date.now() + 2 * 864e5, approve: false, showEntrants: false }));
+    await S.store.addCalEntry('cShare', 'local_1', { uid: 'local', status: 'in' }, { name: 'Les Boulistes', players: ['Ann Lee', 'Bob Fox'], club: '' }, '07700 900222');
+    { const P = S.calPage; if (P) P.cache = {}; } await open('cShare'); for (let i = 0; i < 30 && !q('#cal-cShare .cal-ent-row'); i++) await w(100);
+    L.push('your entries: ' + qa('#cal-cShare .cal-ent-row .btn').map(txt).join(','));
+    window.__file = null; q('#cal-cShare .cal-ent-row [data-act="cal-ics"]')?.click(); await w(200);
+    L.push('your entries file: ' + (window.__file?.filename || ''));
+    window.__shot = 'cShare';
+  `));
+  for (const [wd, h, nm] of [[1100, 900, 'desktop'], [390, 844, '390']]) {
+    await p4.setViewportSize({ width: wd, height: h }); await p4.waitForTimeout(250);
+    out.push(`share ${nm}: no sideways scroll ` + await p4.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1) + ' | buttons under 44 ' + await p4.evaluate(() => [...document.querySelectorAll('#cal-cShare .cal-share .btn, #cal-cShare .cal-ent-row .btn')].filter(x => x.getBoundingClientRect().height < 44).length));
+    await p4.evaluate(() => document.querySelector('#cal-cShare .cal-facts')?.scrollIntoView()); await p4.screenshot({ path: `test-results/calendar-share-${nm}.png` });
+  }
+  await p4.setViewportSize({ width: 1100, height: 900 }); await p4.waitForTimeout(150);
+  out.push(...await run4(`
+    const e = await S.store.getCal('cShare'); await S.store.setCal('cShare', Object.assign(e, { status: 'cancelled', statusNote: 'Rained off', updatedAt: Date.now() }));
+    { const P = S.calPage; if (P) P.cache = {}; } await go('calendar'); await go('calendar.cShare'); for (let i = 0; i < 40 && !q('#cal-cShare .cal-status-note'); i++) await w(100);
+    L.push('cancelled: Add to calendar shown ' + !!q('#cal-cShare [data-act="cal-ics"]') + ' | buttons ' + qa('#cal-cShare .cal-share .btn').map(txt).join(','));
+    await S.store.setCal('cShare', Object.assign(e, { status: 'on', statusNote: '' }));
+    { const P = S.calPage; if (P) P.cache = {}; } await go('calendar'); await go('calendar.cShare'); for (let i = 0; i < 40 && !q('#cal-cShare .cal-share'); i++) await w(100);
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="fr"]').click(); await w(200);
+    L.push('fr share: ' + qa('#cal-cShare .cal-share .btn').map(txt).join(','));
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
   `));
   console.log(out.join('\n'));
   console.log('errs', errs); await b.close();
