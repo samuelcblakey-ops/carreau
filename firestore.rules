@@ -245,12 +245,15 @@ service cloud.firestore {
         && d.get('fee', '') is string && d.get('fee', '').size() <= 60 && d.get('prizes', '') is string && d.get('prizes', '').size() <= 120
         && d.get('howTo', '') is string && d.get('howTo', '').size() <= 300 && d.get('contact', '') is string && d.get('contact', '').size() <= 120
         && d.get('note', '') is string && d.get('note', '').size() <= 300 && d.get('lang', '') is string && d.get('lang', '').size() <= 8
-        && d.status == 'on' && d.hidden is bool && d.get('hiddenAt', 0) is number;
+        && d.status == 'on' && d.hidden is bool && d.get('hiddenAt', 0) is number
+        && d.get('online', false) is bool && d.get('places', 0) is int && d.get('places', 0) >= 0 && d.get('places', 0) <= 512
+        && d.get('closesAt', 0) is number && d.get('approve', false) is bool && d.get('showEntrants', false) is bool
+        && (d.get('online', false) != true || d.get('fmt', 'triples') in ['singles', 'doubles', 'triples', 'melee', 'shooting']);
     }
     function calShape(d, cid) {
       return d.keys().hasOnly(['kind', 'tid', 'name', 'date', 'checkin', 'start', 'venue', 'address', 'country', 'region', 'level', 'fmt', 'system',
                                'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'lang', 'byUid', 'byCode', 'createdAt', 'updatedAt',
-                               'hidden', 'hiddenAt', 'gone'])
+                               'hidden', 'hiddenAt', 'gone', 'online', 'places', 'closesAt', 'approve', 'showEntrants'])
         && d.kind == 'comp' && d.tid == cid && calBase(d)
         && d.get('fmt', 'triples') in ['singles', 'doubles', 'triples', 'melee', 'shooting', 'eurocup', 'clubs']
         && d.get('system', '') is string && d.get('system', '').size() <= 20 && d.get('gone', false) is bool;
@@ -262,7 +265,7 @@ service cloud.firestore {
     function calEvShape(d, cid) {
       return d.keys().hasOnly(['kind', 'id', 'name', 'date', 'checkin', 'start', 'venue', 'address', 'country', 'region', 'level', 'fmt', 'formatNote',
                                'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'lang', 'ownerUid', 'orgCode', 'byUid', 'byCode',
-                               'createdAt', 'updatedAt', 'hidden', 'hiddenAt'])
+                               'createdAt', 'updatedAt', 'hidden', 'hiddenAt', 'online', 'places', 'closesAt', 'approve', 'showEntrants'])
         && d.kind == 'event' && d.id == cid && calBase(d) && d.name.size() >= 1
         && d.fmt in ['singles', 'doubles', 'triples', 'melee', 'shooting', 'other']
         && d.get('formatNote', '') is string && d.get('formatNote', '').size() <= 80
@@ -275,6 +278,29 @@ service cloud.firestore {
     function evOrg(cid, d) { return signedIn() && d.kind == 'event'
                                && (calMember(cid) || (loginOn() ? (orgValid() && d.orgCode != '' && d.orgCode == myCode()) : d.ownerUid == request.auth.uid)); }
     function evOrgOf(cid) { return exists(cdoc(cid)) && evOrg(cid, get(cdoc(cid)).data); }
+    // Season Calendar 4 (calendar-entry-form): players enter online. Each entry is three documents with the same id
+    // (<device uid>_<1..5>, so a device makes at most 5 per listing), written together in one batch: entries/{eid} (public:
+    // uid, at, status, queuedAt; no names), teams/{eid} (names: public only when the listing shows who's entered) and
+    // contacts/{eid} (a phone or email: the entrant, the listing's organisers and the admin only). Online entry is a site
+    // switch (config/site.calendarEntry: false | "admin" | true), off by default.
+    function calEntryOn() { return exists(cfg()) && (get(cfg()).data.get('calendarEntry', false) == true
+                              || (get(cfg()).data.get('calendarEntry', false) == 'admin' && isAdmin())); }
+    // the listing's organisers: a competition's (the calendar-publish test) or an event's (evOrg)
+    function calOrganiser(cid) { return signedIn() && exists(cdoc(cid))
+                                   && (get(cdoc(cid)).data.kind == 'comp' ? hofOrganiser(cid) : evOrg(cid, get(cdoc(cid)).data)); }
+    // entries are open: online entry on, shown, going ahead, before its closing time, and the site switch on
+    function calEntOpen(cid) { return exists(cdoc(cid)) && get(cdoc(cid)).data.get('online', false) == true && get(cdoc(cid)).data.get('hidden', false) != true
+                              && get(cdoc(cid)).data.get('status', '') == 'on' && request.time.toMillis() < get(cdoc(cid)).data.get('closesAt', 0) && calEntryOn(); }
+    // this device's own entry (the id starts with its uid)
+    function calMine(eid) { return signedIn() && eid.matches(request.auth.uid + '_[1-5]'); }
+    function calStr(v, n) { return v is string && v.size() <= n; }
+    function calTeamShape(d) {
+      return d.keys().hasOnly(['name', 'players', 'club']) && calStr(d.name, 60) && calStr(d.get('club', ''), 60)
+        && d.players is list && d.players.size() >= 1 && d.players.size() <= 3 && calStr(d.players[0], 60)
+        && (d.players.size() < 2 || calStr(d.players[1], 60)) && (d.players.size() < 3 || calStr(d.players[2], 60));
+    }
+    function calContactShape(d) { return d.keys().hasOnly(['contact']) && d.contact is string && d.contact.size() >= 1 && d.contact.size() <= 120; }
+    function calEdoc(cid, sub, eid) { return /databases/$(database)/documents/calendar/$(cid)/$(sub)/$(eid); }
     // the admin hides a listing from the Season Calendar page (hidden, hiddenAt: when) and can show it again; nobody else can
     match /calendar/{cid} {
       allow get: if resource == null || resource.data.hidden != true || isAdmin()
@@ -304,6 +330,35 @@ service cloud.firestore {
         allow write: if docId == 'code' && (isAdmin() || evOrgOf(cid))
                      && (request.resource == null || (request.resource.data.keys().hasOnly(['code']) && request.resource.data.code is string
                                                       && request.resource.data.code.size() >= 6 && request.resource.data.code.size() <= 40));
+      }
+      // online entries (calendar-entry-form). The queue is the "in" entries by queuedAt, then at, then id; the first `places`
+      // have a place. Nothing enforces the cap (rules can't count), so an entry is always accepted while entries are open.
+      match /entries/{eid} {
+        allow get, list: if true;
+        allow create: if calMine(eid) && request.resource.data.keys().hasOnly(['uid', 'at', 'status', 'queuedAt'])
+          && request.resource.data.uid == request.auth.uid && request.resource.data.at == request.time
+          && (get(cdoc(cid)).data.get('approve', false) == true
+              ? request.resource.data.status == 'pending' && !request.resource.data.keys().hasAny(['queuedAt'])
+              : request.resource.data.status == 'in' && request.resource.data.queuedAt == request.time)
+          && calEntOpen(cid) && existsAfter(calEdoc(cid, 'teams', eid)) && existsAfter(calEdoc(cid, 'contacts', eid));
+        // an organiser accepts a pending entry: it joins the queue now (calendar-entries-desk)
+        allow update: if (isAdmin() || calOrganiser(cid)) && resource.data.status == 'pending' && request.resource.data.status == 'in'
+          && request.resource.data.queuedAt == request.time && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'queuedAt']);
+        allow delete: if calMine(eid) || isAdmin() || calOrganiser(cid);
+      }
+      match /teams/{eid} {
+        allow get: if calMine(eid) || isAdmin() || get(cdoc(cid)).data.get('showEntrants', false) == true || calOrganiser(cid);
+        allow list: if isAdmin() || get(cdoc(cid)).data.get('showEntrants', false) == true || calOrganiser(cid);
+        allow create: if calMine(eid) && calTeamShape(request.resource.data) && calEntOpen(cid) && existsAfter(calEdoc(cid, 'entries', eid));
+        allow update: if calMine(eid) && calTeamShape(request.resource.data) && calEntOpen(cid) && exists(calEdoc(cid, 'entries', eid));
+        allow delete: if calMine(eid) || isAdmin() || calOrganiser(cid);
+      }
+      match /contacts/{eid} {
+        allow get: if calMine(eid) || isAdmin() || calOrganiser(cid);
+        allow list: if isAdmin() || calOrganiser(cid);
+        allow create: if calMine(eid) && calContactShape(request.resource.data) && calEntOpen(cid) && existsAfter(calEdoc(cid, 'entries', eid));
+        allow update: if calMine(eid) && calContactShape(request.resource.data) && calEntOpen(cid) && exists(calEdoc(cid, 'entries', eid));
+        allow delete: if calMine(eid) || isAdmin() || calOrganiser(cid);
       }
       // a device that opened the organiser link: accepted only with the event's current code, like a stream's desk link
       match /members/{uid} {

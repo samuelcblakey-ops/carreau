@@ -435,6 +435,11 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .cal-live{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;background:#c62828}
 .cal-facts{display:grid;grid-template-columns:10em minmax(0,1fr);gap:6px 14px;margin:0}.cal-facts > div{display:contents}.cal-facts dt{font-weight:600;color:var(--muted);font-size:14px}.cal-facts dd{margin:0;overflow-wrap:anywhere}
 .cal-how{gap:6px}.cal-how h4{margin:4px 0 0}.cal-how p{margin:0;white-space:pre-line;overflow-wrap:anywhere}
+.cal-ent{border-top:1px solid var(--line);padding-top:10px}.cal-ent h4{margin:0}.cal-ent-line{color:var(--accent);font-weight:600;white-space:normal}
+.cal-chk{min-height:44px;font-size:15px}.cal-chk input{width:22px;height:22px;flex:none}.cal-ent-sheet{max-width:520px}.cal-ent-sheet input{font-size:16px;min-height:44px}
+.cal-ent-row{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}.cal-ent-row .err{flex-basis:100%}
+.cal-who-list summary{min-height:44px;padding:12px 0;box-sizing:border-box;cursor:pointer}.cal-who-ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cal-who-row{display:flex;gap:10px;align-items:flex-start}.cal-who-n{flex:none;min-width:2em;text-align:right;font-weight:700;color:var(--muted)}.cal-who-main{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}.cal-wait-h{margin:10px 0 6px}
 .cal-admin{gap:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;background:var(--surface-2)}
 @media (max-width:560px){.cal-facts{grid-template-columns:1fr;gap:2px}.cal-facts dd{margin-bottom:6px}.cal-row{gap:10px;padding:9px 10px}.cal-date{width:52px}}
 /* Hall of Fame: the header link, the start-screen card and the page */
@@ -1300,6 +1305,14 @@ Object.assign(LANG_TEXT.de, {"Add an event": "Turnier hinzufügen", "For a compe
 Object.assign(LANG_TEXT.nl, {"Add an event": "Toernooi toevoegen", "For a competition run on SN Pétanque, list it from its Setup instead.": "Een toernooi dat op SN Pétanque loopt, zet je op de kalender vanuit de Instellingen.", "Edit the event": "Toernooi bewerken", "Other": "Anders", "Format details (optional)": "Details van de formule (optioneel)", "e.g. Swiss, 4 rounds then knockouts": "bijv. Zwitsers, 4 ronden en dan knock-out", "Add the event": "Toernooi toevoegen", "Update the event": "Toernooi bijwerken", "Pick a format.": "Kies een formule.", "Added to the Season Calendar.": "Op de seizoenskalender gezet.", "Only this event's organisers can change it.": "Alleen de organisatoren van dit toernooi kunnen het wijzigen.", "Anyone with this link can change or remove this listing. Share it only with people helping you organise.": "Iedereen met deze link kan deze vermelding wijzigen of verwijderen. Deel hem alleen met mensen die je helpen organiseren.", "You can now edit this listing.": "Je kunt deze vermelding nu bewerken.", "That organiser link didn't work. Ask for a new one.": "Die organisatorlink werkte niet. Vraag om een nieuwe.", "Your listings": "Jouw vermeldingen", "Hidden by the site admin": "Verborgen door de sitebeheerder"});
 Object.assign(LANG_TEXT.pt, {"Add an event": "Adicionar um torneio", "For a competition run on SN Pétanque, list it from its Setup instead.": "Para um torneio gerido no SN Pétanque, coloque-o no calendário a partir da Configuração.", "Edit the event": "Editar o torneio", "Other": "Outro", "Format details (optional)": "Detalhes do formato (opcional)", "e.g. Swiss, 4 rounds then knockouts": "p. ex. Suíço a 4 rondas e depois eliminatórias", "Add the event": "Adicionar o torneio", "Update the event": "Atualizar o torneio", "Pick a format.": "Escolha um formato.", "Added to the Season Calendar.": "Adicionado ao calendário da época.", "Only this event's organisers can change it.": "Só os organizadores deste torneio o podem alterar.", "Anyone with this link can change or remove this listing. Share it only with people helping you organise.": "Quem tiver este link pode alterar ou retirar este anúncio. Partilhe-o só com quem o ajuda a organizar.", "You can now edit this listing.": "Já pode editar este anúncio.", "That organiser link didn't work. Ask for a new one.": "Esse link de organizador não funcionou. Peça um novo.", "Your listings": "Os seus anúncios", "Hidden by the site admin": "Ocultado pelo administrador do site"});
 Object.assign(LANG_TEXT.th, {"Add an event": "เพิ่มการแข่งขัน", "For a competition run on SN Pétanque, list it from its Setup instead.": "การแข่งขันที่จัดบน SN Pétanque ให้ลงปฏิทินจากหน้าตั้งค่าของการแข่งขันนั้น", "Edit the event": "แก้ไขการแข่งขัน", "Other": "อื่น ๆ", "Format details (optional)": "รายละเอียดรูปแบบ (ไม่บังคับ)", "e.g. Swiss, 4 rounds then knockouts": "เช่น ระบบสวิส 4 รอบ แล้วต่อด้วยรอบน็อกเอาต์", "Add the event": "เพิ่มการแข่งขัน", "Update the event": "อัปเดตการแข่งขัน", "Pick a format.": "เลือกรูปแบบ", "Added to the Season Calendar.": "เพิ่มลงปฏิทินฤดูกาลแล้ว", "Only this event's organisers can change it.": "เฉพาะผู้จัดการแข่งขันนี้เท่านั้นที่แก้ไขได้", "Anyone with this link can change or remove this listing. Share it only with people helping you organise.": "ทุกคนที่มีลิงก์นี้แก้ไขหรือนำรายการนี้ออกได้ แชร์ให้เฉพาะคนที่ช่วยคุณจัดงานเท่านั้น", "You can now edit this listing.": "ตอนนี้คุณแก้ไขรายการนี้ได้แล้ว", "That organiser link didn't work. Ask for a new one.": "ลิงก์ผู้จัดนี้ใช้ไม่ได้ ขอลิงก์ใหม่", "Your listings": "รายการของคุณ", "Hidden by the site admin": "ซ่อนโดยผู้ดูแลเว็บไซต์"});
+// Season Calendar 4: online entry (calendar-entry-form)
+Object.assign(FR_TEXT, {"Season Calendar online entry": "Inscription en ligne au Calendrier de la saison", "Players can enter online on SN Pétanque": "Les joueurs peuvent s'inscrire en ligne sur SN Pétanque", "Online entry isn't available for this format yet.": "L'inscription en ligne n'est pas encore disponible pour ce format.", "Places": "Places", "Blank for no limit": "Vide = sans limite", "Entries close": "Clôture des inscriptions", "I'll approve each entry": "Je valide chaque inscription", "Show who's entered on the listing": "Afficher les inscrits sur l'annonce", "Enter online": "S'inscrire en ligne", "Enter online · closes {x}": "S'inscrire en ligne · clôture {1}", "Entries closed": "Inscriptions closes", "Entries open": "Inscriptions ouvertes", "{n} of {x} places taken · entries close {x}": "{1} places prises sur {2} · clôture des inscriptions {3}", "Full · {n} on the waiting list": "Complet · {1} en liste d'attente", "{n} entered": "{1} inscrits", "Your name": "Votre nom", "Club (optional)": "Club (facultatif)", "Phone or email for the organiser": "Téléphone ou e-mail pour l'organisateur", "Your team and player names will be shown on this listing.": "Les noms de votre équipe et de vos joueurs seront affichés sur cette annonce.", "Your phone or email goes to the organiser only.": "Votre téléphone ou e-mail n'est transmis qu'à l'organisateur.", "Send my entry": "Envoyer mon inscription", "Name every player.": "Indiquez le nom de chaque joueur.", "Add a phone number or email so the organiser can reach you.": "Ajoutez un téléphone ou un e-mail pour que l'organisateur puisse vous joindre.", "This phone has already sent 5 entries for this competition.": "Ce téléphone a déjà envoyé 5 inscriptions pour ce concours.", "Entries have closed.": "Les inscriptions sont closes.", "Entry sent.": "Inscription envoyée.", "Your entries": "Vos inscriptions", "You have a place ({n} of {x})": "Vous avez une place ({1} sur {2})", "You have a place": "Vous avez une place", "On the waiting list (number {n})": "En liste d'attente (n° {1})", "Waiting for the organiser to accept it": "En attente de validation par l'organisateur", "Withdraw my entry": "Retirer mon inscription", "Withdraw this entry? Your place goes to the next team.": "Retirer cette inscription ? Votre place ira à l'équipe suivante.", "Entry withdrawn.": "Inscription retirée.", "This entry was withdrawn or removed.": "Cette inscription a été retirée ou supprimée.", "Who's entered": "Inscrits", "Waiting list": "Liste d'attente", "Loading…": "Chargement…", "Places taken": "Places prises", "Season Calendar online entry is on for everyone.": "L'inscription en ligne au Calendrier de la saison est ouverte à tous.", "Season Calendar online entry is on for you only.": "L'inscription en ligne au Calendrier de la saison n'est visible que par vous.", "Season Calendar online entry is switched off.": "L'inscription en ligne au Calendrier de la saison est désactivée."});
+Object.assign(LANG_TEXT.es, {"Season Calendar online entry": "Inscripción en línea en el Calendario de la temporada", "Players can enter online on SN Pétanque": "Los jugadores pueden inscribirse en línea en SN Pétanque", "Online entry isn't available for this format yet.": "La inscripción en línea aún no está disponible para este formato.", "Places": "Plazas", "Blank for no limit": "En blanco = sin límite", "Entries close": "Cierre de inscripciones", "I'll approve each entry": "Aprobaré cada inscripción", "Show who's entered on the listing": "Mostrar los inscritos en el anuncio", "Enter online": "Inscribirse en línea", "Enter online · closes {x}": "Inscribirse en línea · cierra el {1}", "Entries closed": "Inscripciones cerradas", "Entries open": "Inscripciones abiertas", "{n} of {x} places taken · entries close {x}": "{1} de {2} plazas ocupadas · las inscripciones cierran el {3}", "Full · {n} on the waiting list": "Completo · {1} en lista de espera", "{n} entered": "{1} inscritos", "Your name": "Tu nombre", "Club (optional)": "Club (opcional)", "Phone or email for the organiser": "Teléfono o email para el organizador", "Your team and player names will be shown on this listing.": "Los nombres de tu equipo y de los jugadores se mostrarán en este anuncio.", "Your phone or email goes to the organiser only.": "Tu teléfono o email solo llega al organizador.", "Send my entry": "Enviar mi inscripción", "Name every player.": "Indica el nombre de cada jugador.", "Add a phone number or email so the organiser can reach you.": "Añade un teléfono o un email para que el organizador pueda contactarte.", "This phone has already sent 5 entries for this competition.": "Este teléfono ya ha enviado 5 inscripciones para esta competición.", "Entries have closed.": "Las inscripciones están cerradas.", "Entry sent.": "Inscripción enviada.", "Your entries": "Tus inscripciones", "You have a place ({n} of {x})": "Tienes plaza ({1} de {2})", "You have a place": "Tienes plaza", "On the waiting list (number {n})": "En lista de espera (número {1})", "Waiting for the organiser to accept it": "Pendiente de que el organizador la acepte", "Withdraw my entry": "Retirar mi inscripción", "Withdraw this entry? Your place goes to the next team.": "¿Retirar esta inscripción? Tu plaza pasará al siguiente equipo.", "Entry withdrawn.": "Inscripción retirada.", "This entry was withdrawn or removed.": "Esta inscripción se retiró o se eliminó.", "Who's entered": "Inscritos", "Waiting list": "Lista de espera", "Loading…": "Cargando…", "Places taken": "Plazas ocupadas", "Season Calendar online entry is on for everyone.": "La inscripción en línea del Calendario de la temporada está activada para todos.", "Season Calendar online entry is on for you only.": "La inscripción en línea del Calendario de la temporada solo la ves tú.", "Season Calendar online entry is switched off.": "La inscripción en línea del Calendario de la temporada está desactivada."});
+Object.assign(LANG_TEXT.it, {"Season Calendar online entry": "Iscrizione online al Calendario della stagione", "Players can enter online on SN Pétanque": "I giocatori possono iscriversi online su SN Pétanque", "Online entry isn't available for this format yet.": "L'iscrizione online non è ancora disponibile per questo formato.", "Places": "Posti", "Blank for no limit": "Vuoto = nessun limite", "Entries close": "Chiusura iscrizioni", "I'll approve each entry": "Approverò ogni iscrizione", "Show who's entered on the listing": "Mostra gli iscritti nell'annuncio", "Enter online": "Iscriviti online", "Enter online · closes {x}": "Iscriviti online · chiude {1}", "Entries closed": "Iscrizioni chiuse", "Entries open": "Iscrizioni aperte", "{n} of {x} places taken · entries close {x}": "{1} posti occupati su {2} · le iscrizioni chiudono {3}", "Full · {n} on the waiting list": "Completo · {1} in lista d'attesa", "{n} entered": "{1} iscritti", "Your name": "Il tuo nome", "Club (optional)": "Club (facoltativo)", "Phone or email for the organiser": "Telefono o email per l'organizzatore", "Your team and player names will be shown on this listing.": "I nomi della tua squadra e dei giocatori saranno mostrati in questo annuncio.", "Your phone or email goes to the organiser only.": "Il tuo telefono o email va solo all'organizzatore.", "Send my entry": "Invia la mia iscrizione", "Name every player.": "Indica il nome di ogni giocatore.", "Add a phone number or email so the organiser can reach you.": "Aggiungi un telefono o un'email perché l'organizzatore possa contattarti.", "This phone has already sent 5 entries for this competition.": "Questo telefono ha già inviato 5 iscrizioni per questa gara.", "Entries have closed.": "Le iscrizioni sono chiuse.", "Entry sent.": "Iscrizione inviata.", "Your entries": "Le tue iscrizioni", "You have a place ({n} of {x})": "Hai un posto ({1} su {2})", "You have a place": "Hai un posto", "On the waiting list (number {n})": "In lista d'attesa (numero {1})", "Waiting for the organiser to accept it": "In attesa che l'organizzatore la accetti", "Withdraw my entry": "Ritira la mia iscrizione", "Withdraw this entry? Your place goes to the next team.": "Ritirare questa iscrizione? Il tuo posto passa alla squadra successiva.", "Entry withdrawn.": "Iscrizione ritirata.", "This entry was withdrawn or removed.": "Questa iscrizione è stata ritirata o rimossa.", "Who's entered": "Iscritti", "Waiting list": "Lista d'attesa", "Loading…": "Caricamento…", "Places taken": "Posti occupati", "Season Calendar online entry is on for everyone.": "L'iscrizione online al Calendario della stagione è attiva per tutti.", "Season Calendar online entry is on for you only.": "L'iscrizione online al Calendario della stagione è visibile solo a te.", "Season Calendar online entry is switched off.": "L'iscrizione online al Calendario della stagione è disattivata."});
+Object.assign(LANG_TEXT.de, {"Season Calendar online entry": "Online-Meldung im Saisonkalender", "Players can enter online on SN Pétanque": "Spieler können sich online bei SN Pétanque melden", "Online entry isn't available for this format yet.": "Online-Meldung gibt es für dieses Format noch nicht.", "Places": "Plätze", "Blank for no limit": "Leer = unbegrenzt", "Entries close": "Meldeschluss", "I'll approve each entry": "Ich bestätige jede Meldung", "Show who's entered on the listing": "Gemeldete in der Ausschreibung zeigen", "Enter online": "Online melden", "Enter online · closes {x}": "Online melden · Meldeschluss {1}", "Entries closed": "Meldung geschlossen", "Entries open": "Meldung offen", "{n} of {x} places taken · entries close {x}": "{1} von {2} Plätzen vergeben · Meldeschluss {3}", "Full · {n} on the waiting list": "Voll · {1} auf der Warteliste", "{n} entered": "{1} gemeldet", "Your name": "Dein Name", "Club (optional)": "Verein (optional)", "Phone or email for the organiser": "Telefon oder E-Mail für den Organisator", "Your team and player names will be shown on this listing.": "Die Namen deines Teams und der Spieler werden in dieser Ausschreibung angezeigt.", "Your phone or email goes to the organiser only.": "Deine Telefonnummer oder E-Mail sieht nur der Organisator.", "Send my entry": "Meldung absenden", "Name every player.": "Gib jedem Spieler einen Namen.", "Add a phone number or email so the organiser can reach you.": "Gib eine Telefonnummer oder E-Mail an, damit der Organisator dich erreichen kann.", "This phone has already sent 5 entries for this competition.": "Dieses Handy hat schon 5 Meldungen für dieses Turnier gesendet.", "Entries have closed.": "Die Meldung ist geschlossen.", "Entry sent.": "Meldung gesendet.", "Your entries": "Deine Meldungen", "You have a place ({n} of {x})": "Du hast einen Platz ({1} von {2})", "You have a place": "Du hast einen Platz", "On the waiting list (number {n})": "Auf der Warteliste (Nummer {1})", "Waiting for the organiser to accept it": "Wartet auf die Bestätigung des Organisators", "Withdraw my entry": "Meldung zurückziehen", "Withdraw this entry? Your place goes to the next team.": "Diese Meldung zurückziehen? Dein Platz geht an das nächste Team.", "Entry withdrawn.": "Meldung zurückgezogen.", "This entry was withdrawn or removed.": "Diese Meldung wurde zurückgezogen oder entfernt.", "Who's entered": "Gemeldet", "Waiting list": "Warteliste", "Loading…": "Wird geladen…", "Places taken": "Vergebene Plätze", "Season Calendar online entry is on for everyone.": "Online-Meldung im Saisonkalender ist für alle an.", "Season Calendar online entry is on for you only.": "Online-Meldung im Saisonkalender ist nur für dich an.", "Season Calendar online entry is switched off.": "Online-Meldung im Saisonkalender ist ausgeschaltet."});
+Object.assign(LANG_TEXT.nl, {"Season Calendar online entry": "Online inschrijven via de Seizoenskalender", "Players can enter online on SN Pétanque": "Spelers kunnen zich online inschrijven op SN Pétanque", "Online entry isn't available for this format yet.": "Online inschrijven is voor dit format nog niet beschikbaar.", "Places": "Plaatsen", "Blank for no limit": "Leeg = geen limiet", "Entries close": "Inschrijving sluit", "I'll approve each entry": "Ik keur elke inschrijving goed", "Show who's entered on the listing": "Toon wie er ingeschreven is", "Enter online": "Online inschrijven", "Enter online · closes {x}": "Online inschrijven · sluit {1}", "Entries closed": "Inschrijving gesloten", "Entries open": "Inschrijving open", "{n} of {x} places taken · entries close {x}": "{1} van {2} plaatsen bezet · inschrijving sluit {3}", "Full · {n} on the waiting list": "Vol · {1} op de wachtlijst", "{n} entered": "{1} ingeschreven", "Your name": "Je naam", "Club (optional)": "Club (optioneel)", "Phone or email for the organiser": "Telefoon of e-mail voor de organisator", "Your team and player names will be shown on this listing.": "De namen van je team en spelers worden op deze vermelding getoond.", "Your phone or email goes to the organiser only.": "Je telefoon of e-mail gaat alleen naar de organisator.", "Send my entry": "Inschrijving versturen", "Name every player.": "Geef elke speler een naam.", "Add a phone number or email so the organiser can reach you.": "Voeg een telefoonnummer of e-mail toe zodat de organisator je kan bereiken.", "This phone has already sent 5 entries for this competition.": "Deze telefoon heeft al 5 inschrijvingen voor dit toernooi verstuurd.", "Entries have closed.": "De inschrijving is gesloten.", "Entry sent.": "Inschrijving verstuurd.", "Your entries": "Je inschrijvingen", "You have a place ({n} of {x})": "Je hebt een plaats ({1} van {2})", "You have a place": "Je hebt een plaats", "On the waiting list (number {n})": "Op de wachtlijst (nummer {1})", "Waiting for the organiser to accept it": "Wacht op goedkeuring van de organisator", "Withdraw my entry": "Inschrijving intrekken", "Withdraw this entry? Your place goes to the next team.": "Deze inschrijving intrekken? Je plaats gaat naar het volgende team.", "Entry withdrawn.": "Inschrijving ingetrokken.", "This entry was withdrawn or removed.": "Deze inschrijving is ingetrokken of verwijderd.", "Who's entered": "Ingeschreven", "Waiting list": "Wachtlijst", "Loading…": "Laden…", "Places taken": "Bezette plaatsen", "Season Calendar online entry is on for everyone.": "Online inschrijven via de Seizoenskalender staat aan voor iedereen.", "Season Calendar online entry is on for you only.": "Online inschrijven via de Seizoenskalender staat alleen voor jou aan.", "Season Calendar online entry is switched off.": "Online inschrijven via de Seizoenskalender staat uit."});
+Object.assign(LANG_TEXT.pt, {"Season Calendar online entry": "Inscrição online no Calendário da época", "Players can enter online on SN Pétanque": "Os jogadores podem inscrever-se online no SN Pétanque", "Online entry isn't available for this format yet.": "A inscrição online ainda não está disponível para este formato.", "Places": "Vagas", "Blank for no limit": "Em branco = sem limite", "Entries close": "Fecho das inscrições", "I'll approve each entry": "Vou aprovar cada inscrição", "Show who's entered on the listing": "Mostrar os inscritos no anúncio", "Enter online": "Inscrever online", "Enter online · closes {x}": "Inscrever online · fecha {1}", "Entries closed": "Inscrições fechadas", "Entries open": "Inscrições abertas", "{n} of {x} places taken · entries close {x}": "{1} de {2} vagas ocupadas · inscrições fecham {3}", "Full · {n} on the waiting list": "Completo · {1} em lista de espera", "{n} entered": "{1} inscritos", "Your name": "O seu nome", "Club (optional)": "Clube (opcional)", "Phone or email for the organiser": "Telefone ou email para o organizador", "Your team and player names will be shown on this listing.": "Os nomes da sua equipa e dos jogadores serão mostrados neste anúncio.", "Your phone or email goes to the organiser only.": "O seu telefone ou email só chega ao organizador.", "Send my entry": "Enviar a minha inscrição", "Name every player.": "Indique o nome de cada jogador.", "Add a phone number or email so the organiser can reach you.": "Adicione um telefone ou email para o organizador o poder contactar.", "This phone has already sent 5 entries for this competition.": "Este telemóvel já enviou 5 inscrições para este torneio.", "Entries have closed.": "As inscrições estão fechadas.", "Entry sent.": "Inscrição enviada.", "Your entries": "As suas inscrições", "You have a place ({n} of {x})": "Tem vaga ({1} de {2})", "You have a place": "Tem vaga", "On the waiting list (number {n})": "Em lista de espera (número {1})", "Waiting for the organiser to accept it": "À espera de aprovação do organizador", "Withdraw my entry": "Retirar a minha inscrição", "Withdraw this entry? Your place goes to the next team.": "Retirar esta inscrição? A sua vaga passa para a equipa seguinte.", "Entry withdrawn.": "Inscrição retirada.", "This entry was withdrawn or removed.": "Esta inscrição foi retirada ou removida.", "Who's entered": "Inscritos", "Waiting list": "Lista de espera", "Loading…": "A carregar…", "Places taken": "Vagas ocupadas", "Season Calendar online entry is on for everyone.": "A inscrição online no Calendário da época está ativa para todos.", "Season Calendar online entry is on for you only.": "A inscrição online no Calendário da época só é visível para si.", "Season Calendar online entry is switched off.": "A inscrição online no Calendário da época está desativada."});
+Object.assign(LANG_TEXT.th, {"Season Calendar online entry": "การสมัครออนไลน์ในปฏิทินฤดูกาล", "Players can enter online on SN Pétanque": "ผู้เล่นสมัครออนไลน์บน SN Pétanque ได้", "Online entry isn't available for this format yet.": "รูปแบบนี้ยังสมัครออนไลน์ไม่ได้", "Places": "จำนวนที่", "Blank for no limit": "เว้นว่าง = ไม่จำกัด", "Entries close": "ปิดรับสมัคร", "I'll approve each entry": "ฉันจะอนุมัติการสมัครทีละรายการ", "Show who's entered on the listing": "แสดงรายชื่อผู้สมัครในประกาศ", "Enter online": "สมัครออนไลน์", "Enter online · closes {x}": "สมัครออนไลน์ · ปิดรับ {1}", "Entries closed": "ปิดรับสมัครแล้ว", "Entries open": "เปิดรับสมัคร", "{n} of {x} places taken · entries close {x}": "มีผู้สมัคร {1} จาก {2} ที่ · ปิดรับสมัคร {3}", "Full · {n} on the waiting list": "เต็มแล้ว · รอคิว {1} ทีม", "{n} entered": "สมัครแล้ว {1}", "Your name": "ชื่อของคุณ", "Club (optional)": "สโมสร (ไม่บังคับ)", "Phone or email for the organiser": "โทรศัพท์หรืออีเมลสำหรับผู้จัด", "Your team and player names will be shown on this listing.": "ชื่อทีมและชื่อผู้เล่นของคุณจะแสดงในประกาศนี้", "Your phone or email goes to the organiser only.": "โทรศัพท์หรืออีเมลของคุณส่งถึงผู้จัดเท่านั้น", "Send my entry": "ส่งใบสมัคร", "Name every player.": "ใส่ชื่อผู้เล่นทุกคน", "Add a phone number or email so the organiser can reach you.": "เพิ่มเบอร์โทรหรืออีเมลเพื่อให้ผู้จัดติดต่อคุณได้", "This phone has already sent 5 entries for this competition.": "โทรศัพท์เครื่องนี้ส่งใบสมัครครบ 5 รายการสำหรับการแข่งขันนี้แล้ว", "Entries have closed.": "ปิดรับสมัครแล้ว", "Entry sent.": "ส่งใบสมัครแล้ว", "Your entries": "ใบสมัครของคุณ", "You have a place ({n} of {x})": "คุณได้ที่ ({1} จาก {2})", "You have a place": "คุณได้ที่", "On the waiting list (number {n})": "อยู่ในรายชื่อรอ (ลำดับที่ {1})", "Waiting for the organiser to accept it": "รอผู้จัดอนุมัติ", "Withdraw my entry": "ถอนใบสมัคร", "Withdraw this entry? Your place goes to the next team.": "ถอนใบสมัครนี้หรือไม่? ที่ของคุณจะตกเป็นของทีมถัดไป", "Entry withdrawn.": "ถอนใบสมัครแล้ว", "This entry was withdrawn or removed.": "ใบสมัครนี้ถูกถอนหรือถูกลบแล้ว", "Who's entered": "ผู้สมัคร", "Waiting list": "รายชื่อรอ", "Loading…": "กำลังโหลด…", "Places taken": "ที่ที่มีผู้สมัครแล้ว", "Season Calendar online entry is on for everyone.": "การสมัครออนไลน์ในปฏิทินฤดูกาลเปิดให้ทุกคนแล้ว", "Season Calendar online entry is on for you only.": "การสมัครออนไลน์ในปฏิทินฤดูกาลเปิดให้คุณคนเดียว", "Season Calendar online entry is switched off.": "ปิดการสมัครออนไลน์ในปฏิทินฤดูกาลแล้ว"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -1520,6 +1533,19 @@ function localStore() {
     async getTournament(tid) { return data.t[tid] ? clone(data.t[tid]) : null; },
     async listCal({ country } = {}) { return Object.values(data.cal).filter(e => !e.hidden && (!country || e.country === country)).map(clone); },
     async listMyCal() { return Object.values(data.cal).filter(e => e.kind === "event").map(clone); }, // on this device every event is this device's own
+    // online entries (calendar-entry-form): data.ce[cid] = { entries, teams, contacts }, each by entry id; the website keeps them in
+    // calendar/{cid}/entries, /teams and /contacts. Times are this device's clock (the website's are the server's).
+    watchCalEntries(cid, cb) { const k = "ce:" + cid, f = () => cb(Object.entries(data.ce?.[cid]?.entries || {}).map(([id, x]) => Object.assign(clone(x), { id })));
+      setTimeout(f); if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(f); return () => subsL.get(k).delete(f); },
+    watchCalTeams(cid, cb) { const k = "ct:" + cid, f = () => cb(clone(data.ce?.[cid]?.teams || {}));
+      setTimeout(f); if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(f); return () => subsL.get(k).delete(f); },
+    async getCalEntry(cid, eid) { const c = data.ce?.[cid]; return c?.entries?.[eid] ? { team: clone(c.teams[eid] || null), contact: c.contacts?.[eid]?.contact || "" } : null; },
+    async addCalEntry(cid, eid, entry, team, contact) { const c = ((data.ce ||= {})[cid] ||= { entries: {}, teams: {}, contacts: {} }), now = Date.now();
+      c.entries[eid] = Object.assign({ uid: entry.uid, at: now, status: entry.status }, entry.status === "in" ? { queuedAt: now } : {}); c.teams[eid] = clone(team); c.contacts[eid] = { contact };
+      persist(); this._ce(cid); },
+    async updateCalEntry(cid, eid, team, contact) { const c = data.ce?.[cid]; if (!c?.entries?.[eid]) throw { code: "not-found" }; c.teams[eid] = clone(team); c.contacts[eid] = { contact }; persist(); this._ce(cid); },
+    async withdrawCalEntry(cid, eid) { const c = data.ce?.[cid]; if (c) { delete c.entries[eid]; delete c.teams[eid]; delete c.contacts[eid]; } persist(); this._ce(cid); },
+    _ce(cid) { setTimeout(() => ["ce:", "ct:"].forEach(k => (subsL.get(k + cid) || new Set()).forEach(f => f()))); },
     watchStreams(cb) { subsS.add(cb); emitS(); return () => subsS.delete(cb); },
     watchStream(sid, cb) { if (!subsS1.has(sid)) subsS1.set(sid, new Set()); subsS1.get(sid).add(cb); emitS(sid); return () => subsS1.get(sid).delete(cb); },
     async setStream(st) { data.s[st.id] = clone(st); persist(); emitS(st.id); },
@@ -1553,6 +1579,17 @@ function dbStore(db) {
     getCal(cid) { return new Promise((res, rej) => { let u = null; u = db.doc(`calendar/${cid}`).onSnapshot(d => { setTimeout(() => u && u()); res(d.exists ? clone(d.data()) : null); }, rej); }); },
     getTournament(tid) { return new Promise((res, rej) => { let u = null; u = db.doc(`tournaments/${tid}`).onSnapshot(d => { setTimeout(() => u && u()); res(d.exists ? clone(d.data()) : null); }, rej); }); },
     listCal({ country } = {}) { return new Promise((res, rej) => { let u = null; u = db.collection("calendar").limit(300).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => clone(d.data())).filter(e => !e.hidden && (!country || e.country === country))); }, rej); }); },
+    // online entries (calendar-entry-form): one write each here (a shared db has no batches)
+    watchCalEntries(cid, cb, onErr) { return db.collection(`calendar/${cid}/entries`).limit(600).onSnapshot(s => cb(s.docs.map(d => Object.assign(clone(d.data()), { id: d.id }))), onErr); },
+    watchCalTeams(cid, cb, onErr) { return db.collection(`calendar/${cid}/teams`).limit(600).onSnapshot(s => { const m = {}; s.docs.forEach(d => m[d.id] = clone(d.data())); cb(m); }, onErr); },
+    getCalEntry(cid, eid) { return new Promise((res, rej) => { let u = null; u = db.doc(`calendar/${cid}/entries/${eid}`).onSnapshot(async d => { setTimeout(() => u && u()); if (!d.exists) { res(null); return; }
+      const one = p => new Promise(r => { let v = null; v = db.doc(p).onSnapshot(x => { setTimeout(() => v && v()); r(x.exists ? clone(x.data()) : null); }, () => r(null)); });
+      const [team, c] = await Promise.all([one(`calendar/${cid}/teams/${eid}`), one(`calendar/${cid}/contacts/${eid}`)]); res({ team, contact: c?.contact || "" }); }, rej); }); },
+    async addCalEntry(cid, eid, entry, team, contact) { const now = Date.now();
+      await db.doc(`calendar/${cid}/teams/${eid}`).set(clone(team)); await db.doc(`calendar/${cid}/contacts/${eid}`).set({ contact });
+      await db.doc(`calendar/${cid}/entries/${eid}`).set(Object.assign({ uid: entry.uid, at: now, status: entry.status }, entry.status === "in" ? { queuedAt: now } : {})); },
+    async updateCalEntry(cid, eid, team, contact) { await db.doc(`calendar/${cid}/teams/${eid}`).set(clone(team)); await db.doc(`calendar/${cid}/contacts/${eid}`).set({ contact }); },
+    async withdrawCalEntry(cid, eid) { await db.doc(`calendar/${cid}/entries/${eid}`).delete(); await db.doc(`calendar/${cid}/teams/${eid}`).delete(); await db.doc(`calendar/${cid}/contacts/${eid}`).delete(); },
     watchStreams(cb, onErr) { return db.collection("streams").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
     watchStream(sid, cb, onErr) { return db.doc(`streams/${sid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setStream(st) { return db.doc(`streams/${st.id}`).set(clone(st)); },
@@ -3528,7 +3565,7 @@ function calOpen(t) {
   const e = S.cal?.[t.id] || null;
   S.modal = { cal: true, tid: t.id, date: t.date || "", checkin: e?.checkin || "", start: e?.start || "", venue: calVenue(t), address: e?.address || "",
     level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: e?.region || "", who: e ? [...(e.who || [])] : ["open"],
-    fee: e?.fee || "", prizes: e?.prizes || "", howTo: e?.howTo || "", contact: e?.contact || "", note: e?.note || "", err: "", busy: false };
+    fee: e?.fee || "", prizes: e?.prizes || "", howTo: e?.howTo || "", contact: e?.contact || "", note: e?.note || "", err: "", busy: false, ...calEntMd(e) };
   renderModal();
 }
 function renderCalModal(t, el) {
@@ -3563,6 +3600,7 @@ function renderCalModal(t, el) {
     ${area("howTo", "How to enter (optional)", 300, "e.g. Call Jane on 07700 900123 or enter at the club bar")}
     <div class="cal-grid">${box("contact", "Contact (optional)", 120)}</div>
     ${area("note", "Note (optional)", 300)}
+    ${calEntSheet(md, md.ev ? md.fmt : calFmtKey(t))}
     <p class="small muted">Everything here will be public.</p>
     ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
     <div class="row"><button class="btn primary" data-act="cal-save" ${md.busy ? "disabled" : ""}>${md.ev ? (e ? "Update the event" : "Add the event") : e ? "Update the listing" : "List it"}</button><button class="btn" data-act="close">Cancel</button></div>
@@ -3572,7 +3610,8 @@ function renderCalModal(t, el) {
 function calInput(el) {
   const md = S.modal; if (!md?.cal) return;
   const k = el.dataset.cal;
-  if (["date", "checkin", "start", "venue", "address", "country", "region", "fee", "prizes", "howTo", "contact", "note", "name", "formatNote"].includes(k)) md[k] = el.value;
+  if (["date", "checkin", "start", "venue", "address", "country", "region", "fee", "prizes", "howTo", "contact", "note", "name", "formatNote", "places", "closes"].includes(k)) md[k] = el.value;
+  if (["online", "approve", "showEntrants"].includes(k)) { md[k] = el.checked; if (k === "online") renderModal(); }
 }
 // the listing as saved: what only the admin sets (hidden, hiddenAt) and who first listed it are carried over unchanged
 function calEntry(t, md, prev) {
@@ -3582,7 +3621,7 @@ function calEntry(t, md, prev) {
     country: md.country, region: s(md.region, 60), level: HOF_LEVELS.includes(md.level) ? md.level : "open", fmt: calFmtKey(t), system: sysOf(t),
     who: CAL_WHO.map(x => x[0]).filter(k => md.who.includes(k)), fee: s(md.fee, 60), prizes: s(md.prizes, 120), howTo: s(md.howTo, 300), contact: s(md.contact, 120), note: s(md.note, 300),
     status: prev?.status || "on", lang: I18N.lang, byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "",
-    createdAt: prev?.createdAt || now, updatedAt: now, hidden: prev ? !!prev.hidden : false, gone: false };
+    createdAt: prev?.createdAt || now, updatedAt: now, hidden: prev ? !!prev.hidden : false, gone: false, ...calEntFields(md, prev, calFmtKey(t)) };
   if (prev && prev.hiddenAt !== undefined) L.hiddenAt = prev.hiddenAt;
   return L;
 }
@@ -3669,7 +3708,8 @@ function calDeep(cid) {
 const calShown = list => { const P = calPage(), today = calDay(); return list.filter(e => (e.date || "") >= today && (!e.hidden || calId(e) === P.hl)); };
 function calFiltered(list) {
   const P = calPage(), terms = hofNorm(P.q).split(/\s+/).filter(Boolean);
-  return calShown(list).filter(e => (P.level === "all" || e.level === P.level) && (P.fmt === "all" || e.fmt === P.fmt) && terms.every(x => calHay(e).includes(x)))
+  return calShown(list).filter(e => (P.level === "all" || e.level === P.level) && (P.fmt === "all" || e.fmt === P.fmt) && terms.every(x => calHay(e).includes(x))
+      && (!P.entOpen || !calEntOn() || calEntOpen(e)))
     .sort((a, b) => a.date.localeCompare(b.date) || (a.start || "99").localeCompare(b.start || "99") || String(a.name).localeCompare(String(b.name)));
 }
 // "This week" runs from today to Sunday, "Next week" the seven days after; later listings go under their month
@@ -3688,7 +3728,7 @@ function calRow(e, mine) {
     <span class="cal-date" data-notr><span class="cal-dow">${esc(calDate(e, { weekday: "short" }))}</span><b>${esc(calDate(e, { day: "numeric", month: "short" }))}</b>${e.start ? `<span class="cal-time">${esc(e.start)}</span>` : ""}</span>
     <span class="cal-main"><span class="cal-name"><b data-notr>${esc(e.name)}</b>${hofLabel(e.level)}${calLivePill(e)}</span>
       ${e.venue || e.region ? `<span class="cal-sub" data-notr>${esc([e.venue, e.region].filter(Boolean).join(" · "))}</span>` : ""}
-      <span class="cal-sub">${calLineHtml(e)}</span>${mine && e.hidden ? `<span class="cal-sub err cal-hidden-mark">Hidden by the site admin</span>` : ""}</span>
+      <span class="cal-sub">${calLineHtml(e)}</span>${calEntRowLine(e)}${mine && e.hidden ? `<span class="cal-sub err cal-hidden-mark">Hidden by the site admin</span>` : ""}</span>
   </button>`;
 }
 // a competition's listing links to it: "Follow the draw" once it has a draw, before that "View the competition". This
@@ -3721,6 +3761,7 @@ function calCard(e, close) {
     ${e.howTo || e.contact || e.note ? `<div class="cal-how stack"><h4>How to enter</h4>${e.howTo ? `<p data-notr>${esc(e.howTo)}</p>` : ""}
       <dl class="cal-facts">${fact("Contact", esc(e.contact || ""))}${fact("Note", esc(e.note || ""))}</dl></div>` : ""}
     ${org && e.hidden ? `<div class="notice small err cal-hidden-mark">Hidden by the site admin</div>` : ""}
+    ${calEntHtml(e)}
     <div class="row">${link}${org ? `${ev && e.hidden ? "" : `<button type="button" class="btn sm" data-act="${ev ? "cal-ev-edit" : "cal-edit"}" data-id="${esc(id)}">Edit</button>`}${confirm
       ? `<span class="err">Take it off the Season Calendar?</span><button type="button" class="btn sm danger" data-act="cal-page-remove-yes" data-id="${esc(id)}">Remove</button><button type="button" class="btn sm" data-act="cal-page-remove-no">Keep it</button>`
       : `<button type="button" class="btn sm" data-act="cal-page-remove" data-id="${esc(id)}">Remove</button>`}` : ""}${close ? `<button type="button" class="btn sm ghost" data-act="cal-close-entry" data-id="${esc(id)}">Close</button>` : ""}</div>
@@ -3730,6 +3771,7 @@ function calCard(e, close) {
 }
 function calResultsHtml() {
   const P = calPage(), c = P.cache[P.country || "all"];
+  if (P.ent && P.ent.cid !== P.open) calEntStop();
   if (!c || c.loading || (S.liveRoute?.cid && P.deep === "loading")) return `<div class="empty">Loading the Season Calendar…</div>`;
   if (c.err) return `<div class="empty stack" style="gap:10px"><span>The Season Calendar couldn't be loaded. Check your connection and try again.</span><div><button type="button" class="btn" data-act="cal-retry">Try again</button></div></div>`;
   if (!calShown(c.list).length) return P.country !== "all" ? `<div class="empty stack" style="gap:10px"><span>Nothing on the calendar for this country yet.</span><div><button type="button" class="btn" data-act="cal-all-countries">Show all countries</button></div></div>`
@@ -3772,7 +3814,8 @@ function renderCalPage() {
         <label class="f"><span>Country</span><select id="cal-country">${[["all", "All countries"], ...countries].map(([c, n]) => `<option value="${esc(c)}"${c === P.country ? " selected" : ""}${c === "all" ? "" : " data-notr"}>${esc(n)}</option>`).join("")}</select></label>
         <label class="f"><span>Format</span><select id="cal-fmt">${[["all", "All formats"], ...CAL_FORMATS].map(([k, n]) => `<option value="${k}"${k === P.fmt ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>
       </div>
-      <div class="hof-chips" role="group" aria-label="Competition level">${["all", ...HOF_LEVELS].map(k => `<button type="button" class="hof-chip${k === "all" ? "" : " hof-" + k}" data-act="cal-filter-level" data-k="${k}" aria-pressed="${P.level === k}">${k === "all" ? "All levels" : `<span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(k))}</span>`}</button>`).join("")}</div>
+      <div class="hof-chips" role="group" aria-label="Competition level">${["all", ...HOF_LEVELS].map(k => `<button type="button" class="hof-chip${k === "all" ? "" : " hof-" + k}" data-act="cal-filter-level" data-k="${k}" aria-pressed="${P.level === k}">${k === "all" ? "All levels" : `<span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(k))}</span>`}</button>`).join("")}${calEntOn()
+        ? `<button type="button" class="hof-chip cal-chip-open" data-act="cal-filter-open" aria-pressed="${!!P.entOpen}">Entries open</button>` : ""}</div>
       ${calEvCanAdd() ? `<div class="cal-add stack" style="gap:6px"><div><button type="button" class="btn" data-act="cal-ev-new">Add an event</button></div>
         <span class="small muted">For a competition run on SN Pétanque, list it from its Setup instead.</span></div>` : ""}
     </div>
@@ -3820,7 +3863,7 @@ function calEvOpen(e) {
   S.calPageRemove = null; const v = k => e?.[k] || "";
   S.modal = { cal: true, ev: true, prev: e || null, name: v("name"), fmt: v("fmt"), formatNote: v("formatNote"), date: v("date"), checkin: v("checkin"), start: v("start"),
     venue: v("venue"), address: v("address"), level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: v("region"), who: e ? [...(e.who || [])] : ["open"],
-    fee: v("fee"), prizes: v("prizes"), howTo: v("howTo"), contact: v("contact"), note: v("note"), err: "", busy: false };
+    fee: v("fee"), prizes: v("prizes"), howTo: v("howTo"), contact: v("contact"), note: v("note"), err: "", busy: false, ...calEntMd(e) };
   renderModal();
 }
 // the listing as saved: who added it (ownerUid, orgCode, byUid, byCode, createdAt) and what only the admin sets are carried over
@@ -3831,7 +3874,7 @@ function calEvEntry(md, prev, id) {
     country: md.country, region: s(md.region, 60), level: HOF_LEVELS.includes(md.level) ? md.level : "open", fmt: md.fmt, formatNote: s(md.formatNote, 80),
     who: CAL_WHO.map(x => x[0]).filter(k => md.who.includes(k)), fee: s(md.fee, 60), prizes: s(md.prizes, 120), howTo: s(md.howTo, 300), contact: s(md.contact, 120), note: s(md.note, 300),
     status: prev?.status || "on", lang: I18N.lang, ownerUid: prev ? prev.ownerUid || "" : S.me?.() || "", orgCode: prev ? prev.orgCode || "" : who.byCode || "",
-    byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "", createdAt: prev?.createdAt || now, updatedAt: now, hidden: prev ? !!prev.hidden : false };
+    byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "", createdAt: prev?.createdAt || now, updatedAt: now, hidden: prev ? !!prev.hidden : false, ...calEntFields(md, prev, md.fmt) };
   if (prev && prev.hiddenAt !== undefined) L.hiddenAt = prev.hiddenAt;
   return L;
 }
@@ -3877,6 +3920,176 @@ function calMineLoad() {
 function calMineHtml() {
   const list = calPage().mine?.list || []; if (!list.length) return "";
   return `<section class="panel stack cal-mine" style="gap:8px"><h3>Your listings</h3><div class="cal-list">${list.map(e => calRow(e, true)).join("")}</div></section>`;
+}
+/* ---------------- Season Calendar 4: players enter online (calendar-entry-form) ---------------- */
+// A listing can take entries (online, places, closesAt, approve, showEntrants) when its format is one the entry form knows.
+// Each entry is calendar/{cid}/entries/{eid} (public, no names), teams/{eid} (names: public only with showEntrants) and
+// contacts/{eid} (the organisers and the admin only), written together, with eid = <this device>_<1..5>. Nothing is ever
+// written into the competition or the listing. The queue: "in" entries by queuedAt, then at, then id; the first `places`
+// have a place, the rest are the waiting list. On the website it's a site switch (S.calEntryOn, config/site.calendarEntry,
+// off by default); on its own the app offers it on one device only, never in a shared db that anyone could read.
+const CAL_ENT_FMTS = ["singles", "doubles", "triples", "melee", "shooting"];
+const calEntOn = () => S.calEntryOn ? !!S.calEntryOn() : S.store.mode === "local";
+const calEntFmt = fmt => CAL_ENT_FMTS.includes(fmt);
+const calEntOpen = e => !!e && e.online === true && calEntFmt(e.fmt) && !e.hidden && (e.status || "on") === "on" && Date.now() < (e.closesAt || 0);
+const calEntN = fmt => fmt === "doubles" ? 2 : fmt === "triples" ? 3 : 1;
+const calMe = () => S.me?.() || "local";
+const calYmd = ms => { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+// entries close the day before the event by default (not before today), at the end of that day on the organiser's device
+const calCloseDefault = date => { if (!date) return ""; const d = new Date(date + "T12:00"); d.setDate(d.getDate() - 1); const v = calYmd(d.getTime()); return v < calDay() ? (calDay() > date ? date : calDay()) : v; };
+const calCloseDay = e => new Date(e.closesAt).toLocaleDateString(LOCALES[I18N.lang], { weekday: "short", day: "numeric", month: "short" });
+// the sheet's Entries fields, from the listing as saved
+const calEntMd = e => ({ online: !!e?.online, places: e?.places ? String(e.places) : "", closes: e?.closesAt ? calYmd(e.closesAt) : "", approve: !!e?.approve, showEntrants: !!e?.showEntrants });
+// the listing's entry fields as saved; while the switch is off (nothing shown), whatever was saved before stays
+function calEntFields(md, prev, fmt) {
+  if (!calEntOn()) return prev && prev.online !== undefined ? { online: !!prev.online, places: prev.places || 0, closesAt: prev.closesAt || 0, approve: !!prev.approve, showEntrants: !!prev.showEntrants } : {};
+  let closes = /^\d{4}-\d{2}-\d{2}$/.test(md.closes || "") ? md.closes : calCloseDefault(md.date); if (md.date && closes > md.date) closes = md.date;
+  return { online: !!md.online && calEntFmt(fmt), places: Math.max(0, Math.min(512, parseInt(md.places, 10) || 0)), closesAt: closes ? new Date(closes + "T23:59:59.999").getTime() : 0,
+    approve: !!md.approve, showEntrants: !!md.showEntrants };
+}
+function calEntSheet(md, fmt) {
+  if (!calEntOn() || !fmt) return "";
+  const chk = (k, label) => `<label class="chk cal-chk"><input type="checkbox" data-cal="${k}" ${md[k] ? "checked" : ""}><span>${label}</span></label>`;
+  return `<div class="stack cal-ent-set" style="gap:8px"><div class="eyebrow">Entries</div>
+    ${!calEntFmt(fmt) ? `<p class="small muted cal-ent-na">Online entry isn't available for this format yet.</p>` : `${chk("online", "Players can enter online on SN Pétanque")}
+    ${md.online ? `<div class="cal-grid"><label class="f"><span>Places</span><input type="number" min="0" max="512" step="1" inputmode="numeric" data-cal="places" value="${esc(md.places)}" placeholder="Blank for no limit"></label>
+      <label class="f"><span>Entries close</span><input type="date" data-cal="closes" value="${esc(md.closes || calCloseDefault(md.date))}" ${md.date ? `max="${esc(md.date)}"` : ""}></label></div>
+      ${chk("approve", "I'll approve each entry")}${chk("showEntrants", "Show who's entered on the listing")}` : ""}`}</div>`;
+}
+// a row on the page: from the listing's own fields (no entry reads)
+const calEntRowLine = e => calEntOn() && e.online && calEntFmt(e.fmt)
+  ? `<span class="cal-sub cal-ent-line">${calEntOpen(e) ? esc(`Enter online · closes ${calCloseDay(e)}`) : "Entries closed"}</span>` : "";
+// the queue: { n: places (0 = no limit), ins: "in" entries in order, pos: id -> number in the queue, wait, pending }
+function calQueue(e, list) {
+  const n = Math.max(0, +e.places || 0);
+  const ins = list.filter(x => x.status === "in").sort((a, b) => (a.queuedAt || 0) - (b.queuedAt || 0) || (a.at || 0) - (b.at || 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const pos = {}; ins.forEach((x, i) => { pos[x.id] = i + 1; });
+  return { n, ins, pos, wait: n ? Math.max(0, ins.length - n) : 0, pending: list.filter(x => x.status === "pending") };
+}
+function calPlacesLine(e, q) {
+  if (!calEntOpen(e)) return "Entries closed";
+  if (!q.n) return `${q.ins.length} entered`;
+  if (q.ins.length >= q.n) return `Full · ${q.wait} on the waiting list`;
+  return `${q.ins.length} of ${q.n} places taken · entries close ${calCloseDay(e)}`;
+}
+// where one entry stands
+const calEntState = (x, q) => x.status !== "in" ? "Waiting for the organiser to accept it"
+  : !q.n ? "You have a place" : q.pos[x.id] <= q.n ? `You have a place (${q.pos[x.id]} of ${q.n})` : `On the waiting list (number ${q.pos[x.id] - q.n})`;
+const calTeamName = tm => tm ? String(tm.name || "").trim() || (tm.players || []).filter(Boolean).join(" & ") : "";
+// this device's entries, by listing: { cid: { eid: team name } }, so a team name shows when names aren't public and an
+// entry removed by the organiser can be noticed (once)
+const CAL_ENT_KEY = "carreau-cal-entries";
+const calEntRec = () => { try { return JSON.parse(lsGet(CAL_ENT_KEY) || "{}") || {}; } catch { return {}; } };
+const calEntRecSet = (cid, eid, name) => { const r = calEntRec(); r[cid] = r[cid] || {}; if (name === null) delete r[cid][eid]; else r[cid][eid] = name; if (!Object.keys(r[cid]).length) delete r[cid]; lsSet(CAL_ENT_KEY, JSON.stringify(r)); };
+// the open listing's entries (and team names, when shown), watched while it's open
+function calEntWatch(e) {
+  const P = calPage(), id = calId(e); let w = P.ent;
+  // the website swaps its stand-in store for Firebase once signed in: watch again then
+  if (!w || w.cid !== id || w.store !== S.store) {
+    calEntStop(); w = P.ent = { cid: id, store: S.store, list: null, teams: null, gone: false };
+    // only the server's list can say an entry of this device's has gone (not a cached copy, nor the website's stand-in store)
+    const real = !(S.calEntryOn && S.store.mode === "local");
+    if (!S.store.watchCalEntries) w.list = [];
+    else w.unsub = S.store.watchCalEntries(id, (list, meta) => { if (P.ent !== w) return; w.list = list;
+      if (real && !meta?.fromCache) { const rec = calEntRec()[id] || {}, have = new Set(list.map(x => x.id)); Object.keys(rec).forEach(eid => { if (!have.has(eid)) { calEntRecSet(id, eid, null); w.gone = true; } }); }
+      if (calOnPage()) calPaint(); }, err => { console.error(err); if (P.ent === w) { w.list = []; if (calOnPage()) calPaint(); } });
+  }
+  if (e.showEntrants && !w.unsubT && S.store.watchCalTeams) w.unsubT = S.store.watchCalTeams(id, m => { if (P.ent !== w) return; w.teams = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
+  return w;
+}
+function calEntStop() { const P = calPage(), w = P.ent; if (!w) return; w.unsub?.(); w.unsubT?.(); P.ent = null; S.calEntConfirm = null; }
+// on the full listing: the places line and bar, Enter online, "Your entries" and "Who's entered"
+function calEntHtml(e) {
+  if (!calEntOn() || !e.online || !calEntFmt(e.fmt)) return "";
+  const w = calEntWatch(e), id = calId(e);
+  if (!w.list) return `<section class="cal-ent stack"><h4>Entries</h4><span class="small muted">Loading…</span></section>`;
+  const q = calQueue(e, w.list), open = calEntOpen(e), pct = q.n ? Math.min(100, Math.round(Math.min(q.ins.length, q.n) / q.n * 100)) : 0;
+  return `<section class="cal-ent stack" style="gap:8px"><h4>Entries</h4>
+    <div class="cal-places"><b>${esc(calPlacesLine(e, q))}</b></div>
+    ${q.n ? `<div class="meter" role="progressbar" aria-label="Places taken" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>` : ""}
+    ${open ? `<div><button type="button" class="btn primary" data-act="cal-ent-new" data-id="${esc(id)}">Enter online</button></div>` : ""}
+    ${calMyEntHtml(e, w, q, open)}${e.showEntrants ? calWhoHtml(w, q) : ""}</section>`;
+}
+function calMyEntHtml(e, w, q, open) {
+  const id = calId(e), me = calMe(), rec = calEntRec()[id] || {};
+  const mine = w.list.filter(x => x.uid === me).sort((a, b) => a.id < b.id ? -1 : 1);
+  if (!mine.length && !w.gone) return "";
+  return `<div class="cal-mine-ent stack" style="gap:6px"><h4>Your entries</h4>
+    ${w.gone ? `<div class="notice small cal-ent-gone">This entry was withdrawn or removed.</div>` : ""}
+    ${mine.map(x => { const nm = calTeamName(w.teams?.[x.id]) || rec[x.id] || "";
+      return `<div class="cal-ent-row stack" data-eid="${esc(x.id)}" style="gap:4px"><div><b data-notr>${esc(nm)}</b></div><div class="small cal-ent-state">${esc(calEntState(x, q))}</div>
+        <div class="row">${S.calEntConfirm === x.id ? `<span class="err">Withdraw this entry? Your place goes to the next team.</span>
+          <button type="button" class="btn sm danger" data-act="cal-ent-withdraw-yes" data-id="${esc(id)}" data-eid="${esc(x.id)}"><span data-notr>${esc(trAs("Withdraw my entry", "Withdraw"))}</span></button><button type="button" class="btn sm" data-act="cal-ent-keep">Keep it</button>`
+          : `${open ? `<button type="button" class="btn sm" data-act="cal-ent-edit" data-id="${esc(id)}" data-eid="${esc(x.id)}">Edit</button>` : ""}<button type="button" class="btn sm" data-act="cal-ent-withdraw" data-eid="${esc(x.id)}"><span data-notr>${esc(trAs("Withdraw my entry", "Withdraw"))}</span></button>`}</div></div>`; }).join("")}</div>`;
+}
+// the teams in queue order, then the waiting list; entries waiting for approval aren't listed
+function calWhoHtml(w, q) {
+  if (!w.teams) return "";
+  const li = (x, i) => { const tm = w.teams[x.id]; if (!tm) return "";
+    const sub = [(tm.players || []).length > 1 && String(tm.name || "").trim() ? tm.players.filter(Boolean).join(", ") : "", tm.club].filter(Boolean).join(" · "); // players, unless they're already the name
+    return `<li class="cal-who-row"><span class="cal-who-n">${i}</span><span class="cal-who-main"><b data-notr>${esc(calTeamName(tm))}</b>${sub && sub !== calTeamName(tm) ? `<span class="small muted" data-notr>${esc(sub)}</span>` : ""}</span></li>`; };
+  const inn = q.n ? q.ins.slice(0, q.n) : q.ins, wait = q.n ? q.ins.slice(q.n) : [];
+  return `<details class="cal-who-list"><summary><b>Who's entered</b></summary>
+    <ol class="cal-who-ol">${inn.map((x, i) => li(x, i + 1)).join("")}</ol>
+    ${wait.length ? `<h4 class="cal-wait-h">Waiting list</h4><ol class="cal-who-ol">${wait.map((x, i) => li(x, i + 1)).join("")}</ol>` : ""}</details>`;
+}
+// the form: one sheet for a new entry or this device's own (Edit reads its names and contact back)
+function calEntForm(e, eid) {
+  const n = calEntN(e.fmt), id = calId(e);
+  S.modal = { calEnt: true, cid: id, eid: eid || null, fmt: e.fmt, name: "", players: Array(n).fill(""), club: "", contact: "", err: "", busy: false, loading: !!eid };
+  renderModal();
+  if (eid) S.store.getCalEntry(id, eid).then(r => { const md = S.modal; if (!md?.calEnt || md.eid !== eid) return; md.loading = false;
+    if (r?.team) { md.name = n > 1 ? r.team.name || "" : ""; md.players = Array.from({ length: n }, (_, i) => r.team.players?.[i] || ""); md.club = r.team.club || ""; }
+    md.contact = r?.contact || ""; renderModal(); }, err => { console.error(err); if (S.modal?.calEnt) { S.modal.loading = false; renderModal(); } });
+}
+function renderCalEntModal(el) {
+  const md = S.modal, e = calFind(md.cid), n = calEntN(md.fmt);
+  const box = (k, label, val, max, extra = "") => `<label class="f"><span>${label}</span><input type="text" maxlength="${max}" data-calent="${k}" value="${esc(val)}" ${extra}></label>`;
+  const who = n > 1 ? `${box("name", "Team name (optional)", md.name, 60)}${md.players.map((v, i) => box("p" + i, `Player ${i + 1}`, v, 60, 'autocomplete="off"')).join("")}`
+    : box("p0", md.fmt === "singles" ? "Player name" : "Your name", md.players[0], 60, 'autocomplete="name"');
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal cal-ent-sheet" role="dialog" aria-modal="true" aria-label="Enter online">
+    <div class="spread"><div><div class="eyebrow" data-notr>${esc(e?.name || "")}</div><h3>Enter online</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    ${md.loading ? `<span class="small muted">Loading…</span>` : `<div class="stack" style="gap:10px">${who}${box("club", "Club (optional)", md.club, 60)}
+      ${box("contact", "Phone or email for the organiser", md.contact, 120, 'autocomplete="email" required')}</div>
+    <p class="small muted cal-ent-privacy">${e?.showEntrants ? `<span>Your team and player names will be shown on this listing.</span> ` : ""}<span>Your phone or email goes to the organiser only.</span></p>
+    ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
+    <div class="row"><button class="btn primary" data-act="cal-ent-send" ${md.busy ? "disabled" : ""}>Send my entry</button><button class="btn" data-act="close">Cancel</button></div>`}
+  </div></div>`;
+  localize(el);
+}
+function calEntInput(el) {
+  const md = S.modal, k = el.dataset.calent;
+  if (/^p\d$/.test(k)) md.players[+k.slice(1)] = el.value; else if (["name", "club", "contact"].includes(k)) md[k] = el.value;
+}
+async function calEntSend() {
+  const md = S.modal, P = calPage(), s = (v, n) => String(v || "").trim().slice(0, n);
+  const fail = msg => { md.err = msg; md.busy = false; renderModal(); };
+  const players = md.players.map(v => s(v, 60));
+  if (players.some(v => !v)) return fail("Name every player.");
+  const contact = s(md.contact, 120); if (!contact) return fail("Add a phone number or email so the organiser can reach you.");
+  // the listing as it is now (the organiser may have closed entries or chosen to approve them since it was opened)
+  const e = (S.store.getCal ? await S.store.getCal(md.cid).catch(() => null) : null) || calFind(md.cid);
+  if (S.modal !== md) return;
+  if (!calEntOpen(e)) return fail("Entries have closed.");
+  const team = { name: players.length > 1 ? s(md.name, 60) : players[0], players, club: s(md.club, 60) };
+  let eid = md.eid;
+  if (!eid) {
+    const me = calMe(), used = new Set((P.ent?.cid === md.cid ? P.ent.list || [] : []).filter(x => x.uid === me).map(x => x.id));
+    const k = [1, 2, 3, 4, 5].find(i => !used.has(`${me}_${i}`)); if (!k) return fail("This phone has already sent 5 entries for this competition.");
+    eid = `${me}_${k}`;
+  }
+  md.busy = true; md.err = ""; renderModal();
+  try {
+    calEntRecSet(md.cid, eid, calTeamName(team));
+    if (md.eid) await S.store.updateCalEntry(md.cid, eid, team, contact);
+    else await S.store.addCalEntry(md.cid, eid, { uid: calMe(), status: e.approve ? "pending" : "in" }, team, contact);
+  } catch (err) { console.error(err); if (!md.eid) calEntRecSet(md.cid, eid, null); return fail(err?.code === "permission-denied" ? "Entries have closed." : "That didn't save. Check your connection and try again."); }
+  S.modal = null; renderModal(); toast("Entry sent."); calPaint();
+}
+async function calEntWithdraw(cid, eid) {
+  const name = (calEntRec()[cid] || {})[eid]; calEntRecSet(cid, eid, null); // so the entry going isn't taken for a removal
+  try { await S.store.withdrawCalEntry(cid, eid); S.calEntConfirm = null; toast("Entry withdrawn."); calPaint(); }
+  catch (err) { console.error(err); if (name !== undefined) calEntRecSet(cid, eid, name); toast("That didn't save. Check your connection and try again."); }
 }
 function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
@@ -4080,6 +4293,7 @@ function renderModal() {
 function drawModal() {
   const el = $("#modal"); const t = T();
   if (S.modal?.cal && S.modal.ev) { renderCalModal(null, el); return; } // an event run elsewhere has no competition
+  if (S.modal?.calEnt) { renderCalEntModal(el); return; } // a player's online entry (the Season Calendar page)
   if (!S.modal || !t) { el.innerHTML = ""; return; }
   if (S.modal.hof) { if (S.modal.tid !== t.id) { S.modal = null; el.innerHTML = ""; return; } renderHofModal(t, el); return; }
   if (S.modal.cal) { if (S.modal.tid !== t.id) { S.modal = null; el.innerHTML = ""; return; } renderCalModal(t, el); return; }
@@ -4139,6 +4353,7 @@ async function modalAction(act, k, a) {
   if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
   if (md.hof) { await hofAction(act, k); return; }
   if (md.cal) { await calAction(act, k); return; }
+  if (md.calEnt) { if (act === "cal-ent-send") await calEntSend(); return; }
   // the game went while its dialog was open (a draw undone on another phone, say): close it rather than save into nothing
   if (!t || (md.id && !S.matches[md.id]) || (md.so && (md.ids || []).some(id => !S.matches[id]))) { S.modal = null; renderModal(); toast("That game isn't in the draw any more."); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
@@ -5826,7 +6041,13 @@ document.addEventListener("click", async e => {
     case "cal-open": if (t && calCan(t)) calOpen(t); break;
     case "cal-filter-level": calPage().level = HOF_LEVELS.includes(a.dataset.k) ? a.dataset.k : "all"; hofRedraw(); break;
     case "cal-all-countries": calPage().country = "all"; hofRedraw(); break;
-    case "cal-clear": Object.assign(calPage(), { q: "", level: "all", fmt: "all" }); hofRedraw(); break;
+    case "cal-clear": Object.assign(calPage(), { q: "", level: "all", fmt: "all", entOpen: false }); hofRedraw(); break;
+    case "cal-filter-open": calPage().entOpen = !calPage().entOpen; hofRedraw(); break;
+    case "cal-ent-new": { const e2 = calFind(a.dataset.id); if (e2 && calEntOpen(e2)) calEntForm(e2, null); break; }
+    case "cal-ent-edit": { const e2 = calFind(a.dataset.id); if (e2 && calEntOpen(e2)) calEntForm(e2, a.dataset.eid); break; }
+    case "cal-ent-withdraw": S.calEntConfirm = a.dataset.eid; calPaint(); break;
+    case "cal-ent-keep": S.calEntConfirm = null; calPaint(); break;
+    case "cal-ent-withdraw-yes": await calEntWithdraw(a.dataset.id, a.dataset.eid); break;
     case "cal-retry": calLoad(true); hofRedraw(); break;
     case "cal-open-entry": { const P = calPage(), e1 = calFind(a.dataset.id); P.open = a.dataset.id; S.calPageRemove = null; if (e1?.tid) delete P.comp[e1.tid]; calPaint(); document.querySelector(`#cal-${CSS.escape(a.dataset.id)} [data-act="cal-close-entry"]`)?.focus({ preventScroll: true }); break; }
     case "cal-close-entry": { const id = a.dataset.id, P = calPage(); P.open = null; S.calPageRemove = null; if (P.hl === id) P.hl = null; calPaint(); document.getElementById("cal-" + id)?.focus({ preventScroll: true }); break; }
@@ -6002,6 +6223,7 @@ document.addEventListener("change", async e => {
 document.addEventListener("input", e => {
   if (e.target.dataset?.hof && S.modal?.hof) { hofInput(e.target); return; }
   if (e.target.dataset?.cal && S.modal?.cal) { calInput(e.target); return; }
+  if (e.target.dataset?.calent && S.modal?.calEnt) { calEntInput(e.target); return; }
   if (e.target.id === "hof-q") { hofPage().q = e.target.value; hofPaint(); return; }
   if (e.target.id === "cal-q") { calPage().q = e.target.value; calPaint(); return; }
   if (e.target.id === "picker-q") {
@@ -6142,6 +6364,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns, calQueue, calEntState, calPlacesLine };
 })();
 </script>
