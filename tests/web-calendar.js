@@ -159,7 +159,7 @@ const { chromium } = require('playwright');
   if (process.env.OUT) await V.screenshot({ path: process.env.OUT + '/calendar-event-stranger-390.png' });
   log('event organiser: Edit', ownerEdit, '| Organiser link', orgLink.endsWith('#calendar.' + cid + '.org.' + code) && !!code, '| stranger Edit', strangerEdit);
   log('event organiser more: format', await V.evaluate(c => [...document.querySelectorAll('#cal-' + c + ' dt')].find(d => d.textContent === 'Format')?.nextElementSibling.textContent.replace(/\s+/g, ' ').trim(), cid),
-    '| live now', await V.evaluate(c => !!document.querySelector('#cal-' + c + ' .cal-live'), cid), '| competition links', await V.evaluate(c => !!document.querySelector('#cal-' + c + ' a.btn'), cid),
+    '| live now', await V.evaluate(c => !!document.querySelector('#cal-' + c + ' .cal-live'), cid), '| competition links', await V.evaluate(c => !!document.querySelector('#cal-' + c + ' a.btn:not(.cal-maps)'), cid),
     '| note', await txt(E, '#cal-' + cid + ' .cal-orglink p'));
 
   // the organiser link joins another device; a wrong code doesn't
