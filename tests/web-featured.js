@@ -97,6 +97,10 @@ const { chromium } = require('playwright');
   // examples: unchanged, view-only
   await V.evaluate(id => { location.hash = id; }, ex); await w(2500);
   const exTabs = await tabs(V);
+  // with open testing off, an example still says Example in the header (not the Organiser code button)
+  const exHead = await V.evaluate(() => ({ pill: /Example/.test(document.querySelector('#tsel')?.textContent || ''), code: !!document.querySelector('header [data-act="enter-code"]') }));
+  await V.screenshot({ path: process.env.OUT + '/web-featured-example-phone.png' });
+  log(`example header (open testing off): ${exHead.pill ? 'Example pill' : 'no example pill'} | code button ${exHead.code}`);
   const exEdit = await V.evaluate(async () => { const S = window.__carreau.S; const t = JSON.parse(JSON.stringify(S.tournaments[S.tid])); t.name = 'hacked'; try { await S.store.setTournament(t); return 'WROTE'; } catch (e) { return 'denied ' + e.code; } });
   await AD.evaluate(() => window.__testSetSite({ openTesting: true })); await w(2500);
   const exEditOpen = await raw(V, 'update', 'tournaments/' + ex, { name: 'hacked' });

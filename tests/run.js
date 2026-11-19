@@ -457,6 +457,7 @@ const SUITES = {
       /featured, organiser publishes to the Hall of Fame: true/,
       /organiser rules: make example denied \S+ \| unfeature ok \| feature again ok \| not a bool denied \S+/,
       /new competition listed by a visitor: denied/,
+      /example header \(open testing off\): Example pill \| code button false/,
       /example still view-only: true \| tabs entries,setup,draw,courts,standings,stream \| hof false/, /admin example button: Example ✓/, /errs \[\]/],
     'web-open-testing.js': [
       /B sees A comp in menu: false/, /B tabs \(open testing\): Registration\|Setup/, /B rename: ok/, /B delete: blocked/,
