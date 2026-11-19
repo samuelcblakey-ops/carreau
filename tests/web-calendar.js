@@ -4,6 +4,8 @@
 // level. Archiving marks the listing gone; the admin's restore in #admin unmarks it.
 // Season Calendar 2 (calendar-page): a visitor's page and listing (Follow the draw once the competition is drawn), and the
 // admin's hide from the page: allowed for the admin, refused for anyone else; the organiser's Setup panel says so.
+// Season Calendar 3 (calendar-own-events): an event added from the page, its organiser link (join, wrong code), "Your listings"
+// (hidden ones marked), and the event rules, with organiser login off and on.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -129,5 +131,90 @@ const { chromium } = require('playwright');
   const showBtn = await txt(AD, `#cal-${tid5} [data-act="cal-hide"]`);
   await AD.click(`#cal-${tid5} [data-act="cal-hide"]`); await w(2000);
   log('admin show again:', showBtn, '| hidden', (await AD.evaluate(t => window.__testRaw.get('calendar/' + t), tid5)).hidden, '| organiser removes', await ok(A, 'del', 'calendar/' + tid5));
+
+  // ---- Season Calendar 3 (calendar-own-events): an event run elsewhere, its organiser link, and its rules ----
+  const W = process.env.WEB_URL;
+  const toastOf = async (p, re) => { try { await p.waitForFunction(r => new RegExp(r).test(document.querySelector('#toast')?.textContent || ''), re.source, { timeout: 15000 }); } catch {} return txt(p, '#toast'); };
+  const evDoc = (id, u, extra) => Object.assign({ kind: 'event', id, name: 'Raw event', date: day(10), checkin: '', start: '', venue: '', address: '', country: 'GB-ENG', region: '', level: 'open', fmt: 'singles', formatNote: '',
+    who: ['open'], fee: '', prizes: '', howTo: '', contact: '', note: '', status: 'on', lang: 'en', ownerUid: u, orgCode: '', byUid: u, byCode: '', createdAt: Date.now(), updatedAt: Date.now(), hidden: false }, extra);
+  const E = await mk('eventOwner', 390); await E.goto(W + '#calendar'); await w(4500);
+  await E.click('[data-act="cal-ev-new"]'); await w(400);
+  await E.fill('#modal [data-cal="name"]', 'Arlesey Summer Doubles'); await E.click('#modal [data-act="cal-fmt"][data-k="doubles"]');
+  await E.fill('#modal [data-cal="formatNote"]', 'Swiss, 4 rounds then knockouts'); await E.fill('#modal [data-cal="date"]', day(15)); await E.fill('#modal [data-cal="venue"]', 'Arlesey PC');
+  if (process.env.OUT) await E.screenshot({ path: process.env.OUT + '/calendar-event-sheet-web-390.png' });
+  await E.click('#modal [data-act="cal-save"]');
+  const added = await toastOf(E, /Season Calendar/); await w(2500);
+  const cid = await E.evaluate(() => location.hash.split('.')[1]);
+  const EV = await E.evaluate(c => window.__testRaw.get('calendar/' + c), cid), euid = await E.evaluate(() => window.__testUid());
+  const code = (await E.evaluate(c => window.__testRaw.get('calendar/' + c + '/private/code'), cid))?.code || '';
+  log('web add event: ' + added + ' | kind', EV.kind, '| fmt', EV.fmt, '| on page', await E.evaluate(c => !!document.querySelector('#cal-' + c + '.cal-card'), cid),
+    '| ownerUid mine', EV.ownerUid === euid, '| code private', code.length === 8 && !JSON.stringify(EV).includes(code));
+  const orgLink = await E.evaluate(c => document.querySelector('#cal-org-' + c)?.value || '', cid);
+  const ownerEdit = await E.evaluate(c => !!document.querySelector('#cal-' + c + ' [data-act="cal-ev-edit"]'), cid);
+  await E.evaluate(c => document.querySelector('#cal-' + c)?.scrollIntoView(), cid); await w(300);
+  if (process.env.OUT) await E.screenshot({ path: process.env.OUT + '/calendar-event-organiser-390.png' });
+  await V.goto(W + '#calendar.' + cid); await V.reload(); await w(4500);
+  const strangerEdit = await V.evaluate(c => !!document.querySelector('#cal-' + c + ' [data-act="cal-ev-edit"], #cal-' + c + ' [data-act="cal-page-remove"], #cal-org-' + c), cid);
+  await V.evaluate(c => document.querySelector('#cal-' + c)?.scrollIntoView(), cid); await w(300);
+  if (process.env.OUT) await V.screenshot({ path: process.env.OUT + '/calendar-event-stranger-390.png' });
+  log('event organiser: Edit', ownerEdit, '| Organiser link', orgLink.endsWith('#calendar.' + cid + '.org.' + code) && !!code, '| stranger Edit', strangerEdit);
+  log('event organiser more: format', await V.evaluate(c => [...document.querySelectorAll('#cal-' + c + ' dt')].find(d => d.textContent === 'Format')?.nextElementSibling.textContent.replace(/\s+/g, ' ').trim(), cid),
+    '| live now', await V.evaluate(c => !!document.querySelector('#cal-' + c + ' .cal-live'), cid), '| competition links', await V.evaluate(c => !!document.querySelector('#cal-' + c + ' a.btn'), cid),
+    '| note', await txt(E, '#cal-' + cid + ' .cal-orglink p'));
+
+  // the organiser link joins another device; a wrong code doesn't
+  const J = await mk('joiner', 390); await J.goto(W + '#calendar.' + cid + '.org.' + code);
+  const joinToast = await toastOf(J, /edit this listing|didn't work/); await w(2500);
+  const jUpdate = await ok(J, 'update', 'calendar/' + cid, { note: 'Bring your own boules', updatedAt: Date.now() });
+  log('join link: ' + joinToast + ' | second device updates', jUpdate, '| wrong code: ' + await (async () => {
+    const D = await mk('wrongCode'); await D.goto(W + '#calendar.' + cid + '.org.WRONG234'); const t = await toastOf(D, /edit this listing|didn't work/); return t; })());
+  log('join link more: code stripped', await J.evaluate(c => location.hash === '#calendar.' + c, cid), '| Edit', await J.evaluate(c => !!document.querySelector('#cal-' + c + ' [data-act="cal-ev-edit"]'), cid),
+    '| member', await raw(J, 'get', 'calendar/' + cid + '/members/' + await J.evaluate(() => window.__testUid())));
+  // the joined device edits it from the sheet
+  await J.click('#cal-' + cid + ' [data-act="cal-ev-edit"]'); await w(400); await J.fill('#modal [data-cal="venue"]', 'Arlesey Pétanque Club'); await J.click('#modal [data-act="cal-save"]');
+  const jSaved = await toastOf(J, /Listing updated|organisers/); await w(1500);
+  log('joined edit: ' + jSaved + ' | venue', (await E.evaluate(c => window.__testRaw.get('calendar/' + c), cid)).venue);
+
+  // the rules for events
+  const bUid = await B.evaluate(() => window.__testUid());
+  log('rules: stranger updates event', await ok(B, 'update', 'calendar/' + cid, { note: 'Junk' }), '| stranger reads code', await ok(B, 'get', 'calendar/' + cid + '/private/code'),
+    '| member reads code', await ok(J, 'get', 'calendar/' + cid + '/private/code'), '| change kind', await ok(E, 'update', 'calendar/' + cid, { kind: 'comp' }),
+    '| change ownerUid', await ok(E, 'update', 'calendar/' + cid, { ownerUid: bUid }));
+  log('rules more: stranger deletes', await ok(B, 'del', 'calendar/' + cid), '| stranger joins with wrong code', await ok(B, 'set', 'calendar/' + cid + '/members/' + bUid, { role: 'edit', code: 'WRONG234', joinedAt: Date.now() }),
+    '| stranger writes code', await ok(B, 'set', 'calendar/' + cid + '/private/code', { code: 'MINEMINE' }), '| owner sets hidden', await ok(E, 'update', 'calendar/' + cid, { hidden: true }),
+    '| change orgCode', await ok(E, 'update', 'calendar/' + cid, { orgCode: 'ABCDEFGH' }), '| change createdAt', await ok(E, 'update', 'calendar/' + cid, { createdAt: 5 }));
+  log('rules create: own', await ok(B, 'set', 'calendar/cRawB', evDoc('cRawB', bUid)), '| someone else\'s ownerUid', await ok(B, 'set', 'calendar/cRawB2', evDoc('cRawB2', euid, { byUid: bUid })),
+    '| at a competition\'s id', await ok(A, 'set', 'calendar/' + tid4, evDoc(tid4, await A.evaluate(() => window.__testUid()))), '| hidden', await ok(B, 'set', 'calendar/cRawB3', evDoc('cRawB3', bUid, { hidden: true })),
+    '| other format', await ok(B, 'set', 'calendar/cRawB4', evDoc('cRawB4', bUid, { fmt: 'eurocup' })), '| wrong id', await ok(B, 'set', 'calendar/cRawB5', evDoc('cRawB6', bUid)), '| no name', await ok(B, 'set', 'calendar/cRawB7', evDoc('cRawB7', bUid, { name: '' })));
+
+  // the admin hides it: "Your listings" still shows it (marked) to its organisers; the competition's listing (hidden) too
+  await AD.evaluate(c => window.__testRaw.update('calendar/' + c, { hidden: true, hiddenAt: Date.now() }), cid);
+  const mineOn = async (p, id) => p.evaluate(id => ({ row: !!document.querySelector('#calmine-' + id), mark: (document.querySelector('#calmine-' + id + ' .cal-hidden-mark')?.textContent || '') }), id);
+  await E.goto(W + '#calendar'); await E.reload(); await w(5000); const em = await mineOn(E, cid);
+  await J.goto(W + '#calendar'); await J.reload(); await w(5000); const jm = await mineOn(J, cid);
+  await A.goto(W + '#calendar'); await A.reload(); await w(6000); const am = await mineOn(A, tid2);
+  log('web your listings: event', em.row, '| competition listing', am.row, '| hidden marked', em.mark === 'Hidden by the site admin' && am.mark === 'Hidden by the site admin', '| joined device', jm.row && jm.mark === 'Hidden by the site admin',
+    '| stranger reads hidden', await ok(B, 'get', 'calendar/' + cid), '| owner unhides', await ok(E, 'update', 'calendar/' + cid, { hidden: false }));
+  if (process.env.OUT) await E.screenshot({ path: process.env.OUT + '/calendar-your-listings-390.png' });
+
+  // organiser login on: a device without a code can't add an event; one logged in with a valid code can
+  await AD.evaluate(() => window.__testDoc('orgcodes/EVTCODE7', { label: 'Events', createdAt: new Date(), expiresAt: new Date(Date.now() + 3 * 864e5), revoked: false }));
+  await AD.evaluate(() => window.__testSetSite({ organiserLogin: true })); await w(1500);
+  const F = await mk('orgLogin'); await F.goto(W); await w(3500); const fUid = await F.evaluate(() => window.__testUid());
+  const noCode = await ok(F, 'set', 'calendar/cLogin1', evDoc('cLogin1', fUid));
+  const loginWrite = await ok(F, 'set', 'organisers/' + fUid, { code: 'EVTCODE7', at: Date.now() });
+  const withCode = await ok(F, 'set', 'calendar/cLogin2', evDoc('cLogin2', fUid, { orgCode: 'EVTCODE7', byCode: 'EVTCODE7' }));
+  const ownerNoCode = await ok(E, 'update', 'calendar/' + cid, { note: 'Login on', updatedAt: Date.now() });
+  const memberStill = await ok(J, 'update', 'calendar/' + cid, { note: 'Member edit', updatedAt: Date.now() });
+  const sameCode = await ok(F, 'update', 'calendar/cLogin2', { note: 'Same code', updatedAt: Date.now() });
+  log('rules, organiser login on: device without a code creates event', noCode, '| with a valid code', loginWrite && withCode);
+  log('rules, organiser login on more: owner without a code updates', ownerNoCode, '| member updates', memberStill, '| code holder updates', sameCode);
+  await AD.evaluate(() => window.__testSetSite({ organiserLogin: false })); await w(1500);
+
+  // the owner takes it off the calendar: the private code goes with it
+  await E.goto(W + '#calendar.' + cid); await E.reload(); await w(5000);
+  await E.click('#cal-' + cid + ' [data-act="cal-page-remove"]'); await w(300); await E.click('#cal-' + cid + ' [data-act="cal-page-remove-yes"]');
+  const removed = await toastOf(E, /Taken off|organisers|didn't save/); await w(1500);
+  log('web event remove: ' + removed + ' | read', await raw(AD, 'get', 'calendar/' + cid), '| code', await raw(AD, 'get', 'calendar/' + cid + '/private/code'));
   log('errs', errs); await b.close();
 })();

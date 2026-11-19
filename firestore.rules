@@ -232,37 +232,88 @@ service cloud.firestore {
     // organiser code it was made with; not archived, not an example) or the admin. Open testing doesn't count. Anyone can
     // read shown listings; only the admin may hide one (hidden, hiddenAt), and an organiser can't change those or who first
     // listed it (byUid, byCode, createdAt). 'gone' marks a listing whose competition has been archived or deleted.
-    function calShape(d, cid) {
-      return d.keys().hasOnly(['kind', 'tid', 'name', 'date', 'checkin', 'start', 'venue', 'address', 'country', 'region', 'level', 'fmt', 'system',
-                               'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'lang', 'byUid', 'byCode', 'createdAt', 'updatedAt',
-                               'hidden', 'hiddenAt', 'gone'])
-        && d.kind == 'comp' && d.tid == cid
-        && d.name is string && d.name.size() <= 120
+    // the fields both kinds of listing share
+    function calBase(d) {
+      return d.name is string && d.name.size() <= 120
         && d.date is string && d.date.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
         && d.get('checkin', '') is string && d.get('checkin', '').matches('([0-9]{2}:[0-9]{2})?')
         && d.get('start', '') is string && d.get('start', '').matches('([0-9]{2}:[0-9]{2})?')
         && d.get('venue', '') is string && d.get('venue', '').size() <= 120 && d.get('address', '') is string && d.get('address', '').size() <= 200
         && d.country is string && d.country.size() >= 2 && d.country.size() <= 8
         && d.get('region', '') is string && d.get('region', '').size() <= 60 && d.level in ['national', 'regional', 'open']
-        && d.get('fmt', 'triples') in ['singles', 'doubles', 'triples', 'melee', 'shooting', 'eurocup', 'clubs']
-        && d.get('system', '') is string && d.get('system', '').size() <= 20
         && d.who is list && d.who.size() <= 8 && d.who.hasOnly(['open', 'men', 'ladies', 'mixed', 'veterans', 'juniors', 'members', 'licence'])
         && d.get('fee', '') is string && d.get('fee', '').size() <= 60 && d.get('prizes', '') is string && d.get('prizes', '').size() <= 120
         && d.get('howTo', '') is string && d.get('howTo', '').size() <= 300 && d.get('contact', '') is string && d.get('contact', '').size() <= 120
         && d.get('note', '') is string && d.get('note', '').size() <= 300 && d.get('lang', '') is string && d.get('lang', '').size() <= 8
-        && d.status == 'on' && d.hidden is bool && d.get('hiddenAt', 0) is number && d.get('gone', false) is bool;
+        && d.status == 'on' && d.hidden is bool && d.get('hiddenAt', 0) is number;
     }
+    function calShape(d, cid) {
+      return d.keys().hasOnly(['kind', 'tid', 'name', 'date', 'checkin', 'start', 'venue', 'address', 'country', 'region', 'level', 'fmt', 'system',
+                               'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'lang', 'byUid', 'byCode', 'createdAt', 'updatedAt',
+                               'hidden', 'hiddenAt', 'gone'])
+        && d.kind == 'comp' && d.tid == cid && calBase(d)
+        && d.get('fmt', 'triples') in ['singles', 'doubles', 'triples', 'melee', 'shooting', 'eurocup', 'clubs']
+        && d.get('system', '') is string && d.get('system', '').size() <= 20 && d.get('gone', false) is bool;
+    }
+    // Season Calendar 3 (calendar-own-events): an event run elsewhere (kind 'event'), with a new id of its own (id == cid, never a
+    // competition's). Its organisers: the device that added it (ownerUid) while organiser login is off, or the organiser code it
+    // was added with (orgCode) while it's on, and any device that joined with its organiser link (members role 'edit', checked
+    // against the private code in private/code, which only organisers and the admin can read).
+    function calEvShape(d, cid) {
+      return d.keys().hasOnly(['kind', 'id', 'name', 'date', 'checkin', 'start', 'venue', 'address', 'country', 'region', 'level', 'fmt', 'formatNote',
+                               'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'lang', 'ownerUid', 'orgCode', 'byUid', 'byCode',
+                               'createdAt', 'updatedAt', 'hidden', 'hiddenAt'])
+        && d.kind == 'event' && d.id == cid && calBase(d) && d.name.size() >= 1
+        && d.fmt in ['singles', 'doubles', 'triples', 'melee', 'shooting', 'other']
+        && d.get('formatNote', '') is string && d.get('formatNote', '').size() <= 80
+        && d.ownerUid is string && d.orgCode is string;
+    }
+    function cdoc(cid) { return /databases/$(database)/documents/calendar/$(cid); }
+    function calMember(cid) { return signedIn() && exists(/databases/$(database)/documents/calendar/$(cid)/members/$(request.auth.uid))
+                                && get(/databases/$(database)/documents/calendar/$(cid)/members/$(request.auth.uid)).data.role == 'edit'; }
+    // the event's organisers, given the listing as stored (d)
+    function evOrg(cid, d) { return signedIn() && d.kind == 'event'
+                               && (calMember(cid) || (loginOn() ? (orgValid() && d.orgCode != '' && d.orgCode == myCode()) : d.ownerUid == request.auth.uid)); }
+    function evOrgOf(cid) { return exists(cdoc(cid)) && evOrg(cid, get(cdoc(cid)).data); }
     // the admin hides a listing from the Season Calendar page (hidden, hiddenAt: when) and can show it again; nobody else can
     match /calendar/{cid} {
-      allow get: if resource == null || resource.data.hidden != true || isAdmin() || (resource.data.kind == 'comp' && hofOrganiser(cid));
-      allow list: if isAdmin() || resource.data.hidden == false;
-      allow create: if calShape(request.resource.data, cid)
-                    && (isAdmin() || (hofOrganiser(cid) && request.resource.data.byUid == request.auth.uid && request.resource.data.hidden == false
-                                      && (request.resource.data.get('byCode', '') == '' || request.resource.data.byCode == myCode())
-                                      && !request.resource.data.keys().hasAny(['hiddenAt'])));
-      allow update: if resource.data.kind == 'comp' && calShape(request.resource.data, cid)
-                    && (isAdmin() || (hofOrganiser(cid) && same('hidden') && same('hiddenAt') && same('byUid') && same('byCode') && same('createdAt')));
-      allow delete: if resource.data.kind == 'comp' && (isAdmin() || hofOrganiser(cid));
+      allow get: if resource == null || resource.data.hidden != true || isAdmin()
+                 || (resource.data.kind == 'comp' && hofOrganiser(cid)) || (resource.data.kind == 'event' && evOrg(cid, resource.data));
+      // "Your listings": the events this device added, hidden ones included
+      allow list: if isAdmin() || resource.data.hidden == false || (signedIn() && resource.data.get('ownerUid', '') == request.auth.uid);
+      allow create: if (calShape(request.resource.data, cid)
+                        && (isAdmin() || (hofOrganiser(cid) && request.resource.data.byUid == request.auth.uid && request.resource.data.hidden == false
+                                          && (request.resource.data.get('byCode', '') == '' || request.resource.data.byCode == myCode())
+                                          && !request.resource.data.keys().hasAny(['hiddenAt']))))
+                    || (calEvShape(request.resource.data, cid) && signedIn() && !exists(tdoc(cid)) && request.resource.data.ownerUid == request.auth.uid
+                        && (isAdmin() || (request.resource.data.byUid == request.auth.uid && request.resource.data.hidden == false
+                                          && !request.resource.data.keys().hasAny(['hiddenAt'])
+                                          && (request.resource.data.get('byCode', '') == '' || request.resource.data.byCode == myCode())
+                                          && (request.resource.data.orgCode == '' || request.resource.data.orgCode == myCode())
+                                          && (!loginOn() || (orgValid() && request.resource.data.orgCode == myCode())))));
+      allow update: if (resource.data.kind == 'comp' && calShape(request.resource.data, cid)
+                        && (isAdmin() || (hofOrganiser(cid) && same('hidden') && same('hiddenAt') && same('byUid') && same('byCode') && same('createdAt'))))
+                    || (resource.data.kind == 'event' && calEvShape(request.resource.data, cid)
+                        && same('ownerUid') && same('orgCode') && same('byUid') && same('byCode') && same('createdAt')
+                        && (isAdmin() || (evOrg(cid, resource.data) && same('hidden') && same('hiddenAt'))));
+      allow delete: if (resource.data.kind == 'comp' && (isAdmin() || hofOrganiser(cid)))
+                    || (resource.data.kind == 'event' && (isAdmin() || evOrg(cid, resource.data)));
+      // an event's organiser code (the organiser link carries it): for its organisers and the admin only
+      match /private/{docId} {
+        allow read: if docId == 'code' && (isAdmin() || evOrgOf(cid));
+        allow write: if docId == 'code' && (isAdmin() || evOrgOf(cid))
+                     && (request.resource == null || (request.resource.data.keys().hasOnly(['code']) && request.resource.data.code is string
+                                                      && request.resource.data.code.size() >= 6 && request.resource.data.code.size() <= 40));
+      }
+      // a device that opened the organiser link: accepted only with the event's current code, like a stream's desk link
+      match /members/{uid} {
+        allow read: if signedIn() && (request.auth.uid == uid || isAdmin() || evOrgOf(cid));
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['role', 'code', 'joinedAt']) && request.resource.data.role == 'edit'
+          && request.resource.data.code is string && request.resource.data.code.size() > 0
+          && request.resource.data.code == get(/databases/$(database)/documents/calendar/$(cid)/private/code).data.get('code', '#');
+        allow delete: if signedIn() && (request.auth.uid == uid || isAdmin() || evOrgOf(cid));
+      }
     }
     // SN Pétanque Academy (academy.snpetanque.com): one document per player, keyed by their uid, with their results underneath.
     // A player reads and writes only their own; the admin can read everyone's (the Academy admin page).
