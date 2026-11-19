@@ -190,6 +190,17 @@ function fbStore() {
       const b = writeBatch(db); b.set(doc(db, "calendar", cid, "teams", eid), clone(team)); b.set(doc(db, "calendar", cid, "contacts", eid), { contact }); return track(b.commit());
     },
     withdrawCalEntry(cid, eid) { const b = writeBatch(db); ["entries", "teams", "contacts"].forEach(k => b.delete(doc(db, "calendar", cid, k, eid))); return track(b.commit()); },
+    // the listing's organisers (calendar-entries-desk): the contacts (the rules refuse anyone else), accepting a pending entry
+    // (it joins the queue at the server's time), and every entry of a listing being removed: entries, teams and contacts, in
+    // batches of up to 450, before the listing goes (the rules check the listing to know who its organisers are)
+    watchCalContacts(cid, cb, onErr) { return onSnapshot(collection(db, "calendar", cid, "contacts"), s => { const m = {}; s.docs.forEach(d => { m[d.id] = d.data().contact || ""; }); cb(m); }, onErr); },
+    acceptCalEntry(cid, eid) { return track(updateDoc(doc(db, "calendar", cid, "entries", eid), { status: "in", queuedAt: serverTimestamp() })); },
+    async deleteCalEntries(cid) {
+      const subs = ["entries", "teams", "contacts"], ids = new Set();
+      for (const k of subs) (await getDocs(collection(db, "calendar", cid, k))).docs.forEach(d => ids.add(d.id));
+      const refs = [...ids].flatMap(id => subs.map(k => doc(db, "calendar", cid, k, id)));
+      for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await track(b.commit()); }
+    },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },

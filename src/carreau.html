@@ -441,6 +441,12 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .cal-who-list summary{min-height:44px;padding:12px 0;box-sizing:border-box;cursor:pointer}.cal-who-ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .cal-who-row{display:flex;gap:10px;align-items:flex-start}.cal-who-n{flex:none;min-width:2em;text-align:right;font-weight:700;color:var(--muted)}.cal-who-main{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}.cal-wait-h{margin:10px 0 6px}
 .cal-admin{gap:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;background:var(--surface-2)}
+/* the organiser's online entries (on the listing) and Registration's "Entered online" (calendar-entries-desk) */
+.cal-desk{gap:8px}.cal-desk h4{margin:0}.cal-desk-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cal-desk-row{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}.cal-desk-row.pending{border-style:dashed}
+.cal-desk-n{flex:none;min-width:2em;text-align:right;font-weight:700;color:var(--muted)}.cal-desk-n.pill{min-width:0;max-width:40%;text-align:left;white-space:normal}
+.cal-desk-main{flex:1;min-width:0;overflow-wrap:anywhere}.cal-desk-main .row{margin-top:4px}.cal-desk-main .row .err,.cal-reg-row .err{flex-basis:100%}.cal-desk-meta a{color:var(--accent);font-weight:600}
+@media (max-width:560px),(pointer:coarse){.cal-desk .btn,.cal-reg .btn{min-height:44px}}
 @media (max-width:560px){.cal-facts{grid-template-columns:1fr;gap:2px}.cal-facts dd{margin-bottom:6px}.cal-row{gap:10px;padding:9px 10px}.cal-date{width:52px}}
 /* Hall of Fame: the header link, the start-screen card and the page */
 .hof-btn,.cal-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;flex:none;white-space:nowrap}
@@ -1313,6 +1319,14 @@ Object.assign(LANG_TEXT.de, {"Season Calendar online entry": "Online-Meldung im 
 Object.assign(LANG_TEXT.nl, {"Season Calendar online entry": "Online inschrijven via de Seizoenskalender", "Players can enter online on SN Pétanque": "Spelers kunnen zich online inschrijven op SN Pétanque", "Online entry isn't available for this format yet.": "Online inschrijven is voor dit format nog niet beschikbaar.", "Places": "Plaatsen", "Blank for no limit": "Leeg = geen limiet", "Entries close": "Inschrijving sluit", "I'll approve each entry": "Ik keur elke inschrijving goed", "Show who's entered on the listing": "Toon wie er ingeschreven is", "Enter online": "Online inschrijven", "Enter online · closes {x}": "Online inschrijven · sluit {1}", "Entries closed": "Inschrijving gesloten", "Entries open": "Inschrijving open", "{n} of {x} places taken · entries close {x}": "{1} van {2} plaatsen bezet · inschrijving sluit {3}", "Full · {n} on the waiting list": "Vol · {1} op de wachtlijst", "{n} entered": "{1} ingeschreven", "Your name": "Je naam", "Club (optional)": "Club (optioneel)", "Phone or email for the organiser": "Telefoon of e-mail voor de organisator", "Your team and player names will be shown on this listing.": "De namen van je team en spelers worden op deze vermelding getoond.", "Your phone or email goes to the organiser only.": "Je telefoon of e-mail gaat alleen naar de organisator.", "Send my entry": "Inschrijving versturen", "Name every player.": "Geef elke speler een naam.", "Add a phone number or email so the organiser can reach you.": "Voeg een telefoonnummer of e-mail toe zodat de organisator je kan bereiken.", "This phone has already sent 5 entries for this competition.": "Deze telefoon heeft al 5 inschrijvingen voor dit toernooi verstuurd.", "Entries have closed.": "De inschrijving is gesloten.", "Entry sent.": "Inschrijving verstuurd.", "Your entries": "Je inschrijvingen", "You have a place ({n} of {x})": "Je hebt een plaats ({1} van {2})", "You have a place": "Je hebt een plaats", "On the waiting list (number {n})": "Op de wachtlijst (nummer {1})", "Waiting for the organiser to accept it": "Wacht op goedkeuring van de organisator", "Withdraw my entry": "Inschrijving intrekken", "Withdraw this entry? Your place goes to the next team.": "Deze inschrijving intrekken? Je plaats gaat naar het volgende team.", "Entry withdrawn.": "Inschrijving ingetrokken.", "This entry was withdrawn or removed.": "Deze inschrijving is ingetrokken of verwijderd.", "Who's entered": "Ingeschreven", "Waiting list": "Wachtlijst", "Loading…": "Laden…", "Places taken": "Bezette plaatsen", "Season Calendar online entry is on for everyone.": "Online inschrijven via de Seizoenskalender staat aan voor iedereen.", "Season Calendar online entry is on for you only.": "Online inschrijven via de Seizoenskalender staat alleen voor jou aan.", "Season Calendar online entry is switched off.": "Online inschrijven via de Seizoenskalender staat uit."});
 Object.assign(LANG_TEXT.pt, {"Season Calendar online entry": "Inscrição online no Calendário da época", "Players can enter online on SN Pétanque": "Os jogadores podem inscrever-se online no SN Pétanque", "Online entry isn't available for this format yet.": "A inscrição online ainda não está disponível para este formato.", "Places": "Vagas", "Blank for no limit": "Em branco = sem limite", "Entries close": "Fecho das inscrições", "I'll approve each entry": "Vou aprovar cada inscrição", "Show who's entered on the listing": "Mostrar os inscritos no anúncio", "Enter online": "Inscrever online", "Enter online · closes {x}": "Inscrever online · fecha {1}", "Entries closed": "Inscrições fechadas", "Entries open": "Inscrições abertas", "{n} of {x} places taken · entries close {x}": "{1} de {2} vagas ocupadas · inscrições fecham {3}", "Full · {n} on the waiting list": "Completo · {1} em lista de espera", "{n} entered": "{1} inscritos", "Your name": "O seu nome", "Club (optional)": "Clube (opcional)", "Phone or email for the organiser": "Telefone ou email para o organizador", "Your team and player names will be shown on this listing.": "Os nomes da sua equipa e dos jogadores serão mostrados neste anúncio.", "Your phone or email goes to the organiser only.": "O seu telefone ou email só chega ao organizador.", "Send my entry": "Enviar a minha inscrição", "Name every player.": "Indique o nome de cada jogador.", "Add a phone number or email so the organiser can reach you.": "Adicione um telefone ou email para o organizador o poder contactar.", "This phone has already sent 5 entries for this competition.": "Este telemóvel já enviou 5 inscrições para este torneio.", "Entries have closed.": "As inscrições estão fechadas.", "Entry sent.": "Inscrição enviada.", "Your entries": "As suas inscrições", "You have a place ({n} of {x})": "Tem vaga ({1} de {2})", "You have a place": "Tem vaga", "On the waiting list (number {n})": "Em lista de espera (número {1})", "Waiting for the organiser to accept it": "À espera de aprovação do organizador", "Withdraw my entry": "Retirar a minha inscrição", "Withdraw this entry? Your place goes to the next team.": "Retirar esta inscrição? A sua vaga passa para a equipa seguinte.", "Entry withdrawn.": "Inscrição retirada.", "This entry was withdrawn or removed.": "Esta inscrição foi retirada ou removida.", "Who's entered": "Inscritos", "Waiting list": "Lista de espera", "Loading…": "A carregar…", "Places taken": "Vagas ocupadas", "Season Calendar online entry is on for everyone.": "A inscrição online no Calendário da época está ativa para todos.", "Season Calendar online entry is on for you only.": "A inscrição online no Calendário da época só é visível para si.", "Season Calendar online entry is switched off.": "A inscrição online no Calendário da época está desativada."});
 Object.assign(LANG_TEXT.th, {"Season Calendar online entry": "การสมัครออนไลน์ในปฏิทินฤดูกาล", "Players can enter online on SN Pétanque": "ผู้เล่นสมัครออนไลน์บน SN Pétanque ได้", "Online entry isn't available for this format yet.": "รูปแบบนี้ยังสมัครออนไลน์ไม่ได้", "Places": "จำนวนที่", "Blank for no limit": "เว้นว่าง = ไม่จำกัด", "Entries close": "ปิดรับสมัคร", "I'll approve each entry": "ฉันจะอนุมัติการสมัครทีละรายการ", "Show who's entered on the listing": "แสดงรายชื่อผู้สมัครในประกาศ", "Enter online": "สมัครออนไลน์", "Enter online · closes {x}": "สมัครออนไลน์ · ปิดรับ {1}", "Entries closed": "ปิดรับสมัครแล้ว", "Entries open": "เปิดรับสมัคร", "{n} of {x} places taken · entries close {x}": "มีผู้สมัคร {1} จาก {2} ที่ · ปิดรับสมัคร {3}", "Full · {n} on the waiting list": "เต็มแล้ว · รอคิว {1} ทีม", "{n} entered": "สมัครแล้ว {1}", "Your name": "ชื่อของคุณ", "Club (optional)": "สโมสร (ไม่บังคับ)", "Phone or email for the organiser": "โทรศัพท์หรืออีเมลสำหรับผู้จัด", "Your team and player names will be shown on this listing.": "ชื่อทีมและชื่อผู้เล่นของคุณจะแสดงในประกาศนี้", "Your phone or email goes to the organiser only.": "โทรศัพท์หรืออีเมลของคุณส่งถึงผู้จัดเท่านั้น", "Send my entry": "ส่งใบสมัคร", "Name every player.": "ใส่ชื่อผู้เล่นทุกคน", "Add a phone number or email so the organiser can reach you.": "เพิ่มเบอร์โทรหรืออีเมลเพื่อให้ผู้จัดติดต่อคุณได้", "This phone has already sent 5 entries for this competition.": "โทรศัพท์เครื่องนี้ส่งใบสมัครครบ 5 รายการสำหรับการแข่งขันนี้แล้ว", "Entries have closed.": "ปิดรับสมัครแล้ว", "Entry sent.": "ส่งใบสมัครแล้ว", "Your entries": "ใบสมัครของคุณ", "You have a place ({n} of {x})": "คุณได้ที่ ({1} จาก {2})", "You have a place": "คุณได้ที่", "On the waiting list (number {n})": "อยู่ในรายชื่อรอ (ลำดับที่ {1})", "Waiting for the organiser to accept it": "รอผู้จัดอนุมัติ", "Withdraw my entry": "ถอนใบสมัคร", "Withdraw this entry? Your place goes to the next team.": "ถอนใบสมัครนี้หรือไม่? ที่ของคุณจะตกเป็นของทีมถัดไป", "Entry withdrawn.": "ถอนใบสมัครแล้ว", "This entry was withdrawn or removed.": "ใบสมัครนี้ถูกถอนหรือถูกลบแล้ว", "Who's entered": "ผู้สมัคร", "Waiting list": "รายชื่อรอ", "Loading…": "กำลังโหลด…", "Places taken": "ที่ที่มีผู้สมัครแล้ว", "Season Calendar online entry is on for everyone.": "การสมัครออนไลน์ในปฏิทินฤดูกาลเปิดให้ทุกคนแล้ว", "Season Calendar online entry is on for you only.": "การสมัครออนไลน์ในปฏิทินฤดูกาลเปิดให้คุณคนเดียว", "Season Calendar online entry is switched off.": "ปิดการสมัครออนไลน์ในปฏิทินฤดูกาลแล้ว"});
+// Season Calendar 5: organisers manage online entries (calendar-entries-desk)
+Object.assign(FR_TEXT, {"Online entries": "Inscriptions en ligne", "{n} with a place": "{1} avec une place", "{n} on the waiting list": "{1} en liste d'attente", "{n} waiting for you": "{1} en attente de votre accord", "Waiting list {n}": "Liste d'attente {1}", "Waiting for you": "En attente de votre accord", "Accept": "Accepter", "Remove this entry? The team won't be told.": "Retirer cette inscription ? L'équipe ne sera pas prévenue.", "Download the entries (CSV)": "Télécharger les inscriptions (CSV)", "Number": "Numéro", "Status": "Statut", "Sent": "Envoyée", "With a place": "Avec une place", "Remove the listing and its {n} online entries? Contact details are deleted too.": "Retirer l'annonce et ses {1} inscriptions en ligne ? Les coordonnées sont supprimées aussi.", "Remove the listing and its online entry? Contact details are deleted too.": "Retirer l'annonce et son inscription en ligne ? Les coordonnées sont supprimées aussi.", "Entered online": "Inscrits en ligne", "Add to Registration": "Ajouter aux inscriptions", "Add everyone with a place": "Ajouter tous ceux qui ont une place", "In Registration": "Dans les inscriptions", "Withdrew online": "Désisté en ligne"});
+Object.assign(LANG_TEXT.es, {"Online entries": "Inscripciones en línea", "{n} with a place": "{1} con plaza", "{n} on the waiting list": "{1} en lista de espera", "{n} waiting for you": "{1} esperan tu aprobación", "Waiting list {n}": "Lista de espera {1}", "Waiting for you": "Espera tu aprobación", "Accept": "Aceptar", "Remove this entry? The team won't be told.": "¿Quitar esta inscripción? No se avisará al equipo.", "Download the entries (CSV)": "Descargar las inscripciones (CSV)", "Number": "Número", "Status": "Estado", "Sent": "Enviada", "With a place": "Con plaza", "Remove the listing and its {n} online entries? Contact details are deleted too.": "¿Quitar el anuncio y sus {1} inscripciones en línea? También se borran los datos de contacto.", "Remove the listing and its online entry? Contact details are deleted too.": "¿Quitar el anuncio y su inscripción en línea? También se borran los datos de contacto.", "Entered online": "Inscritos en línea", "Add to Registration": "Añadir a Inscripción", "Add everyone with a place": "Añadir a todos los que tienen plaza", "In Registration": "En Inscripción", "Withdrew online": "Se retiró en línea"});
+Object.assign(LANG_TEXT.it, {"Online entries": "Iscrizioni online", "{n} with a place": "{1} con un posto", "{n} on the waiting list": "{1} in lista d'attesa", "{n} waiting for you": "{1} in attesa della tua approvazione", "Waiting list {n}": "Lista d'attesa {1}", "Waiting for you": "In attesa della tua approvazione", "Accept": "Accetta", "Remove this entry? The team won't be told.": "Togliere questa iscrizione? La squadra non verrà avvisata.", "Download the entries (CSV)": "Scarica le iscrizioni (CSV)", "Number": "Numero", "Status": "Stato", "Sent": "Inviata", "With a place": "Con un posto", "Remove the listing and its {n} online entries? Contact details are deleted too.": "Togliere l'annuncio e le sue {1} iscrizioni online? Vengono cancellati anche i contatti.", "Remove the listing and its online entry? Contact details are deleted too.": "Togliere l'annuncio e la sua iscrizione online? Vengono cancellati anche i contatti.", "Entered online": "Iscritti online", "Add to Registration": "Aggiungi alle Iscrizioni", "Add everyone with a place": "Aggiungi tutti quelli con un posto", "In Registration": "Nelle Iscrizioni", "Withdrew online": "Ritirata online"});
+Object.assign(LANG_TEXT.de, {"Online entries": "Online-Meldungen", "{n} with a place": "{1} mit Platz", "{n} on the waiting list": "{1} auf der Warteliste", "{n} waiting for you": "{1} warten auf dich", "Waiting list {n}": "Warteliste {1}", "Waiting for you": "Wartet auf dich", "Accept": "Annehmen", "Remove this entry? The team won't be told.": "Diese Meldung entfernen? Das Team wird nicht benachrichtigt.", "Download the entries (CSV)": "Meldungen herunterladen (CSV)", "Number": "Nummer", "Status": "Status", "Sent": "Gesendet", "With a place": "Mit Platz", "Remove the listing and its {n} online entries? Contact details are deleted too.": "Den Eintrag und seine {1} Online-Meldungen entfernen? Die Kontaktdaten werden auch gelöscht.", "Remove the listing and its online entry? Contact details are deleted too.": "Den Eintrag und seine Online-Meldung entfernen? Die Kontaktdaten werden auch gelöscht.", "Entered online": "Online gemeldet", "Add to Registration": "Zur Anmeldung hinzufügen", "Add everyone with a place": "Alle mit Platz hinzufügen", "In Registration": "In der Anmeldung", "Withdrew online": "Online zurückgezogen"});
+Object.assign(LANG_TEXT.nl, {"Online entries": "Online inschrijvingen", "{n} with a place": "{1} met een plaats", "{n} on the waiting list": "{1} op de wachtlijst", "{n} waiting for you": "{1} wachten op jou", "Waiting list {n}": "Wachtlijst {1}", "Waiting for you": "Wacht op jou", "Accept": "Accepteren", "Remove this entry? The team won't be told.": "Deze inschrijving weghalen? Het team krijgt geen bericht.", "Download the entries (CSV)": "De inschrijvingen downloaden (CSV)", "Number": "Nummer", "Status": "Status", "Sent": "Verstuurd", "With a place": "Met een plaats", "Remove the listing and its {n} online entries? Contact details are deleted too.": "De vermelding en de {1} online inschrijvingen weghalen? De contactgegevens worden ook gewist.", "Remove the listing and its online entry? Contact details are deleted too.": "De vermelding en de online inschrijving weghalen? De contactgegevens worden ook gewist.", "Entered online": "Online ingeschreven", "Add to Registration": "Aan Inschrijving toevoegen", "Add everyone with a place": "Iedereen met een plaats toevoegen", "In Registration": "In Inschrijving", "Withdrew online": "Online teruggetrokken", "Contact": "Contact"});
+Object.assign(LANG_TEXT.pt, {"Online entries": "Inscrições online", "{n} with a place": "{1} com vaga", "{n} on the waiting list": "{1} na lista de espera", "{n} waiting for you": "{1} à espera da sua aprovação", "Waiting list {n}": "Lista de espera {1}", "Waiting for you": "À espera da sua aprovação", "Accept": "Aceitar", "Remove this entry? The team won't be told.": "Remover esta inscrição? A equipa não será avisada.", "Download the entries (CSV)": "Descarregar as inscrições (CSV)", "Number": "Número", "Status": "Estado", "Sent": "Enviada", "With a place": "Com vaga", "Remove the listing and its {n} online entries? Contact details are deleted too.": "Remover o anúncio e as suas {1} inscrições online? Os contactos também são apagados.", "Remove the listing and its online entry? Contact details are deleted too.": "Remover o anúncio e a sua inscrição online? Os contactos também são apagados.", "Entered online": "Inscritos online", "Add to Registration": "Adicionar às Inscrições", "Add everyone with a place": "Adicionar todos os que têm vaga", "In Registration": "Nas Inscrições", "Withdrew online": "Desistiu online"});
+Object.assign(LANG_TEXT.th, {"Online entries": "ใบสมัครออนไลน์", "{n} with a place": "{1} ได้ที่แล้ว", "{n} on the waiting list": "{1} อยู่ในรายชื่อรอ", "{n} waiting for you": "{1} รอคุณอนุมัติ", "Waiting list {n}": "รายชื่อรอ {1}", "Waiting for you": "รอคุณอนุมัติ", "Accept": "อนุมัติ", "Remove this entry? The team won't be told.": "นำใบสมัครนี้ออกหรือไม่? ทีมจะไม่ได้รับแจ้ง", "Download the entries (CSV)": "ดาวน์โหลดใบสมัคร (CSV)", "Number": "ลำดับ", "Status": "สถานะ", "Sent": "ส่งเมื่อ", "With a place": "ได้ที่แล้ว", "Remove the listing and its {n} online entries? Contact details are deleted too.": "นำรายการนี้และใบสมัครออนไลน์ {1} ใบออกหรือไม่? ข้อมูลติดต่อจะถูกลบด้วย", "Remove the listing and its online entry? Contact details are deleted too.": "นำรายการนี้และใบสมัครออนไลน์ออกหรือไม่? ข้อมูลติดต่อจะถูกลบด้วย", "Entered online": "สมัครออนไลน์", "Add to Registration": "เพิ่มในการลงทะเบียน", "Add everyone with a place": "เพิ่มทุกคนที่ได้ที่", "In Registration": "อยู่ในการลงทะเบียนแล้ว", "Withdrew online": "ถอนตัวทางออนไลน์"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -1545,6 +1559,11 @@ function localStore() {
       persist(); this._ce(cid); },
     async updateCalEntry(cid, eid, team, contact) { const c = data.ce?.[cid]; if (!c?.entries?.[eid]) throw { code: "not-found" }; c.teams[eid] = clone(team); c.contacts[eid] = { contact }; persist(); this._ce(cid); },
     async withdrawCalEntry(cid, eid) { const c = data.ce?.[cid]; if (c) { delete c.entries[eid]; delete c.teams[eid]; delete c.contacts[eid]; } persist(); this._ce(cid); },
+    // the listing's organisers (calendar-entries-desk): contacts by entry id, accepting a pending entry, and every entry of a listing removed
+    watchCalContacts(cid, cb) { const k = "ct:" + cid, f = () => cb(Object.fromEntries(Object.entries(data.ce?.[cid]?.contacts || {}).map(([id, x]) => [id, x?.contact || ""])));
+      setTimeout(f); if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(f); return () => subsL.get(k).delete(f); },
+    async acceptCalEntry(cid, eid) { const x = data.ce?.[cid]?.entries?.[eid]; if (!x) throw { code: "not-found" }; if (x.status === "pending") Object.assign(x, { status: "in", queuedAt: Date.now() }); persist(); this._ce(cid); },
+    async deleteCalEntries(cid) { if (data.ce?.[cid]) { delete data.ce[cid]; persist(); this._ce(cid); } },
     _ce(cid) { setTimeout(() => ["ce:", "ct:"].forEach(k => (subsL.get(k + cid) || new Set()).forEach(f => f()))); },
     watchStreams(cb) { subsS.add(cb); emitS(); return () => subsS.delete(cb); },
     watchStream(sid, cb) { if (!subsS1.has(sid)) subsS1.set(sid, new Set()); subsS1.get(sid).add(cb); emitS(sid); return () => subsS1.get(sid).delete(cb); },
@@ -1590,6 +1609,12 @@ function dbStore(db) {
       await db.doc(`calendar/${cid}/entries/${eid}`).set(Object.assign({ uid: entry.uid, at: now, status: entry.status }, entry.status === "in" ? { queuedAt: now } : {})); },
     async updateCalEntry(cid, eid, team, contact) { await db.doc(`calendar/${cid}/teams/${eid}`).set(clone(team)); await db.doc(`calendar/${cid}/contacts/${eid}`).set({ contact }); },
     async withdrawCalEntry(cid, eid) { await db.doc(`calendar/${cid}/entries/${eid}`).delete(); await db.doc(`calendar/${cid}/teams/${eid}`).delete(); await db.doc(`calendar/${cid}/contacts/${eid}`).delete(); },
+    watchCalContacts(cid, cb, onErr) { return db.collection(`calendar/${cid}/contacts`).limit(600).onSnapshot(s => { const m = {}; s.docs.forEach(d => m[d.id] = d.data().contact || ""); cb(m); }, onErr); },
+    acceptCalEntry(cid, eid) { return db.doc(`calendar/${cid}/entries/${eid}`).update({ status: "in", queuedAt: Date.now() }); },
+    async deleteCalEntries(cid) {
+      const ids = k => new Promise((res, rej) => { let u = null; u = db.collection(`calendar/${cid}/${k}`).limit(600).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => d.id)); }, rej); });
+      const all = new Set(); for (const k of ["entries", "teams", "contacts"]) (await ids(k)).forEach(id => all.add(id));
+      for (const id of all) await this.withdrawCalEntry(cid, id); },
     watchStreams(cb, onErr) { return db.collection("streams").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
     watchStream(sid, cb, onErr) { return db.doc(`streams/${sid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setStream(st) { return db.doc(`streams/${st.id}`).set(clone(st)); },
@@ -3540,7 +3565,8 @@ const calPast = t => !!t.date && t.date < calDay(-1);
 // the competition's name, date or venue no longer match its listing
 const calChanged = (t, e) => !!e && (e.name !== calName(t) || e.date !== (t.date || "") || (e.venue || "") !== calVenue(t));
 function calWatch() {
-  const t = T(); const want = t && calCan(t) && S.tab === "setup" ? t.id : null;
+  const t = T(); const want = t && calCan(t) && (S.tab === "setup" || S.tab === "entries") ? t.id : null;
+  if (S.calReg && !(t && S.tab === "entries" && S.calReg.cid === t.id && calRegOn(t))) calRegStop(); // Registration's "Entered online"
   if (!want) { if (S.calKey && S.calKey !== S.tid) { S.unsubC?.(); S.unsubC = null; S.calKey = null; } return; }
   if (S.calKey === want) return;
   S.unsubC?.(); S.calKey = want; S.cal = S.cal || {};
@@ -3556,7 +3582,7 @@ function calPanel(t) {
     <button class="btn primary" data-act="cal-open">List on the Season Calendar</button></div>`;
   return `<div class="panel stack cal-panel" data-cal-panel style="gap:8px"><div class="spread"><div>${head}
       <div class="small">${e.hidden ? `<b class="err">Hidden from the Season Calendar by the site admin.</b>` : `<b>On the Season Calendar</b>`} · ${hofLabel(e.level)} <span data-notr>${esc(hofCountryName(e.country))}</span></div></div>
-      <div class="row">${e.hidden ? "" : `<button class="btn" data-act="cal-open">Update</button>`}${S.calConfirmRemove === t.id ? `<span class="err">Take it off the Season Calendar?</span><button class="btn danger" data-act="cal-remove-yes">Remove</button><button class="btn" data-act="cal-remove-no">Keep it</button>` : `<button class="btn" data-act="cal-remove">Remove</button>`}</div></div>
+      <div class="row">${e.hidden ? "" : `<button class="btn" data-act="cal-open">Update</button>`}${S.calConfirmRemove === t.id ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === t.id ? S.calRemoveN.n : 0))}</span><button class="btn danger" data-act="cal-remove-yes">Remove</button><button class="btn" data-act="cal-remove-no">Keep it</button>` : `<button class="btn" data-act="cal-remove">Remove</button>`}</div></div>
     ${e.hidden ? `<div class="small muted cal-hidden-note">Questions? Contact Info@FoundryITadvisory.com.</div>` : ""}
     ${calChanged(t, e) && !e.hidden ? `<div class="notice small cal-changed">The competition's name, date or venue has changed since it was listed. <button class="btn" data-act="cal-open">Update the listing</button></div>` : ""}</div>`;
 }
@@ -3640,7 +3666,7 @@ async function calAction(act, k) {
   }
 }
 async function calRemove(t) {
-  try { await S.store.deleteCal(t.id); S.cal = S.cal || {}; S.cal[t.id] = null; calReset(); S.calConfirmRemove = null; render(); toast("Taken off the Season Calendar."); }
+  try { if (S.store.deleteCalEntries) await S.store.deleteCalEntries(t.id); await S.store.deleteCal(t.id); S.cal = S.cal || {}; S.cal[t.id] = null; calReset(); S.calConfirmRemove = null; render(); toast("Taken off the Season Calendar."); }
   catch (err) { console.error(err); toast(err?.code === "permission-denied" ? "Only this competition's organisers can list it." : "That didn't save. Check your connection and try again."); }
 }
 // archiving marks the listing gone, so the calendar doesn't link to it (restoring unmarks it); no listing is fine
@@ -3763,7 +3789,7 @@ function calCard(e, close) {
     ${org && e.hidden ? `<div class="notice small err cal-hidden-mark">Hidden by the site admin</div>` : ""}
     ${calEntHtml(e)}
     <div class="row">${link}${org ? `${ev && e.hidden ? "" : `<button type="button" class="btn sm" data-act="${ev ? "cal-ev-edit" : "cal-edit"}" data-id="${esc(id)}">Edit</button>`}${confirm
-      ? `<span class="err">Take it off the Season Calendar?</span><button type="button" class="btn sm danger" data-act="cal-page-remove-yes" data-id="${esc(id)}">Remove</button><button type="button" class="btn sm" data-act="cal-page-remove-no">Keep it</button>`
+      ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === id ? S.calRemoveN.n : 0))}</span><button type="button" class="btn sm danger" data-act="cal-page-remove-yes" data-id="${esc(id)}">Remove</button><button type="button" class="btn sm" data-act="cal-page-remove-no">Keep it</button>`
       : `<button type="button" class="btn sm" data-act="cal-page-remove" data-id="${esc(id)}">Remove</button>`}` : ""}${close ? `<button type="button" class="btn sm ghost" data-act="cal-close-entry" data-id="${esc(id)}">Close</button>` : ""}</div>
     ${ev && org ? calOrgLinkBox(id) : ""}
     ${calAdmin() ? `<div class="cal-admin spread"><span class="small"><b>Only you see this</b></span><button type="button" class="btn sm${e.hidden ? "" : " danger"}" data-act="cal-hide" data-id="${esc(id)}" data-on="${e.hidden ? "0" : "1"}">${e.hidden ? "Show again" : "Hide from the Season Calendar"}</button></div>` : ""}
@@ -3826,12 +3852,12 @@ const calFind = id => { const P = calPage(); return [...Object.values(P.cache).f
 // the organiser's Edit: the competition's Setup, with the listing sheet open on it
 function calEdit(id) {
   const t = S.tournaments[id], e = calFind(id); if (!t || !calCan(t)) return;
-  S.cal = S.cal || {}; if (e && S.cal[id] === undefined) S.cal[id] = e;
+  S.cal = S.cal || {}; if (e && !S.cal[id]) S.cal[id] = e;
   S.calPageRemove = null; S.tab = "setup"; lsSet("carreau-tab", "setup"); pickCompetition(id); if (T()?.id === id) calOpen(T());
 }
 async function calPageRemove(id) {
   const ev = calFind(id)?.kind === "event";
-  try { await (ev && S.store.deleteCalEvent ? S.store.deleteCalEvent(id) : S.store.deleteCal(id)); if (S.cal) S.cal[id] = null; S.calPageRemove = null; const P = calPage(); P.open = null; if (P.hl === id) P.hl = null; if (P.deepItem && calId(P.deepItem) === id) P.deepItem = null; calReset(); toast("Taken off the Season Calendar."); hofRedraw(); }
+  try { if (S.store.deleteCalEntries) await S.store.deleteCalEntries(id); await (ev && S.store.deleteCalEvent ? S.store.deleteCalEvent(id) : S.store.deleteCal(id)); if (S.cal) S.cal[id] = null; S.calPageRemove = null; const P = calPage(); P.open = null; if (P.hl === id) P.hl = null; if (P.deepItem && calId(P.deepItem) === id) P.deepItem = null; calReset(); toast("Taken off the Season Calendar."); hofRedraw(); }
   catch (err) { console.error(err); toast(err?.code === "permission-denied" ? (ev ? "Only this event's organisers can change it." : "Only this competition's organisers can list it.") : "That didn't save. Check your connection and try again."); }
 }
 // the admin hides a listing (it drops off the page at once) or shows it again; organisers can't (firestore.rules)
@@ -3994,10 +4020,13 @@ function calEntWatch(e) {
       if (real && !meta?.fromCache) { const rec = calEntRec()[id] || {}, have = new Set(list.map(x => x.id)); Object.keys(rec).forEach(eid => { if (!have.has(eid)) { calEntRecSet(id, eid, null); w.gone = true; } }); }
       if (calOnPage()) calPaint(); }, err => { console.error(err); if (P.ent === w) { w.list = []; if (calOnPage()) calPaint(); } });
   }
-  if (e.showEntrants && !w.unsubT && S.store.watchCalTeams) w.unsubT = S.store.watchCalTeams(id, m => { if (P.ent !== w) return; w.teams = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
+  // the listing's organisers also read every team, and the contacts (calendar-entries-desk)
+  const org = calOrg(e);
+  if ((e.showEntrants || org) && !w.unsubT && S.store.watchCalTeams) w.unsubT = S.store.watchCalTeams(id, m => { if (P.ent !== w) return; w.teams = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
+  if (org && !w.unsubC && S.store.watchCalContacts) w.unsubC = S.store.watchCalContacts(id, m => { if (P.ent !== w) return; w.contacts = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
   return w;
 }
-function calEntStop() { const P = calPage(), w = P.ent; if (!w) return; w.unsub?.(); w.unsubT?.(); P.ent = null; S.calEntConfirm = null; }
+function calEntStop() { const P = calPage(), w = P.ent; if (!w) return; w.unsub?.(); w.unsubT?.(); w.unsubC?.(); P.ent = null; S.calEntConfirm = null; S.calDeskConfirm = null; }
 // on the full listing: the places line and bar, Enter online, "Your entries" and "Who's entered"
 function calEntHtml(e) {
   if (!calEntOn() || !e.online || !calEntFmt(e.fmt)) return "";
@@ -4008,7 +4037,7 @@ function calEntHtml(e) {
     <div class="cal-places"><b>${esc(calPlacesLine(e, q))}</b></div>
     ${q.n ? `<div class="meter" role="progressbar" aria-label="Places taken" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>` : ""}
     ${open ? `<div><button type="button" class="btn primary" data-act="cal-ent-new" data-id="${esc(id)}">Enter online</button></div>` : ""}
-    ${calMyEntHtml(e, w, q, open)}${e.showEntrants ? calWhoHtml(w, q) : ""}</section>`;
+    ${calMyEntHtml(e, w, q, open)}${e.showEntrants ? calWhoHtml(w, q) : ""}${calOrg(e) ? calDeskHtml(e, w, q) : ""}</section>`;
 }
 function calMyEntHtml(e, w, q, open) {
   const id = calId(e), me = calMe(), rec = calEntRec()[id] || {};
@@ -4090,6 +4119,111 @@ async function calEntWithdraw(cid, eid) {
   const name = (calEntRec()[cid] || {})[eid]; calEntRecSet(cid, eid, null); // so the entry going isn't taken for a removal
   try { await S.store.withdrawCalEntry(cid, eid); S.calEntConfirm = null; toast("Entry withdrawn."); calPaint(); }
   catch (err) { console.error(err); if (name !== undefined) calEntRecSet(cid, eid, name); toast("That didn't save. Check your connection and try again."); }
+}
+/* ---------------- Season Calendar 5: organisers manage online entries (calendar-entries-desk) ---------------- */
+// On the full listing, for its organisers: "Online entries", every entry in queue order (the places, the waiting list, then
+// those waiting for approval) with its contact, Accept and Remove, and the entries as a CSV file. In Registration, for a
+// competition whose listing takes entries online: "Entered online", where Add to Registration copies an entry's names and
+// club (never its contact) into the competition as a team (a player for mêlée and shooting) carrying calEntry: <entry id>,
+// so it can't be added twice and shows "Withdrew online" once its entry has gone.
+const calDeskOrder = q => [...q.ins, ...q.pending.slice().sort((a, b) => (a.at || 0) - (b.at || 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))];
+const calPlaced = (x, q) => x.status === "in" && (!q.n || q.pos[x.id] <= q.n);
+// "3", "Waiting list 1" or "Waiting for you"
+const calDeskLabel = (x, q) => x.status !== "in" ? "Waiting for you" : calPlaced(x, q) ? String(q.pos[x.id]) : `Waiting list ${q.pos[x.id] - q.n}`;
+const calDeskSum = q => { const placed = q.n ? Math.min(q.ins.length, q.n) : q.ins.length;
+  return [placed && `${placed} with a place`, q.wait && `${q.wait} on the waiting list`, q.pending.length && `${q.pending.length} waiting for you`].filter(Boolean); };
+const calSent = ms => ms ? new Date(ms).toLocaleString(LOCALES[I18N.lang], { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+// a phone number rings (tel:), an email opens a message (mailto:); anything else stays as typed
+function calContactHtml(c) {
+  c = String(c || "").trim(); if (!c) return "";
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)) return `<a href="mailto:${esc(c)}" data-notr>${esc(c)}</a>`;
+  if (/^\+?[\d\s().-]{6,}$/.test(c) && (c.match(/\d/g) || []).length >= 6) return `<a href="tel:${esc(c.replace(/[^\d+]/g, ""))}" data-notr>${esc(c)}</a>`;
+  return `<span data-notr>${esc(c)}</span>`;
+}
+const calTeamSub = tm => { const name = String(tm?.name || "").trim(), ps = (tm?.players || []).filter(Boolean);
+  return [ps.length > 1 && name ? ps.join(", ") : "", tm?.club || ""].filter(Boolean).join(" · "); }; // players, unless they're already the name
+function calDeskHtml(e, w, q) {
+  if (!w.list.length) return "";
+  const id = calId(e), rows = calDeskOrder(q);
+  return `<section class="cal-desk stack" style="gap:8px"><h4>Online entries</h4>
+    <div class="small cal-desk-sum">${calDeskSum(q).map(x => `<span>${esc(x)}</span>`).join(" · ")}</div>
+    <ol class="cal-desk-list">${rows.map(x => { const tm = w.teams?.[x.id], sub = calTeamSub(tm), lab = calDeskLabel(x, q);
+      return `<li class="cal-desk-row${x.status !== "in" ? " pending" : ""}" data-eid="${esc(x.id)}"><span class="cal-desk-n${/^\d+$/.test(lab) ? "" : " pill"}">${esc(lab)}</span>
+        <div class="cal-desk-main stack" style="gap:2px"><b data-notr>${esc(calTeamName(tm) || "…")}</b>${sub ? `<span class="small muted" data-notr>${esc(sub)}</span>` : ""}
+          <span class="small cal-desk-meta">${calContactHtml(w.contacts?.[x.id])}${w.contacts?.[x.id] ? " · " : ""}<span class="muted" data-notr>${esc(calSent(x.at))}</span></span>
+          <div class="row">${S.calDeskConfirm === x.id ? `<span class="err">Remove this entry? The team won't be told.</span>
+            <button type="button" class="btn sm danger" data-act="cal-desk-remove-yes" data-id="${esc(id)}" data-eid="${esc(x.id)}">Remove</button><button type="button" class="btn sm" data-act="cal-desk-keep">Keep it</button>`
+            : `${x.status !== "in" ? `<button type="button" class="btn sm primary" data-act="cal-desk-accept" data-id="${esc(id)}" data-eid="${esc(x.id)}">Accept</button>` : ""}<button type="button" class="btn sm" data-act="cal-desk-remove" data-eid="${esc(x.id)}">Remove</button>`}</div></div></li>`; }).join("")}</ol>
+    ${S.downloads ? `<div><button type="button" class="btn sm" data-act="cal-desk-csv" data-id="${esc(id)}">Download the entries (CSV)</button></div>` : ""}</section>`;
+}
+// Accept (on the listing, or in Registration): the entry joins the queue now
+async function calDeskAccept(cid, eid) {
+  try { await S.store.acceptCalEntry(cid, eid); }
+  catch (err) { console.error(err); toast("That didn't save. Check your connection and try again."); }
+  if (calOnPage()) calPaint(); else render();
+}
+async function calDeskRemove(cid, eid) {
+  try { await S.store.withdrawCalEntry(cid, eid); S.calDeskConfirm = null; calPaint(); }
+  catch (err) { console.error(err); toast("That didn't save. Check your connection and try again."); }
+}
+// a date and time a spreadsheet can sort: 2026-11-19 14:05
+const calStamp = ms => { if (!ms) return ""; const d = new Date(ms), p = n => String(n).padStart(2, "0"); return `${calYmd(ms)} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+async function calDeskCsv(cid) {
+  const e = calFind(cid), w = calPage().ent; if (!e || !w?.list || w.cid !== cid || !S.downloads) return;
+  const q = calQueue(e, w.list), rows = [["Number", "Status", "Team", "Players", "Club", "Contact", "Sent"].map(tr)];
+  calDeskOrder(q).forEach(x => { const tm = w.teams?.[x.id] || {};
+    rows.push([x.status === "in" ? q.pos[x.id] : "", tr(calPlaced(x, q) ? "With a place" : calDeskLabel(x, q)), calTeamName(tm), (tm.players || []).filter(Boolean).join(", "), tm.club || "", w.contacts?.[x.id] || "", calStamp(x.at)]); });
+  await csvSave(`${e.name || ""} · ${tr("Online entries")}`, csvText(rows, true));
+}
+// the question before a listing goes: how many online entries go with it (read once, from the server where there is one)
+function calRemoveAsk(cid, done) {
+  if (!S.store.watchCalEntries) { done(0); return; }
+  let u = null, fired = false, last = 0; const fin = n => { if (fired) return; fired = true; setTimeout(() => u && u()); done(n); };
+  u = S.store.watchCalEntries(cid, (list, meta) => { last = list.length; if (!meta?.fromCache) fin(last); }, () => fin(0));
+  setTimeout(() => fin(last), 5000);
+}
+const calRemoveQ = n => !n ? "Take it off the Season Calendar?" : n === 1 ? "Remove the listing and its online entry? Contact details are deleted too." : `Remove the listing and its ${n} online entries? Contact details are deleted too.`;
+// Registration
+const calRegOn = t => { const e = t && S.cal?.[t.id]; return !!(e && calEntOn() && e.online && calEntFmt(e.fmt) && canEdit() && calCan(t)); };
+function calRegStop() { const r = S.calReg; if (!r) return; r.unsub?.(); r.unsubT?.(); S.calReg = null; }
+function calRegWatch(t) {
+  let r = S.calReg; if (r && r.cid === t.id && r.store === S.store) return r;
+  calRegStop(); r = S.calReg = { cid: t.id, store: S.store, list: null, teams: null, server: false };
+  if (!S.store.watchCalEntries) r.list = [];
+  else r.unsub = S.store.watchCalEntries(t.id, (list, meta) => { if (S.calReg !== r) return; r.list = list; r.server = !meta?.fromCache; render(); }, err => { console.error(err); if (S.calReg === r) { r.list = []; render(); } });
+  if (!S.store.watchCalTeams) r.teams = {};
+  else r.unsubT = S.store.watchCalTeams(t.id, m => { if (S.calReg !== r) return; r.teams = m; render(); }, err => { if (err?.code !== "permission-denied") console.error(err); if (S.calReg === r) { r.teams = {}; render(); } });
+  return r;
+}
+// above the Teams (or Players) list
+function calRegPanel(t) {
+  if (!calRegOn(t)) return "";
+  const r = calRegWatch(t);
+  if (!r.list || !r.teams) return `<div class="panel stack cal-reg" style="gap:8px"><h3>Entered online</h3><span class="small muted">Loading…</span></div>`;
+  const q = calQueue(S.cal[t.id], r.list), have = new Set(entities(t).map(x => x.calEntry).filter(Boolean));
+  const rows = calDeskOrder(q).filter(x => r.teams[x.id]); if (!rows.length) return "";
+  const todo = rows.filter(x => calPlaced(x, q) && !have.has(x.id)).length;
+  return `<div class="panel stack cal-reg" style="gap:8px"><div class="spread"><h3>Entered online</h3>${todo ? `<button type="button" class="btn sm" data-act="cal-reg-all">Add everyone with a place</button>` : ""}</div>
+    <div class="elist">${rows.map(x => { const tm = r.teams[x.id], sub = calTeamSub(tm), lab = calDeskLabel(x, q);
+      return `<div class="erow cal-reg-row" data-eid="${esc(x.id)}"><span class="num">${/^\d+$/.test(lab) ? esc(lab) : ""}</span>
+        <div class="who"><b data-notr>${esc(calTeamName(tm))}</b>${sub ? `<span class="small muted" data-notr>${esc(sub)}</span>` : ""}</div>
+        ${/^\d+$/.test(lab) ? "" : `<span class="pill">${esc(lab)}</span>`}
+        ${have.has(x.id) ? `<span class="pill done cal-reg-in">In Registration</span>` : x.status !== "in" ? `<button type="button" class="btn sm primary" data-act="cal-desk-accept" data-id="${esc(t.id)}" data-eid="${esc(x.id)}">Accept</button>`
+          : `<button type="button" class="btn sm" data-act="cal-reg-add" data-eid="${esc(x.id)}">Add to Registration</button>`}</div>`; }).join("")}</div></div>`;
+}
+// a Registration row whose online entry has gone (the server's list says so)
+const calRegPill = (t, e) => { const r = S.calReg; return e.calEntry && r?.cid === t.id && r.list && r.server && !r.list.some(x => x.id === e.calEntry) ? `<span class="pill cal-withdrew">Withdrew online</span>` : ""; };
+// copy entries into the competition, not checked in: names and club only, each entry once
+async function calRegAdd(eids) {
+  const t0 = T(), r = S.calReg; if (!t0 || !r || r.cid !== t0.id || !r.teams || S.calRegBusy || !calRegOn(t0)) return;
+  const t = clone(t0), list = entities(t), size = SIZE[t.format] || 1; let n = 0;
+  eids.forEach(eid => { const tm = r.teams[eid]; if (!tm || list.some(x => x.calEntry === eid)) return;
+    const ps = (tm.players || []).map(v => String(v || "").trim()).filter(Boolean), name = String(tm.name || "").trim(), club = String(tm.club || "").trim();
+    if (isIndiv(t)) list.push(Object.assign({ id: "p" + uid(), name: ps[0] || name, active: true, calEntry: eid }, club ? { club } : {}));
+    else list.push({ id: "e" + uid(), name: ps.length === 1 && name === ps[0] ? "" : name, players: Array.from({ length: size }, (_, i) => ps[i] || ""), club, active: true, calEntry: eid });
+    n++; });
+  if (!n) return;
+  S.calRegBusy = true; try { await guard(() => saveT(t)); } finally { S.calRegBusy = false; }
 }
 function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
@@ -5294,13 +5428,14 @@ function renderEntries(t) {
         <div><button class="btn" type="submit">Add all</button></div>
       </form>
     </div>`) : ""}
+    ${calRegPanel(t)}
     <div class="panel stack" style="gap:8px">
       <div class="spread"><h3>${melee ? "Players" : isEuro(t) ? "Clubs" : "Teams"}</h3>${list.length > 6 ? `<input type="search" id="reg-search" placeholder="Find a ${melee ? "player" : "team or player"}" value="${esc(S.regFilter || "")}" style="max-width:260px" aria-label="Search entries">` : ""}</div>
       ${list.length ? `<div class="elist">${list.map((e, i) => `<div class="erow ${e.active === false ? "out" : ""} ${t.checkin && e.checkedIn && e.active !== false ? "here" : ""}" data-row="${e.id}" ${match(e) ? "" : "hidden"} data-text="${esc([entName(t, e.id), ...(e.players || []), e.club || ""].join(" ").toLowerCase())}">
         <span class="num">${i + 1}</span>
         <div class="who">${melee ? `<b>${esc(e.name)}</b>` : isEuro(t) ? `<b>${esc(entName(t, e.id))}</b><span class="small muted">${squadOf(t, e.id).map(p => esc(p.name) + (p.sex ? " " + EURO_SEX[p.sex] : "")).join(", ")}</span>` : `<b>${esc(entName(t, e.id))}</b><span class="small muted">${esc((e.players || []).filter(Boolean).join(", "))}${e.club ? " · " + esc(e.club) : ""}</span>`}</div>
         ${e.active === false ? `<span class="pill">Withdrawn</span>` : t.checkin ? (canEdit() ? `<button class="btn ci ${e.checkedIn ? "checked" : ""}" data-act="checkin" data-id="${e.id}" aria-pressed="${!!e.checkedIn}">${e.checkedIn ? "✓ Checked in" : `${CI_RING}Check in`}</button>` : e.checkedIn ? `<span class="pill done">Checked in</span>` : `<span class="pill">Not here yet</span>`) : ""}
-        ${isEuro(t) && e.active !== false ? euroSquadPill(t, e.id) : ""}
+        ${isEuro(t) && e.active !== false ? euroSquadPill(t, e.id) : ""}${calRegPill(t, e)}
         ${canEdit() ? `<div class="row">
           ${isEuro(t) ? `<button class="btn sm ghost" data-act="eu-edit" data-id="${e.id}">Edit squad</button>` : ""}
           ${(t.seeding === "entry" || isClubs(t)) && !drawn ? `<button class="btn sm ghost" data-act="up" data-id="${e.id}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button>` : ""}
@@ -6048,18 +6183,25 @@ document.addEventListener("click", async e => {
     case "cal-ent-withdraw": S.calEntConfirm = a.dataset.eid; calPaint(); break;
     case "cal-ent-keep": S.calEntConfirm = null; calPaint(); break;
     case "cal-ent-withdraw-yes": await calEntWithdraw(a.dataset.id, a.dataset.eid); break;
+    case "cal-desk-remove": S.calDeskConfirm = a.dataset.eid; calPaint(); break;
+    case "cal-desk-keep": S.calDeskConfirm = null; calPaint(); break;
+    case "cal-desk-remove-yes": { const e2 = calFind(a.dataset.id); if (calOrg(e2)) await calDeskRemove(a.dataset.id, a.dataset.eid); break; }
+    case "cal-desk-accept": { const id = a.dataset.id, e2 = calFind(id), t2 = S.tournaments[id]; if (calOrg(e2) || (t2 && T()?.id === id && calRegOn(t2))) await calDeskAccept(id, a.dataset.eid); break; }
+    case "cal-desk-csv": await calDeskCsv(a.dataset.id); break;
+    case "cal-reg-add": await calRegAdd([a.dataset.eid]); break;
+    case "cal-reg-all": { const r = S.calReg, e2 = t && S.cal?.[t.id]; if (!r?.list || !e2) break; const q = calQueue(e2, r.list); await calRegAdd(q.ins.filter(x => calPlaced(x, q)).map(x => x.id)); break; }
     case "cal-retry": calLoad(true); hofRedraw(); break;
     case "cal-open-entry": { const P = calPage(), e1 = calFind(a.dataset.id); P.open = a.dataset.id; S.calPageRemove = null; if (e1?.tid) delete P.comp[e1.tid]; calPaint(); document.querySelector(`#cal-${CSS.escape(a.dataset.id)} [data-act="cal-close-entry"]`)?.focus({ preventScroll: true }); break; }
     case "cal-close-entry": { const id = a.dataset.id, P = calPage(); P.open = null; S.calPageRemove = null; if (P.hl === id) P.hl = null; calPaint(); document.getElementById("cal-" + id)?.focus({ preventScroll: true }); break; }
     case "cal-edit": calEdit(a.dataset.id); break;
-    case "cal-page-remove": S.calPageRemove = a.dataset.id; calPaint(); break;
+    case "cal-page-remove": { const id = a.dataset.id; S.calPageRemove = id; S.calRemoveN = null; calPaint(); calRemoveAsk(id, n => { if (S.calPageRemove !== id) return; S.calRemoveN = { id, n }; calPaint(); }); break; }
     case "cal-page-remove-no": S.calPageRemove = null; calPaint(); break;
     case "cal-page-remove-yes": { const e2 = calFind(a.dataset.id), t2 = S.tournaments[a.dataset.id]; if (e2?.kind === "event" ? calEvCan(e2) : t2 && calCan(t2)) await calPageRemove(a.dataset.id); break; }
     case "cal-ev-new": if (calEvCanAdd()) calEvOpen(null); break;
     case "cal-ev-edit": { const e2 = calFind(a.dataset.id); if (calEvCan(e2)) calEvOpen(e2); break; }
     case "cal-mine-open": { const id = a.dataset.id, P = calPage(); S.calPageRemove = null; if (location.hash === "#calendar." + id) { P.deepFor = null; hofRedraw(); } else location.hash = "calendar." + id; break; }
     case "cal-hide": if (calAdmin()) await calHide(a.dataset.id, a.dataset.on === "1"); break;
-    case "cal-remove": S.calConfirmRemove = t?.id; render(); break;
+    case "cal-remove": { const id = t?.id; S.calConfirmRemove = id; S.calRemoveN = null; render(); if (id) calRemoveAsk(id, n => { if (S.calConfirmRemove !== id) return; S.calRemoveN = { id, n }; render(); }); break; }
     case "cal-remove-no": S.calConfirmRemove = null; render(); break;
     case "cal-remove-yes": if (t && calCan(t)) await calRemove(t); break;
     case "logo-remove": { try { await S.store.setBrand(t.id, null); setBrandLocal(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
@@ -6312,10 +6454,15 @@ async function exportCsv() {
   const bi = m => m.stage === "ko" ? 1 + Math.max(0, (t.brackets || []).findIndex(b => b.id === m.bracket)) : 0;
   const csvStatus = m => tr({ done: "Finished", playing: "Playing" }[mStatus(m)] || "Waiting");
   MS().sort((x, y) => bi(x) - bi(y) || byOrder(x, y)).forEach(m => rows.push([matchContext(t, m), m.round, m.courtUsed || m.court ? courtName(t, m.courtUsed || m.court) : "", sideName(t, m.a) || "", m.sa ?? "", m.sb ?? "", m.bye ? "BYE" : sideName(t, m.b) || "", csvStatus(m)]));
-  // a BOM first so Excel reads the file as UTF-8 (accented names)
-  const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  await csvSave(t.name, csvText(rows));
+}
+// a CSV file's text: a BOM first so Excel reads it as UTF-8 (accented names), every cell quoted. guard: for typed text, an
+// apostrophe before a cell starting with =, @, + or - so a spreadsheet can't run it as a formula (not before a phone number)
+const csvGuard = s => /^[=@+\-]/.test(s) && !/^\+[\d ]+$/.test(s) ? "'" + s : s;
+const csvText = (rows, guard) => "\uFEFF" + rows.map(r => r.map(v => `"${(guard ? csvGuard(String(v)) : String(v)).replace(/"/g, '""')}"`).join(",")).join("\n");
+async function csvSave(name, csv) {
   // keep accents and spaces in the file name; drop only what file names can't hold
-  const fname = (t.name || "").replace(/[\/\\:*?"<>|\u0000-\u001f]+/g, "").replace(/\s+/g, " ").trim().replace(/^\.+/, "") || "results";
+  const fname = (name || "").replace(/[\/\\:*?"<>|\u0000-\u001f]+/g, "").replace(/\s+/g, " ").trim().replace(/^\.+/, "") || "results";
   try { await S.downloads.save({ filename: `${fname}.csv`, data: csv }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
 }
 
@@ -6364,6 +6511,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns, calQueue, calEntState, calPlacesLine };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns, calQueue, calEntState, calPlacesLine, csvText };
 })();
 </script>
