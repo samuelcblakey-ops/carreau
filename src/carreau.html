@@ -415,6 +415,11 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .hof-where{align-items:flex-end}.hof-where .f{flex:1 1 200px}
 .hof-part{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px}.hof-part input{width:22px;height:22px;margin-top:1px;flex:none}.hof-part.off{opacity:.65}
 .hof-sheet{max-width:560px}
+/* Season Calendar: the listing sheet (two fields a row on desktop, one on phones) */
+.cal-sheet{max-width:640px}.cal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:start}.cal-times{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cal-sheet input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:0;min-height:40px;line-height:1.3;text-align:left;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--ink)}
+.cal-who{display:flex;flex-wrap:wrap;gap:8px}.cal-who .hof-chip{min-height:44px}.cal-comp .eyebrow{margin-right:4px}
+@media (max-width:560px){.cal-grid{grid-template-columns:1fr}}
 /* Hall of Fame: the header link, the start-screen card and the page */
 .hof-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;flex:none;white-space:nowrap}
 .hof-btn svg{display:block;color:#b8860b}.hof-btn:hover{border-color:var(--accent)}.hof-btn[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.hof-btn[aria-current="page"] svg{color:inherit}
@@ -1254,6 +1259,14 @@ Object.assign(LANG_TEXT.de, {"Layout": "Ansicht", "Cards": "Karten", "List": "Li
 Object.assign(LANG_TEXT.nl, {"Layout": "Weergave", "Cards": "Kaarten", "List": "Lijst"});
 Object.assign(LANG_TEXT.pt, {"Layout": "Vista", "Cards": "Cartões", "List": "Lista"});
 Object.assign(LANG_TEXT.th, {"Layout": "มุมมอง", "Cards": "การ์ด", "List": "รายการ"});
+// Season Calendar: organisers list a competition
+Object.assign(FR_TEXT, {"Season Calendar": "Calendrier de la saison", "Season Calendar…": "Calendrier de la saison…", "List this competition on the Season Calendar so players can find it and see how to enter.": "Inscrivez ce concours au calendrier de la saison pour que les joueurs le trouvent et sachent comment s'engager.", "List on the Season Calendar": "Inscrire au calendrier de la saison", "On the Season Calendar": "Au calendrier de la saison", "Take it off the Season Calendar?": "Le retirer du calendrier de la saison ?", "The competition's name, date or venue has changed since it was listed.": "Le nom, la date ou le lieu du concours a changé depuis son inscription au calendrier.", "Update the listing": "Mettre à jour l'annonce", "Pick a date from today on.": "Choisissez une date à partir d'aujourd'hui.", "Check-in from": "Pointage à partir de", "Play starts": "Début des parties", "Address (optional)": "Adresse (facultative)", "Who can enter": "Qui peut s'engager", "Open to all": "Ouvert à tous", "Men": "Masculins", "Ladies": "Féminines", "Mixed": "Mixtes", "Veterans": "Vétérans", "Juniors": "Jeunes", "Club members only": "Membres du club uniquement", "Licence required": "Licence obligatoire", "Entry fee (optional)": "Droit d'engagement (facultatif)", "e.g. £5 per player": "ex. 5 € par joueur", "Prizes (optional)": "Prix (facultatif)", "e.g. Prize fund £300": "ex. 300 € de prix", "How to enter (optional)": "Comment s'engager (facultatif)", "e.g. Call Jane on 07700 900123 or enter at the club bar": "ex. Appelez Jeanne au 06 12 34 56 78 ou inscrivez-vous au bar du club", "Contact (optional)": "Contact (facultatif)", "Everything here will be public.": "Tout ce qui figure ici sera public.", "List it": "L'inscrire", "Listed on the Season Calendar.": "Inscrit au calendrier de la saison.", "Listing updated.": "Annonce mise à jour.", "Taken off the Season Calendar.": "Retiré du calendrier de la saison.", "Only this competition's organisers can list it.": "Seuls les organisateurs de ce concours peuvent l'inscrire."});
+Object.assign(LANG_TEXT.es, {"Season Calendar": "Calendario de la temporada", "Season Calendar…": "Calendario de la temporada…", "List this competition on the Season Calendar so players can find it and see how to enter.": "Publica esta competición en el calendario de la temporada para que los jugadores la encuentren y sepan cómo inscribirse.", "List on the Season Calendar": "Publicar en el calendario de la temporada", "On the Season Calendar": "En el calendario de la temporada", "Take it off the Season Calendar?": "¿Quitarla del calendario de la temporada?", "The competition's name, date or venue has changed since it was listed.": "El nombre, la fecha o el lugar de la competición han cambiado desde que se publicó.", "Update the listing": "Actualizar el anuncio", "Pick a date from today on.": "Elige una fecha a partir de hoy.", "Check-in from": "Acreditación desde", "Play starts": "Inicio del juego", "Address (optional)": "Dirección (opcional)", "Who can enter": "Quién puede inscribirse", "Open to all": "Abierto a todos", "Men": "Masculino", "Ladies": "Femenino", "Mixed": "Mixto", "Veterans": "Veteranos", "Juniors": "Juveniles", "Club members only": "Solo socios del club", "Licence required": "Licencia obligatoria", "Entry fee (optional)": "Inscripción (opcional)", "e.g. £5 per player": "p. ej. 5 € por jugador", "Prizes (optional)": "Premios (opcional)", "e.g. Prize fund £300": "p. ej. 300 € en premios", "How to enter (optional)": "Cómo inscribirse (opcional)", "e.g. Call Jane on 07700 900123 or enter at the club bar": "p. ej. Llama a Juana al 612 345 678 o apúntate en el bar del club", "Contact (optional)": "Contacto (opcional)", "Everything here will be public.": "Todo lo que pongas aquí será público.", "List it": "Publicarla", "Listed on the Season Calendar.": "Publicada en el calendario de la temporada.", "Listing updated.": "Anuncio actualizado.", "Taken off the Season Calendar.": "Quitada del calendario de la temporada.", "Only this competition's organisers can list it.": "Solo los organizadores de esta competición pueden publicarla."});
+Object.assign(LANG_TEXT.it, {"Season Calendar": "Calendario della stagione", "Season Calendar…": "Calendario della stagione…", "List this competition on the Season Calendar so players can find it and see how to enter.": "Inserisci questa gara nel calendario della stagione, così i giocatori la trovano e sanno come iscriversi.", "List on the Season Calendar": "Inserisci nel calendario della stagione", "On the Season Calendar": "Nel calendario della stagione", "Take it off the Season Calendar?": "Toglierla dal calendario della stagione?", "The competition's name, date or venue has changed since it was listed.": "Il nome, la data o il luogo della gara sono cambiati da quando è stata inserita.", "Update the listing": "Aggiorna l'annuncio", "Pick a date from today on.": "Scegli una data da oggi in poi.", "Check-in from": "Accredito dalle", "Play starts": "Inizio partite", "Address (optional)": "Indirizzo (facoltativo)", "Who can enter": "Chi può iscriversi", "Open to all": "Aperta a tutti", "Men": "Maschile", "Ladies": "Femminile", "Mixed": "Misto", "Veterans": "Veterani", "Juniors": "Giovanili", "Club members only": "Solo soci del club", "Licence required": "Tessera obbligatoria", "Entry fee (optional)": "Quota d'iscrizione (facoltativa)", "e.g. £5 per player": "es. 5 € a giocatore", "Prizes (optional)": "Premi (facoltativo)", "e.g. Prize fund £300": "es. Montepremi 300 €", "How to enter (optional)": "Come iscriversi (facoltativo)", "e.g. Call Jane on 07700 900123 or enter at the club bar": "es. Chiama Giovanna al 333 123 4567 o iscriviti al bar del club", "Contact (optional)": "Contatto (facoltativo)", "Everything here will be public.": "Tutto ciò che è qui sarà pubblico.", "List it": "Inseriscila", "Listed on the Season Calendar.": "Inserita nel calendario della stagione.", "Listing updated.": "Annuncio aggiornato.", "Taken off the Season Calendar.": "Tolta dal calendario della stagione.", "Only this competition's organisers can list it.": "Solo gli organizzatori di questa gara possono inserirla."});
+Object.assign(LANG_TEXT.de, {"Season Calendar": "Saisonkalender", "Season Calendar…": "Saisonkalender…", "List this competition on the Season Calendar so players can find it and see how to enter.": "Trage dieses Turnier in den Saisonkalender ein, damit Spieler es finden und sehen, wie sie sich anmelden.", "List on the Season Calendar": "In den Saisonkalender eintragen", "On the Season Calendar": "Im Saisonkalender", "Take it off the Season Calendar?": "Aus dem Saisonkalender nehmen?", "The competition's name, date or venue has changed since it was listed.": "Name, Datum oder Ort des Turniers haben sich seit dem Eintrag geändert.", "Update the listing": "Eintrag aktualisieren", "Pick a date from today on.": "Wähle ein Datum ab heute.", "Check-in from": "Einchecken ab", "Play starts": "Spielbeginn", "Address (optional)": "Adresse (optional)", "Who can enter": "Wer teilnehmen kann", "Open to all": "Offen für alle", "Men": "Herren", "Ladies": "Damen", "Mixed": "Mixed", "Veterans": "Senioren", "Juniors": "Jugend", "Club members only": "Nur Vereinsmitglieder", "Licence required": "Lizenz erforderlich", "Entry fee (optional)": "Startgeld (optional)", "e.g. £5 per player": "z. B. 5 € pro Spieler", "Prizes (optional)": "Preise (optional)", "e.g. Prize fund £300": "z. B. 300 € Preisgeld", "How to enter (optional)": "So meldest du dich an (optional)", "e.g. Call Jane on 07700 900123 or enter at the club bar": "z. B. Jana unter 0170 1234567 anrufen oder an der Vereinsbar anmelden", "Contact (optional)": "Kontakt (optional)", "Everything here will be public.": "Alles hier wird öffentlich sein.", "List it": "Eintragen", "Listed on the Season Calendar.": "In den Saisonkalender eingetragen.", "Listing updated.": "Eintrag aktualisiert.", "Taken off the Season Calendar.": "Aus dem Saisonkalender genommen.", "Only this competition's organisers can list it.": "Nur die Organisatoren dieses Turniers können es eintragen."});
+Object.assign(LANG_TEXT.nl, {"Season Calendar": "Seizoenskalender", "Season Calendar…": "Seizoenskalender…", "List this competition on the Season Calendar so players can find it and see how to enter.": "Zet dit toernooi op de seizoenskalender, zodat spelers het vinden en zien hoe ze zich kunnen inschrijven.", "List on the Season Calendar": "Op de seizoenskalender zetten", "On the Season Calendar": "Op de seizoenskalender", "Take it off the Season Calendar?": "Van de seizoenskalender halen?", "The competition's name, date or venue has changed since it was listed.": "De naam, datum of locatie van het toernooi is veranderd sinds het op de kalender is gezet.", "Update the listing": "Vermelding bijwerken", "Pick a date from today on.": "Kies een datum vanaf vandaag.", "Check-in from": "Inchecken vanaf", "Play starts": "Aanvang", "Address (optional)": "Adres (optioneel)", "Who can enter": "Wie mag meedoen", "Open to all": "Open voor iedereen", "Men": "Heren", "Ladies": "Dames", "Mixed": "Gemengd", "Veterans": "Veteranen", "Juniors": "Jeugd", "Club members only": "Alleen clubleden", "Licence required": "Licentie verplicht", "Entry fee (optional)": "Inschrijfgeld (optioneel)", "e.g. £5 per player": "bijv. € 5 per speler", "Prizes (optional)": "Prijzen (optioneel)", "e.g. Prize fund £300": "bijv. € 300 prijzengeld", "How to enter (optional)": "Zo schrijf je in (optioneel)", "e.g. Call Jane on 07700 900123 or enter at the club bar": "bijv. Bel Jana op 06 12345678 of schrijf in aan de clubbar", "Contact (optional)": "Contact (optioneel)", "Everything here will be public.": "Alles hier wordt openbaar.", "List it": "Op de kalender zetten", "Listed on the Season Calendar.": "Op de seizoenskalender gezet.", "Listing updated.": "Vermelding bijgewerkt.", "Taken off the Season Calendar.": "Van de seizoenskalender gehaald.", "Only this competition's organisers can list it.": "Alleen de organisatoren van dit toernooi kunnen het op de kalender zetten."});
+Object.assign(LANG_TEXT.pt, {"Season Calendar": "Calendário da época", "Season Calendar…": "Calendário da época…", "List this competition on the Season Calendar so players can find it and see how to enter.": "Coloque este torneio no calendário da época para que os jogadores o encontrem e saibam como se inscrever.", "List on the Season Calendar": "Colocar no calendário da época", "On the Season Calendar": "No calendário da época", "Take it off the Season Calendar?": "Retirá-lo do calendário da época?", "The competition's name, date or venue has changed since it was listed.": "O nome, a data ou o local do torneio mudaram desde que foi colocado no calendário.", "Update the listing": "Atualizar o anúncio", "Pick a date from today on.": "Escolha uma data a partir de hoje.", "Check-in from": "Confirmação a partir das", "Play starts": "Início dos jogos", "Address (optional)": "Morada (opcional)", "Who can enter": "Quem pode participar", "Open to all": "Aberto a todos", "Men": "Masculino", "Ladies": "Feminino", "Mixed": "Misto", "Veterans": "Veteranos", "Juniors": "Juniores", "Club members only": "Só sócios do clube", "Licence required": "Licença obrigatória", "Entry fee (optional)": "Inscrição (opcional)", "e.g. £5 per player": "ex. 5 € por jogador", "Prizes (optional)": "Prémios (opcional)", "e.g. Prize fund £300": "ex. 300 € em prémios", "How to enter (optional)": "Como se inscrever (opcional)", "e.g. Call Jane on 07700 900123 or enter at the club bar": "ex. Ligue à Joana para o 912 345 678 ou inscreva-se no bar do clube", "Contact (optional)": "Contacto (opcional)", "Everything here will be public.": "Tudo o que estiver aqui será público.", "List it": "Colocá-lo", "Listed on the Season Calendar.": "Colocado no calendário da época.", "Listing updated.": "Anúncio atualizado.", "Taken off the Season Calendar.": "Retirado do calendário da época.", "Only this competition's organisers can list it.": "Só os organizadores deste torneio o podem colocar no calendário."});
+Object.assign(LANG_TEXT.th, {"Season Calendar": "ปฏิทินฤดูกาล", "Season Calendar…": "ปฏิทินฤดูกาล…", "List this competition on the Season Calendar so players can find it and see how to enter.": "ลงรายการการแข่งขันนี้ในปฏิทินฤดูกาล เพื่อให้ผู้เล่นค้นหาและดูวิธีสมัครได้", "List on the Season Calendar": "ลงในปฏิทินฤดูกาล", "On the Season Calendar": "อยู่ในปฏิทินฤดูกาล", "Take it off the Season Calendar?": "นำออกจากปฏิทินฤดูกาลหรือไม่", "The competition's name, date or venue has changed since it was listed.": "ชื่อ วันที่ หรือสถานที่ของการแข่งขันเปลี่ยนไปตั้งแต่ลงรายการ", "Update the listing": "อัปเดตรายการ", "Pick a date from today on.": "เลือกวันที่ตั้งแต่วันนี้เป็นต้นไป", "Check-in from": "เช็คอินตั้งแต่", "Play starts": "เริ่มแข่ง", "Address (optional)": "ที่อยู่ (ไม่บังคับ)", "Who can enter": "ใครสมัครได้", "Open to all": "เปิดให้ทุกคน", "Men": "ชาย", "Ladies": "หญิง", "Mixed": "ผสม", "Veterans": "อาวุโส", "Juniors": "เยาวชน", "Club members only": "เฉพาะสมาชิกสโมสร", "Licence required": "ต้องมีใบอนุญาต", "Entry fee (optional)": "ค่าสมัคร (ไม่บังคับ)", "e.g. £5 per player": "เช่น 200 บาทต่อคน", "Prizes (optional)": "รางวัล (ไม่บังคับ)", "e.g. Prize fund £300": "เช่น เงินรางวัลรวม 10,000 บาท", "How to enter (optional)": "วิธีสมัคร (ไม่บังคับ)", "e.g. Call Jane on 07700 900123 or enter at the club bar": "เช่น โทรหาคุณจันทร์ 081 234 5678 หรือสมัครที่บาร์ของสโมสร", "Contact (optional)": "ติดต่อ (ไม่บังคับ)", "Everything here will be public.": "ข้อมูลทั้งหมดในนี้จะเป็นสาธารณะ", "List it": "ลงรายการ", "Listed on the Season Calendar.": "ลงในปฏิทินฤดูกาลแล้ว", "Listing updated.": "อัปเดตรายการแล้ว", "Taken off the Season Calendar.": "นำออกจากปฏิทินฤดูกาลแล้ว", "Only this competition's organisers can list it.": "เฉพาะผู้จัดการแข่งขันนี้เท่านั้นที่ลงรายการได้"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -1437,7 +1450,7 @@ document.documentElement.lang = I18N.lang;
 function localStore() {
   const KEY = "carreau-local-v1";
   let data; try { data = JSON.parse(lsGet(KEY) || "null"); } catch { data = null; }
-  data = data || { t: {}, m: {} }; data.l = data.l || {}; data.s = data.s || {}; data.br = data.br || {}; data.hof = data.hof || {};
+  data = data || { t: {}, m: {} }; data.l = data.l || {}; data.s = data.s || {}; data.br = data.br || {}; data.hof = data.hof || {}; data.cal = data.cal || {};
   const subsT = new Set(), subsM = new Map(), subsL = new Map(), subsS = new Set(), subsS1 = new Map();
   // opened from disk (the app tests), refuse what Firestore can't store, an array directly inside an array, so the
   // quick tests catch it instead of the website failing to save (the inter-club draw, #34)
@@ -1465,6 +1478,13 @@ function localStore() {
     async updateHof(tid, patch) { if (!data.hof[tid]) throw { code: "not-found" }; return this.setHof(tid, Object.assign(clone(data.hof[tid]), clone(patch))); },
     async getHof(tid) { return data.hof[tid] ? clone(data.hof[tid]) : null; },
     async listHof({ country } = {}) { return Object.values(data.hof).filter(e => !e.hidden && (!country || e.country === country)).map(clone); },
+    // Season Calendar listings (the web build keeps them in calendar/{cid})
+    watchCal(cid, cb) { setTimeout(() => cb(data.cal[cid] ? clone(data.cal[cid]) : null)); const k = "c:" + cid; if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(cb); return () => subsL.get(k).delete(cb); },
+    async setCal(cid, L) { if (L) data.cal[cid] = clone(L); else delete data.cal[cid]; persist(); setTimeout(() => (subsL.get("c:" + cid) || new Set()).forEach(cb => cb(L ? clone(L) : null))); },
+    async deleteCal(cid) { return this.setCal(cid, null); },
+    async updateCal(cid, patch) { if (!data.cal[cid]) throw { code: "not-found" }; return this.setCal(cid, Object.assign(clone(data.cal[cid]), clone(patch))); },
+    async getCal(cid) { return data.cal[cid] ? clone(data.cal[cid]) : null; },
+    async listCal({ country } = {}) { return Object.values(data.cal).filter(e => !e.hidden && (!country || e.country === country)).map(clone); },
     watchStreams(cb) { subsS.add(cb); emitS(); return () => subsS.delete(cb); },
     watchStream(sid, cb) { if (!subsS1.has(sid)) subsS1.set(sid, new Set()); subsS1.get(sid).add(cb); emitS(sid); return () => subsS1.get(sid).delete(cb); },
     async setStream(st) { data.s[st.id] = clone(st); persist(); emitS(st.id); },
@@ -1474,7 +1494,7 @@ function localStore() {
     watchTournaments(cb) { subsT.add(cb); emitT(); return () => subsT.delete(cb); },
     watchMatches(tid, cb) { if (!subsM.has(tid)) subsM.set(tid, new Set()); subsM.get(tid).add(cb); emitM(tid); return () => subsM.get(tid).delete(cb); },
     async setTournament(t) { data.t[t.id] = clone(t); persist(); emitT(); },
-    async deleteTournament(tid) { delete data.t[tid]; delete data.m[tid]; delete data.l[tid]; if (data.hof[tid]) data.hof[tid].gone = true; persist(); emitT(); },
+    async deleteTournament(tid) { delete data.t[tid]; delete data.m[tid]; delete data.l[tid]; if (data.hof[tid]) data.hof[tid].gone = true; if (data.cal[tid]) data.cal[tid].gone = true; persist(); emitT(); },
     async setMatch(tid, m) { (data.m[tid] ||= {})[m.id] = clone(m); persist(); emitM(tid); },
     async updateMatch(tid, id, patch) { const m = data.m[tid]?.[id]; if (!m) throw { code: "invalid_argument" }; Object.assign(m, clone(patch)); persist(); emitM(tid); },
     async deleteMatch(tid, id) { delete data.m[tid]?.[id]; persist(); emitM(tid); },
@@ -1491,6 +1511,12 @@ function dbStore(db) {
     deleteHof(tid) { return db.doc(`hallOfFame/${tid}`).delete(); },
     updateHof(tid, patch) { return db.doc(`hallOfFame/${tid}`).update(clone(patch)); },
     listHof({ country } = {}) { return new Promise((res, rej) => { let u = null; u = db.collection("hallOfFame").limit(300).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => clone(d.data())).filter(e => !e.hidden && (!country || e.country === country))); }, rej); }); },
+    watchCal(cid, cb, onErr) { return db.doc(`calendar/${cid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
+    setCal(cid, L) { return db.doc(`calendar/${cid}`).set(clone(L)); },
+    deleteCal(cid) { return db.doc(`calendar/${cid}`).delete(); },
+    updateCal(cid, patch) { return db.doc(`calendar/${cid}`).update(clone(patch)); },
+    getCal(cid) { return new Promise((res, rej) => { let u = null; u = db.doc(`calendar/${cid}`).onSnapshot(d => { setTimeout(() => u && u()); res(d.exists ? clone(d.data()) : null); }, rej); }); },
+    listCal({ country } = {}) { return new Promise((res, rej) => { let u = null; u = db.collection("calendar").limit(300).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => clone(d.data())).filter(e => !e.hidden && (!country || e.country === country))); }, rej); }); },
     watchStreams(cb, onErr) { return db.collection("streams").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
     watchStream(sid, cb, onErr) { return db.doc(`streams/${sid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setStream(st) { return db.doc(`streams/${st.id}`).set(clone(st)); },
@@ -3073,6 +3099,7 @@ function shootStandings(t) {
 S.canSeeArchived = S.canSeeArchived || (() => true);
 async function archiveCompetition(on) {
   await hofMarkGone(T().id, !!on); // first: once archived, the organiser can no longer change its Hall of Fame entry
+  await calMarkGone(T().id, !!on); // and its Season Calendar listing
   const t = clone(T()); t.archived = !!on; t.archivedAt = on ? Date.now() : null;
   const hide = on && !S.canSeeArchived();
   if (hide) {
@@ -3423,6 +3450,120 @@ async function hofMarkGone(tid, gone) {
   try { await S.store.updateHof(tid, { gone }); if (e) e.gone = gone; if (S.hofPage) S.hofPage.cache = {}; }
   catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
 }
+/* ---------------- Season Calendar: organisers list a competition (calendar/{cid}) ---------------- */
+// A competition's listing has the competition's id (one per competition, like hallOfFame/{tid}). Its organisers (the
+// device that made it, an organiser link, or the organiser code it was made with) or the admin list it from Setup; it's
+// public at once. Times are kept as typed, the venue's local time. Archiving marks the listing gone (calMarkGone).
+const CAL_WHO = [["open", "Open to all"], ["men", "Men"], ["ladies", "Ladies"], ["mixed", "Mixed"], ["veterans", "Veterans"], ["juniors", "Juniors"], ["members", "Club members only"], ["licence", "Licence required"]];
+const CAL_FMTS = ["singles", "doubles", "triples", "melee", "shooting", "eurocup", "clubs"];
+// a local day as "YYYY-MM-DD", days from today (-1 is yesterday)
+const calDay = (n = 0) => { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const calFmtKey = t => sysOf(t) === "clubs" ? "clubs" : hofFmtKey({ system: sysOf(t), entry: t.entry, fmt: t.format });
+const calName = t => String(t.name || "").trim().slice(0, 120), calVenue = t => String(t.venue || "").trim().slice(0, 120);
+// the competition's organisers (or the admin), not for examples or archived competitions
+const calCan = t => !!(t && S.store.setCal && !t.archived && !(t.listed || t.example) && (S.calCanPublish ? S.calCanPublish(t) : canEdit()));
+// once the competition's date is more than a day past, there's nothing to list
+const calPast = t => !!t.date && t.date < calDay(-1);
+// the competition's name, date or venue no longer match its listing
+const calChanged = (t, e) => !!e && (e.name !== calName(t) || e.date !== (t.date || "") || (e.venue || "") !== calVenue(t));
+function calWatch() {
+  const t = T(); const want = t && calCan(t) && S.tab === "setup" ? t.id : null;
+  if (!want) { if (S.calKey && S.calKey !== S.tid) { S.unsubC?.(); S.unsubC = null; S.calKey = null; } return; }
+  if (S.calKey === want) return;
+  S.unsubC?.(); S.calKey = want; S.cal = S.cal || {};
+  S.unsubC = S.store.watchCal(want, e => { if (S.calKey !== want) return; S.cal[want] = e || null; render(); if (S.modal?.cal) renderModal(); }, err => { console.error(err); if (S.calKey === want) { S.cal[want] = null; render(); } });
+}
+// the panel in Setup, above the Hall of Fame's: list it, or what's listed with Update / Remove
+function calPanel(t) {
+  if (!calCan(t) || calPast(t)) return "";
+  const e = S.cal?.[t.id];
+  if (e === undefined) return `<div class="panel cal-panel" data-cal-panel><span class="small muted">Season Calendar…</span></div>`;
+  const head = `<h3>Season Calendar</h3>`;
+  if (!e) return `<div class="panel spread cal-panel" data-cal-panel><div>${head}<div class="small muted">List this competition on the Season Calendar so players can find it and see how to enter.</div></div>
+    <button class="btn primary" data-act="cal-open">List on the Season Calendar</button></div>`;
+  return `<div class="panel stack cal-panel" data-cal-panel style="gap:8px"><div class="spread"><div>${head}
+      <div class="small"><b>On the Season Calendar</b> · ${hofLabel(e.level)} <span data-notr>${esc(hofCountryName(e.country))}</span></div></div>
+      <div class="row"><button class="btn" data-act="cal-open">Update</button>${S.calConfirmRemove === t.id ? `<span class="err">Take it off the Season Calendar?</span><button class="btn danger" data-act="cal-remove-yes">Remove</button><button class="btn" data-act="cal-remove-no">Keep it</button>` : `<button class="btn" data-act="cal-remove">Remove</button>`}</div></div>
+    ${calChanged(t, e) ? `<div class="notice small cal-changed">The competition's name, date or venue has changed since it was listed. <button class="btn" data-act="cal-open">Update the listing</button></div>` : ""}</div>`;
+}
+// the sheet: the competition's name, date and venue as they are now; the rest as listed (or the defaults)
+function calOpen(t) {
+  const e = S.cal?.[t.id] || null;
+  S.modal = { cal: true, tid: t.id, date: t.date || "", checkin: e?.checkin || "", start: e?.start || "", venue: calVenue(t), address: e?.address || "",
+    level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: e?.region || "", who: e ? [...(e.who || [])] : ["open"],
+    fee: e?.fee || "", prizes: e?.prizes || "", howTo: e?.howTo || "", contact: e?.contact || "", note: e?.note || "", err: "", busy: false };
+  renderModal();
+}
+function renderCalModal(t, el) {
+  const md = S.modal, e = S.cal?.[t.id] || null;
+  const countries = HOF_COUNTRIES.map(c => [c, hofCountryName(c)]).sort((a, b) => (a[0].startsWith("GB-") ? 0 : 1) - (b[0].startsWith("GB-") ? 0 : 1) || a[1].localeCompare(b[1], LOCALES[I18N.lang] || "en"));
+  if (!countries.some(c => c[0] === md.country)) countries.unshift([md.country, hofCountryName(md.country)]);
+  const fmt = hofFmtLabel({ system: sysOf(t), entry: t.entry, fmt: t.format });
+  const box = (k, label, max, ph, type = "text") => `<label class="f"><span>${label}</span><input type="${type}" ${max ? `maxlength="${max}"` : ""} data-cal="${k}" value="${esc(md[k])}" ${ph ? `placeholder="${ph}"` : ""}></label>`;
+  const area = (k, label, max, ph) => `<label class="f"><span>${label}</span><textarea data-cal="${k}" maxlength="${max}" rows="2" ${ph ? `placeholder="${ph}"` : ""}>${esc(md[k])}</textarea></label>`;
+  el.innerHTML = `<div class="scrim" data-act="close-bg"><div class="modal hof-sheet cal-sheet" role="dialog" aria-modal="true" aria-label="${e ? "Update the listing" : "List on the Season Calendar"}">
+    <div class="spread"><div><div class="eyebrow">Season Calendar</div><h3>${e ? "Update the listing" : "List on the Season Calendar"}</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    <div class="small cal-comp"><span class="eyebrow">Competition</span> <b data-notr>${esc(calName(t))}</b> · <span>${esc(fmt)}</span></div>
+    <div class="cal-grid">
+      <label class="f"><span>Date</span><input type="date" data-cal="date" value="${esc(md.date)}" min="${calDay()}" required></label>
+      <div class="cal-times">${box("checkin", "Check-in from", 0, "", "time")}${box("start", "Play starts", 0, "", "time")}</div>
+      ${box("venue", "Venue", 120)}${box("address", "Address (optional)", 200)}
+    </div>
+    <div class="stack" style="gap:6px"><div class="eyebrow">Competition level</div>
+      <div class="hof-levels" role="group" aria-label="Competition level">${HOF_LEVELS.map(l => `<button type="button" class="hof-pick hof-${l} ${md.level === l ? "on" : ""}" data-act="cal-level" data-k="${l}" aria-pressed="${md.level === l}"><span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(l))}</span></button>`).join("")}</div></div>
+    <div class="cal-grid"><label class="f"><span>Country</span><select data-cal="country">${countries.map(([c, n]) => `<option value="${esc(c)}" ${c === md.country ? "selected" : ""} data-notr>${esc(n)}</option>`).join("")}</select></label>
+      ${box("region", "Region (optional)", 60, "e.g. Chiltern")}</div>
+    <div class="stack" style="gap:6px"><div class="eyebrow">Who can enter</div>
+      <div class="cal-who" role="group" aria-label="Who can enter">${CAL_WHO.map(([k, l]) => `<button type="button" class="hof-chip" data-act="cal-who" data-k="${k}" aria-pressed="${md.who.includes(k)}">${l}</button>`).join("")}</div></div>
+    <div class="cal-grid">${box("fee", "Entry fee (optional)", 60, "e.g. £5 per player")}${box("prizes", "Prizes (optional)", 120, "e.g. Prize fund £300")}</div>
+    ${area("howTo", "How to enter (optional)", 300, "e.g. Call Jane on 07700 900123 or enter at the club bar")}
+    <div class="cal-grid">${box("contact", "Contact (optional)", 120)}</div>
+    ${area("note", "Note (optional)", 300)}
+    <p class="small muted">Everything here will be public.</p>
+    ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
+    <div class="row"><button class="btn primary" data-act="cal-save" ${md.busy ? "disabled" : ""}>${e ? "Update the listing" : "List it"}</button><button class="btn" data-act="close">Cancel</button></div>
+  </div></div>`;
+  localize(el);
+}
+function calInput(el) {
+  const md = S.modal; if (!md?.cal) return;
+  const k = el.dataset.cal;
+  if (["date", "checkin", "start", "venue", "address", "country", "region", "fee", "prizes", "howTo", "contact", "note"].includes(k)) md[k] = el.value;
+}
+// the listing as saved: what only the admin sets (hidden, hiddenAt) and who first listed it are carried over unchanged
+function calEntry(t, md, prev) {
+  const now = Date.now(); const who = S.hofWho ? S.hofWho() : { byUid: "", byCode: "" }; const s = (v, n) => String(v || "").trim().slice(0, n);
+  const time = v => /^\d{2}:\d{2}$/.test(v || "") ? v : "";
+  const L = { kind: "comp", tid: t.id, name: calName(t), date: md.date, checkin: time(md.checkin), start: time(md.start), venue: s(md.venue, 120), address: s(md.address, 200),
+    country: md.country, region: s(md.region, 60), level: HOF_LEVELS.includes(md.level) ? md.level : "open", fmt: calFmtKey(t), system: sysOf(t),
+    who: CAL_WHO.map(x => x[0]).filter(k => md.who.includes(k)), fee: s(md.fee, 60), prizes: s(md.prizes, 120), howTo: s(md.howTo, 300), contact: s(md.contact, 120), note: s(md.note, 300),
+    status: prev?.status || "on", lang: I18N.lang, byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "",
+    createdAt: prev?.createdAt || now, updatedAt: now, hidden: prev ? !!prev.hidden : false, gone: false };
+  if (prev && prev.hiddenAt !== undefined) L.hiddenAt = prev.hiddenAt;
+  return L;
+}
+async function calAction(act, k) {
+  const md = S.modal, t = T(); if (!t || t.id !== md.tid) { S.modal = null; renderModal(); return; }
+  if (act === "cal-level") { if (HOF_LEVELS.includes(k)) md.level = k; renderModal(); return; }
+  if (act === "cal-who") { if (CAL_WHO.some(x => x[0] === k)) md.who = md.who.includes(k) ? md.who.filter(x => x !== k) : [...md.who, k]; renderModal(); return; }
+  if (act === "cal-save") {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(md.date || "") || md.date < calDay()) { md.err = "Pick a date from today on."; renderModal(); return; }
+    const prev = S.cal?.[t.id] || null; const L = calEntry(t, md, prev);
+    md.busy = true; md.err = ""; renderModal();
+    try { await S.store.setCal(t.id, L); S.cal = S.cal || {}; S.cal[t.id] = L; S.modal = null; renderModal(); render(); toast(prev ? "Listing updated." : "Listed on the Season Calendar."); }
+    catch (err) { console.error(err); md.busy = false; md.err = err?.code === "permission-denied" ? "Only this competition's organisers can list it." : "That didn't save. Check your connection and try again."; renderModal(); }
+  }
+}
+async function calRemove(t) {
+  try { await S.store.deleteCal(t.id); S.cal = S.cal || {}; S.cal[t.id] = null; S.calConfirmRemove = null; render(); toast("Taken off the Season Calendar."); }
+  catch (err) { console.error(err); toast(err?.code === "permission-denied" ? "Only this competition's organisers can list it." : "That didn't save. Check your connection and try again."); }
+}
+// archiving marks the listing gone, so the calendar doesn't link to it (restoring unmarks it); no listing is fine
+async function calMarkGone(tid, gone) {
+  const e = S.cal?.[tid]; if (!S.store.updateCal || e === null || (e && !!e.gone === gone)) return;
+  try { await S.store.updateCal(tid, { gone }); if (e) e.gone = gone; }
+  catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
+}
 function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
     ${ko ? `<span>The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.</span>` : ""}
@@ -3626,6 +3767,7 @@ function drawModal() {
   const el = $("#modal"); const t = T();
   if (!S.modal || !t) { el.innerHTML = ""; return; }
   if (S.modal.hof) { if (S.modal.tid !== t.id) { S.modal = null; el.innerHTML = ""; return; } renderHofModal(t, el); return; }
+  if (S.modal.cal) { if (S.modal.tid !== t.id) { S.modal = null; el.innerHTML = ""; return; } renderCalModal(t, el); return; }
   if (S.modal.so) { renderSoModal(t, el); return; }
   if (S.modal.lineup) { renderLineupModal(t, el); return; }
   const m = S.matches[S.modal.id]; if (!m) { S.modal = null; el.innerHTML = ""; return; }
@@ -3681,6 +3823,7 @@ async function modalAction(act, k, a) {
   const t = T(); const md = S.modal; if (!md) return;
   if (act === "close" || act === "close-bg") { S.modal = null; renderModal(); return; }
   if (md.hof) { await hofAction(act, k); return; }
+  if (md.cal) { await calAction(act, k); return; }
   // the game went while its dialog was open (a draw undone on another phone, say): close it rather than save into nothing
   if (!t || (md.id && !S.matches[md.id]) || (md.so && (md.ids || []).some(id => !S.matches[id]))) { S.modal = null; renderModal(); toast("That game isn't in the draw any more."); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
@@ -4245,7 +4388,7 @@ function drawPage() {
   const t = T(); const main = $("#main"); checkNewRound(t); renderAlert();
   const scrolls = {}; document.querySelectorAll("[data-scroll-key]").forEach(el => scrolls[el.dataset.scrollKey] = [el.scrollLeft, el.scrollTop]);
   const restore = () => { document.querySelectorAll("[data-scroll-key]").forEach(el => { const v = scrolls[el.dataset.scrollKey]; if (v) { el.scrollLeft = v[0]; el.scrollTop = v[1]; } }); };
-  applyCompTheme(S.liveRoute && !S.liveRoute.tid ? null : T()); brandWatch(); hofWatch();
+  applyCompTheme(S.liveRoute && !S.liveRoute.tid ? null : T()); brandWatch(); hofWatch(); calWatch();
   document.body.classList.toggle("stream", S.liveRoute?.view === "stream"); document.body.classList.toggle("desk", S.liveRoute?.view === "desk");
   if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lc = S.liveRoute.view === "stream" && S.loaded ? liveCtx() : null; if (lc) fitOvNames(); scheduleCardTick(lc ? lc.L : null); return; }
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
@@ -4492,6 +4635,7 @@ function renderSetup(t) {
   </div>` : ""}
   ${S.setupExtra ? S.setupExtra(t) : ""}
   ${lookPanel(t)}
+  ${calPanel(t)}
   ${hofPanel(t, "setup")}
   ${canEdit() ? `<div class="panel spread">
     <div><h3>${t.archived ? "Archived" : "Archive competition"}</h3><p class="small muted">${t.archived ? "Only the site admin can see this competition. Restore it to make it visible again." : `Once the competition has finished, archive it to hide it from everyone except the site admin.${MS().some(m => !m.done && m.a && (m.b || m.stage === "shoot")) ? " Some games aren't finished yet." : ""}`}</p></div>
@@ -5359,6 +5503,10 @@ document.addEventListener("click", async e => {
     case "hof-remove": S.hofConfirmRemove = t?.id; render(); break;
     case "hof-remove-no": S.hofConfirmRemove = null; render(); break;
     case "hof-remove-yes": if (t && hofCan(t)) await hofRemove(t); break;
+    case "cal-open": if (t && calCan(t)) calOpen(t); break;
+    case "cal-remove": S.calConfirmRemove = t?.id; render(); break;
+    case "cal-remove-no": S.calConfirmRemove = null; render(); break;
+    case "cal-remove-yes": if (t && calCan(t)) await calRemove(t); break;
     case "logo-remove": { try { await S.store.setBrand(t.id, null); setBrandLocal(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
     case "lv-links": S.lvLinks = S.lvLinks === a.dataset.id ? null : a.dataset.id; render(); break;
     case "copy": { const el = document.getElementById(a.dataset.target); if (!el) break; try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } break; }
@@ -5518,6 +5666,7 @@ document.addEventListener("change", async e => {
 });
 document.addEventListener("input", e => {
   if (e.target.dataset?.hof && S.modal?.hof) { hofInput(e.target); return; }
+  if (e.target.dataset?.cal && S.modal?.cal) { calInput(e.target); return; }
   if (e.target.id === "hof-q") { hofPage().q = e.target.value; hofPaint(); return; }
   if (e.target.id === "picker-q") {
     const q = hofNorm(e.target.value.trim()); let n = 0;
