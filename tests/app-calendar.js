@@ -1,6 +1,9 @@
 // Season Calendar 1 (calendar-publish): the organiser lists a competition from Setup, the sheet is pre-filled from the
 // competition, the saved listing, the "changed since it was listed" notice, Remove, archiving marks the listing gone,
 // and no panel for spectators, examples or a competition more than a day past. Screenshots of the sheet at 390 px and desktop.
+// Season Calendar 2 (calendar-page): the links in, the page (soonest first, grouped by week then month), filters, search,
+// the full listing in place (Follow the draw once drawn), deep links, the organiser's Edit and Remove, the admin's hide
+// (stood in for here; the rules are in web-calendar.js), French, and the page and a listing at 390 px.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, locale: 'en-GB' });
@@ -85,6 +88,149 @@ const { chromium } = require('playwright');
   await p.evaluate(() => document.querySelector('[data-cal-panel]')?.scrollIntoView()); await p.screenshot({ path: 'test-results/calendar-panel-desktop.png' });
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
   await p.evaluate(() => document.querySelector('[data-cal-panel]')?.scrollIntoView()); await p.screenshot({ path: 'test-results/calendar-panel-390.png' });
+
+  // ---- Season Calendar 2 (calendar-page): the public page, #calendar and #calendar.<id> ----
+  const p2 = await ctx.newPage(); p2.on('pageerror', e => errs.push('page: ' + e.message));
+  await p2.setViewportSize({ width: 1100, height: 900 });
+  await p2.goto(process.env.APP_URL); await p2.evaluate(() => localStorage.clear()); await p2.reload(); await p2.waitForTimeout(300);
+  const run2 = body => p2.evaluate(new Function(`return (async () => { ${pre}
+    const go = async h => { document.activeElement?.blur?.(); location.hash = h; await w(250); };
+    const rows = () => qa('#cal-results .cal-row .cal-name b, #cal-results .cal-card h3').map(txt);
+    const change = async (sel, v) => { const el = q(sel); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); await w(200); };
+    const search = async v => { const el = q('#cal-q'); el.focus(); el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); await w(80); };
+    const toSun = (7 - new Date().getDay()) % 7;
+    const setC = async patch => { const t = JSON.parse(JSON.stringify(S.tournaments[window.__tid])); Object.assign(t, patch); await S.store.setTournament(t); S.tournaments[t.id] = t; await w(150); C.render(); await w(60); };
+    const L = []; try { ${body} } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\\n')[1]); } return L; })();`));
+  out.push(...await run2(`
+    q('[data-act="new-t"]').click(); await w(150);
+    await setT({ name: 'Hitchin Summer Triples', venue: 'Hitchin Town Cricket Club', date: day(0), wizard: false, system: 'swiss', format: 'triples' });
+    const tid = C.T().id; window.__tid = tid;
+    const mk = (cid, o) => Object.assign({ kind: 'comp', tid: cid, name: '', date: day(1), checkin: '', start: '', venue: '', address: '', country: 'GB-ENG', region: '', level: 'open', fmt: 'triples', system: 'swiss',
+      who: ['open'], fee: '', prizes: '', howTo: '', contact: '', note: '', status: 'on', lang: 'en', byUid: '', byCode: '', createdAt: Date.now(), updatedAt: Date.now(), hidden: false, gone: false }, o);
+    await Promise.all([
+      mk(tid, { name: 'Hitchin Summer Triples', date: day(0), checkin: '09:00', start: '10:00', venue: 'Hitchin Town Cricket Club', address: 'Lucas Lane, Hitchin SG5 2JB', region: 'Chiltern', level: 'regional',
+        who: ['open', 'veterans'], fee: '£5 per player', prizes: 'Prize fund £300', howTo: 'Enter at the club bar', contact: 'Jane, 07700 900123', note: 'Bring your own boules' }),
+      mk('c2', { name: 'English Doubles Championship', date: day(toSun + 3), start: '09:30', venue: 'Pétanque Park, Leicester', level: 'national', fmt: 'doubles' }),
+      mk('c3', { name: 'Coupe de Bretagne', date: day(45), venue: 'Rennes', country: 'FR', region: 'Bretagne', fmt: 'melee', system: 'melee' }),
+      mk('c4', { name: 'Last Week Open', date: day(-2) }),
+      mk('c5', { name: 'Hidden junk', date: day(3), hidden: true, hiddenAt: Date.now() }),
+    ].map(e => S.store.setCal(e.tid, e)));
+    // the three ways in: header (between the picker and the Hall of Fame), footer (before the Hall of Fame), start screen
+    const hb = q('header a.cal-btn[href="#calendar"]'), fl = q('#foot a[href="#calendar"]');
+    L.push('links: header before hall of fame ' + !!(hb && hb.compareDocumentPosition(q('header .hof-btn:not(.cal-btn)')) & Node.DOCUMENT_POSITION_FOLLOWING) + ' | after picker ' + !!(hb && q('.picker-btn')?.compareDocumentPosition(hb) & Node.DOCUMENT_POSITION_FOLLOWING)
+      + ' | footer before hall of fame ' + !!(fl && fl.compareDocumentPosition(q('#foot a[href="#halloffame"]')) & Node.DOCUMENT_POSITION_FOLLOWING));
+    document.activeElement?.blur?.(); q('header .brand .home').click(); await w(200);
+    const sc = q('.start-actions a[href="#calendar"]');
+    L.push('start card: ' + txt(sc) + ' | before hall of fame ' + !!(sc && sc.compareDocumentPosition(q('.start-actions a[href="#halloffame"]')) & Node.DOCUMENT_POSITION_FOLLOWING));
+    const startCard = !!sc;
+    await go('calendar');
+    L.push('page: title ' + txt(q('main h2')) + ' | header button ' + !!hb + ' | footer link ' + !!fl + ' | start card ' + startCard);
+    L.push('page more: ' + txt(q('.cal-page .hof-hero p')) + ' | back ' + txt(q('.cal-page .hof-hero .btn')) + ' | current ' + q('header .cal-btn').getAttribute('aria-current') + ' | tab title ' + document.title + ' | search ' + q('#cal-q').placeholder);
+    const eng = rows().length;
+    await change('#cal-country', 'all');
+    const g = qa('.cal-group-h').map(txt), month = new Date(day(45) + 'T12:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    L.push('rows: ' + rows()[0] + ' first | past listing shown ' + rows().includes('Last Week Open') + ' | groups ' + g.join(','));
+    L.push('groups month ok: ' + (g[2] === month) + ' | hidden shown ' + rows().includes('Hidden junk') + ' | order ' + rows().join(' / '));
+    L.push('row: ' + txt(q('#cal-' + tid)) + ' | live pill ' + !!q('#cal-' + tid + ' .cal-live') + ' | others live ' + qa('#cal-results .cal-live').length);
+    L.push('row c3: ' + txt(q('#cal-c3')));
+    const all = rows().length;
+    q('[data-act="cal-filter-level"][data-k="national"]').click(); await w(150); const nat = rows().length + ' ' + rows().join(',');
+    q('[data-act="cal-filter-level"][data-k="all"]').click(); await w(150);
+    await change('#cal-fmt', 'melee'); const mel = rows().join(','); await change('#cal-fmt', 'all');
+    await search('PETANQUE park'); const acc = rows().length + ' | focus kept ' + (document.activeElement === q('#cal-q'));
+    await search('chiltern'); const reg = rows().join(',');
+    L.push('filters: country GB-ENG ' + eng + ' | all countries ' + all + ' | level national ' + nat.split(' ')[0] + ' | search accents ' + acc);
+    L.push('filters more: national ' + nat + ' | melee ' + mel + ' | region search ' + reg);
+    await search('nobody here'); L.push('no match: ' + txt(q('#cal-results .empty')));
+    q('[data-act="cal-clear"]').click(); await w(150); L.push('cleared: ' + rows().length + ' | box ' + (q('#cal-q').value === ''));
+    await change('#cal-country', 'GB-SCT'); L.push('scotland: ' + txt(q('#cal-results .empty')));
+    q('[data-act="cal-all-countries"]').click(); await w(200); L.push('show all: ' + q('#cal-country').value + ' | ' + rows().length);
+    // the full listing, opened in place
+    q('#cal-' + tid).click(); await w(150);
+    const card = q('#cal-' + tid + '.cal-card');
+    L.push('open listing: How to enter ' + (txt(card?.querySelector('h4')) === 'How to enter') + ' | Follow the draw ' + !!card?.querySelector('a[href="#' + tid + '"].primary') + ' before draw | view ' + txt(card?.querySelector('a.btn')));
+    L.push('listing: ' + txt(card.querySelector('.hof-where')) + ' | ' + qa('#cal-' + tid + ' dt').map(d => d.textContent + '=' + txt(d.nextElementSibling)).join(' ; '));
+    L.push('listing buttons: ' + qa('#cal-' + tid + ' .row .btn').map(txt).join(',') + ' | close focused ' + (document.activeElement?.dataset?.act === 'cal-close-entry') + ' | other rows ' + qa('#cal-results .cal-row').length);
+    q('#cal-' + tid + ' [data-act="cal-close-entry"]').click(); await w(150);
+    L.push('closed: ' + !!q('#cal-' + tid + '.cal-row') + ' | focus back ' + (document.activeElement?.id === 'cal-' + tid));
+    // a listing whose competition isn't on this device: no organiser buttons, no link (there's no competition to read)
+    q('#cal-c2').click(); await w(200); L.push('stranger listing: buttons ' + qa('#cal-c2 .row .btn').map(txt).join(','));
+    q('#cal-c2 [data-act="cal-close-entry"]').click(); await w(100);
+    // the competition is drawn: Follow the draw
+    await setC({ draws: [{ id: 'R1', kind: 'round', at: Date.now() }] });
+    q('#cal-' + tid).click(); await w(150);
+    const fd = q('#cal-' + tid + ' a.primary');
+    L.push('after draw: Follow the draw ' + (txt(fd) === 'Follow the draw' && fd.getAttribute('href') === '#' + tid) + ' after draw');
+    await setC({ draws: [] });
+  `));
+  await p2.screenshot({ path: 'test-results/calendar-listing-desktop.png' });
+  out.push(...await run2(`
+    const tid = window.__tid;
+    q('#cal-' + tid + ' [data-act="cal-close-entry"]')?.click(); await w(150);
+  `));
+  await p2.evaluate(() => scrollTo(0, 0)); await p2.screenshot({ path: 'test-results/calendar-page-desktop.png' });
+  out.push(...await run2(`
+    const tid = window.__tid;
+    // deep links: one listing opens on its country; a missing, hidden or past one says it's gone
+    await go('calendar.c3'); await w(200);
+    L.push('deep link: #calendar.<id> opens ' + !!q('#cal-c3.cal-card.hof-focus') + ' | country ' + q('#cal-country').value + ' | missing shows notice ' + (await (async () => { await go('calendar.nothing-here'); await w(200); return txt(q('main .notice')) === "That listing isn't on the Season Calendar any more."; })()));
+    await go('calendar.c5'); await w(200); const hid = txt(q('main .notice')); await go('calendar.c4'); await w(200);
+    L.push('deep link more: hidden ' + hid + ' | past ' + txt(q('main .notice')));
+    // the organiser's Edit: the competition's Setup with the sheet open
+    await go('calendar'); await change('#cal-country', 'all'); q('#cal-' + tid).click(); await w(150);
+    q('#cal-' + tid + ' [data-act="cal-edit"]').click(); await w(300);
+    L.push('edit: sheet ' + txt(q('#modal h3')) + ' | tab ' + S.tab + ' | page left ' + !q('.cal-page') + ' | fee ' + q('#modal [data-cal="fee"]')?.value);
+    q('#modal [data-act="close"]').click(); await w(100);
+    // the admin (website only; stood in for here): hide, the organiser's notice, show again
+    S.calAdmin = () => true;
+    await go('calendar'); await change('#cal-country', 'all'); q('#cal-' + tid).click(); await w(150);
+    L.push('admin strip: ' + txt(q('#cal-' + tid + ' .cal-admin')));
+    q('#cal-' + tid + ' [data-act="cal-hide"]').click(); await w(250);
+    const st = await S.store.getCal(tid);
+    const goneFromPage = !q('#cal-' + tid) && !rows().includes('Hitchin Summer Triples');
+    q('[data-act="picker"]').click(); await w(80); q('.pick-row[data-id="' + tid + '"]').click(); await w(200); q('[data-tab="setup"]').click(); await w(250);
+    const panel = txt(q('[data-cal-panel]'));
+    L.push('admin hide: hidden ' + (st.hidden === true && typeof st.hiddenAt === 'number') + ' | gone from page ' + goneFromPage + ' | organiser notice ' + panel.includes('Hidden from the Season Calendar by the site admin.'));
+    L.push('organiser panel hidden: ' + panel);
+    await go('calendar.' + tid); await w(250);
+    L.push('admin deep link to hidden: ' + !!q('#cal-' + tid + '.cal-card') + ' | ' + txt(q('#cal-' + tid + ' [data-act="cal-hide"]')));
+    q('#cal-' + tid + ' [data-act="cal-hide"]').click(); await w(250);
+    L.push('show again: hidden ' + (await S.store.getCal(tid)).hidden + ' | ' + txt(q('#cal-' + tid + ' [data-act="cal-hide"]')));
+    S.calAdmin = null; C.render(); await w(100);
+    L.push('no strip for others: ' + !q('.cal-admin'));
+    // the organiser removes it from the page
+    q('#cal-' + tid + ' [data-act="cal-page-remove"]').click(); await w(100);
+    L.push('page remove confirm: ' + txt(q('#cal-' + tid + ' .err')));
+    q('#cal-' + tid + ' [data-act="cal-page-remove-yes"]').click(); await w(300);
+    L.push('page remove: ' + txt(q('#toast')) + ' | store ' + (await S.store.getCal(tid)) + ' | on page ' + !!q('#cal-' + tid));
+    // empty everywhere
+    for (const c of ['c2', 'c3', 'c4']) await S.store.deleteCal(c);
+    S.calPage.cache = {}; await go('calendar.x'); await go('calendar'); await w(200); await change('#cal-country', 'all');
+    L.push('empty: ' + txt(q('#cal-results .empty')));
+    // in French
+    await S.store.setCal('c2', Object.assign(await (async () => ({ kind: 'comp', tid: 'c2', name: 'English Doubles Championship', date: day(toSun + 3), checkin: '', start: '', venue: 'Leicester', address: '', country: 'GB-ENG', region: '', level: 'national', fmt: 'doubles', system: 'swiss',
+      who: ['open', 'ladies'], fee: '', prizes: '', howTo: 'Online', contact: '', note: '', status: 'on', lang: 'en', byUid: '', byCode: '', createdAt: 1, updatedAt: 1, hidden: false, gone: false }))()));
+    S.calPage.cache = {};
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="fr"]').click(); await w(250);
+    L.push('fr: ' + txt(q('main h2')) + ' | ' + q('#cal-q').placeholder + ' | ' + qa('.cal-group-h').map(txt).join(',') + ' | ' + txt(q('#cal-c2 .cal-main')) + ' | header ' + txt(q('header .cal-btn')) + ' | foot ' + txt(q('#foot a[href="#calendar"]')));
+    q('#cal-c2').click(); await w(150); L.push('fr listing: ' + qa('#cal-c2 dt, #cal-c2 h4').map(txt).join(','));
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
+  `));
+  // phones: the page and an open listing at 390 px, with no sideways scrolling
+  await p2.evaluate(async () => { const S = window.__carreau.S; const t = window.__tid; const d = new Date(); const day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    await S.store.setCal(t, { kind: 'comp', tid: t, name: 'Hitchin Summer Triples', date: day, checkin: '09:00', start: '10:00', venue: 'Hitchin Town Cricket Club', address: 'Lucas Lane, Hitchin SG5 2JB', country: 'GB-ENG', region: 'Chiltern', level: 'regional', fmt: 'triples', system: 'swiss',
+      who: ['open', 'veterans'], fee: '£5 per player', prizes: 'Prize fund £300', howTo: 'Enter at the club bar, or call Jane on 07700 900123 before Friday', contact: 'Jane, 07700 900123', note: 'Bring your own boules', status: 'on', lang: 'en', byUid: '', byCode: '', createdAt: 1, updatedAt: 1, hidden: false, gone: false });
+    S.calPage.cache = {}; S.calPage.open = null; location.hash = 'calendar'; await new Promise(r => setTimeout(r, 300)); });
+  await p2.evaluate(() => { const t = document.querySelector('#toast'); if (t) t.hidden = true; }); // the toast from Remove would cover the rows
+  await p2.setViewportSize({ width: 390, height: 844 }); await p2.waitForTimeout(300);
+  const wide = () => p2.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+  const pageWide = await wide(); const rowH = await p2.evaluate(() => Math.round(document.querySelector('.cal-row')?.getBoundingClientRect().height || 0));
+  await p2.screenshot({ path: 'test-results/calendar-page-390.png' });
+  await p2.evaluate(async () => { document.querySelector('#cal-' + window.__tid).click(); await new Promise(r => setTimeout(r, 200)); document.querySelector('#cal-' + window.__tid).scrollIntoView(); });
+  const listingWide = await wide();
+  await p2.screenshot({ path: 'test-results/calendar-listing-390.png' });
+  out.push('phone 390: no sideways scroll ' + (!pageWide && !listingWide) + ' | row height ' + rowH + ' | header label ' + await p2.evaluate(() => getComputedStyle(document.querySelector('header .cal-btn span')).display)
+    + ' | targets under 44 ' + await p2.evaluate(() => [...document.querySelectorAll('.cal-page .hof-chip, .cal-page .cal-row, header .cal-btn')].filter(x => x.getBoundingClientRect().height < 40).map(x => x.className + ' ' + Math.round(x.getBoundingClientRect().height)).join(',') || 0));
   console.log(out.join('\n'));
   console.log('errs', errs); await b.close();
 })();

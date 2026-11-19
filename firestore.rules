@@ -250,8 +250,9 @@ service cloud.firestore {
         && d.get('fee', '') is string && d.get('fee', '').size() <= 60 && d.get('prizes', '') is string && d.get('prizes', '').size() <= 120
         && d.get('howTo', '') is string && d.get('howTo', '').size() <= 300 && d.get('contact', '') is string && d.get('contact', '').size() <= 120
         && d.get('note', '') is string && d.get('note', '').size() <= 300 && d.get('lang', '') is string && d.get('lang', '').size() <= 8
-        && d.status == 'on' && d.hidden is bool && d.get('gone', false) is bool;
+        && d.status == 'on' && d.hidden is bool && d.get('hiddenAt', 0) is number && d.get('gone', false) is bool;
     }
+    // the admin hides a listing from the Season Calendar page (hidden, hiddenAt: when) and can show it again; nobody else can
     match /calendar/{cid} {
       allow get: if resource == null || resource.data.hidden != true || isAdmin() || (resource.data.kind == 'comp' && hofOrganiser(cid));
       allow list: if isAdmin() || resource.data.hidden == false;
