@@ -100,6 +100,7 @@ function fbStore() {
       try { (await getDocs(collection(db, "tournaments", tid, "live"))).docs.forEach(d => extra.push(d.ref)); } catch {}
       await Promise.allSettled(extra.map(r => deleteDoc(r)));
       try { await updateDoc(doc(db, "hallOfFame", tid), { gone: true }); } catch {} // a Hall of Fame entry stays, without its link
+      try { await updateDoc(doc(db, "calendar", tid), { gone: true }); } catch {} // and a Season Calendar listing
       await deleteDoc(doc(db, "tournaments", tid)); // last, so a failure part-way never leaves games without their competition
     },
     watchLive(tid, mid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "live", mid), d => cb(d.exists() ? d.data() : null), onErr); },
@@ -123,6 +124,22 @@ function fbStore() {
     listHof({ country } = {}) {
       const c = [where("hidden", "==", false)]; if (country) c.push(where("country", "==", country));
       return getDocs(query(collection(db, "hallOfFame"), ...c, limit(300))).then(s => s.docs.map(d => d.data()));
+    },
+    // Season Calendar: one listing per competition (calendar/{competition id}), kept apart from the competition, like the Hall of Fame
+    watchCal(cid, cb, onErr) { return onSnapshot(doc(db, "calendar", cid), d => cb(d.exists() ? d.data() : null), onErr); },
+    setCal(cid, L) { return track(setDoc(doc(db, "calendar", cid), clone(L))); },
+    deleteCal(cid) { return track(deleteDoc(doc(db, "calendar", cid))); },
+    updateCal(cid, patch) { return track(updateDoc(doc(db, "calendar", cid), clone(patch))); },
+    getCal(cid) {
+      return getDocFromServer(doc(db, "calendar", cid)).then(d => d.exists() ? d.data() : null, e => {
+        if (e?.code !== "unavailable") throw e;
+        return new Promise((res, rej) => { let u = null; u = onSnapshot(doc(db, "calendar", cid), d => { setTimeout(() => u && u()); res(d.exists() ? d.data() : null); }, rej); });
+      });
+    },
+    // shown listings only (the rules refuse anything else), for one country or all; equality filters only, so no index is needed
+    listCal({ country } = {}) {
+      const c = [where("hidden", "==", false)]; if (country) c.push(where("country", "==", country));
+      return getDocs(query(collection(db, "calendar"), ...c, limit(300))).then(s => s.docs.map(d => d.data()));
     },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
@@ -178,6 +195,8 @@ S.canCreate = () => !!AUTH.user && (!loginMode() || isAdmin() || orgActive());
 // Hall of Fame: only the competition's organiser (the device that made it, an organiser link, or an organiser code that
 // made it) or the admin can publish its winners, even while open testing lets everyone run it (enforced in firestore.rules)
 S.hofCanPublish = t => !!(AUTH.user && t) && (isAdmin() || (!t.archived && !t.listed && (isOwner(t) || ROLE[t.id] === "edit" || (orgActive() && !!t.orgCode && t.orgCode === ORG.code))));
+// Season Calendar: the same people list a competition (enforced in firestore.rules, match /calendar/{cid})
+S.calCanPublish = t => S.hofCanPublish(t);
 S.hofWho = () => ({ byUid: AUTH.user?.uid || "", byCode: orgActive() ? ORG.code : "" });
 // live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
 S.liveRole = t => !!(t && ROLE[t.id] === "live");
@@ -263,6 +282,7 @@ function teamLinksPanel(t) {
 // the admin's archive and restore in #admin do what the organiser's buttons do (hofMarkGone in the page): an archived
 // competition's Hall of Fame entry stays, without its link; restoring links it again. No entry is fine.
 async function hofGone(tid, gone) {
+  await calMarkGone(tid, gone); // its Season Calendar listing too
   const e = S.hof?.[tid]; if (e === null || (e && !!e.gone === gone)) return;
   try { await S.store.updateHof(tid, { gone }); if (e) e.gone = gone; if (S.hofPage) S.hofPage.cache = {}; }
   catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
