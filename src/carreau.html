@@ -433,6 +433,11 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .cal-name{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}.cal-name b{font-size:15px;overflow-wrap:anywhere}
 .cal-sub{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cal-live{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;background:#c62828}
+/* a postponed or cancelled listing (calendar-cancel): a pill on its row, its name struck through when cancelled, a notice on the full listing */
+.cal-st{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;color:var(--jack-ink);background:var(--jack-soft);border:1px solid var(--jack)}.cal-st.cal-st-cancelled{color:var(--danger);background:var(--danger-soft);border-color:var(--danger)}
+.cal-row.cal-cancelled .cal-name b,.cal-card.cal-cancelled h3{text-decoration:line-through;text-decoration-thickness:2px}
+.cal-status-note{gap:4px;border-color:var(--jack);background:var(--jack-soft)}.cal-status-note.cal-st-cancelled{border-color:var(--danger);background:var(--danger-soft)}.cal-status-note b{overflow-wrap:anywhere}.cal-st-cancelled > b{color:var(--danger)}
+.cal-ent-st.cal-st-cancelled{border-color:var(--danger);background:var(--danger-soft);color:var(--danger)}.cal-status-set .cal-who .hof-chip[aria-pressed=true].cal-st-c{border-color:var(--danger)}.cal-status-set input{font-size:16px}
 .cal-facts{display:grid;grid-template-columns:10em minmax(0,1fr);gap:6px 14px;margin:0}.cal-facts > div{display:contents}.cal-facts dt{font-weight:600;color:var(--muted);font-size:14px}.cal-facts dd{margin:0;overflow-wrap:anywhere}
 .cal-how{gap:6px}.cal-how h4{margin:4px 0 0}.cal-how p{margin:0;white-space:pre-line;overflow-wrap:anywhere}
 .cal-ent{border-top:1px solid var(--line);padding-top:10px}.cal-ent h4{margin:0}.cal-ent-line{color:var(--accent);font-weight:600;white-space:normal}
@@ -1327,6 +1332,14 @@ Object.assign(LANG_TEXT.de, {"Online entries": "Online-Meldungen", "{n} with a p
 Object.assign(LANG_TEXT.nl, {"Online entries": "Online inschrijvingen", "{n} with a place": "{1} met een plaats", "{n} on the waiting list": "{1} op de wachtlijst", "{n} waiting for you": "{1} wachten op jou", "Waiting list {n}": "Wachtlijst {1}", "Waiting for you": "Wacht op jou", "Accept": "Accepteren", "Remove this entry? The team won't be told.": "Deze inschrijving weghalen? Het team krijgt geen bericht.", "Download the entries (CSV)": "De inschrijvingen downloaden (CSV)", "Number": "Nummer", "Status": "Status", "Sent": "Verstuurd", "With a place": "Met een plaats", "Remove the listing and its {n} online entries? Contact details are deleted too.": "De vermelding en de {1} online inschrijvingen weghalen? De contactgegevens worden ook gewist.", "Remove the listing and its online entry? Contact details are deleted too.": "De vermelding en de online inschrijving weghalen? De contactgegevens worden ook gewist.", "Entered online": "Online ingeschreven", "Add to Registration": "Aan Inschrijving toevoegen", "Add everyone with a place": "Iedereen met een plaats toevoegen", "In Registration": "In Inschrijving", "Withdrew online": "Online teruggetrokken", "Contact": "Contact"});
 Object.assign(LANG_TEXT.pt, {"Online entries": "Inscrições online", "{n} with a place": "{1} com vaga", "{n} on the waiting list": "{1} na lista de espera", "{n} waiting for you": "{1} à espera da sua aprovação", "Waiting list {n}": "Lista de espera {1}", "Waiting for you": "À espera da sua aprovação", "Accept": "Aceitar", "Remove this entry? The team won't be told.": "Remover esta inscrição? A equipa não será avisada.", "Download the entries (CSV)": "Descarregar as inscrições (CSV)", "Number": "Número", "Status": "Estado", "Sent": "Enviada", "With a place": "Com vaga", "Remove the listing and its {n} online entries? Contact details are deleted too.": "Remover o anúncio e as suas {1} inscrições online? Os contactos também são apagados.", "Remove the listing and its online entry? Contact details are deleted too.": "Remover o anúncio e a sua inscrição online? Os contactos também são apagados.", "Entered online": "Inscritos online", "Add to Registration": "Adicionar às Inscrições", "Add everyone with a place": "Adicionar todos os que têm vaga", "In Registration": "Nas Inscrições", "Withdrew online": "Desistiu online"});
 Object.assign(LANG_TEXT.th, {"Online entries": "ใบสมัครออนไลน์", "{n} with a place": "{1} ได้ที่แล้ว", "{n} on the waiting list": "{1} อยู่ในรายชื่อรอ", "{n} waiting for you": "{1} รอคุณอนุมัติ", "Waiting list {n}": "รายชื่อรอ {1}", "Waiting for you": "รอคุณอนุมัติ", "Accept": "อนุมัติ", "Remove this entry? The team won't be told.": "นำใบสมัครนี้ออกหรือไม่? ทีมจะไม่ได้รับแจ้ง", "Download the entries (CSV)": "ดาวน์โหลดใบสมัคร (CSV)", "Number": "ลำดับ", "Status": "สถานะ", "Sent": "ส่งเมื่อ", "With a place": "ได้ที่แล้ว", "Remove the listing and its {n} online entries? Contact details are deleted too.": "นำรายการนี้และใบสมัครออนไลน์ {1} ใบออกหรือไม่? ข้อมูลติดต่อจะถูกลบด้วย", "Remove the listing and its online entry? Contact details are deleted too.": "นำรายการนี้และใบสมัครออนไลน์ออกหรือไม่? ข้อมูลติดต่อจะถูกลบด้วย", "Entered online": "สมัครออนไลน์", "Add to Registration": "เพิ่มในการลงทะเบียน", "Add everyone with a place": "เพิ่มทุกคนที่ได้ที่", "In Registration": "อยู่ในการลงทะเบียนแล้ว", "Withdrew online": "ถอนตัวทางออนไลน์"});
+// Season Calendar 6: postponed and cancelled listings (calendar-cancel)
+Object.assign(FR_TEXT, {"Going ahead": "Maintenu", "Postponed": "Reporté", "Cancelled": "Annulé", "Reason (optional)": "Motif (facultatif)", "e.g. Rained off": "ex. Intempéries", "Postponed: {x}": "Reporté : {1}", "Cancelled: {x}": "Annulé : {1}", "A new date will be shown here when the organiser sets one.": "La nouvelle date s'affichera ici dès que l'organisateur l'aura fixée.", "Entries are paused": "Inscriptions suspendues", "This competition has been postponed.": "Ce concours a été reporté.", "This competition has been cancelled.": "Ce concours a été annulé."});
+Object.assign(LANG_TEXT.es, {"Going ahead": "Se celebra", "Postponed": "Aplazada", "Cancelled": "Cancelada", "Reason (optional)": "Motivo (opcional)", "e.g. Rained off": "p. ej. Lluvia", "Postponed: {x}": "Aplazada: {1}", "Cancelled: {x}": "Cancelada: {1}", "A new date will be shown here when the organiser sets one.": "La nueva fecha aparecerá aquí cuando el organizador la fije.", "Entries are paused": "Inscripciones en pausa", "This competition has been postponed.": "Esta competición se ha aplazado.", "This competition has been cancelled.": "Esta competición se ha cancelado."});
+Object.assign(LANG_TEXT.it, {"Going ahead": "Confermata", "Postponed": "Rinviata", "Cancelled": "Annullata", "Reason (optional)": "Motivo (facoltativo)", "e.g. Rained off": "es. Pioggia", "Postponed: {x}": "Rinviata: {1}", "Cancelled: {x}": "Annullata: {1}", "A new date will be shown here when the organiser sets one.": "La nuova data apparirà qui quando l'organizzatore la fisserà.", "Entries are paused": "Iscrizioni sospese", "This competition has been postponed.": "Questa gara è stata rinviata.", "This competition has been cancelled.": "Questa gara è stata annullata."});
+Object.assign(LANG_TEXT.de, {"Going ahead": "Findet statt", "Postponed": "Verschoben", "Cancelled": "Abgesagt", "Reason (optional)": "Grund (optional)", "e.g. Rained off": "z. B. Regen", "Postponed: {x}": "Verschoben: {1}", "Cancelled: {x}": "Abgesagt: {1}", "A new date will be shown here when the organiser sets one.": "Das neue Datum erscheint hier, sobald der Organisator es festlegt.", "Entries are paused": "Meldung pausiert", "This competition has been postponed.": "Dieses Turnier wurde verschoben.", "This competition has been cancelled.": "Dieses Turnier wurde abgesagt."});
+Object.assign(LANG_TEXT.nl, {"Going ahead": "Gaat door", "Postponed": "Uitgesteld", "Cancelled": "Afgelast", "Reason (optional)": "Reden (optioneel)", "e.g. Rained off": "bijv. Regen", "Postponed: {x}": "Uitgesteld: {1}", "Cancelled: {x}": "Afgelast: {1}", "A new date will be shown here when the organiser sets one.": "De nieuwe datum verschijnt hier zodra de organisator die vastlegt.", "Entries are paused": "Inschrijving gepauzeerd", "This competition has been postponed.": "Dit toernooi is uitgesteld.", "This competition has been cancelled.": "Dit toernooi is afgelast."});
+Object.assign(LANG_TEXT.pt, {"Going ahead": "Confirmado", "Postponed": "Adiado", "Cancelled": "Cancelado", "Reason (optional)": "Motivo (opcional)", "e.g. Rained off": "ex. Chuva", "Postponed: {x}": "Adiado: {1}", "Cancelled: {x}": "Cancelado: {1}", "A new date will be shown here when the organiser sets one.": "A nova data aparecerá aqui quando o organizador a definir.", "Entries are paused": "Inscrições suspensas", "This competition has been postponed.": "Este torneio foi adiado.", "This competition has been cancelled.": "Este torneio foi cancelado."});
+Object.assign(LANG_TEXT.th, {"Going ahead": "จัดตามกำหนด", "Postponed": "เลื่อนออกไป", "Cancelled": "ยกเลิก", "Reason (optional)": "เหตุผล (ไม่บังคับ)", "e.g. Rained off": "เช่น ฝนตก", "Postponed: {x}": "เลื่อนออกไป: {1}", "Cancelled: {x}": "ยกเลิก: {1}", "A new date will be shown here when the organiser sets one.": "วันที่ใหม่จะแสดงที่นี่เมื่อผู้จัดกำหนดแล้ว", "Entries are paused": "หยุดรับสมัครชั่วคราว", "This competition has been postponed.": "การแข่งขันนี้ถูกเลื่อนออกไป", "This competition has been cancelled.": "การแข่งขันนี้ถูกยกเลิก"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -3581,7 +3594,7 @@ function calPanel(t) {
   if (!e) return `<div class="panel spread cal-panel" data-cal-panel><div>${head}<div class="small muted">List this competition on the Season Calendar so players can find it and see how to enter.</div></div>
     <button class="btn primary" data-act="cal-open">List on the Season Calendar</button></div>`;
   return `<div class="panel stack cal-panel" data-cal-panel style="gap:8px"><div class="spread"><div>${head}
-      <div class="small">${e.hidden ? `<b class="err">Hidden from the Season Calendar by the site admin.</b>` : `<b>On the Season Calendar</b>`} · ${hofLabel(e.level)} <span data-notr>${esc(hofCountryName(e.country))}</span></div></div>
+      <div class="small">${e.hidden ? `<b class="err">Hidden from the Season Calendar by the site admin.</b>` : `<b>On the Season Calendar</b>`}${calStPill(e) ? " " + calStPill(e) : ""} · ${hofLabel(e.level)} <span data-notr>${esc(hofCountryName(e.country))}</span></div></div>
       <div class="row">${e.hidden ? "" : `<button class="btn" data-act="cal-open">Update</button>`}${S.calConfirmRemove === t.id ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === t.id ? S.calRemoveN.n : 0))}</span><button class="btn danger" data-act="cal-remove-yes">Remove</button><button class="btn" data-act="cal-remove-no">Keep it</button>` : `<button class="btn" data-act="cal-remove">Remove</button>`}</div></div>
     ${e.hidden ? `<div class="small muted cal-hidden-note">Questions? Contact Info@FoundryITadvisory.com.</div>` : ""}
     ${calChanged(t, e) && !e.hidden ? `<div class="notice small cal-changed">The competition's name, date or venue has changed since it was listed. <button class="btn" data-act="cal-open">Update the listing</button></div>` : ""}</div>`;
@@ -3591,7 +3604,7 @@ function calOpen(t) {
   const e = S.cal?.[t.id] || null;
   S.modal = { cal: true, tid: t.id, date: t.date || "", checkin: e?.checkin || "", start: e?.start || "", venue: calVenue(t), address: e?.address || "",
     level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: e?.region || "", who: e ? [...(e.who || [])] : ["open"],
-    fee: e?.fee || "", prizes: e?.prizes || "", howTo: e?.howTo || "", contact: e?.contact || "", note: e?.note || "", err: "", busy: false, ...calEntMd(e) };
+    fee: e?.fee || "", prizes: e?.prizes || "", howTo: e?.howTo || "", contact: e?.contact || "", note: e?.note || "", err: "", busy: false, ...calEntMd(e), ...calStMd(e) };
   renderModal();
 }
 function renderCalModal(t, el) {
@@ -3626,6 +3639,7 @@ function renderCalModal(t, el) {
     ${area("howTo", "How to enter (optional)", 300, "e.g. Call Jane on 07700 900123 or enter at the club bar")}
     <div class="cal-grid">${box("contact", "Contact (optional)", 120)}</div>
     ${area("note", "Note (optional)", 300)}
+    ${e ? calStSheet(md) : ""}
     ${calEntSheet(md, md.ev ? md.fmt : calFmtKey(t))}
     <p class="small muted">Everything here will be public.</p>
     ${md.err ? `<div class="err">${esc(md.err)}</div>` : ""}
@@ -3636,7 +3650,7 @@ function renderCalModal(t, el) {
 function calInput(el) {
   const md = S.modal; if (!md?.cal) return;
   const k = el.dataset.cal;
-  if (["date", "checkin", "start", "venue", "address", "country", "region", "fee", "prizes", "howTo", "contact", "note", "name", "formatNote", "places", "closes"].includes(k)) md[k] = el.value;
+  if (["date", "checkin", "start", "venue", "address", "country", "region", "fee", "prizes", "howTo", "contact", "note", "name", "formatNote", "places", "closes", "statusNote"].includes(k)) md[k] = el.value;
   if (["online", "approve", "showEntrants"].includes(k)) { md[k] = el.checked; if (k === "online") renderModal(); }
 }
 // the listing as saved: what only the admin sets (hidden, hiddenAt) and who first listed it are carried over unchanged
@@ -3646,7 +3660,7 @@ function calEntry(t, md, prev) {
   const L = { kind: "comp", tid: t.id, name: calName(t), date: md.date, checkin: time(md.checkin), start: time(md.start), venue: s(md.venue, 120), address: s(md.address, 200),
     country: md.country, region: s(md.region, 60), level: HOF_LEVELS.includes(md.level) ? md.level : "open", fmt: calFmtKey(t), system: sysOf(t),
     who: CAL_WHO.map(x => x[0]).filter(k => md.who.includes(k)), fee: s(md.fee, 60), prizes: s(md.prizes, 120), howTo: s(md.howTo, 300), contact: s(md.contact, 120), note: s(md.note, 300),
-    status: prev?.status || "on", lang: I18N.lang, byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "",
+    ...calStFields(md), lang: I18N.lang, byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "",
     createdAt: prev?.createdAt || now, updatedAt: now, hidden: prev ? !!prev.hidden : false, gone: false, ...calEntFields(md, prev, calFmtKey(t)) };
   if (prev && prev.hiddenAt !== undefined) L.hiddenAt = prev.hiddenAt;
   return L;
@@ -3655,6 +3669,7 @@ async function calAction(act, k) {
   const md = S.modal, t = T();
   if (act === "cal-level") { if (HOF_LEVELS.includes(k)) md.level = k; renderModal(); return; }
   if (act === "cal-who") { if (CAL_WHO.some(x => x[0] === k)) md.who = md.who.includes(k) ? md.who.filter(x => x !== k) : [...md.who, k]; renderModal(); return; }
+  if (act === "cal-status") { if (CAL_ST.some(x => x[0] === k)) md.status = k; renderModal(); return; }
   if (md.ev) { if (act === "cal-fmt" && CAL_EV_FMTS.some(x => x[0] === k)) { md.fmt = k; renderModal(); } else if (act === "cal-save") await calEvSave(md); return; }
   if (!t || t.id !== md.tid) { S.modal = null; renderModal(); return; }
   if (act === "cal-save") {
@@ -3688,6 +3703,28 @@ const calPage = () => S.calPage || (S.calPage = { country: hofDefaultCountry(), 
 const calOnPage = () => S.liveRoute?.view === "cal";
 const calReset = () => { if (S.calPage) { S.calPage.cache = {}; S.calPage.mine = null; } };
 const calAdmin = () => !!S.calAdmin?.();
+// Season Calendar 6 (calendar-cancel): a listing is going ahead ("on"), postponed or cancelled, with an optional short reason
+// (statusNote). Either stays on the page until its date has passed; entries are open only while it's going ahead (calEntOpen,
+// and calEntOpen in firestore.rules). Setting it back to going ahead reopens entries if they haven't closed. The competition
+// itself isn't changed, and entries aren't deleted.
+const CAL_ST = [["on", "Going ahead"], ["postponed", "Postponed"], ["cancelled", "Cancelled"]];
+const calSt = e => CAL_ST.some(x => x[0] === e?.status) ? e.status : "on";
+const calStMd = e => ({ status: calSt(e), statusNote: e?.statusNote || "" });
+const calStFields = md => { const st = CAL_ST.some(x => x[0] === md.status) ? md.status : "on";
+  return { status: st, statusNote: st === "on" ? "" : String(md.statusNote || "").trim().slice(0, 120) }; };
+const calStPill = e => calSt(e) === "on" ? "" : `<span class="cal-st cal-st-${calSt(e)}">${calSt(e) === "postponed" ? "Postponed" : "Cancelled"}</span>`;
+// on the full listing: "Cancelled: Rained off" (or just "Cancelled"); a postponed one says a new date will follow
+function calStNotice(e) {
+  const st = calSt(e); if (st === "on") return "";
+  const word = st === "postponed" ? "Postponed" : "Cancelled", note = String(e.statusNote || "").trim();
+  return `<div class="notice stack cal-status-note cal-st-${st}" role="status"><b>${esc(note ? `${word}: ${note}` : word)}</b>${st === "postponed" ? `<span class="small">A new date will be shown here when the organiser sets one.</span>` : ""}</div>`;
+}
+// the sheet's Status section (a listing that's already saved)
+function calStSheet(md) {
+  return `<div class="stack cal-status-set" style="gap:6px"><div class="eyebrow">Status</div>
+    <div class="cal-who" role="group" aria-label="Status">${CAL_ST.map(([k, l]) => `<button type="button" class="hof-chip cal-st-${k[0]}" data-act="cal-status" data-k="${k}" aria-pressed="${md.status === k}">${l}</button>`).join("")}</div>
+    ${md.status !== "on" ? `<label class="f"><span>Reason (optional)</span><input type="text" maxlength="120" data-cal="statusNote" value="${esc(md.statusNote)}" placeholder="e.g. Rained off"></label>` : ""}</div>`;
+}
 function calFmtLabel(e) {
   const sys = SYS_NAME[e.system] || "";
   if (e.fmt === "shooting") return "Precision shooting";
@@ -3703,7 +3740,7 @@ const calFmtHtml = e => { if (e.kind !== "event") return esc(calFmtLabel(e)); co
 const calLineHtml = e => [calFmtHtml(e), esc(calWhoLabel(e))].filter(Boolean).join(" · ");
 // what a search looks through: the competition, its venue, address and region, the contact (often the club) and an event's format details
 const calHay = e => e._hay || (e._hay = hofNorm([e.name, e.venue, e.address, e.region, e.contact, e.formatNote].filter(Boolean).join(" ")));
-const calLive = e => e.kind === "comp" && !e.gone && e.date === calDay();
+const calLive = e => e.kind === "comp" && !e.gone && e.date === calDay() && calSt(e) === "on";
 async function calLoad(force) {
   const P = calPage(), key = P.country || "all";
   if (P.store !== S.store) { P.store = S.store; P.cache = {}; } // the website swaps the stand-in store for Firebase once signed in
@@ -3750,9 +3787,9 @@ const calLivePill = e => calLive(e) ? `<span class="cal-live">Live now</span>` :
 // mine: a row under "Your listings" (it opens the listing in the list below, from its link)
 function calRow(e, mine) {
   const id = calId(e);
-  return `<button type="button" class="cal-row hof-${esc(HOF_LEVELS.includes(e.level) ? e.level : "open")}" id="${mine ? "calmine-" : "cal-"}${esc(id)}" data-act="${mine ? "cal-mine-open" : "cal-open-entry"}" data-id="${esc(id)}"${mine ? "" : ` aria-expanded="false"`}>
+  return `<button type="button" class="cal-row hof-${esc(HOF_LEVELS.includes(e.level) ? e.level : "open")}${calSt(e) === "cancelled" ? " cal-cancelled" : ""}" id="${mine ? "calmine-" : "cal-"}${esc(id)}" data-act="${mine ? "cal-mine-open" : "cal-open-entry"}" data-id="${esc(id)}"${mine ? "" : ` aria-expanded="false"`}>
     <span class="cal-date" data-notr><span class="cal-dow">${esc(calDate(e, { weekday: "short" }))}</span><b>${esc(calDate(e, { day: "numeric", month: "short" }))}</b>${e.start ? `<span class="cal-time">${esc(e.start)}</span>` : ""}</span>
-    <span class="cal-main"><span class="cal-name"><b data-notr>${esc(e.name)}</b>${hofLabel(e.level)}${calLivePill(e)}</span>
+    <span class="cal-main"><span class="cal-name"><b data-notr>${esc(e.name)}</b>${hofLabel(e.level)}${calStPill(e)}${calLivePill(e)}</span>
       ${e.venue || e.region ? `<span class="cal-sub" data-notr>${esc([e.venue, e.region].filter(Boolean).join(" · "))}</span>` : ""}
       <span class="cal-sub">${calLineHtml(e)}</span>${calEntRowLine(e)}${mine && e.hidden ? `<span class="cal-sub err cal-hidden-mark">Hidden by the site admin</span>` : ""}</span>
   </button>`;
@@ -3774,8 +3811,9 @@ function calCard(e, close) {
   const st = e.kind === "comp" && !e.gone ? calCompState(e.tid) : "";
   const link = st === "draw" ? `<a class="btn sm primary" href="#${esc(e.tid)}">Follow the draw</a>` : st === "nodraw" ? `<a class="btn sm" href="#${esc(e.tid)}">View the competition</a>` : "";
   const confirm = S.calPageRemove === id;
-  return `<article class="panel hof-card cal-card${P.hl === id ? " hof-focus" : ""}" id="cal-${esc(id)}">
-    <div class="hof-where">${hofLabel(e.level)}<span class="small muted" data-notr>${esc([hofCountryName(e.country), e.region].filter(Boolean).join(" · "))}</span>${calLivePill(e)}</div>
+  return `<article class="panel hof-card cal-card${P.hl === id ? " hof-focus" : ""}${calSt(e) === "cancelled" ? " cal-cancelled" : ""}" id="cal-${esc(id)}">
+    ${calStNotice(e)}
+    <div class="hof-where">${hofLabel(e.level)}<span class="small muted" data-notr>${esc([hofCountryName(e.country), e.region].filter(Boolean).join(" · "))}</span>${calStPill(e)}${calLivePill(e)}</div>
     <h3 data-notr>${esc(e.name)}</h3>
     <dl class="cal-facts">
       ${fact("Date", esc(calDate(e, { weekday: "long", day: "numeric", month: "long", year: "numeric" })))}
@@ -3889,7 +3927,7 @@ function calEvOpen(e) {
   S.calPageRemove = null; const v = k => e?.[k] || "";
   S.modal = { cal: true, ev: true, prev: e || null, name: v("name"), fmt: v("fmt"), formatNote: v("formatNote"), date: v("date"), checkin: v("checkin"), start: v("start"),
     venue: v("venue"), address: v("address"), level: e?.level || "open", country: e?.country || hofDefaultCountry(), region: v("region"), who: e ? [...(e.who || [])] : ["open"],
-    fee: v("fee"), prizes: v("prizes"), howTo: v("howTo"), contact: v("contact"), note: v("note"), err: "", busy: false, ...calEntMd(e) };
+    fee: v("fee"), prizes: v("prizes"), howTo: v("howTo"), contact: v("contact"), note: v("note"), err: "", busy: false, ...calEntMd(e), ...calStMd(e) };
   renderModal();
 }
 // the listing as saved: who added it (ownerUid, orgCode, byUid, byCode, createdAt) and what only the admin sets are carried over
@@ -3899,7 +3937,7 @@ function calEvEntry(md, prev, id) {
   const L = { kind: "event", id, name: s(md.name, 120), date: md.date, checkin: time(md.checkin), start: time(md.start), venue: s(md.venue, 120), address: s(md.address, 200),
     country: md.country, region: s(md.region, 60), level: HOF_LEVELS.includes(md.level) ? md.level : "open", fmt: md.fmt, formatNote: s(md.formatNote, 80),
     who: CAL_WHO.map(x => x[0]).filter(k => md.who.includes(k)), fee: s(md.fee, 60), prizes: s(md.prizes, 120), howTo: s(md.howTo, 300), contact: s(md.contact, 120), note: s(md.note, 300),
-    status: prev?.status || "on", lang: I18N.lang, ownerUid: prev ? prev.ownerUid || "" : S.me?.() || "", orgCode: prev ? prev.orgCode || "" : who.byCode || "",
+    ...calStFields(md), lang: I18N.lang, ownerUid: prev ? prev.ownerUid || "" : S.me?.() || "", orgCode: prev ? prev.orgCode || "" : who.byCode || "",
     byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "", createdAt: prev?.createdAt || now, updatedAt: now, hidden: prev ? !!prev.hidden : false, ...calEntFields(md, prev, md.fmt) };
   if (prev && prev.hiddenAt !== undefined) L.hiddenAt = prev.hiddenAt;
   return L;
@@ -3984,7 +4022,7 @@ function calEntSheet(md, fmt) {
 }
 // a row on the page: from the listing's own fields (no entry reads)
 const calEntRowLine = e => calEntOn() && e.online && calEntFmt(e.fmt)
-  ? `<span class="cal-sub cal-ent-line">${calEntOpen(e) ? esc(`Enter online · closes ${calCloseDay(e)}`) : "Entries closed"}</span>` : "";
+  ? `<span class="cal-sub cal-ent-line">${calEntOpen(e) ? esc(`Enter online · closes ${calCloseDay(e)}`) : calSt(e) === "postponed" ? "Entries are paused" : "Entries closed"}</span>` : "";
 // the queue: { n: places (0 = no limit), ins: "in" entries in order, pos: id -> number in the queue, wait, pending }
 function calQueue(e, list) {
   const n = Math.max(0, +e.places || 0);
@@ -3993,7 +4031,7 @@ function calQueue(e, list) {
   return { n, ins, pos, wait: n ? Math.max(0, ins.length - n) : 0, pending: list.filter(x => x.status === "pending") };
 }
 function calPlacesLine(e, q) {
-  if (!calEntOpen(e)) return "Entries closed";
+  if (!calEntOpen(e)) return calSt(e) === "postponed" ? "Entries are paused" : "Entries closed";
   if (!q.n) return `${q.ins.length} entered`;
   if (q.ins.length >= q.n) return `Full · ${q.wait} on the waiting list`;
   return `${q.ins.length} of ${q.n} places taken · entries close ${calCloseDay(e)}`;
@@ -4044,6 +4082,7 @@ function calMyEntHtml(e, w, q, open) {
   const mine = w.list.filter(x => x.uid === me).sort((a, b) => a.id < b.id ? -1 : 1);
   if (!mine.length && !w.gone) return "";
   return `<div class="cal-mine-ent stack" style="gap:6px"><h4>Your entries</h4>
+    ${mine.length && calSt(e) !== "on" ? `<div class="notice small cal-ent-st cal-st-${calSt(e)}">${calSt(e) === "postponed" ? "This competition has been postponed." : "This competition has been cancelled."}</div>` : ""}
     ${w.gone ? `<div class="notice small cal-ent-gone">This entry was withdrawn or removed.</div>` : ""}
     ${mine.map(x => { const nm = calTeamName(w.teams?.[x.id]) || rec[x.id] || "";
       return `<div class="cal-ent-row stack" data-eid="${esc(x.id)}" style="gap:4px"><div><b data-notr>${esc(nm)}</b></div><div class="small cal-ent-state">${esc(calEntState(x, q))}</div>

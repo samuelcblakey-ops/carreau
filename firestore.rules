@@ -232,7 +232,8 @@ service cloud.firestore {
     // organiser code it was made with; not archived, not an example) or the admin. Open testing doesn't count. Anyone can
     // read shown listings; only the admin may hide one (hidden, hiddenAt), and an organiser can't change those or who first
     // listed it (byUid, byCode, createdAt). 'gone' marks a listing whose competition has been archived or deleted.
-    // the fields both kinds of listing share
+    // the fields both kinds of listing share. status: going ahead ('on'), 'postponed' or 'cancelled' (calendar-cancel), with
+    // an optional short reason (statusNote); entries are only open while it's 'on' (calEntOpen)
     function calBase(d) {
       return d.name is string && d.name.size() <= 120
         && d.date is string && d.date.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
@@ -245,14 +246,15 @@ service cloud.firestore {
         && d.get('fee', '') is string && d.get('fee', '').size() <= 60 && d.get('prizes', '') is string && d.get('prizes', '').size() <= 120
         && d.get('howTo', '') is string && d.get('howTo', '').size() <= 300 && d.get('contact', '') is string && d.get('contact', '').size() <= 120
         && d.get('note', '') is string && d.get('note', '').size() <= 300 && d.get('lang', '') is string && d.get('lang', '').size() <= 8
-        && d.status == 'on' && d.hidden is bool && d.get('hiddenAt', 0) is number
+        && d.status in ['on', 'postponed', 'cancelled'] && d.get('statusNote', '') is string && d.get('statusNote', '').size() <= 120
+        && d.hidden is bool && d.get('hiddenAt', 0) is number
         && d.get('online', false) is bool && d.get('places', 0) is int && d.get('places', 0) >= 0 && d.get('places', 0) <= 512
         && d.get('closesAt', 0) is number && d.get('approve', false) is bool && d.get('showEntrants', false) is bool
         && (d.get('online', false) != true || d.get('fmt', 'triples') in ['singles', 'doubles', 'triples', 'melee', 'shooting']);
     }
     function calShape(d, cid) {
       return d.keys().hasOnly(['kind', 'tid', 'name', 'date', 'checkin', 'start', 'venue', 'address', 'country', 'region', 'level', 'fmt', 'system',
-                               'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'lang', 'byUid', 'byCode', 'createdAt', 'updatedAt',
+                               'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'statusNote', 'lang', 'byUid', 'byCode', 'createdAt', 'updatedAt',
                                'hidden', 'hiddenAt', 'gone', 'online', 'places', 'closesAt', 'approve', 'showEntrants'])
         && d.kind == 'comp' && d.tid == cid && calBase(d)
         && d.get('fmt', 'triples') in ['singles', 'doubles', 'triples', 'melee', 'shooting', 'eurocup', 'clubs']
@@ -264,7 +266,7 @@ service cloud.firestore {
     // against the private code in private/code, which only organisers and the admin can read).
     function calEvShape(d, cid) {
       return d.keys().hasOnly(['kind', 'id', 'name', 'date', 'checkin', 'start', 'venue', 'address', 'country', 'region', 'level', 'fmt', 'formatNote',
-                               'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'lang', 'ownerUid', 'orgCode', 'byUid', 'byCode',
+                               'who', 'fee', 'prizes', 'howTo', 'contact', 'note', 'status', 'statusNote', 'lang', 'ownerUid', 'orgCode', 'byUid', 'byCode',
                                'createdAt', 'updatedAt', 'hidden', 'hiddenAt', 'online', 'places', 'closesAt', 'approve', 'showEntrants'])
         && d.kind == 'event' && d.id == cid && calBase(d) && d.name.size() >= 1
         && d.fmt in ['singles', 'doubles', 'triples', 'melee', 'shooting', 'other']
