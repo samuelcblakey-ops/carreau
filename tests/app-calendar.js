@@ -420,6 +420,96 @@ const { chromium } = require('playwright');
     L.push('fr entries: ' + txt(q('#cal-cEnt .cal-places')) + ' | ' + txt(q('#cal-cEnt [data-act="cal-ent-new"]')) + ' | ' + txt(q('#cal-cEnt .cal-mine-ent h4')) + ' | ' + qa('#cal-cEnt .cal-ent-state').map(txt).join(' / '));
     q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
   `));
+  // ---- Season Calendar 5 (calendar-entries-desk): the organiser's "Online entries", CSV, Registration's "Entered online" ----
+  const p3 = await ctx.newPage(); p3.on('pageerror', e => errs.push('desk: ' + e.message));
+  await p3.setViewportSize({ width: 1100, height: 900 });
+  await p3.goto(process.env.APP_URL); await p3.evaluate(() => localStorage.clear()); await p3.reload(); await p3.waitForTimeout(300);
+  const run3 = body => p3.evaluate(new Function(`return (async () => { ${pre}
+    const go = async h => { document.activeElement?.blur?.(); location.hash = h; await w(250); };
+    const tid = window.__dtid, card = () => q('#cal-' + window.__dtid + '.cal-card'), rowsT = () => qa('#cal-' + window.__dtid + ' .cal-desk-row');
+    const L = []; try { ${body} } catch (e) { L.push('ERR ' + e.message + ' ' + e.stack.split('\\n')[1]); } return L; })();`));
+  out.push(...await run3(`
+    q('[data-act="new-t"]').click(); await w(150);
+    await setT({ name: 'Arlesey Autumn Doubles', venue: 'Arlesey PC', date: day(5), wizard: false, system: 'swiss', format: 'doubles' });
+    const tid = C.T().id; window.__dtid = tid;
+    await S.store.setCal(tid, { kind: 'comp', tid, name: 'Arlesey Autumn Doubles', date: day(5), checkin: '', start: '10:00', venue: 'Arlesey PC', address: '', country: 'GB-ENG', region: '', level: 'open', fmt: 'doubles', system: 'swiss',
+      who: ['open'], fee: '', prizes: '', howTo: '', contact: '', note: '', status: 'on', lang: 'en', byUid: '', byCode: '', createdAt: 1, updatedAt: 1, hidden: false, gone: false,
+      online: true, places: 2, closesAt: Date.now() + 2 * 864e5, approve: false, showEntrants: false });
+    const add = async (eid, status, players, contact, name = '', club = '') => { await S.store.addCalEntry(tid, eid, { uid: eid.split('_')[0], status }, { name, players, club }, contact); await w(5); };
+    await add('u1_1', 'in', ['Ann Lee', 'Bob Fox'], '+44 7700 900123', 'Les Copains', 'Arlesey PC'); await add('u2_1', 'in', ['Cat Ray', 'Dan Oak'], 'cat@example.com');
+    await add('u3_1', 'in', ['Eve Ash', 'Fay Elm'], '=HYPERLINK("x")', '@Third', '-Club'); await add('u4_1', 'pending', ['Gus Hay', 'Hal Ivy'], '07700 900444', 'Waiting Team');
+    window.__csv = null; S.downloads = { save: async f => { window.__csv = f; } };
+    await go('calendar.' + tid); for (let i = 0; i < 40 && !(card() && rowsT().length); i++) await w(100);
+    const labels = () => rowsT().map(r => txt(r.querySelector('.cal-desk-n'))).join(',');
+    L.push('desk: ' + txt(card().querySelector('.cal-desk h4')) + ' | ' + txt(card().querySelector('.cal-desk-sum')) + ' | ' + labels() + ' | names ' + rowsT().map(r => txt(r.querySelector('b'))).join(',')
+      + ' | tel ' + (card().querySelector('.cal-desk-row[data-eid="u1_1"] a')?.getAttribute('href') || '') + ' | mailto ' + (card().querySelector('.cal-desk-row[data-eid="u2_1"] a')?.getAttribute('href') || '')
+      + ' | formula plain ' + !card().querySelector('.cal-desk-row[data-eid="u3_1"] a') + ' | sent ' + /\\d{1,2} [A-Z][a-z]{2},? \\d{2}:\\d{2}/.test(txt(card().querySelector('.cal-desk-row .cal-desk-meta'))));
+    L.push('desk buttons: ' + rowsT().map(r => qa.call(null, '#cal-' + tid + ' .cal-desk-row[data-eid="' + r.dataset.eid + '"] .btn').map(txt).join('+')).join(' / ') + ' | your entries ' + !!card().querySelector('.cal-mine-ent'));
+  `));
+  await p3.setViewportSize({ width: 390, height: 844 }); await p3.waitForTimeout(250);
+  out.push('desk 390: no sideways scroll ' + await p3.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1) + ' | buttons under 44 ' + await p3.evaluate(() => [...document.querySelectorAll('.cal-desk .btn')].filter(x => x.getBoundingClientRect().height < 44).length));
+  await p3.evaluate(() => document.querySelector('.cal-desk')?.scrollIntoView()); await p3.screenshot({ path: 'test-results/calendar-desk-390.png' });
+  await p3.setViewportSize({ width: 1100, height: 900 }); await p3.waitForTimeout(150);
+  out.push(...await run3(`
+    const labels = () => rowsT().map(r => txt(r.querySelector('.cal-desk-n'))).join(',');
+    q('#cal-' + tid + ' [data-act="cal-desk-accept"][data-eid="u4_1"]').click(); await w(300);
+    L.push('accept: ' + JSON.parse(localStorage.getItem('carreau-local-v1')).ce[tid].entries.u4_1.status + ' | ' + labels() + ' | ' + txt(card().querySelector('.cal-desk-sum')));
+    q('#cal-' + tid + ' [data-act="cal-desk-csv"]').click(); await w(200);
+    const f = window.__csv, lines = (f?.data || '').replace(/^\\uFEFF/, '').split('\\n');
+    L.push('csv: ' + (f?.filename || '') + ' | bom ' + (f?.data || '').startsWith('\\uFEFF') + ' | ' + lines[0] + ' | rows ' + (lines.length - 1));
+    L.push('csv rows: ' + lines.slice(1).join(' / ').replace(/\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}/g, '<sent>'));
+    L.push('csv guard: ' + C.csvText([['=1+2', '@x', '+44 7700 900123', '+1-2', '-3', 'ok', 'a"b']], true).slice(1) + ' | export unguarded ' + C.csvText([['=1']]).slice(1));
+    q('#cal-' + tid + ' [data-act="cal-desk-remove"][data-eid="u2_1"]').click(); await w(100);
+    L.push('remove confirm: ' + txt(q('#cal-' + tid + ' .cal-desk-row[data-eid="u2_1"] .err')) + ' | ' + qa('#cal-' + tid + ' .cal-desk-row[data-eid="u2_1"] .btn').map(txt).join(','));
+    q('#cal-' + tid + ' [data-act="cal-desk-remove-yes"]').click(); await w(300);
+    const ce = JSON.parse(localStorage.getItem('carreau-local-v1')).ce[tid];
+    L.push('removed: entry ' + !!ce.entries.u2_1 + ' | team ' + !!ce.teams.u2_1 + ' | contact ' + !!ce.contacts.u2_1 + ' | ' + labels());
+    // put the removed one back (for Registration), last in the queue
+    await S.store.addCalEntry(tid, 'u2_1', { uid: 'u2', status: 'in' }, { name: '', players: ['Cat Ray', 'Dan Oak'], club: '' }, 'cat@example.com'); await w(100);
+    // Registration
+    await go(tid); await w(200); q('[data-tab="entries"]').click(); await w(400);
+    const panel = () => q('.cal-reg'), regRows = () => qa('.cal-reg .cal-reg-row'), teams = () => C.T().teams;
+    const next = q('.cal-reg')?.nextElementSibling;
+    L.push('registration: ' + txt(panel()?.querySelector('h3')) + ' ' + regRows().length + ' | above the list ' + /Teams/.test(txt(next?.querySelector('h3'))) + ' | rows ' + regRows().map(r => txt(r)).join(' / '));
+    const n0 = teams().length;
+    q('.cal-reg-row[data-eid="u1_1"] [data-act="cal-reg-add"]').click(); await w(300);
+    const t1 = teams().find(x => x.calEntry === 'u1_1');
+    L.push('add one: teams +' + (teams().length - n0) + ' | ' + JSON.stringify(t1 && { name: t1.name, players: t1.players, club: t1.club, active: t1.active, checkedIn: !!t1.checkedIn, calEntry: t1.calEntry }) + ' | row ' + txt(q('.cal-reg-row[data-eid="u1_1"] .cal-reg-in')));
+    const n1 = teams().length; q('[data-act="cal-reg-all"]').click(); await w(300);
+    const n2 = teams().length; await C.render(); await w(50);
+    const allBtn = !!q('[data-act="cal-reg-all"]');
+    q('.cal-reg-row[data-eid="u1_1"] [data-act="cal-reg-add"]')?.click(); await w(200);
+    L.push('add everyone with a place: +' + (n2 - n1) + ' | button after ' + allBtn + ' | twice: teams ' + teams().length + ' | ids ' + teams().map(x => x.calEntry || '').join(','));
+    L.push('registration contact in tournament: ' + /07700|example\\.com|HYPERLINK/.test(JSON.stringify(C.T())));
+    await setT({ checkin: true });
+    L.push('not checked in: ' + teams().filter(x => x.calEntry).map(x => !!x.checkedIn).join(','));
+    await S.store.withdrawCalEntry(tid, 'u1_1'); await w(300);
+    L.push('withdrew online pill: ' + txt(q('[data-row="' + t1.id + '"] .cal-withdrew')) + ' | row kept ' + !!q('[data-row="' + t1.id + '"]') + ' | others ' + qa('.cal-withdrew').length);
+    window.__dt1 = t1.id;
+  `));
+  await p3.evaluate(() => document.querySelector('.cal-reg')?.scrollIntoView()); await p3.screenshot({ path: 'test-results/calendar-registration-desktop.png' });
+  await p3.setViewportSize({ width: 390, height: 844 }); await p3.waitForTimeout(250);
+  out.push('registration 390: no sideways scroll ' + await p3.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1) + ' | buttons under 44 ' + await p3.evaluate(() => [...document.querySelectorAll('.cal-reg .btn')].filter(x => x.getBoundingClientRect().height < 44).length));
+  await p3.evaluate(() => document.querySelector('.cal-reg')?.scrollIntoView()); await p3.screenshot({ path: 'test-results/calendar-registration-390.png' });
+  await p3.setViewportSize({ width: 1100, height: 900 }); await p3.waitForTimeout(150);
+  out.push(...await run3(`
+    // mêlée: an entry becomes a player
+    await setT({ entry: 'melee' }); await w(200);
+    const p0 = C.T().players.length; q('.cal-reg-row[data-eid="u3_1"] [data-act="cal-reg-add"]')?.click(); await w(300);
+    const pl = C.T().players.find(x => x.calEntry === 'u3_1');
+    L.push('melee: players +' + (C.T().players.length - p0) + ' | ' + JSON.stringify(pl && { name: pl.name, club: pl.club, calEntry: pl.calEntry }));
+    await setT({ entry: 'team' });
+    // French
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="fr"]').click(); await w(200);
+    L.push('fr registration: ' + txt(q('.cal-reg h3')) + ' | ' + qa('.cal-reg .btn, .cal-reg .pill').map(txt).join(',') + ' | ' + txt(q('.cal-withdrew')));
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
+    // removing the listing takes its entries with it
+    q('[data-tab="setup"]').click(); await w(200);
+    q('[data-cal-panel] [data-act="cal-remove"]').click(); await w(300);
+    L.push('remove listing ask: ' + txt(q('[data-cal-panel] .err')));
+    q('[data-cal-panel] [data-act="cal-remove-yes"]').click(); await w(300);
+    L.push('remove listing with entries: listing gone ' + ((await S.store.getCal(tid)) === null) + ' | entries left ' + !!JSON.parse(localStorage.getItem('carreau-local-v1')).ce?.[tid] + ' | ' + txt(q('#toast')));
+  `));
   console.log(out.join('\n'));
   console.log('errs', errs); await b.close();
 })();
