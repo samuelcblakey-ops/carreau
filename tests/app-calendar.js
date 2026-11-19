@@ -4,6 +4,8 @@
 // Season Calendar 2 (calendar-page): the links in, the page (soonest first, grouped by week then month), filters, search,
 // the full listing in place (Follow the draw once drawn), deep links, the organiser's Edit and Remove, the admin's hide
 // (stood in for here; the rules are in web-calendar.js), French, and the page and a listing at 390 px.
+// Season Calendar 3 (calendar-own-events): an event run elsewhere added from the page (the sheet in event mode at 390 px),
+// its full listing (no Live now, no competition links), Edit, "Your listings" (a hidden one marked), Remove, French.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, locale: 'en-GB' });
@@ -231,6 +233,70 @@ const { chromium } = require('playwright');
   await p2.screenshot({ path: 'test-results/calendar-listing-390.png' });
   out.push('phone 390: no sideways scroll ' + (!pageWide && !listingWide) + ' | row height ' + rowH + ' | header label ' + await p2.evaluate(() => getComputedStyle(document.querySelector('header .cal-btn span')).display)
     + ' | targets under 44 ' + await p2.evaluate(() => [...document.querySelectorAll('.cal-page .hof-chip, .cal-page .cal-row, header .cal-btn')].filter(x => x.getBoundingClientRect().height < 40).map(x => x.className + ' ' + Math.round(x.getBoundingClientRect().height)).join(',') || 0));
+
+  // ---- Season Calendar 3 (calendar-own-events): an event run elsewhere, added from the page (at 390 px) ----
+  await p2.evaluate(() => { const t = document.querySelector('#toast'); if (t) t.hidden = false; });
+  out.push(...await run2(`
+    await go('calendar'); await w(200);
+    L.push('add button: ' + txt(q('[data-act="cal-ev-new"]')) + ' | ' + txt(q('.cal-add .muted')));
+    q('[data-act="cal-ev-new"]').click(); await w(150);
+    L.push('event sheet: ' + txt(q('#modal h3')) + ' | name box ' + !!q('#modal [data-cal="name"]') + ' | formats ' + qa('#modal [data-act="cal-fmt"]').map(txt).join(',') + ' | picked ' + qa('#modal [data-act="cal-fmt"][aria-pressed="true"]').length
+      + ' | date "' + q('#modal [data-cal="date"]').value + '" | venue "' + q('#modal [data-cal="venue"]').value + '" | level ' + q('#modal .hof-pick.on')?.dataset.k + ' | who ' + qa('#modal [data-act="cal-who"][aria-pressed="true"]').map(x => x.dataset.k).join(',') + ' | country ' + q('#modal [data-cal="country"]').value);
+    L.push('event sheet more: ' + q('#modal [data-cal="formatNote"]').placeholder + ' | ' + txt(q('#modal [data-act="cal-save"]')) + ' | no competition line ' + !q('#modal .cal-comp'));
+  `));
+  out.push('event sheet 390: no sideways scroll ' + await p2.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)
+    + ' | chips under 44 ' + await p2.evaluate(() => [...document.querySelectorAll('#modal .cal-who button, #modal .hof-pick')].filter(x => x.getBoundingClientRect().height < 44).length)
+    + ' | box font ' + await p2.evaluate(() => getComputedStyle(document.querySelector('#modal [data-cal="name"]')).fontSize));
+  await p2.screenshot({ path: 'test-results/calendar-event-sheet-390.png' });
+  out.push(...await run2(`
+    q('#modal [data-act="cal-save"]').click(); await w(100); const e1 = txt(q('#modal .err'));
+    type('#modal [data-cal="name"]', 'Stotfold Charity Doubles'); q('#modal [data-act="cal-save"]').click(); await w(100); const e2 = txt(q('#modal .err'));
+    q('#modal [data-act="cal-fmt"][data-k="doubles"]').click(); await w(60); q('#modal [data-act="cal-save"]').click(); await w(100); const e3 = txt(q('#modal .err'));
+    L.push('event checks: ' + e1 + ' | ' + e2 + ' | ' + e3);
+    type('#modal [data-cal="formatNote"]', 'Swiss, 4 rounds then knockouts'); type('#modal [data-cal="date"]', day(0)); type('#modal [data-cal="start"]', '10:00');
+    type('#modal [data-cal="venue"]', 'Stotfold Pétanque Club'); type('#modal [data-cal="howTo"]', 'Call Sue on 07700 900456');
+    q('#modal [data-act="cal-level"][data-k="regional"]').click(); await w(60);
+    q('#modal [data-act="cal-save"]').click(); await w(400);
+    const id = location.hash.split('.')[1]; window.__ev = id; const e = await S.store.getCal(id);
+    L.push('add event: ' + txt(q('#toast')) + ' | kind ' + e.kind + ' | fmt ' + e.fmt + ' | on page ' + !!q('#cal-' + id + '.cal-card'));
+    L.push('event listing: id ' + (e.id === id && /^c[a-z0-9]+$/.test(id)) + ' | tid ' + ('tid' in e) + ' | ' + e.formatNote + ' | ' + e.level + ' | ' + e.who.join(',') + ' | hidden ' + e.hidden + ' | orgCode "' + e.orgCode + '" | sheet closed ' + !q('#modal .modal'));
+    const card = q('#cal-' + id + '.cal-card'), fmtDd = qa('#cal-' + id + ' dt').find(d => d.textContent === 'Format')?.nextElementSibling;
+    L.push('event card: format ' + txt(fmtDd) + ' | buttons ' + qa('#cal-' + id + ' .row .btn').map(txt).join(',') + ' | live now ' + !!card.querySelector('.cal-live') + ' | competition links ' + !!card.querySelector('a.btn'));
+    q('#cal-' + id + ' [data-act="cal-close-entry"]').click(); await w(150);
+    L.push('event row: ' + txt(q('#cal-' + id + ' .cal-main')) + ' | live now ' + !!q('#cal-' + id + ' .cal-live'));
+    q('#cal-' + id).click(); await w(150); q('#cal-' + id + ' [data-act="cal-ev-edit"]').click(); await w(150);
+    L.push('edit event: ' + txt(q('#modal h3')) + ' | name ' + q('#modal [data-cal="name"]').value + ' | doubles picked ' + q('#modal [data-act="cal-fmt"][data-k="doubles"]').getAttribute('aria-pressed') + ' | regional kept ' + q('#modal .hof-pick.hof-regional').classList.contains('on') + ' | ' + txt(q('#modal [data-act="cal-save"]')));
+    type('#modal [data-cal="venue"]', 'Stotfold PC'); q('#modal [data-act="cal-save"]').click(); await w(400);
+    const e4 = await S.store.getCal(id);
+    L.push('event updated: ' + txt(q('#toast')) + ' | venue ' + e4.venue + ' | created kept ' + (e4.createdAt === e.createdAt) + ' | open ' + !!q('#cal-' + id + '.cal-card'));
+  `));
+  await p2.evaluate(() => document.querySelector('#cal-' + window.__ev)?.scrollIntoView()); await p2.screenshot({ path: 'test-results/calendar-event-open-390.png' });
+  out.push(...await run2(`
+    const id = window.__ev, tid = window.__tid;
+    // "Your listings": this device's event, its competition's listing, and a hidden event (marked)
+    await S.store.setCal('cHid', { kind: 'event', id: 'cHid', name: 'Hidden event', date: day(4), checkin: '', start: '', venue: '', address: '', country: 'GB-ENG', region: '', level: 'open', fmt: 'other', formatNote: '',
+      who: ['open'], fee: '', prizes: '', howTo: '', contact: '', note: '', status: 'on', lang: 'en', ownerUid: '', orgCode: '', byUid: '', byCode: '', createdAt: 1, updatedAt: 1, hidden: true, hiddenAt: 2 });
+    S.calPage.mine = null; await go('calendar'); await w(300);
+    const mine = q('#cal-mine .cal-mine');
+    L.push('your listings: event ' + !!q('#calmine-' + id) + ' | competition listing ' + !!q('#calmine-' + tid) + ' | hidden marked ' + (txt(q('#calmine-cHid .cal-hidden-mark')) === 'Hidden by the site admin'));
+    L.push('your listings more: ' + txt(mine?.querySelector('h3')) + ' | before tools ' + !!(mine && mine.compareDocumentPosition(q('.hof-tools')) & Node.DOCUMENT_POSITION_FOLLOWING) + ' | hidden in main list ' + !!q('#cal-cHid'));
+    q('#calmine-cHid').click(); await w(300);
+    L.push('mine opens hidden: ' + location.hash + ' | card ' + !!q('#cal-cHid.cal-card') + ' | mark ' + txt(q('#cal-cHid .cal-hidden-mark')) + ' | buttons ' + qa('#cal-cHid .row .btn').map(txt).join(','));
+    // someone who isn't one of its organisers (the website's S.calCanEdit, stood in for here)
+    await go('calendar.' + id); await w(250); S.calCanEdit = () => false; C.render(); await w(100);
+    L.push('stranger stand-in: Edit ' + !!q('#cal-' + id + ' [data-act="cal-ev-edit"]') + ' | Remove ' + !!q('#cal-' + id + ' [data-act="cal-page-remove"]'));
+    S.calCanEdit = null; C.render(); await w(100);
+    q('#cal-' + id + ' [data-act="cal-page-remove"]').click(); await w(100);
+    L.push('event remove confirm: ' + txt(q('#cal-' + id + ' .err')));
+    q('#cal-' + id + ' [data-act="cal-page-remove-yes"]').click(); await w(300);
+    L.push('event remove: ' + txt(q('#toast')) + ' | store ' + (await S.store.getCal(id)) + ' | mine ' + !!q('#calmine-' + id));
+    // in French
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="fr"]').click(); await w(200);
+    const add = txt(q('[data-act="cal-ev-new"]')); q('[data-act="cal-ev-new"]').click(); await w(150);
+    L.push('fr event: ' + add + ' | ' + txt(q('#modal h3')) + ' | ' + qa('#modal [data-act="cal-fmt"]').map(txt).slice(-2).join(',') + ' | ' + txt(q('#modal [data-act="cal-save"]')) + ' | ' + txt(q('#cal-mine h3')));
+    q('#modal [data-act="close"]').click(); await w(60);
+    q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
+  `));
   console.log(out.join('\n'));
   console.log('errs', errs); await b.close();
 })();

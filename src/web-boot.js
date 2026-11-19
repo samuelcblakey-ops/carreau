@@ -29,6 +29,11 @@ const joined = () => { try { return JSON.parse(lsGet(JOINED_KEY) || "[]"); } cat
 const forget = tid => lsSet(JOINED_KEY, JSON.stringify(joined().filter(x => x !== tid)));
 S.forgetComp = forget;
 const remember = tid => { const j = joined(); if (!j.includes(tid)) { j.push(tid); lsSet(JOINED_KEY, JSON.stringify(j.slice(-50))); } };
+// Season Calendar events this device joined with an organiser link (calendar/{cid}/members/{uid}), like joined() for competitions
+const CAL_JOINED_KEY = "carreau-cal-joined";
+const calJoined = () => { try { return JSON.parse(lsGet(CAL_JOINED_KEY) || "[]"); } catch { return []; } };
+const calRemember = cid => { const j = calJoined(); if (!j.includes(cid)) { j.push(cid); lsSet(CAL_JOINED_KEY, JSON.stringify(j.slice(-50))); } };
+const calForget = cid => lsSet(CAL_JOINED_KEY, JSON.stringify(calJoined().filter(x => x !== cid)));
 const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode = () => { const a = new Uint32Array(8); crypto.getRandomValues(a); return [...a].map(x => ALPHA[x % ALPHA.length]).join(""); };
 
@@ -143,6 +148,22 @@ function fbStore() {
       const c = [where("hidden", "==", false)]; if (country) c.push(where("country", "==", country));
       return getDocs(query(collection(db, "calendar"), ...c, limit(300))).then(s => s.docs.map(d => d.data()));
     },
+    // events run elsewhere (calendar-own-events): the listing, then its private organiser code (the organiser link carries it)
+    async addCalEvent(cid, L) {
+      await track(setDoc(doc(db, "calendar", cid), clone(L)));
+      const code = newCode(); try { await track(setDoc(doc(db, "calendar", cid, "private", "code"), { code })); return code; } catch (e) { console.warn("organiser code", e); return null; }
+    },
+    // the organiser code, for the event's organisers (made now if the first save didn't get that far)
+    async calCode(cid) {
+      const ref = doc(db, "calendar", cid, "private", "code"); const d = await getDocFromServer(ref);
+      if (d.exists() && d.data().code) return d.data().code;
+      const code = newCode(); await track(setDoc(ref, { code })); return code;
+    },
+    // a device that opened the organiser link joins as one of the event's organisers (the rules check the code)
+    async joinCal(cid, code) { await setDoc(doc(db, "calendar", cid, "members", AUTH.user.uid), { role: "edit", code, joinedAt: Date.now() }); calRemember(cid); },
+    // the events this device added, hidden ones included ("Your listings")
+    listMyCal() { return AUTH.user ? getDocs(query(collection(db, "calendar"), where("ownerUid", "==", AUTH.user.uid), limit(100))).then(s => s.docs.map(d => d.data())) : Promise.resolve([]); },
+    async deleteCalEvent(cid) { try { await deleteDoc(doc(db, "calendar", cid, "private", "code")); } catch {} await track(deleteDoc(doc(db, "calendar", cid))); calForget(cid); },
     // standalone streams: this device's own (admin: all)
     watchStreams(cb, onErr) { const sc = collection(db, "streams"); return onSnapshot(isAdmin() ? query(sc, limit(300)) : query(sc, where("ownerUid", "==", AUTH.user?.uid || "-"), limit(100)), s => cb(s.docs.map(d => d.data())), onErr); },
     watchStream(sid, cb, onErr) { return onSnapshot(doc(db, "streams", sid), d => cb(d.exists() ? d.data() : null), onErr); },
@@ -201,6 +222,11 @@ S.hofCanPublish = t => !!(AUTH.user && t) && (isAdmin() || (!t.archived && !t.li
 S.calCanPublish = t => S.hofCanPublish(t);
 // the Season Calendar page: the admin can hide a listing, or show it again (firestore.rules lets only the admin change hidden)
 S.calAdmin = () => isAdmin();
+// an event run elsewhere: its organisers are the device that added it (organiser login off) or the organiser code it was added
+// with (login on), devices that joined with its organiser link, and the admin (enforced in firestore.rules, evOrg)
+S.calJoined = calJoined;
+S.calCanEdit = e => !!(AUTH.user && e && e.kind === "event") && (isAdmin() || calJoined().includes(e.id)
+  || (loginMode() ? orgActive() && !!e.orgCode && e.orgCode === ORG.code : e.ownerUid === AUTH.user.uid));
 S.hofWho = () => ({ byUid: AUTH.user?.uid || "", byCode: orgActive() ? ORG.code : "" });
 // live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
 S.liveRole = t => !!(t && ROLE[t.id] === "live");
@@ -1053,6 +1079,13 @@ async function handleHash() {
   const lr = parseLiveHash(); S.liveRoute = lr; S.overlayView = null; S.picker = false;
   if (lr) {
     if (lr.sid) { if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingStreamJoin = { sid: lr.sid, code: lr.code }; } watchStream(lr.sid); liveWatch(); render(); return; }
+    // an event's organiser link (#calendar.<id>.org.<code>): once signed in, join as one of its organisers, then open the listing
+    if (lr.view === "cal" && lr.cid && lr.code && FB && AUTH.user) {
+      history.replaceState(null, "", "#calendar." + lr.cid); S.liveRoute = parseLiveHash();
+      try { await S.store.joinCal(lr.cid, lr.code); toast("You can now edit this listing."); }
+      catch (e) { console.warn("organiser link", e?.code || e); toast("That organiser link didn't work. Ask for a new one."); }
+      if (S.calPage) { S.calPage.deepFor = null; S.calPage.mine = null; S.calPage.codes = {}; }
+    }
     if (lr.view === "streams" || lr.view === "hof" || lr.view === "cal") { liveWatch(); render(); return; }
     if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingLiveJoin = { tid: lr.tid, code: lr.code }; }
     if (lr.tid !== S.tid) { S.tid = lr.tid; S.matches = {}; restart(); } else if (S.pendingLiveJoin) watchRole();
