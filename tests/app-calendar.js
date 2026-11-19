@@ -9,7 +9,7 @@
 // Season Calendar 4 (calendar-entry-form): the sheet's Entries section, the row line and "Entries open" chip, the queue maths,
 // the entry form (its checks, at 390 px), "Your entries" (a place, the waiting list, approval, Edit, Withdraw, removed by
 // the organiser), "Who's entered", five entries a device, closing, and French. On one device (the app on its own) online
-// entry is offered; the website's site switch and rules are in web-calendar.js.
+// entry is offered; the website's site switch and rules are in web-calendar-entry.js.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, locale: 'en-GB' });

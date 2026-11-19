@@ -168,7 +168,9 @@ function fbStore() {
     // names when the listing shows who's entered (the rules refuse them otherwise)
     watchCalEntries(cid, cb, onErr) {
       const ms = v => v && typeof v.toMillis === "function" ? v.toMillis() : typeof v === "number" ? v : 0;
-      return onSnapshot(collection(db, "calendar", cid, "entries"), s => cb(s.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" });
+      // with metadata changes, so the server's answer arrives even when it matches this device's cached copy (fromCache: false
+      // tells the page the list is the server's, before it decides an entry of this device's was removed)
+      return onSnapshot(collection(db, "calendar", cid, "entries"), { includeMetadataChanges: true }, s => cb(s.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" });
         return { id: d.id, uid: x.uid || "", status: x.status || "", at: ms(x.at), queuedAt: ms(x.queuedAt) }; }), { fromCache: s.metadata.fromCache }), onErr);
     },
     watchCalTeams(cid, cb, onErr) { return onSnapshot(collection(db, "calendar", cid, "teams"), s => { const m = {}; s.docs.forEach(d => { m[d.id] = d.data(); }); cb(m); }, onErr); },

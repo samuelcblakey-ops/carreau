@@ -548,7 +548,9 @@ const SUITES = {
       /^rules, organiser login on: device without a code creates event false \| with a valid code true$/m,
       /^rules, organiser login on more: owner without a code updates false \| member updates true \| code holder updates true$/m,
       /^web event remove: Taken off the Season Calendar\. \| read none \| code none$/m,
-      // calendar-entry-form
+      /^errs \[\]$/m],
+    // calendar-entry-form
+    'web-calendar-entry.js': [
       /^entry listing: ok$/m,
       /^switch off: Enter online shown false \| create refused true$/m,
       /^admin switch: default Off \| Season Calendar online entry is on for everyone\. \| saved true \| pill Everyone$/m,
