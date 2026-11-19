@@ -3984,11 +3984,14 @@ const calEntRecSet = (cid, eid, name) => { const r = calEntRec(); r[cid] = r[cid
 // the open listing's entries (and team names, when shown), watched while it's open
 function calEntWatch(e) {
   const P = calPage(), id = calId(e); let w = P.ent;
-  if (!w || w.cid !== id) {
-    calEntStop(); w = P.ent = { cid: id, list: null, teams: null, gone: false };
+  // the website swaps its stand-in store for Firebase once signed in: watch again then
+  if (!w || w.cid !== id || w.store !== S.store) {
+    calEntStop(); w = P.ent = { cid: id, store: S.store, list: null, teams: null, gone: false };
+    // only the server's list can say an entry of this device's has gone (not a cached copy, nor the website's stand-in store)
+    const real = !(S.calEntryOn && S.store.mode === "local");
     if (!S.store.watchCalEntries) w.list = [];
     else w.unsub = S.store.watchCalEntries(id, (list, meta) => { if (P.ent !== w) return; w.list = list;
-      if (!meta?.fromCache) { const rec = calEntRec()[id] || {}, have = new Set(list.map(x => x.id)); Object.keys(rec).forEach(eid => { if (!have.has(eid)) { calEntRecSet(id, eid, null); w.gone = true; } }); }
+      if (real && !meta?.fromCache) { const rec = calEntRec()[id] || {}, have = new Set(list.map(x => x.id)); Object.keys(rec).forEach(eid => { if (!have.has(eid)) { calEntRecSet(id, eid, null); w.gone = true; } }); }
       if (calOnPage()) calPaint(); }, err => { console.error(err); if (P.ent === w) { w.list = []; if (calOnPage()) calPaint(); } });
   }
   if (e.showEntrants && !w.unsubT && S.store.watchCalTeams) w.unsubT = S.store.watchCalTeams(id, m => { if (P.ent !== w) return; w.teams = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });

@@ -116,7 +116,8 @@ const { chromium } = require('playwright');
     '| status in on an approve listing', await okB(P2, entOps('cEnt1', p2Uid + '_3', p2Uid, 'in')));
   log('entrant edits after close', editClosed, '| entrant changes status', await okB(P1, [['update', `calendar/cEnt1/entries/${p1Uid}_2`, { status: 'pending' }]]),
     '| stranger deletes another entry', await ok(B, 'del', `calendar/cEnt1/entries/${p1Uid}_2`));
+  // the entrant's phone still has the listing open: the notice shows there, once
   log('organiser removes an entry', await okB(EO, [['del', `calendar/cEnt1/entries/${p1Uid}_2`], ['del', `calendar/cEnt1/teams/${p1Uid}_2`], ['del', `calendar/cEnt1/contacts/${p1Uid}_2`]]),
-    '| entrant sees: ' + await (async () => { await openCard(P1); try { await P1.waitForSelector('#cal-cEnt1 .cal-ent-gone', { timeout: 10000 }); } catch {} return txt(P1, '#cal-cEnt1 .cal-ent-gone'); })());
+    '| entrant sees: ' + await (async () => { try { await P1.waitForSelector('#cal-cEnt1 .cal-ent-gone', { timeout: 10000 }); } catch {} return txt(P1, '#cal-cEnt1 .cal-ent-gone'); })());
   log('errs', errs); await b.close();
 })();
