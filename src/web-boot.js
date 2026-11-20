@@ -565,6 +565,7 @@ async function joinWithCode(tid, raw) {
 // player once it has proved the key in pickdev/{its uid} (like a team link, but kept out of members, so a player never gets
 // any scoring rights). The private link (#<competition>.pk-<pid>-<key>) does that on another phone. Cost: one listener on
 // this device's pickdev doc, one on its player's name, one on its own picks; nothing on anyone else's.
+const BOARD = { tid: null, pickers: null, at: 0, busy: false, rounds: {}, asking: {}, failed: {} };
 const PICK = { tid: null, uid: null, ready: false, me: null, picks: {}, unsubs: [], unsubMe: null };
 function pickStop() { PICK.unsubs.forEach(u => u()); PICK.unsubs = []; PICK.unsubMe?.(); PICK.unsubMe = null; Object.assign(PICK, { tid: null, uid: null, ready: false, me: null, picks: {} }); }
 function pickPlayer(tid, pid, key) {
@@ -598,6 +599,29 @@ S.pickGame = {
     b.set(doc(FB.db, "tournaments", t.id, "pickdev", AUTH.user.uid), { pid, key, at: now });
     await b.commit();
     pickWatch(t); if (PICK.me?.pid !== pid) pickPlayer(t.id, pid, key); PICK.me.name = name; PICK.ready = true;
+  },
+  // the leaderboard (pick-game-leaderboard): the players, read once and again at most every 2 minutes while the page is
+  // drawn, and each closed round's picks read once (they can't change after the close). No listeners, to keep reads down.
+  board(t) {
+    if (BOARD.tid !== t.id) Object.assign(BOARD, { tid: t.id, pickers: null, at: 0, busy: false, rounds: {}, asking: {}, failed: {} });
+    const now = Date.now(), tid = t.id;
+    if (!BOARD.busy && now - BOARD.at > 120e3) { BOARD.busy = true;
+      getDocs(collection(FB.db, "tournaments", tid, "pickers")).then(s => { if (BOARD.tid !== tid) return; const m = {}; s.docs.forEach(d => { m[d.id] = d.data(); }); BOARD.pickers = m; BOARD.at = Date.now(); BOARD.busy = false; render(); },
+        e => { console.warn("pickers", e?.code || e); BOARD.busy = false; BOARD.at = Date.now() - 90e3; if (!BOARD.pickers) BOARD.pickers = {}; render(); }); }
+    const close = t.pickClose || {};
+    (t.pick?.rounds || []).forEach(r => {
+      // a device clock running ahead of the server's is refused until the close has really passed: try again after 30 s
+      if (now < (close[r.id] || Infinity) || BOARD.rounds[r.id] || BOARD.asking[r.id] || now - (BOARD.failed[r.id] || 0) < 30e3) return;
+      BOARD.asking[r.id] = true;
+      getDocs(query(collection(FB.db, "tournaments", tid, "picks"), where("round", "==", r.id))).then(s => { if (BOARD.tid !== tid) return; BOARD.rounds[r.id] = s.docs.map(d => d.data()); BOARD.asking[r.id] = false; render(); },
+        e => { console.warn("picks", r.id, e?.code || e); BOARD.asking[r.id] = false; BOARD.failed[r.id] = Date.now(); setTimeout(() => S.tab === "pick" && render(), 31e3); });
+    });
+    return { pickers: BOARD.pickers, picks: Object.values(BOARD.rounds).flat() };
+  },
+  // the organiser hides an unsuitable name (the rules let them change only hidden)
+  async hide(t, pid, hidden) {
+    await track(updateDoc(doc(FB.db, "tournaments", t.id, "pickers", pid), { hidden }));
+    if (BOARD.tid === t.id && BOARD.pickers?.[pid]) BOARD.pickers[pid] = { ...BOARD.pickers[pid], hidden };
   },
   // the time is the server's; the rules refuse a pick once its round has closed
   async pick(t, rid, team) {
