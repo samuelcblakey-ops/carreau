@@ -112,7 +112,9 @@ service cloud.firestore {
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
                     && (!loginOn() || isAdmin() || (orgValid() && request.resource.data.get('orgCode', '') == myCode()))
                     && (isAdmin() || request.resource.data.get('listed', false) != true) && request.resource.data.get('featured', false) is bool;
+      // a Pick the Winner game (pick, pickClose) is set up by the admin only (pick-game-admin-only)
       allow update: if ((canEdit(tid) && resource.data.get('archived', false) != true) || isAdmin()) && flagsOk(tid)
+                    && (isAdmin() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['pick', 'pickClose']))
                     && request.resource.data.ownerUid == resource.data.ownerUid
                     && (isAdmin() || request.resource.data.get('orgCode', '') == resource.data.get('orgCode', ''));
       // organisers can only archive; deleting a competition is admin-only

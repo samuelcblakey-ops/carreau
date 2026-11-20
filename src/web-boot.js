@@ -385,6 +385,7 @@ async function hofGone(tid, gone) {
   catch (err) { if (!["not-found", "permission-denied"].includes(err?.code)) console.error(err); }
 }
 S.canDelete = () => isAdmin();
+S.pickAdmin = () => isAdmin(); // only the admin sets up a Pick the Winner game (pick-game-admin-only; the rules agree)
 S.canSeeArchived = () => isAdmin();
 S.decorateNew = nt => { nt.ownerUid = AUTH.user.uid; nt.device = deviceLabel(); nt.listed = false; nt._new = true; if (loginMode() && orgActive() && !isAdmin()) nt.orgCode = ORG.code; remember(nt.id); };
 // a rough "what kind of device" label so the admin can tell creators apart (no personal data)
