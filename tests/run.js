@@ -147,7 +147,7 @@ const SUITES = {
       /^deep link: #calendar\.<id> opens true \| country FR \| missing shows notice true$/m,
       /^deep link more: hidden That listing isn't on the Season Calendar any more\. \| past That listing isn't on the Season Calendar any more\.$/m,
       /^edit: sheet Update the listing \| tab setup \| page left true \| fee £5 per player$/m,
-      /^admin strip: Only you see thisHide from the Season Calendar$/m, /^admin hide: hidden true \| gone from page true \| organiser notice true$/m,
+      /^admin strip: Only you see thisHide from the Season CalendarRemove$/m, /^admin hide: hidden true \| gone from page true \| organiser notice true$/m,
       /^organiser panel hidden: Season Calendar Hidden from the Season Calendar by the site admin\. · Regional England Remove Questions\? Contact Info@FoundryITadvisory\.com\.$/m,
       /^admin deep link to hidden: true \| Show again$/m, /^show again: hidden false \| Hide from the Season Calendar$/m, /^no strip for others: true$/m,
       /^page remove confirm: Take it off the Season Calendar\?$/m, /^page remove: Taken off the Season Calendar\. \| store null \| on page false$/m,
@@ -276,7 +276,7 @@ const SUITES = {
       /^listing flyer 390: shown true \| alt Flyer for Spring Triples \| above the details true \| width full \| no sideways scroll true \| rows show flyers 0$/m,
       /^flyer tapped: new tab true$/m,
       /^flyer remove: ask Take the flyer off your listing\? \| Remove,Keep it \| keep it kept true \| removed true \| toast Flyer removed\. \| add again Add your flyer$/m,
-      /^flyer admin strip: Only you see this ?Remove the flyer ?Hide from the Season Calendar \| removed true \| toast Flyer removed\. \| gone from listing true \| button gone true$/m,
+      /^flyer admin strip: Only you see this ?Remove the flyer ?Hide from the Season Calendar ?Remove \| removed true \| toast Flyer removed\. \| gone from listing true \| button gone true$/m,
       /^flyer with listing \(app\): listing gone true \| flyer gone true$/m, /^flyer without listing \(app\): permission-denied$/m,
       /^errs \[\]$/m],
     'app-hall-of-fame.js': [/swiss with knockout planned, morning done: draw panel shows publish false \| standings ready true/, /morning published: standings$/m, /knockouts drawn: draw panel shows publish false/,
@@ -526,7 +526,7 @@ const SUITES = {
       /^flyer rules: stranger adds false \| stranger reads \(listing shown\) true \| stranger reads \(listing hidden\) false \| png data refused false \| 800000 chars refused false \| without listing false$/m,
       /^flyer rules more: organiser reads hidden true \| 699000 chars allowed true \| other name false \| extra field false \| w 2001 false \| list false$/m,
       /^flyer admin: removes true \| organiser removes true \| stranger removes false$/m,
-      /^flyer admin strip: Only you see this ?Remove the flyer ?Hide from the Season Calendar$/m,
+      /^flyer admin strip: Only you see this ?Remove the flyer ?Hide from the Season Calendar ?Remove$/m,
       /^flyer with listing: removing the listing deletes flyer true$/m, /^errs \[\]$/m],
     'web-isolation.js': [
       /B list \(should be B comp only\): B comp\n/, /admin list: A comp, B comp, Example comp/,
@@ -630,7 +630,7 @@ const SUITES = {
       /^web ics: file \*\.ics \| type text\/calendar;charset=utf-8$/m,
       /^web deep link: opens true \| strip for visitor false$/m,
       /^admin hide: hidden true \| gone from page true \| organiser notice true \| stranger hides false$/m,
-      /^admin hide more: strip Only you see this ?Hide from the Season Calendar \| visitor link That listing isn't on the Season Calendar any more\. \| organiser panel .*Remove Questions\? Contact Info@FoundryITadvisory\.com\.$/m,
+      /^admin hide more: strip Only you see this ?Hide from the Season Calendar ?Remove \| visitor link That listing isn't on the Season Calendar any more\. \| organiser panel .*Remove Questions\? Contact Info@FoundryITadvisory\.com\.$/m,
       /^rules hide: admin bad hiddenAt false \| organiser unhides false \| stranger unhides false$/m,
       /^admin show again: Show again \| hidden false \| organiser removes true$/m,
       // calendar-own-events
@@ -646,6 +646,7 @@ const SUITES = {
       /^rules, organiser login on: device without a code creates event false \| with a valid code true$/m,
       /^rules, organiser login on more: owner without a code updates false \| member updates true \| code holder updates true$/m,
       /^web event remove: Taken off the Season Calendar\. \| read none \| code none$/m,
+      /^admin remove: strip Only you see this ?Hide from the Season Calendar ?Remove \| ask Take it off the Season Calendar\? \| Taken off the Season Calendar\. \| read none \| gone from page true \| stranger strip false$/m,
       /^errs \[\]$/m],
     // calendar-entry-form
     'web-calendar-entry.js': [

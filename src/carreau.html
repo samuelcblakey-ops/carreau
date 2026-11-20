@@ -3901,13 +3901,18 @@ function calCard(e, close) {
     ${calShareRow(e)}
     ${org && e.hidden ? `<div class="notice small err cal-hidden-mark">Hidden by the site admin</div>` : ""}
     ${calEntHtml(e)}
-    <div class="row">${link}${org ? `${ev && e.hidden ? "" : `<button type="button" class="btn sm" data-act="${ev ? "cal-ev-edit" : "cal-edit"}" data-id="${esc(id)}">Edit</button>`}${posterCan(e) ? posterBtn(id) : ""}${confirm
+    <div class="row">${link}${org ? `${ev && e.hidden ? "" : `<button type="button" class="btn sm" data-act="${ev ? "cal-ev-edit" : "cal-edit"}" data-id="${esc(id)}">Edit</button>`}${posterCan(e) ? posterBtn(id) : ""}${calAdmin() ? "" : confirm
       ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === id ? S.calRemoveN.n : 0))}</span><button type="button" class="btn sm danger" data-act="cal-page-remove-yes" data-id="${esc(id)}">Remove</button><button type="button" class="btn sm" data-act="cal-page-remove-no">Keep it</button>`
       : `<button type="button" class="btn sm" data-act="cal-page-remove" data-id="${esc(id)}">Remove</button>`}` : posterCan(e) ? posterBtn(id) : ""}${close ? `<button type="button" class="btn sm ghost" data-act="cal-close-entry" data-id="${esc(id)}">Close</button>` : ""}</div>
     ${ev && org ? calOrgLinkBox(id) : ""}
-    ${calAdmin() ? `<div class="cal-admin spread"><span class="small"><b>Only you see this</b></span><div class="row">${calFlyerHas(id) ? `<button type="button" class="btn sm danger" data-act="cal-flyer-admin-remove" data-id="${esc(id)}">Remove the flyer</button>` : ""}<button type="button" class="btn sm${e.hidden ? "" : " danger"}" data-act="cal-hide" data-id="${esc(id)}" data-on="${e.hidden ? "0" : "1"}">${e.hidden ? "Show again" : "Hide from the Season Calendar"}</button></div></div>` : ""}
+    ${calAdmin() ? `<div class="cal-admin spread"><span class="small"><b>Only you see this</b></span><div class="row">${calFlyerHas(id) ? `<button type="button" class="btn sm danger" data-act="cal-flyer-admin-remove" data-id="${esc(id)}">Remove the flyer</button>` : ""}<button type="button" class="btn sm${e.hidden ? "" : " danger"}" data-act="cal-hide" data-id="${esc(id)}" data-on="${e.hidden ? "0" : "1"}">${e.hidden ? "Show again" : "Hide from the Season Calendar"}</button>${calAdminRemove(id, confirm)}</div></div>` : ""}
   </article>`;
 }
+// the admin removes any listing from its strip (Sam, 20 Nov 2026): the same question and removal as an organiser's Remove, with its entries,
+// contacts and flyer. For the admin it takes the place of the organiser's Remove in the row above, so there's only ever one.
+const calAdminRemove = (id, confirm) => confirm
+  ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === id ? S.calRemoveN.n : 0))}</span><button type="button" class="btn sm danger" data-act="cal-page-remove-yes" data-id="${esc(id)}">Remove</button><button type="button" class="btn sm" data-act="cal-page-remove-no">Keep it</button>`
+  : `<button type="button" class="btn sm danger" data-act="cal-page-remove" data-id="${esc(id)}">Remove</button>`;
 /* Season Calendar 7 (calendar-share): Add to calendar (an .ics file), Open in Maps and Share on the full listing */
 const calLink = id => `${liveBase()}#calendar.${id}`;
 // the event file: CRLF lines, text escaped (\\ ; , and new lines), lines folded at 75 bytes (never inside a character), and
@@ -7148,7 +7153,7 @@ document.addEventListener("click", async e => {
     case "cal-edit": calEdit(a.dataset.id); break;
     case "cal-page-remove": { const id = a.dataset.id; S.calPageRemove = id; S.calRemoveN = null; calPaint(); calRemoveAsk(id, n => { if (S.calPageRemove !== id) return; S.calRemoveN = { id, n }; calPaint(); }); break; }
     case "cal-page-remove-no": S.calPageRemove = null; calPaint(); break;
-    case "cal-page-remove-yes": { const e2 = calFind(a.dataset.id), t2 = S.tournaments[a.dataset.id]; if (e2?.kind === "event" ? calEvCan(e2) : t2 && calCan(t2)) await calPageRemove(a.dataset.id); break; }
+    case "cal-page-remove-yes": { const e2 = calFind(a.dataset.id), t2 = S.tournaments[a.dataset.id]; if (calAdmin() || (e2?.kind === "event" ? calEvCan(e2) : t2 && calCan(t2))) await calPageRemove(a.dataset.id); break; }
     case "cal-ev-new": if (calEvCanAdd()) calEvOpen(null); break;
     case "cal-ev-edit": { const e2 = calFind(a.dataset.id); if (calEvCan(e2)) calEvOpen(e2); break; }
     case "cal-mine-open": { const id = a.dataset.id, P = calPage(); S.calPageRemove = null; if (location.hash === "#calendar." + id) { P.deepFor = null; hofRedraw(); } else location.hash = "calendar." + id; break; }
