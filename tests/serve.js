@@ -8,11 +8,14 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'applic
 module.exports = (port) => new Promise(res => {
   const srv = http.createServer((req, rsp) => {
     let u = decodeURIComponent(req.url.split('?')[0]); if (u === '/') u = '/index.html';
+    // like GitHub Pages: a folder serves its index.html (event pages, /worlds2026/), and the folder without its slash redirects
+    if (u.endsWith('/')) u += 'index.html';
+    else if (!path.extname(u) && fs.existsSync(path.join(DIST, path.normalize(u), 'index.html'))) { rsp.writeHead(301, { location: u + '/' }); return rsp.end(); }
     if (u === '/firebase-config.js') { rsp.writeHead(200, { 'content-type': 'text/javascript' }); return rsp.end(DEMO); }
     const file = u.startsWith('/fb/') && FB_LOCAL ? path.join(FB_LOCAL, path.basename(u)) : path.join(DIST, path.normalize(u));
     fs.readFile(file, (err, body) => {
       if (err) { rsp.writeHead(404); return rsp.end('not found'); }
-      if (u === '/index.html' && FB_LOCAL) body = body.toString('utf8').replace(/https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\//g, '/fb/');
+      if (u.endsWith('/index.html') && FB_LOCAL) body = body.toString('utf8').replace(/https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\//g, '/fb/');
       rsp.writeHead(200, { 'content-type': types[path.extname(file)] || 'text/plain' }); rsp.end(body);
     });
   }).listen(port, '127.0.0.1', () => res(srv));

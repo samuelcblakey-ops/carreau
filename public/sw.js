@@ -27,8 +27,12 @@ self.addEventListener("fetch", e => {
   if (!sameOrigin && !staticCdn) return; // Firestore, sign-in etc. go straight to the network
   if (sameOrigin && url.pathname.includes("/videos/")) return; // guide videos stream from the network, never cached
   if (req.mode === "navigate" || (sameOrigin && /\/(index\.html)?$/.test(url.pathname))) {
-    // page: newest version when online, cached copy when not
-    e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put("./index.html", copy)); return r; }).catch(() => caches.match("./index.html")));
+    // page: newest version when online, cached copy when not. Each page keeps its own copy: the start page as ./index.html,
+    // an event page (/worlds2026/) or privacy.html under its own path, so one never replaces the other offline
+    const root = new URL("./", self.registration.scope).pathname, path = url.pathname.replace(/index\.html$/, "");
+    const key = !sameOrigin || path === root ? "./index.html" : path;
+    e.respondWith(fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(key, copy)); } return r; })
+      .catch(() => caches.match(key).then(hit => hit || caches.match("./index.html"))));
     return;
   }
   // versioned libraries, fonts, icons: cache first, refresh in the background
