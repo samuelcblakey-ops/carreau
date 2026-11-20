@@ -364,6 +364,15 @@ service cloud.firestore {
         allow update: if calMine(eid) && calContactShape(request.resource.data) && calEntOpen(cid) && exists(calEdoc(cid, 'entries', eid));
         allow delete: if calMine(eid) || isAdmin() || calOrganiser(cid);
       }
+      // an entry marked as paid (payments-online-entries): { at, by, team }, set and cleared by the listing's organisers (and the
+      // admin); the entrant can read their own, never change it. Not paid means no document.
+      match /payments/{eid} {
+        allow get: if calMine(eid) || isAdmin() || calOrganiser(cid);
+        allow list: if isAdmin() || calOrganiser(cid);
+        allow create, update: if (isAdmin() || calOrganiser(cid)) && request.resource.data.keys().hasOnly(['at', 'by', 'team'])
+          && request.resource.data.at is int && request.resource.data.team is string && request.resource.data.team.size() <= 60;
+        allow delete: if isAdmin() || calOrganiser(cid);
+      }
       // a device that opened the organiser link: accepted only with the event's current code, like a stream's desk link
       match /members/{uid} {
         allow read: if signedIn() && (request.auth.uid == uid || isAdmin() || evOrgOf(cid));

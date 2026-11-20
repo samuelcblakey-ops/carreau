@@ -201,8 +201,13 @@ function fbStore() {
     // batches of up to 450, before the listing goes (the rules check the listing to know who its organisers are)
     watchCalContacts(cid, cb, onErr) { return onSnapshot(collection(db, "calendar", cid, "contacts"), s => { const m = {}; s.docs.forEach(d => { m[d.id] = d.data().contact || ""; }); cb(m); }, onErr); },
     acceptCalEntry(cid, eid) { return track(updateDoc(doc(db, "calendar", cid, "entries", eid), { status: "in", queuedAt: serverTimestamp() })); },
+    // online entries marked as paid (payments-online-entries): calendar/{cid}/payments/{eid}, { at, by, team }; organisers list
+    // them all, an entrant reads only their own (the rules refuse anything else)
+    watchCalPayments(cid, cb, onErr) { return onSnapshot(collection(db, "calendar", cid, "payments"), s => { const m = {}; s.docs.forEach(d => { m[d.id] = d.data(); }); cb(m); }, onErr); },
+    getCalPayment(cid, eid) { return getDocFromServer(doc(db, "calendar", cid, "payments", eid)).then(d => d.exists() ? d.data() : null); },
+    setCalPayment(cid, eid, rec) { const ref = doc(db, "calendar", cid, "payments", eid); return track(rec ? setDoc(ref, clone(rec)) : deleteDoc(ref)); },
     async deleteCalEntries(cid) {
-      const subs = ["entries", "teams", "contacts"], ids = new Set();
+      const subs = ["entries", "teams", "contacts", "payments"], ids = new Set();
       for (const k of subs) (await getDocs(collection(db, "calendar", cid, k))).docs.forEach(d => ids.add(d.id));
       const refs = [...ids].flatMap(id => subs.map(k => doc(db, "calendar", cid, k, id)));
       for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await track(b.commit()); }
@@ -218,7 +223,7 @@ function fbStore() {
     // can't be listed: their only documents are "code" and "flyer")
     async purgeCal(cid) {
       const refs = [doc(db, "calendar", cid, "private", "code"), doc(db, "calendar", cid, "media", "flyer")];
-      for (const k of ["entries", "teams", "contacts", "members"]) (await getDocs(collection(db, "calendar", cid, k))).docs.forEach(d => refs.push(d.ref));
+      for (const k of ["entries", "teams", "contacts", "members", "payments"]) (await getDocs(collection(db, "calendar", cid, k))).docs.forEach(d => refs.push(d.ref));
       for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await track(b.commit()); }
       await track(deleteDoc(doc(db, "calendar", cid)));
     },
