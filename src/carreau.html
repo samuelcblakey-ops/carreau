@@ -71,7 +71,7 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
 /* event pages (event-page): the event's title beside the logo, then light/dark and language */
 body.ev .tsel{flex:1 1 auto}.ev-head{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto;line-height:1.15}
 .ev-title{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.02em;overflow-wrap:anywhere}.ev-sub{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
-.ev-views{align-self:flex-start}.ev-foot{margin-top:24px;gap:14px;max-width:720px}.ev-foot p{margin:0}.ev-cta a.btn{text-decoration:none}.panel.ev-banner{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;border-color:var(--accent);background:var(--accent-soft)}.ev-banner h2{margin:0;font-size:22px}.ev-banner p{margin:0}.ev-banner .btn{text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding-inline:22px}.ev-notice a{font-weight:600;color:var(--accent)}.ev-main{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--accent)}
+.ev-views{align-self:flex-start}.ev-foot{margin-top:24px;gap:14px;max-width:720px}.ev-foot p{margin:0}.ev-cta a.btn,.ev-to-board a.btn{text-decoration:none}.ev-to-board a.btn{color:var(--ink)}.ev-board .pk-board h3{display:none}.panel.ev-banner{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;border-color:var(--accent);background:var(--accent-soft)}.ev-banner h2{margin:0;font-size:22px}.ev-banner p{margin:0}.ev-banner .btn{text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding-inline:22px}.ev-notice a{font-weight:600;color:var(--accent)}.ev-main{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--accent)}
 /* ---------- phones ---------- */
 @media (max-width:640px){
   input,select,textarea{font-size:16px} /* stops iPhone zooming in on tap */
@@ -1710,6 +1710,13 @@ Object.assign(LANG_TEXT.de, {"Go to SN Pétanque": "Zu SN Pétanque", "Shooting 
 Object.assign(LANG_TEXT.nl, {"Go to SN Pétanque": "Naar SN Pétanque", "Shooting (event tab)": "Precisieschieten"});
 Object.assign(LANG_TEXT.pt, {"Go to SN Pétanque": "Ir para SN Pétanque", "Shooting (event tab)": "Tiro de precisão"});
 Object.assign(LANG_TEXT.th, {"Go to SN Pétanque": "ไปที่ SN Pétanque", "Shooting (event tab)": "การยิงแม่น"});
+Object.assign(FR_TEXT, {"See the leaderboard": "Voir le classement"});
+Object.assign(LANG_TEXT.es, {"See the leaderboard": "Ver la clasificación"});
+Object.assign(LANG_TEXT.it, {"See the leaderboard": "Vedi la classifica"});
+Object.assign(LANG_TEXT.de, {"See the leaderboard": "Zur Rangliste"});
+Object.assign(LANG_TEXT.nl, {"See the leaderboard": "Bekijk het klassement"});
+Object.assign(LANG_TEXT.pt, {"See the leaderboard": "Ver a classificação"});
+Object.assign(LANG_TEXT.th, {"See the leaderboard": "ดูตารางอันดับ"});
 Object.assign(FR_TEXT, {"The draw isn't out yet.": "Le tirage n'est pas encore sorti."});
 Object.assign(LANG_TEXT.es, {"The draw isn't out yet.": "El sorteo aún no se ha publicado."});
 Object.assign(LANG_TEXT.it, {"The draw isn't out yet.": "Il sorteggio non è ancora uscito."});
@@ -1988,9 +1995,14 @@ S.canCreate = () => S.canWrite;
 // everyone, the admin included; the Pick the Winner tab works as it does on the competition itself.
 const EVENTS = Array.isArray(window.SN_EVENTS) ? window.SN_EVENTS : [];
 const EVENT = EVENTS.find(e => e.slug === window.SN_EVENT && (e.tabs || []).length) || null;
-if (EVENT) { document.body.classList.add("ev"); S.event = EVENT; S.evTab = EVENT.tabs[0].key; S.tid = EVENT.tabs[0].tid; S.tab = EVENT.tabs[0].view === "pick" ? "pick" : "draw"; S.home = false; }
+// a tab's own address on the event page (event-page-leaderboard-tab): #leaderboard for the board, the tab's key for the others.
+// Keys hold no "." so they can't be mistaken for a private link (#<competition>.pk-<pid>-<key>)
+const evHash = x => x.view === "board" ? "leaderboard" : x.key;
+const evFromHash = h => EVENT && h ? EVENT.tabs.find(x => evHash(x) === h || x.key === h) || null : null;
+const evGame = v => v === "pick" || v === "board"; // Pick the Winner's own tabs: the game's page and its leaderboard
+if (EVENT) { const x0 = evFromHash(location.hash.slice(1)) || EVENT.tabs[0]; document.body.classList.add("ev"); S.event = EVENT; S.evTab = x0.key; S.tid = x0.tid; S.tab = evGame(x0.view) ? "pick" : "draw"; S.home = false; }
 const evCur = () => S.event ? S.event.tabs.find(x => x.key === S.evTab) || S.event.tabs[0] : null;
-const evRO = () => !!S.event && evCur().view !== "pick";
+const evRO = () => !!S.event && !evGame(evCur().view);
 const canEdit = () => !!T() && !evRO() && S.permFn(T()).edit;
 const canScore = () => !!T() && !evRO() && S.permFn(T()).score;
 const MS = () => Object.values(S.matches);
@@ -6478,7 +6490,7 @@ function drawPage() {
   if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lc = S.liveRoute.view === "stream" && S.loaded ? liveCtx() : null; if (lc) fitOvNames(); scheduleCardTick(lc ? lc.L : null); return; }
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
-  if (S.event) { main.innerHTML = renderEvent(t); main.querySelectorAll(".pk-cta:not(.ev-cta)").forEach(n => n.remove()); localize($("header.app")); localize(main); fitBrackets(); restore(); return; }
+  if (S.event) { main.innerHTML = renderEvent(t); main.querySelectorAll(".pk-cta:not(.ev-cta)").forEach(n => n.remove()); evPickFix(main, t); localize($("header.app")); localize(main); fitBrackets(); restore(); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
   const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDrawPage, courts: renderCourts, standings: renderStandings, pick: renderPickPage, display: renderDisplay, stream: x => streamingOn() ? renderStreamTab(x) : renderDisplay(x) }[S.tab] || renderDrawPage;
   // examples: visitors can open every tab, but the organiser pages are locked
@@ -6575,7 +6587,8 @@ function themeLangBtns() {
 const EV_KEYS = { Shooting: "Shooting (event tab)" };
 const evLabel = l => EV_KEYS[l] ? trAs(EV_KEYS[l], l) : tr(l);
 const EV_ICON = { pick: TAB_ICON.pick, draw: TAB_ICON.draw, standings: TAB_ICON.standings,
-  flag: ic('<path d="M5 21V4"/><path d="M5 4.5h12l-2.5 4 2.5 4H5"/>'), target: ic('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>') }; // i18n-ok: icons
+  flag: ic('<path d="M5 21V4"/><path d="M5 4.5h12l-2.5 4 2.5 4H5"/>'), target: ic('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>'), // i18n-ok: icons
+  board: ic('<path d="M3 20h18M4 20v-6h5v6M9 20V9h6v11M15 20v-8h5v8"/><path d="M12 3.5l.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2L9.1 5.6l2-.3z"/>') }; // i18n-ok: icons
 // the header: the logo (to the main site), the event's title and subtitle, light/dark and language; the tabs below
 // (the bottom bar on phones). No competition picker, + New, Calendar, Hall of Fame, organiser code or role pill.
 function drawEventHeader() {
@@ -6583,7 +6596,7 @@ function drawEventHeader() {
   $(".brand .home")?.setAttribute("href", "/");
   $("#tsel").innerHTML = `<div class="ev-head" data-notr><b class="ev-title">${esc(E.title)}</b>${E.subtitle ? `<span class="ev-sub">${esc(E.subtitle)}</span>` : ""}</div>${themeLangBtns()}`;
   $("#tabs").innerHTML = E.tabs.map(x => { const l = evLabel(x.label), s = x.view === "pick" ? tr(TAB_SHORT.pick) : l;
-    return `<button type="button" data-evtab="${esc(x.key)}" aria-current="${x.key === cur.key}" aria-label="${esc(l)}" data-notr>${EV_ICON[x.icon] || EV_ICON[x.view === "pick" ? "pick" : "draw"]}<span class="t-long">${esc(l)}</span><span class="t-short">${esc(s)}</span></button>`; }).join("");
+    return `<button type="button" data-evtab="${esc(x.key)}" aria-current="${x.key === cur.key}" aria-label="${esc(l)}" data-notr>${EV_ICON[x.icon] || EV_ICON[evGame(x.view) ? x.view === "board" ? "board" : "pick" : "draw"]}<span class="t-long">${esc(l)}</span><span class="t-short">${esc(s)}</span></button>`; }).join("");
   localize($("header.app"));
 }
 // a tab: Pick the Winner as the competition shows it, or a competition's Draw & results and Standings (read-only); then the
@@ -6592,6 +6605,7 @@ function renderEvent(t) {
   const E = S.event, x = evCur(); let body;
   if (!t) body = `<div class="empty">Loading competitions…</div>`;
   else if (x.view === "pick") body = renderPickPage(t);
+  else if (x.view === "board") body = evBoard(t);
   else { const st = S.tab === "standings";
     body = `<div class="seg ev-views" role="group" aria-label="${esc(evLabel(x.label))}"><button type="button" data-evview="draw" aria-pressed="${!st}">Draw &amp; results</button><button type="button" data-evview="standings" aria-pressed="${st}">Standings</button></div>
       <div class="ev-view">${st ? renderStandings(t) : renderDrawPage(t)}</div>`; }
@@ -6605,9 +6619,24 @@ function renderEvent(t) {
 // switching tabs switches the watched competition, as picking one does (one competition's games listened to at a time)
 function evGo(key) {
   const x = S.event.tabs.find(y => y.key === key); if (!x) return;
-  S.evTab = x.key; S.tab = x.view === "pick" ? "pick" : S.evView || "draw";
+  S.evTab = x.key; S.tab = evGame(x.view) ? "pick" : S.evView || "draw";
   if (x.tid !== S.tid) { S.tid = x.tid; S.matches = {}; S.onSelect?.(); watchMatches(); }
+  // the address names the tab, so copying it gives a link to this tab (no new history entry)
+  try { history.replaceState(null, "", location.pathname + location.search + "#" + evHash(x)); } catch {}
   render(); window.scrollTo(0, 0);
+}
+// the Leaderboard tab: the game's leaderboard as the Picks tab draws it (pickBoard), on its own
+function evBoard(t) {
+  if (!pickOn(t)) return renderDrawPage(t);
+  const st = S.pickGame.state(t); pickTimer(t);
+  return `<div class="stack pick-page ev-board" style="max-width:720px"><h2>Leaderboard</h2>${pickBoard(t, st, pickBoardData(t, st))}</div>`;
+}
+// the event's board tab for this competition's game, if it has one: the Picks tab then links to it instead of showing the board
+const evBoardTab = t => S.event && t ? S.event.tabs.find(x => x.view === "board" && x.tid === t.id) || null : null;
+function evPickFix(main, t) {
+  if (evCur().view !== "pick" || !evBoardTab(t)) return;
+  const b = main.querySelector(".pick-page .pk-board"); if (!b) return;
+  b.outerHTML = `<div class="ev-to-board"><a class="btn" href="#leaderboard" data-evtab="${esc(evBoardTab(t).key)}">See the leaderboard</a></div>`;
 }
 // events live today (UK date, live.from to live.to): the front page's banner and the notice on their competitions
 // (event-page-share)
@@ -8018,7 +8047,7 @@ document.addEventListener("click", async e => {
   // event pages: the tabs, the Draw & results / Standings switch; the logo is a plain link to the main site, and in-page
   // links (#main, #) stay on the page (the page's <base href="/"> would otherwise send them to the main site)
   if (S.event) {
-    const et = e.target.closest("[data-evtab]"); if (et) { evGo(et.dataset.evtab); return; }
+    const et = e.target.closest("[data-evtab]"); if (et) { e.preventDefault(); evGo(et.dataset.evtab); return; }
     const ev = e.target.closest("[data-evview]"); if (ev) { S.evView = S.tab = ev.dataset.evview; render(); return; }
     const al = e.target.closest('a[href="#main"], a[href="#"]'); if (al) { e.preventDefault(); if (al.getAttribute("href") === "#main") { const m = $("#main"); m.tabIndex = -1; m.focus(); } return; }
     const dt = e.target.closest("[data-tab]"); if (dt) { if (evCur().view !== "pick" && ["draw", "standings"].includes(dt.dataset.tab)) S.evView = S.tab = dt.dataset.tab; render(); return; }

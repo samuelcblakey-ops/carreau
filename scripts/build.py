@@ -93,7 +93,7 @@ for f in sorted(os.listdir(evdir)) if os.path.isdir(evdir) else []:
     ev = json.load(open(os.path.join(evdir, f), encoding="utf-8"))
     assert re.fullmatch(r"[a-z0-9][a-z0-9-]*", ev.get("slug", "")) and ev["slug"] + ".json" == f, f"{f}: slug must be the file's name (a-z, 0-9, -)"
     assert ev["slug"] not in ("lang", "fonts", "videos"), f"{f}: slug clashes with a folder of the site"
-    assert ev.get("title") and ev.get("tabs") and all(t.get("key") and t.get("label") and re.fullmatch(r"[A-Za-z0-9]+", t.get("tid", "")) and t.get("view") in ("pick", "results") for t in ev["tabs"]), f"{f}: needs a title and tabs (key, label, tid, view pick|results)"
+    assert ev.get("title") and ev.get("tabs") and all(t.get("key") and t.get("label") and re.fullmatch(r"[A-Za-z0-9]+", t.get("tid", "")) and t.get("view") in ("pick", "board", "results") for t in ev["tabs"]), f"{f}: needs a title and tabs (key, label, tid, view pick|board|results)"
     events.append(ev)
 def esc_attr(s): return (str(s).replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;"))
 ev_script = "<script>window.SN_EVENTS=" + json.dumps(events, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";</script>"
