@@ -1,0 +1,18 @@
+{
+  "slug": "worlds2026",
+  "title": "World Championships 2026",
+  "subtitle": "Khon Kaen, Thailand · 21–24 November",
+  "note": "Results come from the official FIPJP results site and update about every hour.",
+  "tabs": [
+    { "key": "pick",    "label": "Pick the Winner", "tid": "tkpo1655", "view": "pick",    "icon": "pick" },
+    { "key": "triples", "label": "Triples",         "tid": "tkpo1655", "view": "results", "icon": "draw" },
+    { "key": "nations", "label": "Nations Cup",     "tid": "tefa7z63", "view": "results", "icon": "flag" },
+    { "key": "shoot",   "label": "Shooting",        "tid": "td9rqc9j", "view": "results", "icon": "target" }
+  ],
+  "live": { "from": "2026-11-20", "to": "2026-11-24" },
+  "share": {
+    "title": "Pick the Winner · World Championships 2026",
+    "description": "Follow the Pétanque World Championships live and pick a winner each round. Free to play.",
+    "image": "worlds2026-share.png"
+  }
+}

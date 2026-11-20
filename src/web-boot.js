@@ -72,7 +72,9 @@ function fbStore() {
       const subD = (key, tid) => { expected.add(key); unsubs.push(onSnapshot(doc(db, "tournaments", tid), d => { parts[key] = d.exists() ? [d.data()] : []; emit(!d.metadata.hasPendingWrites); }, () => { parts[key] = []; emit(); })); };
       const tc = collection(db, "tournaments");
       // archived competitions are only visible to the admin (enforced in firestore.rules)
-      if (isAdmin()) subQ("all", query(tc, limit(300)));
+      // an event page (event-page) needs only its own competitions, the admin's too
+      if (S.event) new Set(S.event.tabs.map(x => x.tid)).forEach(tid => subD("t:" + tid, tid));
+      else if (isAdmin()) subQ("all", query(tc, limit(300)));
       else {
         subQ("listed", query(tc, where("listed", "==", true), where("archived", "==", false), limit(100)));
         // featured: an organiser chose to show it on the front page; it stays an ordinary competition (not an example)
@@ -80,7 +82,7 @@ function fbStore() {
         if (AUTH.user) subQ("mine", query(tc, where("ownerUid", "==", AUTH.user.uid), where("archived", "==", false), limit(200)));
         if (ORG.code) subQ("org", query(tc, where("orgCode", "==", ORG.code), where("archived", "==", false), limit(200)));
       }
-      new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
+      if (!S.event) new Set([...joined(), S.tid].filter(Boolean)).forEach(tid => subD("t:" + tid, tid));
       return () => { unsubs.forEach(u => u()); unsubs = []; };
     },
     watchMatches(tid, cb, onErr) { return onSnapshot(collection(db, "tournaments", tid, "matches"), s => cb(s.docs.map(matchData), { remote: !s.metadata.hasPendingWrites }), onErr); },
@@ -591,7 +593,9 @@ function pickWatch(t) {
     if ((v?.pid || null) !== (PICK.me?.pid || null)) pickPlayer(tid, v?.pid, v?.key); else if (v && PICK.me) PICK.me.key = v.key;
     PICK.ready = true; render(); }, () => { PICK.ready = true; render(); }));
 }
-const pickLink = t => PICK.me ? `${base()}#${t.id}.pk-${PICK.me.pid}-${PICK.me.key}` : "";
+// a game whose competition belongs to an event page gets the event's address (https://snpetanque.com/worlds2026#…)
+const pickLink = t => { if (!PICK.me) return ""; const ev = EVENTS.find(e => (e.tabs || []).some(x => x.tid === t.id));
+  return `${ev ? `${location.origin}/${ev.slug}` : base()}#${t.id}.pk-${PICK.me.pid}-${PICK.me.key}`; };
 S.pickGame = {
   state(t) { pickWatch(t); const on = PICK.tid === t.id; return { ready: on && PICK.ready, me: on && PICK.me ? { pid: PICK.me.pid, name: PICK.me.name } : null, picks: on ? PICK.picks : {}, link: on ? pickLink(t) : "" }; },
   // a new player: the name, the private key and this device's proof of it, in one batch (the rules check each against the others).
@@ -1281,13 +1285,32 @@ function watchSite() {
     render();
   }, () => { SITE.loaded = true; });
 }
-S.onSelect = () => { history.replaceState(null, "", S.tid ? "#" + S.tid : location.pathname); restart(); };
+S.onSelect = () => { history.replaceState(null, "", S.tid && !S.event ? "#" + S.tid : location.pathname); restart(); }; // an event page keeps its own address
 S.onHome = () => history.replaceState(null, "", location.pathname); // the start screen has no competition in the address
 S.onTournaments = () => { if (S.tid) watchCodes(S.tid); backfillArchived(); autoCleanup(); moveToFeatured(); };
 
 // links look like #<competition id> or #<competition id>.<code>; stream overlays and live desks: #<competition id>.stream.<game> / .desk.<game>[.<stream code>]
 function readHash() { const [tid, code] = location.hash.slice(1).split("?")[0].split("."); return { tid: tid || null, code: code || null }; }
+// "Start a competition" on an event page opens the main site at #new: quick setup for a new competition, once the site
+// settings say whether this visitor can make one (organiser login on: the login page instead)
+function startNew() {
+  history.replaceState(null, "", location.pathname);
+  if (!SITE.loaded || !AUTH.user) { setTimeout(startNew, 200); return; }
+  S.overlayView = null; S.liveRoute = null;
+  if (S.canCreate()) { render(); document.querySelector('#tsel [data-act="new-t"]')?.click(); }
+  else { S.overlayView = loginMode() ? loginView : null; render(); }
+}
 async function handleHash() {
+  // an event page (event-page) reads only a Pick the Winner private link (#<competition>.pk-<pid>-<key>): it opens the
+  // event's Pick the Winner tab as that player, and the address goes back to the event's own
+  if (S.event) {
+    const { tid, code } = readHash(), pk = /^pk-([A-Z0-9]+)-([A-Z0-9]+)$/.exec(String(code || ""));
+    if (location.hash) history.replaceState(null, "", location.pathname);
+    const x = S.event.tabs.find(y => y.tid === tid && y.view === "pick");
+    if (pk && x && AUTH.user) { S.evTab = x.key; S.tab = "pick"; if (S.tid !== tid) { S.tid = tid; S.matches = {}; restart(); } await joinPick(tid, pk[1], pk[2]); }
+    render(); return;
+  }
+  if (readHash().tid === "new") { startNew(); return; }
   const lr = parseLiveHash(); S.liveRoute = lr; S.overlayView = null; S.picker = false;
   if (lr) {
     if (lr.sid) { if (lr.code) { history.replaceState(null, "", location.hash.replace("." + lr.code, "")); S.pendingStreamJoin = { sid: lr.sid, code: lr.code }; } watchStream(lr.sid); liveWatch(); render(); return; }
@@ -1355,7 +1378,8 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || window.__
 function boot() {
   // a stream link (#s.<id>.stream, #streams, #halloffame, #calendar) names no competition: reading it as one ("s") watched a competition
   // that doesn't exist, which the rules refuse ("Missing or insufficient permissions")
-  const h = readHash(), lr = parseLiveHash(); if (!lr && h.tid && !["admin", "login", "guides", "halloffame", "calendar"].includes(h.tid)) S.tid = h.tid; if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView;
+  // an event page opens on its first tab whatever the address says (handleHash reads a private link)
+  const h = readHash(), lr = S.event ? null : parseLiveHash(); if (!S.event && !lr && h.tid && !["admin", "login", "guides", "halloffame", "calendar", "new"].includes(h.tid)) S.tid = h.tid; if (!S.event) { if (h.tid === "admin") S.overlayView = adminView; if (h.tid === "login") S.overlayView = loginView; if (h.tid === "guides") S.overlayView = guidesView; }
   if (lr) { if (lr.tid) S.tid = lr.tid; S.liveRoute = lr; }
   if (!CONFIGURED) { startWatching(); setTimeout(() => toast("Firebase isn't set up yet, so this is saving on this device only."), 600); return; }
   const app = initializeApp(firebaseConfig);
