@@ -23,6 +23,7 @@ On Draw & results, for organisers in a Swiss competition (phone and desktop):
 - Matching each side of a line to a registered, active team:
   - The exact team name, ignoring capitals and accents.
   - Or a code: if the team's name ends with a code in brackets, e.g. "Italy (ITA)", then "ITA" (any case) matches it.
+  - Flag emoji at the start of a team's name are ignored when matching (regional indicators U+1F1E6–1F1FF, U+1F3F4 with tag characters U+E0020–E007F, and the space after them), so "Italy (ITA)", "italy" and "ITA" all match "🇮🇹 Italy (ITA)". Error messages show the team name with its flag.
 - Checks before saving (shown in the box, nothing saved until they all pass):
   - A side that matches no team: **Line {n}: no team called "{x}".**
   - A side that matches two teams: **Line {n}: "{x}" matches more than one team.**
@@ -78,6 +79,7 @@ Add `tests/app-own-round.js`. Set up a Swiss competition with 8 teams named "Ita
 - `left out: 2 team(s) have no game this round`
 - `after scores standings top: <name>` (after scoring round 1, the standings leader is the team with the biggest win)
 - `draw round 2 after own round: 4 games` (SN Pétanque draws round 2 normally)
+- `flag name match: ITA, Italy (ITA) -> 🇮🇹 Italy (ITA)`
 - `own round renamed: Cadrage` (a round entered with the name "Cadrage" shows that name on Draw & results)
 - `errs []`
 
