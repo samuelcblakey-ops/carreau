@@ -1329,6 +1329,8 @@ async function handleHash() {
   // an event page (event-page) reads only a Pick the Winner private link (#<competition>.pk-<pid>-<key>): it opens the
   // event's Pick the Winner tab as that player, and the address goes back to the event's own
   if (S.event) {
+    // a tab's own address (#leaderboard, #triples…) opens that tab and stays (event-page-leaderboard-tab)
+    const tab = evFromHash(location.hash.slice(1)); if (tab) { if (tab.key !== S.evTab) evGo(tab.key); else render(); return; }
     const { tid, code } = readHash(), pk = /^pk-([A-Z0-9]+)-([A-Z0-9]+)$/.exec(String(code || ""));
     if (location.hash) history.replaceState(null, "", location.pathname);
     const x = S.event.tabs.find(y => y.tid === tid && y.view === "pick");

@@ -5,6 +5,7 @@
   "note": "Results come from the official FIPJP results site and update about every hour.",
   "tabs": [
     { "key": "pick",    "label": "Pick the Winner", "tid": "tkpo1655", "view": "pick",    "icon": "pick" },
+    { "key": "board",   "label": "Leaderboard",     "tid": "tkpo1655", "view": "board",   "icon": "board" },
     { "key": "triples", "label": "Triples",         "tid": "tkpo1655", "view": "results", "icon": "draw" },
     { "key": "nations", "label": "Nations Cup",     "tid": "tefa7z63", "view": "results", "icon": "flag",
       "empty": "The Nations Cup starts after Sunday's five Triples rounds. Its teams and draw appear here then." },

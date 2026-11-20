@@ -17,7 +17,7 @@ const { chromium } = require('playwright'), http = require('http');
     const comp = (id, name) => { const t = JSON.parse(JSON.stringify(made)); Object.assign(t, { id, name, checkin: false, wizard: false, system: 'swiss', swissRounds: 3, _new: true, created: Date.now() });
       t.teams = ['Italy (ITA)', 'France (FRA)', 'Thailand (THA)', 'Spain (ESP)'].map((name, i) => ({ id: 'e' + i, name, players: ['a', 'b', 'c'], active: true })); return t; };
     const tri = comp('tkpo1655', "Men's Triples"); tri.pick = { on: true, rounds: [{ id: 'p1', name: 'Round 1', src: 'swiss:1' }, { id: 'p2', name: 'Round 2', src: 'swiss:2' }] };
-    tri.pickClose = { p1: Date.now() + 36e5, p2: Date.now() + 72e5 };
+    tri.pickClose = { p1: Date.now() - 6e4, p2: Date.now() + 72e5 }; // round 1 closed: the leaderboard is the table
     for (const t of [tri, Object.assign(comp('tefa7z63', 'Nations Cup'), { teams: [] }), comp('td9rqc9j', 'Precision Shooting')]) { await S.store.setTournament(t); S.tournaments[t.id] = t; } });
   await w(2000);
   await A.goto(base + '#tkpo1655'); await w(3000);
@@ -37,7 +37,8 @@ const { chromium } = require('playwright'), http = require('http');
   await E.goto(base + 'worlds2026'); await w(5000);
   log('no slash: ' + new URL(E.url()).pathname);
   log('event page title: ' + await E.evaluate(() => document.querySelector('.ev-title')?.textContent + ' | ' + document.querySelector('.ev-sub')?.textContent));
-  log('event tabs: ' + (await E.$$eval('#tabs [data-evtab] .t-long', els => els.map(e => e.textContent))).join(', '));
+  log('event tabs: ' + (await E.$$eval('#tabs [data-evtab] .t-short', els => els.map(e => e.textContent))).join(' | '));
+  log('event tabs, desktop labels: ' + (await E.$$eval('#tabs [data-evtab] .t-long', els => els.map(e => e.textContent))).join(', '));
   log('event opens on: ' + await E.evaluate(() => document.querySelector('#tabs [aria-current="true"] .t-long')?.textContent + (document.querySelector('main h2')?.textContent === 'Pick the Winner' ? '' : ' (page: ' + document.querySelector('main h2')?.textContent + ')')));
   log('event header hides: ' + await E.evaluate(() => { const h = document.querySelector('header.app'), gone = [['picker', '.picker-btn'], ['new', '[data-act="new-t"]'], ['calendar', '.cal-btn'], ['hall of fame', '.hof-btn'], ['organiser key', '.code-btn, [data-act="enter-code"], [data-act="org-page"], .pill']];
     return gone.map(([n, sel]) => h.querySelector(sel) ? n + ' SHOWN' : n).join(', '); }));
@@ -70,7 +71,16 @@ const { chromium } = require('playwright'), http = require('http');
   await P.fill('#pk-you', 'Ann'); await P.click('[data-act="pk-join"]'); await w(2500);
   const link = await P.evaluate(() => document.querySelector('#pk-link')?.value || '');
   log('event private link: ' + (/^http:\/\/127\.0\.0\.1:\d+\/worlds2026#tkpo1655\.pk-[A-Z0-9]{8}-[A-Z0-9]{16}$/.test(link) ? '/worlds2026#…' : link));
-  log('390 px: ' + (await P.evaluate(() => document.documentElement.scrollWidth > innerWidth) ? 'sideways scroll' : 'no sideways scroll'));
+  log('390 px, 5 tabs: ' + (await P.evaluate(() => document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('#tabs [data-evtab]')].some(b => b.getBoundingClientRect().right > innerWidth + 0.5)) ? 'sideways scroll' : 'no sideways scroll'));
+  // the Picks tab leaves the board to its own tab, with a link to it
+  await P.evaluate(() => { document.querySelector('#pk-link')?.blur(); }); await w(300);
+  log('picks tab has no board: ' + await P.evaluate(() => !document.querySelector('main .pk-board')) + ' | See the leaderboard -> board tab: ' + await P.evaluate(async () => {
+    const a = document.querySelector('.ev-to-board a'); if (!a || a.textContent.trim() !== 'See the leaderboard') return false; a.click(); await new Promise(r => setTimeout(r, 800));
+    return document.querySelector('#tabs [aria-current="true"]')?.dataset.evtab === 'board' && !!document.querySelector('main .ev-board .pk-board') && location.hash === '#leaderboard'; }));
+  log('leaderboard tab: table with Place Name Right Diff: ' + await P.evaluate(() => [...document.querySelectorAll('main .ev-board .pk-table th')].map(th => th.textContent).join(' ') === 'Place Name Right Diff')
+    + ' | you ' + await P.evaluate(() => /Ann\s*\(you\)/.test(document.querySelector('main .ev-board .pk-table')?.textContent || '')));
+  log('visitor on board tab, Delete player: ' + await P.evaluate(async () => { document.querySelector('main .ev-board [data-act="pk-who"]')?.click(); await new Promise(r => setTimeout(r, 400)); return document.querySelector('main').textContent.includes('Delete player'); }));
+  await P.screenshot({ path: OUT + '/web-event-page-390-board.png', fullPage: true });
   await P.click('[data-evtab="triples"]'); await w(1500); await P.screenshot({ path: OUT + '/web-event-page-390-triples.png', fullPage: true });
   await P.click('[data-evtab="nations"]'); await w(1500); await P.screenshot({ path: OUT + '/web-event-page-390-nations.png', fullPage: true });
   await P.click('[data-evtab="shoot"]'); await w(1500);
@@ -78,6 +88,29 @@ const { chromium } = require('playwright'), http = require('http');
   await P.screenshot({ path: OUT + '/web-event-page-390-shoot.png', fullPage: true });
   const D = await mk('second phone', 390); await D.goto(link); await w(6000);
   log('private link opens: ' + await D.evaluate(() => document.querySelector('#tabs [aria-current="true"] .t-long')?.textContent + ' | ' + document.querySelector('.pk-me span')?.textContent + ' | address ' + location.pathname + location.hash));
+  log('private link still opens Picks as the player: ' + await D.evaluate(() => document.querySelector('#tabs [aria-current="true"]')?.dataset.evtab === 'pick' && /Ann/.test(document.querySelector('.pk-me span')?.textContent || '')));
+  // a link straight to a tab; tapping a tab names it in the address
+  const V = await mk('visitor link', 390); await V.goto(base + 'worlds2026/#leaderboard'); await w(5000);
+  log('#leaderboard opens board: ' + await V.evaluate(() => document.querySelector('#tabs [aria-current="true"]')?.dataset.evtab === 'board' && !!document.querySelector('main .ev-board') && location.hash === '#leaderboard'));
+  const hl = await V.evaluate(() => history.length); await V.click('[data-evtab="triples"]'); await w(1200);
+  log('tap Triples -> hash #triples: ' + await V.evaluate(n => location.hash === '#triples' && history.length === n, hl)); // replaced, no new history entry
+  // fresh loads (a new page each, as when a link is opened)
+  const fresh = async h => { const x = await mk('link ' + h, 390); await x.goto(base + 'worlds2026/' + h); await w(4500); return x.evaluate(() => document.querySelector('#tabs [aria-current="true"]')?.dataset.evtab); };
+  log('#nations opens: ' + await fresh('#nations') + ' | unknown hash: ' + await fresh('#nope'));
+  // the main site's Pick the Winner tab keeps its leaderboard
+  const M = await mk('main site', 390); await M.goto(base + '#tkpo1655'); await w(5000); await M.click('[data-tab="pick"]'); await w(1500);
+  log('main site pick tab still has the board: ' + await M.evaluate(() => !!document.querySelector('main .pk-board') && !document.querySelector('.ev-to-board')));
+  // the admin on the Leaderboard tab keeps the admin-only controls (Hide / Delete player); a visitor gets none
+  const AD = await mk('admin', 390); await AD.goto(base + '#admin'); await w(3000);
+  await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
+  await AD.goto(base + 'worlds2026/#leaderboard'); await w(5000);
+  const adminDel = await AD.evaluate(async () => { document.querySelector('main .ev-board [data-act="pk-who"]')?.click(); await new Promise(r => setTimeout(r, 600)); return [...document.querySelectorAll('main button')].some(x => x.textContent.trim() === 'Delete player'); });
+  log('admin on board tab: Delete player shown: ' + adminDel + ' | visitor: ' + await P.evaluate(() => [...document.querySelectorAll('main button')].some(x => x.textContent.trim() === 'Delete player')));
+  // 360 px in French: five tabs still fit
+  const F = await mk('french 360', 360); await F.goto(base + 'worlds2026/#leaderboard'); await w(4000);
+  await F.click('[data-act="lang-menu"]'); await w(300); await F.click('[data-lang="fr"]'); await w(1500);
+  log('360 px fr tabs: ' + (await F.$$eval('#tabs [data-evtab] .t-short', els => els.map(e => e.textContent))).join(' | ') + ' | ' + (await F.evaluate(() => document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('#tabs [data-evtab]')].some(b => b.getBoundingClientRect().right > innerWidth + 0.5)) ? 'sideways scroll' : 'no sideways scroll'));
+  await F.screenshot({ path: OUT + '/web-event-page-360-fr-board.png' });
 
   // preview tags in the HTML at that address; unknown addresses stay 404; the main page is the normal app
   const html = (await get(base + 'worlds2026/')).body, og = n => (new RegExp(`<meta property="og:${n}" content="([^"]*)"`).exec(html) || [])[1];
