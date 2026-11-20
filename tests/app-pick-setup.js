@@ -104,6 +104,20 @@ const { chromium } = require('playwright');
   let tp = await tapTest(`async () => { const S = window.__carreau.S; S.pickGame.st.me = null; document.querySelector('[data-tab="pick"]').click(); }`, '#pk-you', '[data-act="pk-join"]', 'Bea',
     `() => window.__carreau.S.pickGame.st.me?.name === 'Bea' && !!document.querySelector('.pk-me')`);
   console.log('join tap with pending render: ' + (tp.pending && tp.kept && tp.ok ? 'joined first tap' : JSON.stringify(tp)));
+  // a slow join: the button says Joining… and is disabled, and more taps (or Enter) don't start another (pick-game-join-once)
+  console.log((await p.evaluate(async () => {
+    const S = window.__carreau.S, G = S.pickGame, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), r = [];
+    const realJoin = G.join; let made = 0; G.join = async function (t, name) { made++; await w(300); return realJoin.call(this, t, name); };
+    G.st.me = null; q('[data-tab="pick"]').click(); await w(60);
+    q('#pk-you').value = 'Teat';
+    for (let i = 0; i < 4; i++) { (q('[data-act="pk-join"]') || {}).click?.(); await w(10); }
+    q('#pk-join-form')?.requestSubmit(); await w(10);
+    const btn = q('[data-act="pk-join"]');
+    r.push('join button while joining: ' + (btn?.textContent.trim() || 'none') + (btn?.disabled ? ' (disabled)' : ' (enabled)'));
+    await w(400);
+    r.push(`join tapped 4 times fast: ${made} player${made === 1 ? '' : 's'}` + (q('.pk-me') ? '' : ' (not joined)'));
+    G.join = realJoin; return r;
+  })).join('\n'));
   await p.evaluate(() => { document.querySelector('[data-tab="setup"]').click(); }); await p.waitForTimeout(150);
   await p.evaluate(() => document.querySelector('#pick-setup').scrollIntoView());
   console.log('setup sideways scroll 390: ' + await p.evaluate(() => document.documentElement.scrollWidth > innerWidth));

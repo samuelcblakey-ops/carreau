@@ -593,14 +593,26 @@ function pickWatch(t) {
 const pickLink = t => PICK.me ? `${base()}#${t.id}.pk-${PICK.me.pid}-${PICK.me.key}` : "";
 S.pickGame = {
   state(t) { pickWatch(t); const on = PICK.tid === t.id; return { ready: on && PICK.ready, me: on && PICK.me ? { pid: PICK.me.pid, name: PICK.me.name } : null, picks: on ? PICK.picks : {}, link: on ? pickLink(t) : "" }; },
-  // a new player: the name, the private key and this device's proof of it, in one batch (the rules check each against the others)
-  async join(t, name) {
-    const pid = newCode(), key = newCode() + newCode(), b = writeBatch(FB.db), now = serverTimestamp();
-    b.set(doc(FB.db, "tournaments", t.id, "pickers", pid), { name, at: now });
-    b.set(doc(FB.db, "tournaments", t.id, "pickkeys", pid), { key });
-    b.set(doc(FB.db, "tournaments", t.id, "pickdev", AUTH.user.uid), { pid, key, at: now });
-    await b.commit();
-    pickWatch(t); if (PICK.me?.pid !== pid) pickPlayer(t.id, pid, key); PICK.me.name = name; PICK.ready = true;
+  // a new player: the name, the private key and this device's proof of it, in one batch (the rules check each against the others).
+  // One player per device (pick-game-join-once): a join already under way, or a player this device already has, is returned
+  // instead of making another (repeated taps on a slow phone made four players at once)
+  join(t, name) {
+    if (PICK.tid === t.id && PICK.me) return Promise.resolve({ pid: PICK.me.pid, name: PICK.me.name });
+    if (PICK.joining?.tid === t.id && PICK.joining.uid === AUTH.user.uid) return PICK.joining.p;
+    const p = (async () => {
+      const dev = await getDocFromServer(doc(FB.db, "tournaments", t.id, "pickdev", AUTH.user.uid)).catch(() => null);
+      if (dev?.exists() && dev.data().pid) { const v = dev.data(); pickWatch(t); if (PICK.me?.pid !== v.pid) pickPlayer(t.id, v.pid, v.key); PICK.ready = true; return { pid: v.pid, name: PICK.me?.name || "" }; }
+      const pid = newCode(), key = newCode() + newCode(), b = writeBatch(FB.db), now = serverTimestamp();
+      b.set(doc(FB.db, "tournaments", t.id, "pickers", pid), { name, at: now });
+      b.set(doc(FB.db, "tournaments", t.id, "pickkeys", pid), { key });
+      b.set(doc(FB.db, "tournaments", t.id, "pickdev", AUTH.user.uid), { pid, key, at: now });
+      await b.commit();
+      pickWatch(t); if (PICK.me?.pid !== pid) pickPlayer(t.id, pid, key); PICK.me.name = name; PICK.ready = true;
+      return { pid, name };
+    })();
+    PICK.joining = { tid: t.id, uid: AUTH.user.uid, p };
+    p.finally(() => { if (PICK.joining?.p === p) PICK.joining = null; }).catch(() => {});
+    return p;
   },
   // the leaderboard (pick-game-leaderboard): the players, read once and again at most every 2 minutes while the page is
   // drawn, and each closed round's picks read once (they can't change after the close). Picks are public as soon as they're
