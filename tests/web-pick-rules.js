@@ -29,6 +29,16 @@ const { chromium } = require('playwright');
   const pid = /\.pk-([A-Z0-9]+)-/.exec(link)?.[1] || '';
   log('joined: ' + await P.evaluate(() => document.querySelector('.pk-me span')?.textContent) + ' | link ' + /#\w+\.pk-[A-Z0-9]{8}-[A-Z0-9]{16}$/.test(link));
   await P.screenshot({ path: process.env.OUT + '/web-pick-joined-390.png', fullPage: true });
+  // one player per device (pick-game-join-once): joining again gives back the same player, here and after a reload
+  const again = await P.evaluate(async () => { const C = window.__carreau; return (await C.S.pickGame.join(C.T(), 'Ann again')).pid; });
+  await P.reload(); await w(5000);
+  const again2 = await P.evaluate(async () => { const C = window.__carreau; return (await C.S.pickGame.join(C.T(), 'Ann again')).pid; });
+  log('device with a player joins again: ' + (again === pid && again2 === pid ? 'same player' : `new player ${again} ${again2} (was ${pid})`));
+  // four joins at once on a new phone (a slow join tapped repeatedly) make one player
+  const R = await mk('player4', 390); await R.goto(base + '#' + tid); await w(5000);
+  const four = await R.evaluate(async () => { const C = window.__carreau, t = C.T(); return [...new Set((await Promise.all([1, 2, 3, 4].map(() => C.S.pickGame.join(t, 'Teat')))).map(x => x.pid))]; });
+  log('join 4 times at once on one phone: ' + four.length + ' player' + (four.length === 1 ? '' : 's'));
+  await R.close();
   await P.selectOption('#pk-sel-p1', 'e0'); await P.click('[data-act="pk-save"][data-r="p1"]'); await w(2000);
   log('own pick before close: ' + (await P.evaluate(() => document.querySelector('.pk-card[data-round="p1"] .pk-mine')?.textContent || '')).replace('Your pick: Italy (ITA)', 'allowed'));
   log('own pick (raw) before close: ' + await raw(P, 'batch', await P.evaluate(pickOp, [pid, 'p3', 'e1'])));
