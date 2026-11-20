@@ -110,6 +110,10 @@ const { chromium } = require('playwright');
   const after = await fd();
   log('web open listing: How to enter', before.how === 'How to enter', '| Follow the draw', before.follow, 'before draw | view', before.view, '| Follow the draw', after.follow, 'after draw');
   if (process.env.OUT) await V.screenshot({ path: process.env.OUT + '/calendar-web-listing-390.png' });
+  // Add to calendar on the website: the file is saved as text/calendar (not text/csv), so iPhone Safari offers "Add to Calendar"
+  await V.evaluate(() => { const o = URL.createObjectURL; window.__blobTypes = []; URL.createObjectURL = b => { window.__blobTypes.push(b?.type); return o.call(URL, b); }; });
+  const [icsDl] = await Promise.all([V.waitForEvent('download', { timeout: 15000 }).catch(() => null), V.click(`#cal-${tid5} [data-act="cal-ics"]`)]); await w(500);
+  log('web ics: file ' + (icsDl ? icsDl.suggestedFilename().replace(/^.*\./, '*.') : 'none') + ' | type', (await V.evaluate(() => window.__blobTypes.pop())) || 'none');
   await V.goto(process.env.WEB_URL + '#calendar.' + tid5); await V.reload(); await w(4000);
   log('web deep link: opens', await V.evaluate(t => !!document.querySelector('#cal-' + t + '.cal-card.hof-focus'), tid5), '| strip for visitor', await V.evaluate(() => !!document.querySelector('.cal-admin')));
   // a stranger can't hide it; the admin hides it from the page, and it drops off at once

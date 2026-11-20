@@ -1189,7 +1189,8 @@ async function handleHash() {
 }
 window.addEventListener("hashchange", handleHash);
 
-S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
+// the file's type follows its name: a calendar file (.ics) as text/calendar, so iPhone Safari offers "Add to Calendar"; CSVs as before
+S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: /\.ics$/i.test(filename) ? "text/calendar;charset=utf-8" : "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
 
 // ---------- install to home screen ----------
 const INSTALL = { prompt: null, help: false };
