@@ -101,13 +101,19 @@ function fbStore() {
       const refs = (await getDocs(collection(db, "tournaments", tid, "matches"))).docs.map(d => d.ref);
       for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await b.commit(); }
       // the extras may be refused by their own rules (e.g. live scores while streaming is off): best effort, side by side
-      const extra = [doc(db, "tournaments", tid, "brand", "logo"), doc(db, "tournaments", tid, "private", "codes"), doc(db, "tournaments", tid, "private", "livecode")];
+      const extra = [doc(db, "tournaments", tid, "brand", "logo"), doc(db, "tournaments", tid, "private", "codes"), doc(db, "tournaments", tid, "private", "livecode"),
+        doc(db, "tournaments", tid, "private", "payments")];
       try { (await getDocs(collection(db, "tournaments", tid, "live"))).docs.forEach(d => extra.push(d.ref)); } catch {}
       await Promise.allSettled(extra.map(r => deleteDoc(r)));
       try { await updateDoc(doc(db, "hallOfFame", tid), { gone: true }); } catch {} // a Hall of Fame entry stays, without its link
       try { await updateDoc(doc(db, "calendar", tid), { gone: true }); } catch {} // and a Season Calendar listing
       await deleteDoc(doc(db, "tournaments", tid)); // last, so a failure part-way never leaves games without their competition
     },
+    // payments (payments-registration): tournaments/{tid}/private/payments, { paid: { <team or player id>: { at, by } } }, for the
+    // competition's organisers only (firestore.rules). A merge of the one field, so two organisers ticking different teams both keep theirs.
+    uid() { return AUTH.user?.uid || ""; },
+    watchPayments(tid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "private", "payments"), d => cb(d.exists() ? (d.data().paid || {}) : {}), onErr); },
+    setPayment(tid, id, rec) { return track(setDoc(doc(db, "tournaments", tid, "private", "payments"), { paid: { [id]: rec ? clone(rec) : deleteField() } }, { merge: true })); },
     watchLive(tid, mid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "live", mid), d => cb(d.exists() ? d.data() : null), onErr); },
     // club logo: its own small document so the competition document stays light
     watchBrand(tid, cb, onErr) { return onSnapshot(doc(db, "tournaments", tid, "brand", "logo"), d => cb(d.exists() ? d.data() : null), onErr); },

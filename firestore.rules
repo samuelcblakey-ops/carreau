@@ -119,8 +119,10 @@ service cloud.firestore {
       allow delete: if isAdmin();
 
       match /private/{docId} {
-        allow read: if (docId == 'codes' || docId == 'teamcodes' || docId == 'livecode') && canEdit(tid);
-        allow write: if (docId == 'codes' && (owns(tid) || isAdmin())) || ((docId == 'teamcodes' || docId == 'livecode') && canEdit(tid));
+        allow read: if (docId == 'codes' || docId == 'teamcodes' || docId == 'livecode' || docId == 'payments') && canEdit(tid);
+        allow write: if (docId == 'codes' && (owns(tid) || isAdmin())) || ((docId == 'teamcodes' || docId == 'livecode') && canEdit(tid))
+                     || (docId == 'payments' && canEdit(tid) && (request.resource == null
+                         || (request.resource.data.keys().hasOnly(['paid']) && request.resource.data.paid is map)));
       }
 
       match /members/{uid} {
