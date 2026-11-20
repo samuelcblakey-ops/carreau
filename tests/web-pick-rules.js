@@ -67,6 +67,15 @@ const { chromium } = require('playwright');
   await setTid(A);
   log("organiser writes a player's pick: " + await raw(A, 'batch', await A.evaluate(pickOp, [pid, 'p1', 'e3'])));
   log('organiser reads private key: ' + await raw(A, 'get', `tournaments/${tid}/pickkeys/${pid}`));
+  // pick-game-leaderboard: the organiser hides an unsuitable name; nobody else can, and nobody can rename a player
+  log('organiser hides player: ' + await raw(A, 'update', `tournaments/${tid}/pickers/${pid}`, { hidden: true }));
+  log('player hides another: ' + await raw(Q, 'update', `tournaments/${tid}/pickers/${pid}`, { hidden: false }));
+  log('organiser renames player: ' + await raw(A, 'update', `tournaments/${tid}/pickers/${pid}`, { name: 'Rude' }));
+  log('organiser hides with a non-bool: ' + await raw(A, 'update', `tournaments/${tid}/pickers/${pid}`, { hidden: 'yes' }));
+  log('player renames self: ' + await raw(P, 'update', `tournaments/${tid}/pickers/${pid}`, { name: 'Ann 2' }));
+  { const V3 = await mk('leaderboard viewer', 390); await V3.goto(base + '#' + tid); await w(4000); await V3.click('[data-tab="pick"]'); await w(3000);
+    log('leaderboard for a spectator: ' + await V3.evaluate(() => [...document.querySelectorAll('.pk-table tbody tr')].map(r => r.textContent.replace(/\s+/g, ' ').trim()).join(' / ') + ' | ' + (document.querySelector('.pk-board > p')?.textContent || '')));
+    await V3.screenshot({ path: process.env.OUT + '/web-pick-board-390.png', fullPage: true }); }
   log('stranger turns the game off: ' + await raw(E, 'update', `tournaments/${tid}`, { pick: { on: false, rounds: [] } }));
   await AD.click('[data-act="open-testing"]'); await w(1500); // back to the beta default
   log('errs', errs); await b.close();

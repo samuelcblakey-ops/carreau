@@ -159,7 +159,10 @@ label.f,.fields>*{min-width:0}
 .pick-page .btn,#pick-setup .btn{min-height:44px}
 input[type=time]{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--ink);min-height:40px}
 .pk-zone{white-space:nowrap}.pk-x{min-width:44px;min-height:44px;font-size:20px;line-height:1}
-.pick-page select,.pick-page input[type=text],#pick-setup input,#pick-setup select{min-height:44px}.pill.pk-open{background:var(--accent);color:var(--accent-ink)}
+.pick-page select,.pick-page input[type=text],#pick-setup input,#pick-setup select{min-height:44px}.pk-table{width:100%}.pk-table td,.pk-table th{text-align:left}.pk-table td:nth-child(n+3),.pk-table th:nth-child(n+3){text-align:right;white-space:nowrap}
+.pk-who{background:none;border:0;padding:6px 0;min-height:44px;color:var(--ink);font:inherit;font-weight:600;text-align:left;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
+.pk-you td{background:color-mix(in srgb,var(--accent) 14%,transparent)}.pk-hidden td{opacity:.55}.pk-det td{background:var(--surface-2)}.pk-ok{color:var(--accent)}.pk-no{color:#b3261e}
+.pill.pk-open{background:var(--accent);color:var(--accent-ink)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
 .pill.wrap{white-space:normal;overflow-wrap:anywhere;max-width:100%;border-radius:10px;line-height:1.3;padding-block:3px}
 .pill.playing{background:var(--jack-soft);color:var(--jack-ink)}
@@ -1641,6 +1644,13 @@ Object.assign(LANG_TEXT.de, {"{n} of {x} paid": "{1} von {2} bezahlt", "Withdrew
 Object.assign(LANG_TEXT.nl, {"{n} of {x} paid": "{1} van {2} betaald", "Withdrew after paying": "Teruggetrokken na betaling", "Clear": "Wissen", "Payment received": "Betaling ontvangen", "Yes": "Ja"});
 Object.assign(LANG_TEXT.pt, {"{n} of {x} paid": "{1} de {2} pagos", "Withdrew after paying": "Desistiram depois de pagar", "Clear": "Limpar", "Payment received": "Pagamento recebido", "Yes": "Sim"});
 Object.assign(LANG_TEXT.th, {"{n} of {x} paid": "จ่ายแล้ว {1} จาก {2}", "Withdrew after paying": "ถอนตัวหลังจ่ายเงินแล้ว", "Clear": "ล้าง", "Payment received": "ได้รับเงินแล้ว", "Yes": "ใช่"});
+Object.assign(FR_TEXT, {"Leaderboard": "Classement", "After {x}": "Après {1}", "Place": "Place", "Right": "Bons", "Diff": "Diff.", "(you)": "(vous)", "✓ Right ({x})": "✓ Bon ({1})", "✗ Wrong ({x})": "✗ Raté ({1})", "Waiting for the result": "En attente du résultat", "Hide from the leaderboard": "Masquer du classement", "Show on the leaderboard": "Afficher au classement", "No one has joined yet.": "Personne n'a encore rejoint le jeu.", "The leaderboard starts when the first round's picks close.": "Le classement commence à la fin des pronostics du premier tour."}); // Pick the Winner leaderboard (pick-game-leaderboard)
+Object.assign(LANG_TEXT.es, {"Leaderboard": "Clasificación", "After {x}": "Tras {1}", "Place": "Puesto", "Right": "Aciertos", "Diff": "Dif.", "(you)": "(tú)", "✓ Right ({x})": "✓ Acierto ({1})", "✗ Wrong ({x})": "✗ Fallo ({1})", "Waiting for the result": "Esperando el resultado", "Hide from the leaderboard": "Ocultar de la clasificación", "Show on the leaderboard": "Mostrar en la clasificación", "No one has joined yet.": "Nadie se ha unido todavía.", "The leaderboard starts when the first round's picks close.": "La clasificación empieza cuando se cierran los pronósticos de la primera ronda."}); // Pick the Winner leaderboard (pick-game-leaderboard)
+Object.assign(LANG_TEXT.it, {"Leaderboard": "Classifica", "After {x}": "Dopo {1}", "Place": "Posto", "Right": "Giusti", "Diff": "Diff.", "(you)": "(tu)", "✓ Right ({x})": "✓ Giusto ({1})", "✗ Wrong ({x})": "✗ Sbagliato ({1})", "Waiting for the result": "In attesa del risultato", "Hide from the leaderboard": "Nascondi dalla classifica", "Show on the leaderboard": "Mostra in classifica", "No one has joined yet.": "Ancora nessuno partecipa.", "The leaderboard starts when the first round's picks close.": "La classifica parte quando si chiudono i pronostici del primo turno."}); // Pick the Winner leaderboard (pick-game-leaderboard)
+Object.assign(LANG_TEXT.de, {"Leaderboard": "Rangliste", "After {x}": "Nach {1}", "Place": "Platz", "Right": "Richtig", "Diff": "Diff.", "(you)": "(du)", "✓ Right ({x})": "✓ Richtig ({1})", "✗ Wrong ({x})": "✗ Falsch ({1})", "Waiting for the result": "Warten auf das Ergebnis", "Hide from the leaderboard": "Aus der Rangliste ausblenden", "Show on the leaderboard": "In der Rangliste zeigen", "No one has joined yet.": "Noch spielt niemand mit.", "The leaderboard starts when the first round's picks close.": "Die Rangliste beginnt mit dem Tippschluss der ersten Runde."}); // Pick the Winner leaderboard (pick-game-leaderboard)
+Object.assign(LANG_TEXT.nl, {"Leaderboard": "Klassement", "After {x}": "Na {1}", "Place": "Plaats", "Right": "Goed", "Diff": "Saldo", "(you)": "(jij)", "✓ Right ({x})": "✓ Goed ({1})", "✗ Wrong ({x})": "✗ Fout ({1})", "Waiting for the result": "Wachten op de uitslag", "Hide from the leaderboard": "Verbergen in het klassement", "Show on the leaderboard": "Tonen in het klassement", "No one has joined yet.": "Nog niemand doet mee.", "The leaderboard starts when the first round's picks close.": "Het klassement begint als de keuzes voor de eerste ronde sluiten."}); // Pick the Winner leaderboard (pick-game-leaderboard)
+Object.assign(LANG_TEXT.pt, {"Leaderboard": "Classificação", "After {x}": "Após {1}", "Place": "Lugar", "Right": "Certos", "Diff": "Dif.", "(you)": "(você)", "✓ Right ({x})": "✓ Certo ({1})", "✗ Wrong ({x})": "✗ Errado ({1})", "Waiting for the result": "À espera do resultado", "Hide from the leaderboard": "Ocultar da classificação", "Show on the leaderboard": "Mostrar na classificação", "No one has joined yet.": "Ainda ninguém entrou.", "The leaderboard starts when the first round's picks close.": "A classificação começa quando fecham os palpites da primeira ronda."}); // Pick the Winner leaderboard (pick-game-leaderboard)
+Object.assign(LANG_TEXT.th, {"Leaderboard": "ตารางคะแนน", "After {x}": "หลัง{1}", "Place": "อันดับ", "Right": "ถูก", "Diff": "ต่าง", "(you)": "(คุณ)", "✓ Right ({x})": "✓ ถูก ({1})", "✗ Wrong ({x})": "✗ ผิด ({1})", "Waiting for the result": "รอผลการแข่งขัน", "Hide from the leaderboard": "ซ่อนจากตารางคะแนน", "Show on the leaderboard": "แสดงในตารางคะแนน", "No one has joined yet.": "ยังไม่มีใครเข้าร่วม", "The leaderboard starts when the first round's picks close.": "ตารางคะแนนจะเริ่มเมื่อปิดรับการทายรอบแรก"}); // Pick the Winner leaderboard (pick-game-leaderboard)
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -6731,22 +6741,105 @@ async function pickSaveRounds(t) {
   S.pickDraft = null; await guard(() => saveT(nt)); toast("Rounds saved.");
 }
 // the Pick the Winner tab
+// Pick the Winner leaderboard (pick-game-leaderboard): nothing is saved for scores, they come from the games and the picks.
+// One pick: its team's game in the round. right / wrong (diff = the team's score minus its opponent's, so a wrong pick takes
+// points off; a game ended on time counts by its final score), wait (no result yet), none (no game: a bye, knocked out,
+// sitting out), repeat (the team was picked in an earlier closed round: only the earliest counts)
+function pickResult(src, team, ms) {
+  const g = pickGames(src, ms);
+  const m = g.find(x => !x.bye && x.a && x.b && (x.a.includes(team) || x.b.includes(team)));
+  if (!m) return { st: g.length && g.every(x => x.bye || (x.a && x.b)) ? "none" : "wait", diff: 0 };
+  if (!m.done) return { st: "wait", diff: 0 };
+  const onA = m.a.includes(team), mine = (onA ? m.sa : m.sb) || 0, opp = (onA ? m.sb : m.sa) || 0;
+  return { st: (onA ? aWon(m) : !aWon(m)) ? "right" : "wrong", diff: mine - opp, score: `${mine}–${opp}` };
+}
+// pickers: { pid: { name, hidden } }; picks: [{ pid, round, team }]. Only closed rounds count, earliest close first.
+// Rows ranked by right picks, then points difference; players level on both share the place ("=3").
+function pickScores(t, ms, pickers, picks, now = Date.now()) {
+  const close = t.pickClose || {};
+  const rounds = (t.pick?.rounds || []).map((r, i) => ({ r, i, at: close[r.id] || Infinity })).filter(x => now >= x.at)
+    .sort((a, b) => a.at - b.at || a.i - b.i).map(x => x.r);
+  const by = {}; (picks || []).forEach(p => { if (p && p.pid && p.round) (by[p.pid] ||= {})[p.round] = p.team; });
+  const rows = Object.entries(pickers || {}).map(([pid, pk]) => {
+    const used = new Set(), list = []; let right = 0, diff = 0;
+    rounds.forEach(r => {
+      const team = by[pid]?.[r.id]; if (!team) { list.push({ round: r, team: null, st: "nopick", diff: 0 }); return; }
+      if (used.has(team)) { list.push({ round: r, team, st: "repeat", diff: 0 }); return; }
+      used.add(team); const res = pickResult(r.src, team, ms); if (res.st === "right") right++; diff += res.diff; list.push({ round: r, team, ...res });
+    });
+    return { pid, name: pk?.name || "", hidden: !!pk?.hidden, right, diff, list };
+  });
+  rows.sort((a, b) => b.right - a.right || b.diff - a.diff || a.name.localeCompare(b.name));
+  rows.forEach((x, i) => { const first = rows.findIndex(y => y.right === x.right && y.diff === x.diff);
+    const level = rows.filter(y => y.right === x.right && y.diff === x.diff).length > 1; x.place = (level ? "=" : "") + (first + 1); x.i = i; });
+  return rows;
+}
+const pickSigned = n => n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0";
+// the latest closed round with any finished game, for "After {x}"
+function pickAfter(t, ms, now = Date.now()) {
+  const close = t.pickClose || {};
+  return (t.pick?.rounds || []).filter(r => now >= (close[r.id] || Infinity) && pickGames(r.src, ms).some(m => m.done && !m.bye))
+    .sort((a, b) => (close[b.id] || 0) - (close[a.id] || 0))[0] || null;
+}
+// a result line for a scored pick: ✓ Right (13–7), ✗ Wrong (5–13), Waiting for the result
+const pickResLine = x => x.st === "right" ? trAround("✓ Right ({x})", `<span data-notr>${x.score}</span>`)
+  : x.st === "wrong" ? trAround("✗ Wrong ({x})", `<span data-notr>${x.score}</span>`) : x.st === "wait" ? esc(tr("Waiting for the result")) : "";
+// the scores for this page: the players and closed rounds' picks from the board, plus this device's own picks
+function pickBoardData(t, st) {
+  const B = S.pickGame.board ? S.pickGame.board(t) : { pickers: null, picks: [] };
+  const pickers = B.pickers ? { ...B.pickers } : null, picks = [...(B.picks || [])];
+  if (st.me) { if (pickers && !pickers[st.me.pid]) pickers[st.me.pid] = { name: st.me.name };
+    const have = new Set(picks.filter(p => p.pid === st.me.pid).map(p => p.round));
+    Object.entries(st.picks || {}).forEach(([round, team]) => { if (!have.has(round)) picks.push({ pid: st.me.pid, round, team }); }); }
+  return { pickers, picks, loaded: !!B.pickers };
+}
+function pickBoard(t, st, data) {
+  const ms = MS(), U = pickUi(), now = Date.now(), close = t.pickClose || {}, org = canEdit();
+  const anyClosed = (t.pick?.rounds || []).some(r => now >= (close[r.id] || Infinity));
+  const after = pickAfter(t, ms, now);
+  const head = `<div><h3>Leaderboard</h3>${after ? `<p class="small muted">${trAround("After {x}", esc(tr(after.name)))}</p>` : ""}</div>`;
+  let body;
+  if (!data.loaded) body = `<p class="muted small">Loading…</p>`;
+  else if (!Object.keys(data.pickers).length) body = `<p class="muted">No one has joined yet.</p>`;
+  else if (!anyClosed) body = `<p class="muted">The leaderboard starts when the first round's picks close.</p>`;
+  else {
+    const me = st.me?.pid;
+    // hidden players: only the organiser (to show them again) and the player see them
+    const shown = Object.fromEntries(Object.entries(data.pickers).filter(([pid, p]) => !p.hidden || org || pid === me));
+    const rows = pickScores(t, ms, shown, data.picks, now);
+    body = `<div class="tw"><table class="pk-table"><thead><tr><th>Place</th><th>Name</th><th>Right</th><th>Diff</th></tr></thead><tbody>${rows.map(x => {
+      const open = U.who === x.pid;
+      const det = open ? `<tr class="pk-det"><td colspan="4"><div class="stack" style="gap:6px">${x.list.filter(p => p.team).map(p => `<div class="pk-line"><span>${esc(tr(p.round.name))}</span> · <span data-notr>${esc(entName(t, p.team))}</span>${p.st === "right" ? ` <b class="pk-ok" data-notr>✓ ${p.score}</b>` : p.st === "wrong" ? ` <b class="pk-no" data-notr>✗ ${p.score}</b>` : p.st === "wait" ? ` <span class="muted">${esc(tr("Waiting for the result"))}</span>` : ""}</div>`).join("") || `<span class="muted">No pick</span>`}
+        ${org ? `<div><button type="button" class="btn sm" data-act="pk-hide" data-pid="${esc(x.pid)}" data-hide="${x.hidden ? "" : "1"}">${x.hidden ? "Show on the leaderboard" : "Hide from the leaderboard"}</button></div>` : ""}</div></td></tr>` : "";
+      return `<tr class="${x.pid === me ? "pk-you" : ""}${x.hidden ? " pk-hidden" : ""}" data-pid="${esc(x.pid)}"><td>${x.place}</td><td class="wrap"><button type="button" class="pk-who" data-act="pk-who" data-pid="${esc(x.pid)}" aria-expanded="${open}"><span data-notr>${esc(x.name)}</span>${x.pid === me ? ` <span class="muted">(you)</span>` : ""}</button></td><td>${x.right}</td><td>${pickSigned(x.diff)}</td></tr>${det}`;
+    }).join("")}</tbody></table></div>`;
+  }
+  return `<section class="panel stack pk-board" style="gap:10px">${head}${body}</section>`;
+}
+// a round closing while the page is open: draw it again then (the leaderboard starts, the card closes)
+function pickTimer(t) {
+  const now = Date.now(), next = Object.values(t.pickClose || {}).filter(v => v > now).sort((a, b) => a - b)[0];
+  if (S.pickTimerAt === next) return; clearTimeout(S.pickTimerId); S.pickTimerAt = next;
+  if (next && next - now < 864e5) S.pickTimerId = setTimeout(() => { S.pickTimerAt = null; if (S.tab === "pick") render(); }, next - now + 1500);
+}
 function renderPickPage(t) {
   if (!pickOn(t)) return renderDrawPage(t);
-  const G = S.pickGame, st = G.state(t), U = pickUi(), rounds = t.pick.rounds || [];
+  const G = S.pickGame, st = G.state(t), U = pickUi(), rounds = t.pick.rounds || []; pickTimer(t);
+  const data = pickBoardData(t, st), board = pickBoard(t, st, data);
   const intro = `<p>Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.</p>`;
   let h = `<div class="stack pick-page" style="max-width:720px"><h2>Pick the Winner</h2>`;
-  if (!st.ready) return h + intro + `</div>`;
+  if (!st.ready) return h + intro + board + `</div>`;
   if (!st.me) {
     h += `<div class="panel stack">${intro}
       <label class="f" style="max-width:360px"><span>Your name</span><input type="text" id="pk-you" maxlength="30" autocomplete="nickname" value="${esc(U.name || "")}"></label>
       ${U.joinErr ? `<p class="err" role="alert">${esc(U.joinErr)}</p>` : ""}
       <div><button type="button" class="btn primary" data-act="pk-join">Join the game</button></div></div>`;
-    return h + `</div>`;
+    return h + board + `</div>`;
   }
   h += `<div class="panel spread pk-me"><span>${trAround("You're playing as {x}", `<b data-notr>${esc(st.me.name)}</b>`)}</span><button type="button" class="btn sm" data-act="pk-show-link" aria-expanded="${!!U.showLink}">Show my private link</button></div>`;
   if (U.showLink && st.link) h += `<div class="notice stack pk-link" style="gap:8px"><span>This is your private link. Save it to play on another phone or browser.</span>
     <div class="row" style="flex-wrap:nowrap;gap:6px"><input type="text" id="pk-link" readonly value="${esc(st.link)}" aria-label="Show my private link" class="small" style="flex:1;min-width:0" data-notr><button type="button" class="btn sm" data-act="pk-copy">Copy link</button></div></div>`;
+  const myRow = pickScores(t, MS(), { [st.me.pid]: { name: st.me.name } }, data.picks)[0];
   const nameOf = rid => tr(rounds.find(r => r.id === rid)?.name || "");
   h += rounds.map(r => {
     const close = (t.pickClose || {})[r.id] || 0, open = Date.now() < close, mine = st.picks[r.id];
@@ -6758,11 +6851,12 @@ function renderPickPage(t) {
       <div class="spread"><h3>${esc(r.name)}</h3><span class="pill ${open ? "pk-open" : ""}">${pickState(open)}</span></div>
       <p class="small muted">${trAround("Picks close {x}", `<span data-notr>${esc(pickDay(close))}</span>`)}</p>
       ${mine ? `<p class="pk-mine">${trAround("Your pick: {x}", `<b data-notr>${esc(entName(t, mine))}</b>`)}</p>` : open ? "" : `<p class="pk-mine">No pick</p>`}
+      ${!open && mine ? (x => x && pickResLine(x) ? `<p class="pk-res">${pickResLine(x)}</p>` : "")(myRow?.list.find(l => l.round.id === r.id)) : ""}
       ${open ? `<label class="f"><span>Your pick</span><select id="pk-sel-${esc(r.id)}" data-pk-sel="${esc(r.id)}" data-notr><option value="">—</option>${opts.map(o => `<option value="${esc(o.id)}" ${o.id === sel ? "selected" : ""} ${used[o.id] ? "disabled" : ""}>${esc(o.name)}${used[o.id] ? " " + trAround("(picked in {x})", esc(nameOf(used[o.id]))) : ""}</option>`).join("")}</select></label>
         <div><button type="button" class="btn primary" data-act="pk-save" data-r="${esc(r.id)}">Save pick</button></div>` : ""}
       ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ""}</section>`;
   }).join("");
-  return h + `</div>`;
+  return h + board + `</div>`;
 }
 async function pickAction(act, a, t) {
   const U = pickUi();
@@ -6773,6 +6867,8 @@ async function pickAction(act, a, t) {
     U.joinErr = ""; try { await S.pickGame.join(t, name); U.showLink = true; U.name = ""; } catch (e) { console.error(e); U.joinErr = "Couldn't join. Check your connection and try again."; }
     render(); return;
   }
+  if (act === "pk-who") { U.who = U.who === a.dataset.pid ? null : a.dataset.pid; render(); return; }
+  if (act === "pk-hide" && canEdit() && S.pickGame.hide) { try { await S.pickGame.hide(t, a.dataset.pid, !!a.dataset.hide); } catch (e) { handleWriteError(e); } render(); return; }
   if (act === "pk-show-link") { U.showLink = !U.showLink; render(); return; }
   if (act === "pk-copy") { const el = document.getElementById("pk-link"); if (!el) return; try { await navigator.clipboard.writeText(el.value); } catch { el.select(); try { document.execCommand("copy"); } catch {} } a.textContent = tr("Copied"); return; }
   if (act === "pk-save") {
@@ -8057,6 +8153,6 @@ render();
 boot();
 /* @@BOOT-END */
 // expose internals for testing in local mode only
-if (!window.claude || window.__testHook) window.__carreau = { S, tr, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns, ownSwissRound, ownBracket, ownLines, ownTeams, ownFind, saveShootTotal, drawShootQualifying, saveT, activeIds, entName, sysOf, calQueue, calEntState, calPlacesLine, csvText, calIcs, calMapsUrl };
+if (!window.claude || window.__testHook) window.__carreau = { S, tr, pickScores, trAs, koEntrants, getPlan, applyCompTheme, liveCols, contrastOf, matchContext, assignCourts, parseLiveHash, applyLiveHash, liveOf, liveCtx, newStream, liveStats, sideBoules, genSnake, render, overrideAllowed, shootRanking, shotTotal, archiveCompetition, hofResult, hofEntry, hofSig, hofDefaultCountry, hofCountryName, hofPage, startWatching, watchMatches, renderSoon, applyProposals, toast, esc, clone, startKnockouts, savePlan, getPlan, drawSwissRound, drawMeleeRound, genRoundRobin, drawPools, createBracket, consolanteEntrants, recordResult, addDraw, MS, T, pisteRuns, ownSwissRound, ownBracket, ownLines, ownTeams, ownFind, saveShootTotal, drawShootQualifying, saveT, activeIds, entName, sysOf, calQueue, calEntState, calPlacesLine, csvText, calIcs, calMapsUrl };
 })();
 </script>

@@ -167,6 +167,9 @@ service cloud.firestore {
           && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 30 && request.resource.data.at == request.time
           && !exists(pkdoc(tid, 'pickkeys', pid)) && existsAfter(pkdoc(tid, 'pickkeys', pid))
           && getAfter(pkdoc(tid, 'pickdev', request.auth.uid)).data.pid == pid;
+        // the organiser hides an unsuitable name from the leaderboard (pick-game-leaderboard), and can show it again; nothing else
+        allow update: if canEdit(tid) && notArchived(tid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hidden']) && request.resource.data.hidden is bool;
         allow delete: if isAdmin();
       }
       match /pickkeys/{pid} {
