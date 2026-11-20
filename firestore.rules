@@ -86,6 +86,11 @@ service cloud.firestore {
          || (old != null && old.status == 'pending' && old.by != me && p.sa == old.sa && p.sb == old.sb && p.by == old.by
              && p.status in ['confirmed', 'disputed'] && p.confirmedBy == me));
     }
+    // Pick the Winner (pick-game): the game is on, this device's player (proved with the private key), a pick round's close (ms)
+    function pickOn(tid) { return get(tdoc(tid)).data.get('pick', {}).get('on', false) == true; }
+    function pkdoc(tid, sub, id) { return /databases/$(database)/documents/tournaments/$(tid)/$(sub)/$(id); }
+    function myPid(tid) { return !signedIn() ? '' : (exists(pkdoc(tid, 'pickdev', request.auth.uid)) ? get(pkdoc(tid, 'pickdev', request.auth.uid)).data.pid : ''); }
+    function pickCloseAt(tid, r) { return get(tdoc(tid)).data.get('pickClose', {}).get(r, 0); }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
     // overlays for competition games are a site switch: off, admin only, or everyone (config/site.streaming);
     // standalone streams (the Stream tab) are open to everyone
@@ -148,6 +153,49 @@ service cloud.firestore {
           && request.resource.data.keys().hasOnly(['logo', 'at'])
           && request.resource.data.logo is string && request.resource.data.logo.size() < 150000
           && request.resource.data.logo.matches('data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+');
+      }
+
+      // Pick the Winner (pick-game): followers join with a name (pickers/{pid}, public) and a private key (pickkeys/{pid},
+      // never readable), written together in one batch with this device's proof of the key (pickdev/{uid}). Another device
+      // proves the same key (the private link) to play as that player. A player picks one team per pick round
+      // (picks/{pid}_{round}) until the round's close time (pickClose on the competition, ms); anyone can read a pick once
+      // its round has closed, the player any time. Organisers set the game up on the competition; they can't pick for anyone.
+      match /pickers/{pid} {
+        allow read: if notArchived(tid) || isAdmin();
+        allow create: if signedIn() && pickOn(tid) && notArchived(tid)
+          && request.resource.data.keys().hasOnly(['name', 'at']) && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 30 && request.resource.data.at == request.time
+          && !exists(pkdoc(tid, 'pickkeys', pid)) && existsAfter(pkdoc(tid, 'pickkeys', pid))
+          && getAfter(pkdoc(tid, 'pickdev', request.auth.uid)).data.pid == pid;
+        allow delete: if isAdmin();
+      }
+      match /pickkeys/{pid} {
+        allow read: if false;
+        allow create: if signedIn() && pickOn(tid) && request.resource.data.keys().hasOnly(['key'])
+          && request.resource.data.key is string && request.resource.data.key.size() >= 16 && request.resource.data.key.size() <= 40
+          && !exists(pkdoc(tid, 'pickers', pid)) && existsAfter(pkdoc(tid, 'pickers', pid));
+        allow delete: if isAdmin();
+      }
+      match /pickdev/{uid} {
+        allow get: if signedIn() && request.auth.uid == uid;
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['pid', 'key', 'at']) && request.resource.data.pid is string && request.resource.data.key is string
+          && request.resource.data.at == request.time
+          && getAfter(pkdoc(tid, 'pickkeys', request.resource.data.pid)).data.key == request.resource.data.key;
+        allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
+      }
+      match /picks/{id} {
+        allow read: if (notArchived(tid) || isAdmin())
+          && (request.time.toMillis() >= pickCloseAt(tid, resource.data.round) || resource.data.pid == myPid(tid));
+        allow create, update: if myPid(tid) != '' && pickOn(tid) && notArchived(tid)
+          && request.resource.data.keys().hasOnly(['pid', 'round', 'team', 'at'])
+          && request.resource.data.pid == myPid(tid) && request.resource.data.round is string
+          && id == request.resource.data.pid + '_' + request.resource.data.round
+          && request.resource.data.round in get(tdoc(tid)).data.get('pickClose', {})
+          && request.resource.data.team is string && request.resource.data.team.size() >= 1 && request.resource.data.team.size() <= 40
+          && request.resource.data.at == request.time
+          && request.time.toMillis() < pickCloseAt(tid, request.resource.data.round);
+        allow delete: if (myPid(tid) != '' && resource.data.pid == myPid(tid) && request.time.toMillis() < pickCloseAt(tid, resource.data.round)) || isAdmin();
       }
 
       // live streaming feed, one doc per streamed game (only while streaming is switched on for the site)

@@ -152,6 +152,14 @@ label.f,.fields>*{min-width:0}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .seg button:disabled{cursor:not-allowed;opacity:.6}
 .chk{display:flex;gap:8px;align-items:center;font-size:14px}
+/* Pick the Winner: Setup's pick rounds and the players' round cards */
+.pk-rows{display:grid;gap:12px}.pk-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end;padding-top:12px;border-top:1px solid var(--line)}
+.pk-row .pk-name,.pk-row .pk-src{flex:2 1 180px}.pk-close{flex:3 1 250px;min-width:0;display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+.pk-close>span{text-transform:uppercase;letter-spacing:.06em;font-size:11px}.pk-close .row{flex-wrap:wrap!important}.pk-close input[type=date]{flex:1 1 150px;min-width:0}.pk-close input[type=time]{flex:1 1 110px;min-width:0}
+.pick-page .btn,#pick-setup .btn{min-height:44px}
+input[type=time]{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--ink);min-height:40px}
+.pk-zone{white-space:nowrap}.pk-x{min-width:44px;min-height:44px;font-size:20px;line-height:1}
+.pick-page select,.pick-page input[type=text],#pick-setup input,#pick-setup select{min-height:44px}.pill.pk-open{background:var(--accent);color:var(--accent-ink)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
 .pill.wrap{white-space:normal;overflow-wrap:anywhere;max-width:100%;border-radius:10px;line-height:1.3;padding-block:3px}
 .pill.playing{background:var(--jack-soft);color:var(--jack-ink)}
@@ -1594,6 +1602,13 @@ Object.assign(LANG_TEXT.de, {"Example competition, view only": "Beispielturnier,
 Object.assign(LANG_TEXT.nl, {"Example competition, view only": "Voorbeeldwedstrijd, alleen bekijken"});
 Object.assign(LANG_TEXT.pt, {"Example competition, view only": "Torneio de exemplo, só leitura"});
 Object.assign(LANG_TEXT.th, {"Example competition, view only": "การแข่งขันตัวอย่าง ดูได้อย่างเดียว"});
+Object.assign(FR_TEXT, {"Pick the Winner": "Pronostics", "Picks": "Pronostics", "Run a Pick the Winner game for this competition": "Organiser un jeu de pronostics pour ce concours", "Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.": "À chaque tour, les joueurs choisissent une équipe qui gagnera sa partie. Chaque équipe ne peut être choisie qu'une fois. Le classement compte les bons pronostics, puis le goal-average.", "Games": "Parties", "Swiss round {n}": "Partie {1} (système suisse)", "Knockout: {x}": "Élimination directe : {1}", "Picks close": "Fin des pronostics", "Remove round": "Retirer le tour", "UK time": "heure du Royaume-Uni", "Add the rounds from the plan": "Ajouter les tours du programme", "Add a round": "Ajouter un tour", "Save rounds": "Enregistrer les tours", "Rounds saved.": "Tours enregistrés.", "Each round needs a name, its games and a closing time.": "Chaque tour doit avoir un nom, ses parties et une heure de clôture.", "Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.": "Choisissez une équipe gagnante à chaque tour. Chaque équipe ne peut être choisie qu'une fois : gardez les plus fortes pour plus tard. Un point par bon pronostic ; le goal-average départage les égalités.", "Join the game": "Participer au jeu", "Enter your name.": "Saisissez votre nom.", "Couldn't join. Check your connection and try again.": "Impossible de participer. Vérifiez votre connexion et réessayez.", "This is your private link. Save it to play on another phone or browser.": "Voici votre lien personnel. Gardez-le pour jouer sur un autre téléphone ou navigateur.", "Copy link": "Copier le lien", "Copied": "Copié", "Picks close {x}": "Fin des pronostics : {1}", "Your pick": "Votre pronostic", "Save pick": "Enregistrer le pronostic", "Your pick: {x}": "Votre pronostic : {1}", "No pick": "Aucun pronostic", "(picked in {x})": "(choisie : {1})", "Picks for this round have closed.": "Les pronostics de ce tour sont clos.", "Couldn't save your pick. Check your connection and try again.": "Impossible d'enregistrer votre pronostic. Vérifiez votre connexion et réessayez.", "You're playing as {x}": "Vous jouez sous le nom {1}", "Show my private link": "Afficher mon lien personnel", "Open (picks)": "Ouvert", "Closed": "Clos", "That private link didn't work. Check it and try again.": "Ce lien personnel n'a pas fonctionné. Vérifiez-le et réessayez."}); // Pick the Winner (pick-game)
+Object.assign(LANG_TEXT.es, {"Pick the Winner": "Elige al ganador", "Picks": "Pronósticos", "Run a Pick the Winner game for this competition": "Organizar un juego de Elige al ganador para esta competición", "Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.": "En cada ronda, los jugadores eligen un equipo que gane su partida. Cada equipo solo se puede elegir una vez. La clasificación ordena por aciertos y luego por diferencia de puntos.", "Games": "Partidas", "Swiss round {n}": "Ronda suiza {1}", "Knockout: {x}": "Eliminatoria: {1}", "Picks close": "Cierre de pronósticos", "Remove round": "Quitar ronda", "UK time": "hora del Reino Unido", "Add the rounds from the plan": "Añadir las rondas del plan", "Add a round": "Añadir una ronda", "Save rounds": "Guardar rondas", "Rounds saved.": "Rondas guardadas.", "Each round needs a name, its games and a closing time.": "Cada ronda necesita un nombre, sus partidas y una hora de cierre.", "Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.": "Elige un equipo ganador en cada ronda. Cada equipo solo se puede elegir una vez, así que guarda los fuertes para más adelante. Un punto por cada acierto; la diferencia de puntos desempata.", "Join the game": "Unirse al juego", "Enter your name.": "Escribe tu nombre.", "Couldn't join. Check your connection and try again.": "No se pudo unir. Comprueba la conexión e inténtalo de nuevo.", "This is your private link. Save it to play on another phone or browser.": "Este es tu enlace privado. Guárdalo para jugar en otro teléfono o navegador.", "Copy link": "Copiar enlace", "Copied": "Copiado", "Picks close {x}": "Cierre de pronósticos: {1}", "Your pick": "Tu elección", "Save pick": "Guardar elección", "Your pick: {x}": "Tu elección: {1}", "No pick": "Sin elección", "(picked in {x})": "(elegido en {1})", "Picks for this round have closed.": "Los pronósticos de esta ronda están cerrados.", "Couldn't save your pick. Check your connection and try again.": "No se pudo guardar tu elección. Comprueba la conexión e inténtalo de nuevo.", "You're playing as {x}": "Juegas como {1}", "Show my private link": "Mostrar mi enlace privado", "Open (picks)": "Abierta", "Closed": "Cerrada", "That private link didn't work. Check it and try again.": "Ese enlace privado no ha funcionado. Compruébalo e inténtalo de nuevo."}); // Pick the Winner (pick-game)
+Object.assign(LANG_TEXT.it, {"Pick the Winner": "Indovina il vincitore", "Picks": "Pronostici", "Run a Pick the Winner game for this competition": "Organizza un gioco Indovina il vincitore per questa competizione", "Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.": "A ogni turno, i giocatori scelgono una squadra che vinca la sua partita. Ogni squadra si può scegliere una sola volta. La classifica conta i pronostici giusti, poi la differenza punti.", "Games": "Partite", "Swiss round {n}": "Turno svizzero {1}", "Knockout: {x}": "Eliminazione diretta: {1}", "Picks close": "Chiusura pronostici", "Remove round": "Rimuovi turno", "UK time": "ora del Regno Unito", "Add the rounds from the plan": "Aggiungi i turni dal programma", "Add a round": "Aggiungi un turno", "Save rounds": "Salva i turni", "Rounds saved.": "Turni salvati.", "Each round needs a name, its games and a closing time.": "Ogni turno deve avere un nome, le sue partite e un orario di chiusura.", "Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.": "Scegli una squadra vincente in ogni turno. Ogni squadra si può scegliere una sola volta, quindi tieni le più forti per dopo. Un punto per ogni pronostico giusto; la differenza punti decide i pari merito.", "Join the game": "Partecipa al gioco", "Enter your name.": "Inserisci il tuo nome.", "Couldn't join. Check your connection and try again.": "Impossibile partecipare. Controlla la connessione e riprova.", "This is your private link. Save it to play on another phone or browser.": "Questo è il tuo link personale. Salvalo per giocare su un altro telefono o browser.", "Copy link": "Copia link", "Copied": "Copiato", "Picks close {x}": "Chiusura pronostici: {1}", "Your pick": "Il tuo pronostico", "Save pick": "Salva pronostico", "Your pick: {x}": "Il tuo pronostico: {1}", "No pick": "Nessun pronostico", "(picked in {x})": "(scelta in {1})", "Picks for this round have closed.": "I pronostici per questo turno sono chiusi.", "Couldn't save your pick. Check your connection and try again.": "Impossibile salvare il pronostico. Controlla la connessione e riprova.", "You're playing as {x}": "Giochi come {1}", "Show my private link": "Mostra il mio link personale", "Open (picks)": "Aperto", "Closed": "Chiuso", "That private link didn't work. Check it and try again.": "Questo link personale non ha funzionato. Controllalo e riprova."}); // Pick the Winner (pick-game)
+Object.assign(LANG_TEXT.de, {"Pick the Winner": "Tippspiel", "Picks": "Tipps", "Run a Pick the Winner game for this competition": "Ein Tippspiel für dieses Turnier anbieten", "Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.": "In jeder Runde tippen die Spieler auf ein Team, das sein Spiel gewinnt. Jedes Team kann nur einmal getippt werden. Die Rangliste zählt richtige Tipps, dann die Punktedifferenz.", "Games": "Spiele", "Swiss round {n}": "Schweizer Runde {1}", "Knockout: {x}": "K.-o.-Runde: {1}", "Picks close": "Tippschluss", "Remove round": "Runde entfernen", "UK time": "britische Zeit", "Add the rounds from the plan": "Runden aus dem Plan übernehmen", "Add a round": "Runde hinzufügen", "Save rounds": "Runden speichern", "Rounds saved.": "Runden gespeichert.", "Each round needs a name, its games and a closing time.": "Jede Runde braucht einen Namen, ihre Spiele und einen Tippschluss.", "Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.": "Tippe in jeder Runde auf ein Team, das gewinnt. Jedes Team kannst du nur einmal tippen, also heb dir die starken für später auf. Ein Punkt für jeden richtigen Tipp; bei Gleichstand entscheidet die Punktedifferenz.", "Join the game": "Mitspielen", "Enter your name.": "Gib deinen Namen ein.", "Couldn't join. Check your connection and try again.": "Beitritt fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.", "This is your private link. Save it to play on another phone or browser.": "Das ist dein privater Link. Speichere ihn, um auf einem anderen Handy oder Browser zu spielen.", "Copy link": "Link kopieren", "Copied": "Kopiert", "Picks close {x}": "Tippschluss: {1}", "Your pick": "Dein Tipp", "Save pick": "Tipp speichern", "Your pick: {x}": "Dein Tipp: {1}", "No pick": "Kein Tipp", "(picked in {x})": "(getippt in {1})", "Picks for this round have closed.": "Die Tipps für diese Runde sind geschlossen.", "Couldn't save your pick. Check your connection and try again.": "Dein Tipp konnte nicht gespeichert werden. Prüfe deine Verbindung und versuche es erneut.", "You're playing as {x}": "Du spielst als {1}", "Show my private link": "Meinen privaten Link zeigen", "Open (picks)": "Offen", "Closed": "Geschlossen", "That private link didn't work. Check it and try again.": "Dieser private Link hat nicht funktioniert. Prüfe ihn und versuche es erneut."}); // Pick the Winner (pick-game)
+Object.assign(LANG_TEXT.nl, {"Pick the Winner": "Voorspel de winnaar", "Picks": "Keuzes", "Run a Pick the Winner game for this competition": "Een Voorspel de winnaar-spel houden voor deze wedstrijd", "Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.": "Elke ronde kiezen spelers één team dat zijn partij wint. Elk team kan maar één keer gekozen worden. Het klassement telt goede keuzes, daarna het puntensaldo.", "Games": "Partijen", "Swiss round {n}": "Zwitserse ronde {1}", "Knockout: {x}": "Knock-out: {1}", "Picks close": "Keuzes sluiten", "Remove round": "Ronde verwijderen", "UK time": "Britse tijd", "Add the rounds from the plan": "Rondes uit het schema toevoegen", "Add a round": "Ronde toevoegen", "Save rounds": "Rondes opslaan", "Rounds saved.": "Rondes opgeslagen.", "Each round needs a name, its games and a closing time.": "Elke ronde heeft een naam, de partijen en een sluitingstijd nodig.", "Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.": "Kies in elke ronde één team dat wint. Je kunt elk team maar één keer kiezen, dus bewaar de sterke voor later. Eén punt per goede keuze; bij gelijke stand beslist het puntensaldo.", "Join the game": "Meedoen", "Enter your name.": "Vul je naam in.", "Couldn't join. Check your connection and try again.": "Meedoen lukte niet. Controleer je verbinding en probeer het opnieuw.", "This is your private link. Save it to play on another phone or browser.": "Dit is je persoonlijke link. Bewaar hem om op een andere telefoon of browser te spelen.", "Copy link": "Link kopiëren", "Copied": "Gekopieerd", "Picks close {x}": "Keuzes sluiten {1}", "Your pick": "Jouw keuze", "Save pick": "Keuze opslaan", "Your pick: {x}": "Jouw keuze: {1}", "No pick": "Geen keuze", "(picked in {x})": "(gekozen in {1})", "Picks for this round have closed.": "De keuzes voor deze ronde zijn gesloten.", "Couldn't save your pick. Check your connection and try again.": "Je keuze kon niet worden opgeslagen. Controleer je verbinding en probeer het opnieuw.", "You're playing as {x}": "Je speelt als {1}", "Show my private link": "Mijn persoonlijke link tonen", "Open (picks)": "Open", "Closed": "Gesloten", "That private link didn't work. Check it and try again.": "Die persoonlijke link werkte niet. Controleer hem en probeer het opnieuw."}); // Pick the Winner (pick-game)
+Object.assign(LANG_TEXT.pt, {"Pick the Winner": "Escolha o vencedor", "Picks": "Palpites", "Run a Pick the Winner game for this competition": "Fazer um jogo Escolha o vencedor nesta competição", "Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.": "Em cada ronda, os jogadores escolhem uma equipa para ganhar o seu jogo. Cada equipa só pode ser escolhida uma vez. A classificação conta os palpites certos e depois a diferença de pontos.", "Games": "Jogos", "Swiss round {n}": "Ronda suíça {1}", "Knockout: {x}": "Eliminatórias: {1}", "Picks close": "Fecho dos palpites", "Remove round": "Remover ronda", "UK time": "hora do Reino Unido", "Add the rounds from the plan": "Adicionar as rondas do plano", "Add a round": "Adicionar uma ronda", "Save rounds": "Guardar rondas", "Rounds saved.": "Rondas guardadas.", "Each round needs a name, its games and a closing time.": "Cada ronda precisa de um nome, dos seus jogos e de uma hora de fecho.", "Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.": "Escolha uma equipa vencedora em cada ronda. Cada equipa só pode ser escolhida uma vez, por isso guarde as fortes para mais tarde. Um ponto por cada palpite certo; a diferença de pontos desempata.", "Join the game": "Entrar no jogo", "Enter your name.": "Escreva o seu nome.", "Couldn't join. Check your connection and try again.": "Não foi possível entrar. Verifique a ligação e tente de novo.", "This is your private link. Save it to play on another phone or browser.": "Este é o seu link privado. Guarde-o para jogar noutro telemóvel ou browser.", "Copy link": "Copiar link", "Copied": "Copiado", "Picks close {x}": "Fecho dos palpites: {1}", "Your pick": "O seu palpite", "Save pick": "Guardar palpite", "Your pick: {x}": "O seu palpite: {1}", "No pick": "Sem palpite", "(picked in {x})": "(escolhida em {1})", "Picks for this round have closed.": "Os palpites desta ronda estão fechados.", "Couldn't save your pick. Check your connection and try again.": "Não foi possível guardar o palpite. Verifique a ligação e tente de novo.", "You're playing as {x}": "Está a jogar como {1}", "Show my private link": "Mostrar o meu link privado", "Open (picks)": "Aberta", "Closed": "Fechada", "That private link didn't work. Check it and try again.": "Esse link privado não funcionou. Verifique-o e tente de novo."}); // Pick the Winner (pick-game)
+Object.assign(LANG_TEXT.th, {"Pick the Winner": "ทายผู้ชนะ", "Picks": "ทายผล", "Run a Pick the Winner game for this competition": "จัดเกมทายผู้ชนะสำหรับการแข่งขันนี้", "Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.": "ในแต่ละรอบ ผู้เล่นเลือกหนึ่งทีมที่จะชนะเกมของตน แต่ละทีมเลือกได้เพียงครั้งเดียว ตารางคะแนนเรียงตามจำนวนที่ทายถูก แล้วตามผลต่างแต้ม", "Games": "เกม", "Swiss round {n}": "รอบสวิส {1}", "Knockout: {x}": "น็อกเอาต์: {1}", "Picks close": "ปิดรับการทาย", "Remove round": "ลบรอบ", "UK time": "เวลาสหราชอาณาจักร", "Add the rounds from the plan": "เพิ่มรอบจากแผน", "Add a round": "เพิ่มรอบ", "Save rounds": "บันทึกรอบ", "Rounds saved.": "บันทึกรอบแล้ว", "Each round needs a name, its games and a closing time.": "แต่ละรอบต้องมีชื่อ เกมของรอบ และเวลาปิดรับ", "Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.": "เลือกหนึ่งทีมที่จะชนะในแต่ละรอบ แต่ละทีมเลือกได้เพียงครั้งเดียว จึงควรเก็บทีมเก่งไว้ใช้ภายหลัง ทายถูกได้หนึ่งแต้ม หากเท่ากันตัดสินด้วยผลต่างแต้ม", "Join the game": "เข้าร่วมเกม", "Enter your name.": "กรอกชื่อของคุณ", "Couldn't join. Check your connection and try again.": "เข้าร่วมไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง", "This is your private link. Save it to play on another phone or browser.": "นี่คือลิงก์ส่วนตัวของคุณ บันทึกไว้เพื่อเล่นบนโทรศัพท์หรือเบราว์เซอร์อื่น", "Copy link": "คัดลอกลิงก์", "Copied": "คัดลอกแล้ว", "Picks close {x}": "ปิดรับการทาย {1}", "Your pick": "ทีมที่คุณเลือก", "Save pick": "บันทึกการเลือก", "Your pick: {x}": "ทีมที่คุณเลือก: {1}", "No pick": "ไม่ได้เลือก", "(picked in {x})": "(เลือกแล้วใน {1})", "Picks for this round have closed.": "ปิดรับการทายของรอบนี้แล้ว", "Couldn't save your pick. Check your connection and try again.": "บันทึกการเลือกไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง", "You're playing as {x}": "คุณเล่นในชื่อ {1}", "Show my private link": "แสดงลิงก์ส่วนตัวของฉัน", "Open (picks)": "เปิด", "Closed": "ปิดแล้ว", "That private link didn't work. Check it and try again.": "ลิงก์ส่วนตัวนั้นใช้ไม่ได้ ตรวจสอบแล้วลองอีกครั้ง"}); // Pick the Winner (pick-game)
 // payments (payments-registration): the Paid button in Registration, its toast and the summary line
 Object.assign(FR_TEXT, {"Paid": "Payé", "Not paid": "Non payé", "Marked as paid.": "Marqué comme payé.", "Marked as not paid.": "Marqué comme non payé.", "Paid: {n} of {x}": "Payé : {1} sur {2}"});
 Object.assign(LANG_TEXT.es, {"Paid": "Pagado", "Not paid": "No pagado", "Marked as paid.": "Marcado como pagado.", "Marked as not paid.": "Marcado como no pagado.", "Paid: {n} of {x}": "Pagado: {1} de {2}"});
@@ -2979,17 +2994,20 @@ function morningDone(t, ms) {
   if (t.system === "swiss") { const sm = ms.filter(m => m.stage === "swiss"); return sm.length > 0 && sm.every(m => m.done); }
   return false;
 }
+// how many go into a planned knockout (Setup's plan editor, and Pick the Winner's knockout rounds)
+function planBracketCount(t, br, ms, done = morningDone(t, ms)) {
+  const n = plannedCount(t);
+  if (done) return koEntrants(t, ms, br).length;
+  if (!isGroups(t)) return Math.max(0, Math.min(br.to, n) - br.from + 1);
+  if ((t.pools || []).length) return t.pools.reduce((a, p) => a + Math.max(0, Math.min(br.to, p.members.length) - br.from + 1), 0);
+  if (isLeagues(t)) { const k = Math.max(1, Math.min(t.leagueCount || 2, Math.floor(n / 2) || 1)); const size = Math.ceil(n / k); return Math.max(0, Math.min(br.to, size) - br.from + 1) * k; }
+  const k = poolCount(n, t.poolSize || 4); return Array.from({ length: k }, (_, i) => Math.floor(n / k) + (i < n % k ? 1 : 0)).reduce((a, sz) => a + Math.max(0, Math.min(br.to, sz) - br.from + 1), 0); // i18n-ok
+}
 function renderPlanEditor(t, { locked, compact } = {}) {
   const plan = getPlan(t); const unit = isLeagues(t) ? "League places" : t.system === "pools" ? "Barrage places" : "Ranks";
   const ms = MS(); const done = morningDone(t, ms);
   const n = plannedCount(t);
-  const count = br => {
-    if (done) return koEntrants(t, ms, br).length;
-    if (!isGroups(t)) return Math.max(0, Math.min(br.to, n) - br.from + 1);
-    if ((t.pools || []).length) return t.pools.reduce((a, p) => a + Math.max(0, Math.min(br.to, p.members.length) - br.from + 1), 0);
-    if (isLeagues(t)) { const k = Math.max(1, Math.min(t.leagueCount || 2, Math.floor(n / 2) || 1)); const size = Math.ceil(n / k); return Math.max(0, Math.min(br.to, size) - br.from + 1) * k; }
-    const k = poolCount(n, t.poolSize || 4); return Array.from({ length: k }, (_, i) => Math.floor(n / k) + (i < n % k ? 1 : 0)).reduce((a, sz) => a + Math.max(0, Math.min(br.to, sz) - br.from + 1), 0);
-  };
+  const count = br => planBracketCount(t, br, ms, done);
   const main = plan.brackets.find(b => !b.silver);
   const silver = plan.brackets.find(b => b.silver);
   const dis = locked || !canEdit() ? "disabled" : "";
@@ -6284,7 +6302,7 @@ function lookPanel(t) {
 }
 /* ---------------- rendering ---------------- */
 // phone bottom bar: short labels and simple line icons
-const TAB_SHORT = { entries: "Entries", setup: "Setup", draw: "Draw", courts: "Pistes", standings: "Table", display: "Screen", stream: "Stream" };
+const TAB_SHORT = { pick: "Picks", entries: "Entries", setup: "Setup", draw: "Draw", courts: "Pistes", standings: "Table", display: "Screen", stream: "Stream" };
 const ic = d => `<svg class="t-ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const TAB_ICON = {
   entries: ic('<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5"/><path d="M16 5.5a3 3 0 0 1 0 5.6M18 14.3c1.5.7 2.4 2.3 2.7 4.7"/>'),
@@ -6292,10 +6310,11 @@ const TAB_ICON = {
   draw: ic('<path d="M4 5h5v4H4zM4 15h5v4H4zM9 7h3v10H9M12 12h4"/><path d="M16 10h4v4h-4z"/>'),
   courts: ic('<rect x="4" y="3.5" width="16" height="17" rx="1.5"/><path d="M4 12h16"/><circle cx="12" cy="8" r="1.2"/><circle cx="10" cy="16" r="1.6"/>'),
   standings: ic('<path d="M5 20v-6M12 20V6M19 20v-9"/><path d="M3 20h18"/>'),
+  pick: ic('<circle cx="12" cy="12" r="8.5"/><path d="M8 12.5l2.7 2.7L16 9.5"/>'),
   display: ic('<rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16.5V20"/>'),
   stream: ic('<rect x="3" y="7" width="13" height="11" rx="2"/><path d="M16 11l5-3v9l-5-3z"/>'),
 };
-const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["stream", "Stream"]];
+const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["pick", "Pick the Winner"], ["stream", "Stream"]];
 // changes made on another device (scores, draws): the first one shows at once, and anything else arriving in the next
 // half second is drawn together in one go, so a burst of results on a busy day is a couple of redraws rather than dozens.
 // Changes made on this device still show straight away. A screen that isn't showing (phone locked, another app in front)
@@ -6338,7 +6357,7 @@ function drawPage() {
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
-  const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDrawPage, courts: renderCourts, standings: renderStandings, display: renderDisplay, stream: renderStreamTab }[S.tab] || renderDrawPage;
+  const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDrawPage, courts: renderCourts, standings: renderStandings, pick: renderPickPage, display: renderDisplay, stream: renderStreamTab }[S.tab] || renderDrawPage;
   // examples: visitors can open every tab, but the organiser pages are locked
   const fn = viewAll(t) && ["setup", "entries", "courts"].includes(S.tab) ? (x => `<div class="notice" style="margin-bottom:16px"><b>Example competition.</b> You can look around every page, but nothing here can be changed. Tap + to make your own.</div><fieldset class="ro-view" disabled>${fn0(x)}</fieldset>`) : fn0;
   main.innerHTML = (S.topBanner ? S.topBanner() : "") + (t.archived ? `<div class="notice" style="margin-bottom:16px">Archived. Only the site admin can see this competition.${S.canSeeArchived() ? ` <button class="btn sm" data-act="restore">Restore</button>` : ""}</div>` : "") + (t.template ? `<div class="notice spread" style="margin-bottom:16px"><span><b>Run-through template.</b> Get your own copy with these settings and shooters, then run it start to finish with the live scorer.</span>${S.canCreate() ? `<button class="btn primary sm" data-act="use-template">Try it yourself</button>` : ""}</div>` : "") + (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
@@ -6413,10 +6432,11 @@ function drawHeader() {
     ${S.canCreate() ? `<button class="btn sm new-t" data-act="new-t" aria-label="New competition"><span aria-hidden="true">+</span><span class="hide-sm"> New competition</span><span class="show-sm"> New</span></button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
   const t = T();
-  const SPECTATOR_TABS = ["draw", "standings", "stream", "display"]; // players and spectators: draw & results, standings, stream (and the big screen behind it)
+  const SPECTATOR_TABS = ["draw", "standings", "pick", "stream", "display"]; // players and spectators: draw & results, standings, stream (and the big screen behind it)
   if (t && !canScore() && !viewAll(t) && !SPECTATOR_TABS.includes(S.tab)) S.tab = "draw";
   const onTab = S.overlayView || S.liveRoute ? null : S.tab; // guides, login and the streams page aren't one of the tabs
-  $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
+  if (t && S.tab === "pick" && !pickOn(t)) S.tab = "draw";
+  $("#tabs").innerHTML = t ? TABS.filter(([k]) => k !== "pick" || pickOn(t)).filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
   localize($("header.app")); // every caller (menus, outside taps, Hall of Fame, streams) gets the header in the chosen language
 }
 // the start screen: first visit, or the logo tapped. Run (or watch how it works) up top beside a small live preview,
@@ -6607,6 +6627,7 @@ function renderSetup(t) {
     <p class="small muted">${{ organiser: "Only organisers and scorers enter scores.", teams: "Each team gets its own link (see Team links below). When a game ends, either team enters the score on their phone and the other team confirms it. Disputes come to you on Draw & results. Keep an organiser's screen open: it publishes confirmed scores.", "teams-auto": "As above, but a score the other team hasn't answered counts automatically after the wait below." }[t.scoreMode || "organiser"]}</p>
     ${t.scoreMode === "teams-auto" ? `<label class="f" style="max-width:220px"><span>Auto-confirm after (minutes)</span><input type="number" min="1" max="60" data-field="autoConfirmMin" data-num value="${t.autoConfirmMin || 10}"></label>` : ""}
   </div>` : ""}
+  ${pickSetupPanel(t)}
   ${S.setupExtra ? S.setupExtra(t) : ""}
   ${lookPanel(t)}
   ${calPanel(t)}
@@ -6620,6 +6641,155 @@ function renderSetup(t) {
     ${S.confirmDelete ? `<div class="row"><span class="err">${trAround("Delete “{x}” for everyone?", `<span data-notr>${esc(t.name)}</span>`)}</span><button class="btn danger" data-act="del-t-yes">Delete</button><button class="btn" data-act="del-t-no">Keep it</button></div>` : `<button class="btn danger" data-act="del-t">Delete…</button>`}
   </div>`}
   </div>`;
+}
+
+/* ---------- Pick the Winner (pick-game): followers pick one team to win in each pick round, each team once ----------
+   Website only: S.pickGame comes from the web layer (joining, this device's player and picks, saving a pick). The
+   competition keeps the game: t.pick = { on, rounds: [{ id, name, src }] } and t.pickClose = { id: close time in ms }.
+   src: "swiss:<round>" or "ko:<bracket>:<round>". */
+const pickOn = t => !!(S.pickGame && t && t.pick && t.pick.on);
+const pickState = open => open ? trAs("Open (picks)", "Open") : "Closed"; // i18n-ok: "Open" has a key of its own, "Open (picks)" (French "Open" is the verb)
+const pickUi = () => (S.pickUi ||= { sel: {}, err: {} });
+// the main knockout: the drawn bracket if there is one, else the plan's first bracket sized from the field
+function pickMainKo(t) {
+  const sys = sysOf(t); let id = "A", n = 0;
+  if (PLAN_SYSTEMS.includes(sys)) { const br = getPlan(t).brackets.find(b => !b.silver); if (!br) return null; id = br.id; n = planBracketCount(t, br, MS()); }
+  else if (sys === "knockout") n = plannedCount(t);
+  else return null;
+  const drawn = (t.brackets || []).find(b => b.id === id); if (drawn) return { id, rounds: drawn.rounds };
+  if (n < 2) return null; let size = 2; while (size < n) size *= 2; return { id, rounds: Math.log2(size) };
+}
+// what a pick round can follow: [src, option label, a round name for "Add the rounds from the plan"]
+function pickSrcOptions(t) {
+  const o = [];
+  if (sysOf(t) === "swiss") for (let r = 1; r <= Math.max(1, t.swissRounds || 1); r++) o.push([`swiss:${r}`, `Swiss round ${r}`, `Round ${r}`]);
+  const ko = pickMainKo(t);
+  if (ko) for (let r = 1; r <= ko.rounds; r++) { const l = roundLabel(ko.rounds, r); o.push([`ko:${ko.id}:${r}`, `Knockout: ${l}`, l]); }
+  return o;
+}
+// the games a pick round follows (a knockout's third-place game isn't one: it's not that round's game to win)
+function pickGames(src, ms = MS()) {
+  const [k, a, b] = String(src || "").split(":");
+  if (k === "swiss") return ms.filter(m => m.stage === "swiss" && m.round === +a);
+  if (k === "ko") return ms.filter(m => m.stage === "ko" && m.bracket === a && m.round === +b && !m.third);
+  return [];
+}
+// the teams a player can pick: once the round's games are all set, only teams with a game in it (byes don't count);
+// before then, every active team
+function pickTeams(t, src) {
+  const g = pickGames(src);
+  if (g.length && g.every(m => m.bye || (m.a && m.b))) return [...new Set(g.filter(m => !m.bye && m.a && m.b).flatMap(m => [...m.a, ...m.b]))];
+  return activeIds(t);
+}
+const pickDay = ms => new Date(ms).toLocaleString(LOCALES[I18N.lang], { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+// this device's time zone, as Setup shows it: "UK time" in the UK, else GMT+7 and so on (at that date, for summer time)
+function pickZone(ms) {
+  try { if (Intl.DateTimeFormat().resolvedOptions().timeZone === "Europe/London") return { uk: true, txt: "UK time" }; } catch {}
+  const off = -new Date(ms || Date.now()).getTimezoneOffset(), h = Math.floor(Math.abs(off) / 60), m = Math.abs(off) % 60;
+  return { uk: false, txt: off === 0 ? "GMT" : `GMT${off > 0 ? "+" : "−"}${h}${m ? ":" + String(m).padStart(2, "0") : ""}` };
+}
+const pad2 = n => String(n).padStart(2, "0");
+const pickLocalDate = ms => { const d = new Date(ms); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+const pickLocalTime = ms => { const d = new Date(ms); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+// Setup's rows, edited here until Save rounds
+function pickDraft(t) {
+  if (!S.pickDraft || S.pickDraft.tid !== t.id) {
+    const close = t.pickClose || {};
+    S.pickDraft = { tid: t.id, err: "", rows: (t.pick?.rounds || []).map(r => ({ id: r.id, name: r.name || "", src: r.src || "",
+      date: close[r.id] ? pickLocalDate(close[r.id]) : "", time: close[r.id] ? pickLocalTime(close[r.id]) : "" })) };
+  }
+  return S.pickDraft;
+}
+const pickNewId = rows => { let n = 1; while (rows.some(r => r.id === "p" + n)) n++; return "p" + n; };
+function pickSetupPanel(t) {
+  if (!S.pickGame || !canEdit()) return "";
+  const on = !!t.pick?.on;
+  let rows = "";
+  if (on) {
+    const D = pickDraft(t), opts = pickSrcOptions(t);
+    rows = `<div class="pk-rows">${D.rows.map((r, i) => { const z = pickZone(r.date && r.time ? new Date(`${r.date}T${r.time}`).getTime() : Date.now());
+      const known = opts.some(o => o[0] === r.src);
+      return `<div class="pk-row" data-i="${i}">
+      <label class="f pk-name"><span>Name</span><input type="text" maxlength="40" id="pk-name-${i}" data-pk="name" data-i="${i}" value="${esc(r.name)}"></label>
+      <label class="f pk-src"><span>Games</span><select id="pk-src-${i}" data-pk="src" data-i="${i}"><option value=""></option>${opts.map(([v, l]) => `<option value="${v}" ${v === r.src ? "selected" : ""}>${esc(l)}</option>`).join("")}${r.src && !known ? `<option value="${esc(r.src)}" selected data-notr>${esc(r.src)}</option>` : ""}</select></label>
+      <div class="f pk-close"><span>Picks close</span><div class="row" style="flex-wrap:nowrap;gap:6px"><input type="date" id="pk-date-${i}" data-pk="date" data-i="${i}" value="${esc(r.date)}" aria-label="Picks close"><input type="time" id="pk-time-${i}" data-pk="time" data-i="${i}" value="${esc(r.time)}" aria-label="Picks close"><span class="small muted pk-zone"${z.uk ? "" : " data-notr"}>${z.txt}</span></div></div>
+      <button type="button" class="btn ghost pk-x" data-act="pk-row-x" data-i="${i}" aria-label="Remove round">×</button></div>`; }).join("")}</div>
+      ${D.err ? `<p class="err" role="alert">${esc(D.err)}</p>` : ""}
+      <div class="row" style="gap:8px"><button type="button" class="btn sm" data-act="pk-from-plan">Add the rounds from the plan</button><button type="button" class="btn sm" data-act="pk-row-add">Add a round</button><button type="button" class="btn sm primary" data-act="pk-rows-save">Save rounds</button></div>`;
+  }
+  return `<div class="panel stack" id="pick-setup"><h3>Pick the Winner</h3>
+    <label class="chk"><input type="checkbox" id="pick-on" data-pick-on ${on ? "checked" : ""}> Run a Pick the Winner game for this competition</label>
+    <p class="small muted">Each round, players pick one team to win its game. Each team can be picked only once. The leaderboard ranks right picks, then points difference.</p>
+    ${rows}</div>`;
+}
+async function pickSaveRounds(t) {
+  const D = pickDraft(t);
+  if (D.rows.some(r => !r.name.trim() || !r.src || !r.date || !r.time || isNaN(new Date(`${r.date}T${r.time}`).getTime()))) { D.err = "Each round needs a name, its games and a closing time."; render(); return; }
+  const nt = clone(t);
+  nt.pick = { on: true, rounds: D.rows.map(r => ({ id: r.id, name: r.name.trim(), src: r.src })) };
+  nt.pickClose = Object.fromEntries(D.rows.map(r => [r.id, new Date(`${r.date}T${r.time}`).getTime()]));
+  S.pickDraft = null; await guard(() => saveT(nt)); toast("Rounds saved.");
+}
+// the Pick the Winner tab
+function renderPickPage(t) {
+  if (!pickOn(t)) return renderDrawPage(t);
+  const G = S.pickGame, st = G.state(t), U = pickUi(), rounds = t.pick.rounds || [];
+  const intro = `<p>Pick one team to win in each round. You can pick each team only once, so save the strong ones for later. One point for each right pick; points difference breaks ties.</p>`;
+  let h = `<div class="stack pick-page" style="max-width:720px"><h2>Pick the Winner</h2>`;
+  if (!st.ready) return h + intro + `</div>`;
+  if (!st.me) {
+    h += `<div class="panel stack">${intro}
+      <label class="f" style="max-width:360px"><span>Your name</span><input type="text" id="pk-you" maxlength="30" autocomplete="nickname" value="${esc(U.name || "")}"></label>
+      ${U.joinErr ? `<p class="err" role="alert">${esc(U.joinErr)}</p>` : ""}
+      <div><button type="button" class="btn primary" data-act="pk-join">Join the game</button></div></div>`;
+    return h + `</div>`;
+  }
+  h += `<div class="panel spread pk-me"><span>${trAround("You're playing as {x}", `<b data-notr>${esc(st.me.name)}</b>`)}</span><button type="button" class="btn sm" data-act="pk-show-link" aria-expanded="${!!U.showLink}">Show my private link</button></div>`;
+  if (U.showLink && st.link) h += `<div class="notice stack pk-link" style="gap:8px"><span>This is your private link. Save it to play on another phone or browser.</span>
+    <div class="row" style="flex-wrap:nowrap;gap:6px"><input type="text" id="pk-link" readonly value="${esc(st.link)}" aria-label="Show my private link" class="small" style="flex:1;min-width:0" data-notr><button type="button" class="btn sm" data-act="pk-copy">Copy link</button></div></div>`;
+  const nameOf = rid => tr(rounds.find(r => r.id === rid)?.name || "");
+  h += rounds.map(r => {
+    const close = (t.pickClose || {})[r.id] || 0, open = Date.now() < close, mine = st.picks[r.id];
+    const used = {}; Object.entries(st.picks).forEach(([rid, team]) => { if (rid !== r.id && team) used[team] = rid; });
+    const sel = U.sel[r.id] ?? mine ?? "";
+    const opts = pickTeams(t, r.src).map(id => ({ id, name: entName(t, id) })).sort((a, b) => a.name.localeCompare(b.name));
+    const err = U.err[r.id];
+    return `<section class="panel stack pk-card" data-round="${esc(r.id)}" style="gap:10px">
+      <div class="spread"><h3>${esc(r.name)}</h3><span class="pill ${open ? "pk-open" : ""}">${pickState(open)}</span></div>
+      <p class="small muted">${trAround("Picks close {x}", `<span data-notr>${esc(pickDay(close))}</span>`)}</p>
+      ${mine ? `<p class="pk-mine">${trAround("Your pick: {x}", `<b data-notr>${esc(entName(t, mine))}</b>`)}</p>` : open ? "" : `<p class="pk-mine">No pick</p>`}
+      ${open ? `<label class="f"><span>Your pick</span><select id="pk-sel-${esc(r.id)}" data-pk-sel="${esc(r.id)}" data-notr><option value="">—</option>${opts.map(o => `<option value="${esc(o.id)}" ${o.id === sel ? "selected" : ""} ${used[o.id] ? "disabled" : ""}>${esc(o.name)}${used[o.id] ? " " + trAround("(picked in {x})", esc(nameOf(used[o.id]))) : ""}</option>`).join("")}</select></label>
+        <div><button type="button" class="btn primary" data-act="pk-save" data-r="${esc(r.id)}">Save pick</button></div>` : ""}
+      ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ""}</section>`;
+  }).join("");
+  return h + `</div>`;
+}
+async function pickAction(act, a, t) {
+  const U = pickUi();
+  if (act === "pk-join") {
+    const el = document.getElementById("pk-you"), name = (el?.value || "").trim().slice(0, 30); U.name = el?.value || "";
+    el?.blur();
+    if (!name) { U.joinErr = "Enter your name."; render(); document.getElementById("pk-you")?.focus(); return; }
+    U.joinErr = ""; try { await S.pickGame.join(t, name); U.showLink = true; U.name = ""; } catch (e) { console.error(e); U.joinErr = "Couldn't join. Check your connection and try again."; }
+    render(); return;
+  }
+  if (act === "pk-show-link") { U.showLink = !U.showLink; render(); return; }
+  if (act === "pk-copy") { const el = document.getElementById("pk-link"); if (!el) return; try { await navigator.clipboard.writeText(el.value); } catch { el.select(); try { document.execCommand("copy"); } catch {} } a.textContent = tr("Copied"); return; }
+  if (act === "pk-save") {
+    const rid = a.dataset.r, team = document.getElementById("pk-sel-" + rid)?.value || "";
+    if (!team) return;
+    if (Date.now() >= ((t.pickClose || {})[rid] || 0)) { U.err[rid] = "Picks for this round have closed."; render(); return; }
+    U.err[rid] = "";
+    try { await S.pickGame.pick(t, rid, team); delete U.sel[rid]; }
+    catch (e) { console.error(e); U.err[rid] = e?.code === "permission-denied" ? "Picks for this round have closed." : "Couldn't save your pick. Check your connection and try again."; }
+    render(); return;
+  }
+  if (!canEdit() || !t) return;
+  const D = pickDraft(t);
+  if (act === "pk-row-add") { D.rows.push({ id: pickNewId(D.rows), name: "", src: "", date: "", time: "" }); D.err = ""; render(); return; }
+  if (act === "pk-row-x") { D.rows.splice(+a.dataset.i, 1); render(); return; }
+  if (act === "pk-from-plan") { D.rows = []; pickSrcOptions(t).forEach(([src, , name]) => D.rows.push({ id: pickNewId(D.rows), name, src, date: "", time: "" })); D.err = ""; render(); return; }
+  if (act === "pk-rows-save") { await pickSaveRounds(t); return; }
 }
 
 /* entries */
@@ -7512,6 +7682,7 @@ document.addEventListener("click", async e => {
   const t = T();
   if (act.startsWith("lv-") && act !== "lv-links") { await deskAction(act, a); return; }
   if (act.startsWith("strm-")) { await streamAction(act, a); return; }
+  if (act.startsWith("pk-")) { await pickAction(act, a, t); return; }
   switch (act) {
     case "hof-open": if (t && hofCan(t)) hofOpen(t); break;
     case "hof-filter-level": hofPage().level = HOF_LEVELS.includes(a.dataset.k) ? a.dataset.k : "all"; hofRedraw(); break;
@@ -7705,11 +7876,14 @@ document.addEventListener("change", async e => {
     try { await S.store.setBrand(t0.id, b); setBrandLocal(t0.id, b); toast("Logo saved."); } catch (err) { handleWriteError(err); } return; }
   if (S.overlayView && S.overlayChange && await S.overlayChange(el)) return;
   if (el.id === "cal-country" || el.id === "cal-fmt") { const P = calPage(); if (el.id === "cal-fmt") P.fmt = el.value; else { P.country = el.value; P.hl = null; calLoad(); } calPaint(); return; }
+  if (el.dataset.pkSel) { pickUi().sel[el.dataset.pkSel] = el.value; return; }
   if (el.id === "hof-country" || el.id === "hof-fmt") { const P = hofPage(); if (el.id === "hof-fmt") P.fmt = el.value; else { P.country = el.value; P.hl = null; hofLoad(); } hofPaint(); return; }
   if (!canEdit() || !T()) return;
 
   if (el.closest("#modal")) return;
   if (S.extraChange && await S.extraChange(el)) return;
+  if (el.dataset.pickOn !== undefined) { const t = clone(T()); t.pick = Object.assign({ rounds: [] }, t.pick, { on: el.checked }); if (!t.pickClose) t.pickClose = {}; S.pickDraft = null; await guard(() => saveT(t)); return; }
+  if (el.dataset.pk) { const D = pickDraft(T()), r = D.rows[+el.dataset.i]; if (r) { r[el.dataset.pk] = el.value; D.err = ""; } return; }
   if (el.dataset.plansilver !== undefined) { const on = el.checked; await savePlan(pl => { pl.brackets = pl.brackets.filter(b => !b.silver); if (on) pl.brackets.push({ id: "S", name: "Silver", silver: true, from: 1, to: 9999, third: false }); }); return; }
   if (el.dataset.plan) { const i = +el.dataset.i, f = el.dataset.plan; const v = f === "third" ? el.checked : f === "name" ? (el.value.trim() || "Knockout") : parseInt(el.value, 10); if (f !== "name" && f !== "third" && isNaN(v)) return; await savePlan(pl => pl.brackets[i][f] = f === "name" ? koNameSaved(v, pl.brackets[i].name) : v); return; }
   const t = clone(T());
