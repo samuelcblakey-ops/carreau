@@ -18,6 +18,11 @@ const { chromium } = require('playwright');
   log(`guides page: ${page.h} | ${page.cards.join(' / ')} | posters ${page.imgs}`);
   const files = await p.evaluate(async () => Promise.all(['videos/first-competition.mp4', 'videos/shooting-competition.mp4', 'videos/team-scores.mp4', 'videos/stream-a-game.mp4', 'videos/season-calendar.mp4'].map(async u => { const r = await fetch(u); const n = (await r.arrayBuffer()).byteLength; return `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`; })));
   log('video files:', files.join(' | '));
+  // the streaming guide is listed only while the admin has streaming switched on (it's off by default)
+  const AC = await b.newContext(); await AC.addInitScript(() => { window.__CARREAU_EMULATOR = true; }); const AD = await AC.newPage();
+  await AD.goto(process.env.WEB_URL + '#admin'); await w(3000); await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
+  await AD.evaluate(() => window.__testSetSite({ streaming: true })); await w(1500);
+  log('streaming on, guides page:', await p.evaluate(() => [...document.querySelectorAll('.guide-card b')].map(c => c.textContent).join(' / ')));
   // the streaming guide: its poster shows and its video loads (size and length), and the Stream a game page links to it
   const sg = await p.evaluate(async () => { const img = document.querySelector('#guide-stream img'); const v = document.createElement('video'); v.muted = true; v.preload = 'metadata';
     const can = !!v.canPlayType('video/mp4; codecs="avc1.4d401f"'); let size = 'n/a', long = 'n/a';
@@ -67,5 +72,6 @@ const { chromium } = require('playwright');
   await p.evaluate(() => { location.hash = 'guides'; }); await w(500);
   await p.click('[data-act="lang-menu"]').catch(() => {}); await w(200); await p.click('[data-lang="fr"]').catch(() => {}); await w(600);
   log('french:', await p.evaluate(() => document.querySelector('main h2')?.textContent + ' | ' + document.querySelector('main p.muted')?.textContent + ' | ' + [...document.querySelectorAll('main p.small')].pop()?.textContent));
+  await AD.evaluate(() => window.__testSetSite({ streaming: false })); await w(1000); // back to the default
   log('errs', errs); await b.close();
 })();

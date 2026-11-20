@@ -1335,6 +1335,14 @@ Object.assign(LANG_TEXT.de, {"Filming a game? Type the two team names and you ge
 Object.assign(LANG_TEXT.nl, {"Filming a game? Type the two team names and you get a transparent score overlay for your phone's streaming app (score, mènes, boules left, who holds the point) and a live desk to tap it all in. It works for any game, in a competition or not.": "Film je een partij? Typ de twee teamnamen en je krijgt een transparante scorebalk voor de streaming-app van je telefoon (score, mènes, resterende boules, wie het punt heeft) en een live tafel om alles in te tikken. Het werkt voor elke partij, in een wedstrijd of niet."});
 Object.assign(LANG_TEXT.pt, {"Filming a game? Type the two team names and you get a transparent score overlay for your phone's streaming app (score, mènes, boules left, who holds the point) and a live desk to tap it all in. It works for any game, in a competition or not.": "Vai filmar um jogo? Escreva os nomes das duas equipas e obtém um marcador transparente para a app de streaming do telemóvel (marcador, mãos, bolas restantes, quem tem o ponto) e uma mesa em direto para registar tudo. Funciona para qualquer jogo, num torneio ou não."});
 Object.assign(LANG_TEXT.th, {"Filming a game? Type the two team names and you get a transparent score overlay for your phone's streaming app (score, mènes, boules left, who holds the point) and a live desk to tap it all in. It works for any game, in a competition or not.": "กำลังถ่ายเกมอยู่ใช่ไหม? พิมพ์ชื่อสองทีมแล้วคุณจะได้ป้ายคะแนนแบบโปร่งใสสำหรับแอปสตรีมในโทรศัพท์ (คะแนน เอนด์ ลูกที่เหลือ ใครถือแต้ม) และโต๊ะบันทึกสดสำหรับกดบันทึกทุกอย่าง ใช้ได้กับทุกเกม จะอยู่ในการแข่งขันหรือไม่ก็ได้"});
+// the admin's streaming switch: stream pages and toasts
+Object.assign(FR_TEXT, {"Streaming is on for everyone.": "La diffusion en direct est ouverte à tous.", "Streaming is on for you only.": "La diffusion en direct n'est visible que par vous.", "Streaming is switched off.": "La diffusion en direct est désactivée.", "Streaming is switched off": "La diffusion en direct est désactivée", "Streaming isn't available on this site at the moment.": "La diffusion en direct n'est pas disponible sur ce site pour le moment."});
+Object.assign(LANG_TEXT.es, {"Streaming is on for everyone.": "La retransmisión está activada para todos.", "Streaming is on for you only.": "La retransmisión solo la ves tú.", "Streaming is switched off.": "La retransmisión está desactivada.", "Streaming is switched off": "La retransmisión está desactivada", "Streaming isn't available on this site at the moment.": "La retransmisión no está disponible en este sitio por ahora."});
+Object.assign(LANG_TEXT.it, {"Streaming is on for everyone.": "La diretta è attiva per tutti.", "Streaming is on for you only.": "La diretta è visibile solo a te.", "Streaming is switched off.": "La diretta è disattivata.", "Streaming is switched off": "La diretta è disattivata", "Streaming isn't available on this site at the moment.": "La diretta non è disponibile su questo sito al momento."});
+Object.assign(LANG_TEXT.de, {"Streaming is on for everyone.": "Livestream ist für alle an.", "Streaming is on for you only.": "Livestream ist nur für dich an.", "Streaming is switched off.": "Livestream ist ausgeschaltet.", "Streaming is switched off": "Livestream ist ausgeschaltet", "Streaming isn't available on this site at the moment.": "Livestream ist auf dieser Seite gerade nicht verfügbar."});
+Object.assign(LANG_TEXT.nl, {"Streaming is on for everyone.": "Livestream staat aan voor iedereen.", "Streaming is on for you only.": "Livestream staat alleen voor jou aan.", "Streaming is switched off.": "Livestream staat uit.", "Streaming is switched off": "Livestream staat uit", "Streaming isn't available on this site at the moment.": "Livestream is op deze site op dit moment niet beschikbaar."});
+Object.assign(LANG_TEXT.pt, {"Streaming is on for everyone.": "A transmissão está ativa para todos.", "Streaming is on for you only.": "A transmissão só é visível para si.", "Streaming is switched off.": "A transmissão está desativada.", "Streaming is switched off": "A transmissão está desativada", "Streaming isn't available on this site at the moment.": "A transmissão não está disponível neste site de momento."});
+Object.assign(LANG_TEXT.th, {"Streaming is on for everyone.": "เปิดการถ่ายทอดสดให้ทุกคนแล้ว", "Streaming is on for you only.": "เปิดการถ่ายทอดสดให้คุณคนเดียว", "Streaming is switched off.": "ปิดการถ่ายทอดสดแล้ว", "Streaming is switched off": "การถ่ายทอดสดปิดอยู่", "Streaming isn't available on this site at the moment.": "ขณะนี้การถ่ายทอดสดยังไม่เปิดให้ใช้บนเว็บไซต์นี้"});
 
 
 Object.assign(FR_TEXT, {"Skip to content": "Aller au contenu", "Notifications": "Notifications"});
@@ -5948,8 +5956,12 @@ const boulesEach = n => n >= 3 ? 2 : 3;
 const sideBoules = (t, m, k) => { const n = sidePlayers(t, m[k]).length || 1; return n * boulesEach(n); };
 const lastName = s => String(s || "").trim().split(/\s+/).slice(-1)[0] || "";
 const canLive = () => canScore() || !!(S.liveRole && T() && S.liveRole(T()));
-// streaming is switched on per site by the admin (Off / Admin only / Everyone); the local build has it on
+// streaming is switched on per site by the admin (Off / Admin only / Everyone); the local build has it on. It covers all of it:
+// the start screen's Stream a game card, the Stream tab (off: the Big screen tab takes its place), stand-alone streams, and the
+// competition games' overlays and live desks
 const streamingOn = () => !S.streamingOn || S.streamingOn();
+// the website knows the switch once its site settings have loaded: until then a stream page shows nothing rather than "switched off"
+const streamingKnown = () => !S.streamingKnown || S.streamingKnown();
 function liveStats(L) {
   const st = {};
   (L.events || []).forEach(e => { const s = st[e.k] = st[e.k] || { shoot: 0, hit: 0, carreau: 0, point: 0, holding: 0 };
@@ -6059,6 +6071,9 @@ function renderLiveRoute() {
   const r = S.liveRoute;
   if (r.view === "hof") return renderHofPage();
   if (r.view === "cal") return renderCalPage();
+  // streaming switched off by the admin: overlays go blank, every other stream page says so
+  if (!streamingOn()) return r.view === "stream" || !streamingKnown() ? "" : `<div class="panel stack" style="max-width:520px;margin:24px auto" id="streaming-off"><h3>Streaming is switched off</h3>
+    <p class="muted">Streaming isn't available on this site at the moment.</p><div>${r.tid ? `<a class="btn" href="#${esc(r.tid)}">Back to the competition</a>` : `<button type="button" class="btn" data-tab="${esc(S.tab || "draw")}">‹ Competitions</button>`}</div></div>`;
   if (r.view === "streams") return renderStreamsHome();
   if (r.sid && r.view === "setup") return renderStreamSetup();
   const c = liveCtx();
@@ -6291,7 +6306,7 @@ function renderStreamSetup() {
   </div>`;
 }
 async function streamAction(act, a) {
-  if (act === "strm-new") { if (!S.canCreate()) return; const st = newStream(); if (S.decorateStream) S.decorateStream(st); S.streams[st.id] = st;
+  if (act === "strm-new") { if (!S.canCreate() || !streamingOn()) return; const st = newStream(); if (S.decorateStream) S.decorateStream(st); S.streams[st.id] = st;
     try { await S.store.setStream(st); } catch (e) { console.error(e); delete S.streams[st.id]; toast("Couldn't create the stream. Check your connection and try again."); return; } delete st._new; location.hash = "s." + st.id; return; }
   const st = S.streams[S.liveRoute?.sid]; if (!st || !streamCan(st)) return;
   if (act === "strm-reset") { const keep = st.live?.layout; st.live = Object.assign(newLive("game"), { layout: keep || {} }); st.updated = Date.now(); render(); try { await S.store.setStream(st); } catch (e) { console.error(e); } toast("Score reset."); return; }
@@ -6368,6 +6383,8 @@ const TAB_ICON = {
   stream: ic('<rect x="3" y="7" width="13" height="11" rx="2"/><path d="M16 11l5-3v9l-5-3z"/>'),
 };
 const TABS = [["entries", "Registration"], ["setup", "Setup"], ["draw", "Draw & results"], ["courts", "Pistes"], ["standings", "Standings"], ["pick", "Pick the Winner"], ["stream", "Stream"]];
+// with streaming switched off, the Stream tab gives its place to the Big screen (which is otherwise reached from the Stream tab)
+const tabsNow = () => streamingOn() ? TABS : TABS.map(([k, l]) => k === "stream" ? ["display", "Big screen"] : [k, l]);
 // changes made on another device (scores, draws): the first one shows at once, and anything else arriving in the next
 // half second is drawn together in one go, so a burst of results on a busy day is a couple of redraws rather than dozens.
 // Changes made on this device still show straight away. A screen that isn't showing (phone locked, another app in front)
@@ -6410,7 +6427,7 @@ function drawPage() {
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
-  const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDrawPage, courts: renderCourts, standings: renderStandings, pick: renderPickPage, display: renderDisplay, stream: renderStreamTab }[S.tab] || renderDrawPage;
+  const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDrawPage, courts: renderCourts, standings: renderStandings, pick: renderPickPage, display: renderDisplay, stream: x => streamingOn() ? renderStreamTab(x) : renderDisplay(x) }[S.tab] || renderDrawPage;
   // examples: visitors can open every tab, but the organiser pages are locked
   const fn = viewAll(t) && ["setup", "entries", "courts"].includes(S.tab) ? (x => `<div class="notice" style="margin-bottom:16px"><b>Example competition.</b> You can look around every page, but nothing here can be changed. Tap + to make your own.</div><fieldset class="ro-view" disabled>${fn0(x)}</fieldset>`) : fn0;
   main.innerHTML = (S.topBanner ? S.topBanner() : "") + (t.archived ? `<div class="notice" style="margin-bottom:16px">Archived. Only the site admin can see this competition.${S.canSeeArchived() ? ` <button class="btn sm" data-act="restore">Restore</button>` : ""}</div>` : "") + (t.template ? `<div class="notice spread" style="margin-bottom:16px"><span><b>Run-through template.</b> Get your own copy with these settings and shooters, then run it start to finish with the live scorer.</span>${S.canCreate() ? `<button class="btn primary sm" data-act="use-template">Try it yourself</button>` : ""}</div>` : "") + (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
@@ -6489,7 +6506,8 @@ function drawHeader() {
   if (t && !canScore() && !viewAll(t) && !SPECTATOR_TABS.includes(S.tab)) S.tab = "draw";
   const onTab = S.overlayView || S.liveRoute ? null : S.tab; // guides, login and the streams page aren't one of the tabs
   if (t && S.tab === "pick" && !pickOn(t)) S.tab = "draw";
-  $("#tabs").innerHTML = t ? TABS.filter(([k]) => k !== "pick" || pickOn(t)).filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
+  if (t && S.tab === "stream" && streamingKnown() && !streamingOn()) S.tab = "display";
+  $("#tabs").innerHTML = t ? tabsNow().filter(([k]) => k !== "pick" || pickOn(t)).filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
   localize($("header.app")); // every caller (menus, outside taps, Hall of Fame, streams) gets the header in the chosen language
 }
 // the start screen: first visit, or the logo tapped. Run (or watch how it works) up top beside a small live preview,
@@ -6531,7 +6549,7 @@ function renderWelcome() {
       <ul class="sh-points"><li>Free to use</li><li>No app to install</li><li>${LANGS.length} languages</li><li>No cookies, no tracking</li></ul></div>
       ${startDemo()}</section>
     <div class="start-actions">
-      ${tile("#streams", STREAM_ICON, "Stream a game", "A live score overlay for Facebook Live or YouTube")}
+      ${streamingOn() ? tile("#streams", STREAM_ICON, "Stream a game", "A live score overlay for Facebook Live or YouTube") : ""}
       ${tile("#calendar", CAL_ICON, "Season Calendar", "Upcoming competitions and how to enter")}
       ${tile("#halloffame", TROPHY_ICON, "Hall of Fame", "Winners of competitions run on SN Pétanque")}
       ${tile(SUPPORT_URL, HEART_ICON, "Support the site", "Tips on Ko-fi help cover the running costs", true)}

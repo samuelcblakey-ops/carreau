@@ -65,8 +65,7 @@ const { chromium } = require('playwright');
   const featGroup = vg.split(' | ').find(g => g.includes('Featured Open'))?.split(':')[0];
   log(`featured: on front page ${inFeat.includes('Featured Open')} | group ${featGroup} | not an example ${!vg.split(' | ').find(g => g.startsWith('Examples'))?.includes('Featured Open')}`);
   await V.evaluate(id => { location.hash = id; }, tid); await w(2500);
-  const vt = await tabs(V); await V.click('[data-tab="stream"]'); await w(500);
-  await V.click('main [data-tab="display"]'); await w(800);
+  const vt = await tabs(V); await V.click('#tabs [data-tab="display"]'); await w(800); // streaming is off: the Big screen has its own tab
   const big = await V.evaluate(() => window.__carreau.S.tab === 'display' && !!document.querySelector('main').innerText.trim());
   log('featured, spectator tabs:', vt.split(',').join(', '), '| big screen', big, '| header', (await V.textContent('#tsel')).includes('Example') ? 'Example' : 'no example pill');
   await V.evaluate(() => { window.__carreau.S.tab = 'draw'; window.__carreau.render(); });
