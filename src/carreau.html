@@ -1710,6 +1710,13 @@ Object.assign(LANG_TEXT.de, {"Go to SN Pétanque": "Zu SN Pétanque", "Shooting 
 Object.assign(LANG_TEXT.nl, {"Go to SN Pétanque": "Naar SN Pétanque", "Shooting (event tab)": "Precisieschieten"});
 Object.assign(LANG_TEXT.pt, {"Go to SN Pétanque": "Ir para SN Pétanque", "Shooting (event tab)": "Tiro de precisão"});
 Object.assign(LANG_TEXT.th, {"Go to SN Pétanque": "ไปที่ SN Pétanque", "Shooting (event tab)": "การยิงแม่น"});
+Object.assign(FR_TEXT, {"The draw isn't out yet.": "Le tirage n'est pas encore sorti."});
+Object.assign(LANG_TEXT.es, {"The draw isn't out yet.": "El sorteo aún no se ha publicado."});
+Object.assign(LANG_TEXT.it, {"The draw isn't out yet.": "Il sorteggio non è ancora uscito."});
+Object.assign(LANG_TEXT.de, {"The draw isn't out yet.": "Die Auslosung ist noch nicht da."});
+Object.assign(LANG_TEXT.nl, {"The draw isn't out yet.": "De loting is nog niet bekend."});
+Object.assign(LANG_TEXT.pt, {"The draw isn't out yet.": "O sorteio ainda não saiu."});
+Object.assign(LANG_TEXT.th, {"The draw isn't out yet.": "ยังไม่มีการจับสลาก"});
 Object.assign(FR_TEXT, {"World Championships live": "Championnats du monde en direct", "Follow the results and play Pick the Winner. Free to play.": "Suivez les résultats et jouez aux pronostics. Gratuit.", "Open": "Ouvrir", "Part of {x}.": "Fait partie de {1}.", "Open the event page": "Ouvrir la page de l'événement"});
 Object.assign(LANG_TEXT.es, {"World Championships live": "Campeonato del Mundo en directo", "Follow the results and play Pick the Winner. Free to play.": "Sigue los resultados y juega a Elige al ganador. Gratis.", "Part of {x}.": "Forma parte de {1}.", "Open the event page": "Abrir la página del evento", "Open": "Abrir"});
 Object.assign(LANG_TEXT.it, {"World Championships live": "Campionati del mondo in diretta", "Follow the results and play Pick the Winner. Free to play.": "Segui i risultati e gioca a Indovina il vincitore. Gratis.", "Part of {x}.": "Fa parte di {1}.", "Open the event page": "Apri la pagina dell'evento", "Open": "Apri"});
@@ -7390,7 +7397,7 @@ function matchCard(t, m, opts = {}) {
   if (m.bye) return `<div class="match ro"><div class="meta"><span>${opts.ctx ? esc(matchContext(t, m)) : ""}</span><span class="pill">Bye</span></div>${side(m.a, m.sa, true)}<div class="small muted">Bye scored ${m.sa}–${m.sb}</div></div>`;
   const aw = m.done && aWon(m);
   const noLu = st === "ready" && !lineupOk(m);
-  let label = st === "playing" ? `<span class="court-tag">Piste ${esc(courtName(t, m.court))}</span>` : st === "done" ? (m.courtUsed ? `<span>Piste ${esc(courtName(t, m.courtUsed))}</span>` : "<span></span>") : noLu ? `<span>Line-ups needed</span>` : st === "ready" ? `<span>Waiting for piste</span>` : `<span></span>`;
+  let label = st === "playing" ? `<span class="court-tag">Piste ${esc(courtName(t, m.court))}</span>` : st === "done" ? (m.courtUsed ? `<span>Piste ${esc(courtName(t, m.courtUsed))}</span>` : "<span></span>") : noLu ? `<span>Line-ups needed</span>` : st === "ready" && pistesOn(t) ? `<span>Waiting for piste</span>` : `<span></span>`;
   if (m.eu) label = `<span class="eu-meta"><b>${esc(m.label)}</b>${m.pts > 1 ? ` <span class="muted">${m.pts} pts</span>` : ""} ${label}</span>`;
   const pill = { playing: timeUp(t, m) && canScore() ? `<span class="pill timeup">Time</span>` : `<span class="pill playing"><span class="dot"></span>Playing</span>`, done: m.corrected ? `<span class="pill done">Corrected</span>` : m.time ? `<span class="pill done">Ended on time</span>` : `<span class="pill done">Finished</span>`, ready: noLu ? `<span class="pill">Line-ups</span>` : `<span class="pill ready">Ready</span>`, pending: `<span class="pill">Pending</span>` }[st];
   return `<${ro ? "div" : "button"} class="match ${st} ${ro ? "ro" : ""}" ${ro ? "" : `data-match="${m.id}" type="button"`}>
@@ -7436,6 +7443,8 @@ function printDraw(t) {
 /* draw */
 // EuroCup, before the draw: "2 clubs entered → 1 tie" (each entry is a club)
 const euroCount = (t, n) => { const k = clubFixtureCount(n), v = t.checkin ? "checked in" : "entered"; return `${n} ${n === 1 ? "club" : "clubs"} ${v}${n > 1 ? ` → ${k === 1 ? "1 tie" : `${k} ties`}` : ""}`; };
+// a competition with every piste switched off (event-page-visitor-polish): its games never get one, so no "Waiting for piste"
+const pistesOn = t => (t.courts || []).some(c => c.active !== false);
 function renderDraw(t) {
   if (isShoot(t)) return renderShooting(t);
   const ms = MS(); const n = activeIds(t).length;
@@ -7447,8 +7456,12 @@ function renderDraw(t) {
       ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} players on Registration first.</p>${checkinAllBtn(t) ? `<div>${checkinAllBtn(t)}</div>` : ""}` : wr ? `<div><button class="btn primary" data-act="melee-teams">Draw the teams</button></div><p class="small muted">Players are shuffled into ${FORMAT_LABEL[t.format].toLowerCase()} (with a few ${t.format === "triples" ? "doubles" : "triples"} if the numbers don't divide evenly). You can redraw before the first game.</p>` : `<p class="muted">Waiting for the organiser to draw the teams.</p>`}
     </div></div>`;
   if (!t.draws.length) {
+    // not enough entries yet, seen by someone who can't add any (spectators, players, the event page): one plain line, or the
+    // event tab's own text (event-page-visitor-polish)
+    if (!wr && n < minNeeded) { const ev = S.event && evCur()?.empty;
+      return `<div class="stack"><h2>Draw & results</h2><div class="panel stack ev-empty">${ev ? `<p data-notr>${esc(ev)}</p>` : `<p>The draw isn't out yet.</p>`}</div></div>`; }
     return `<div class="stack"><h2>Draw & results</h2><div class="panel stack">
-      <p>${isEuro(t) ? euroCount(t, n) : `${n} ${isIndiv(t) ? "players" : "teams"} ${t.checkin ? "checked in" : "entered"}${isClubs(t) ? ` · ${clubsOf(t).length} clubs → ${clubFixtureCount(clubsOf(t).length)} fixtures` : ""}`} · ${SYSTEM_LABEL[sys]} · ${t.courts.filter(c => c.active !== false).length} pistes</p>
+      <p>${isEuro(t) ? euroCount(t, n) : `${n} ${isIndiv(t) ? "players" : "teams"} ${t.checkin ? "checked in" : "entered"}${isClubs(t) ? ` · ${clubsOf(t).length} clubs → ${clubFixtureCount(clubsOf(t).length)} fixtures` : ""}`} · ${SYSTEM_LABEL[sys]}${pistesOn(t) ? ` · ${t.courts.filter(c => c.active !== false).length} pistes` : ""}</p>
       ${t.checkin && enteredIds(t).length > n ? `<div class="notice stack" style="gap:8px"><span>${enteredIds(t).length - n} entered ${isIndiv(t) ? "player" : isEuro(t) ? "club" : "team"}${enteredIds(t).length - n === 1 ? " hasn't" : "s haven't"} checked in and won't be in the draw.</span><div class="row">${checkinAllBtn(t)}<button class="btn sm ghost" data-tab="entries">Go to Registration</button></div></div>` : ""}
       ${n < minNeeded ? `<p class="muted">${t.checkin ? "Check in" : "Add"} at least ${minNeeded} ${isIndiv(t) ? "players" : isEuro(t) ? "clubs" : "teams"} on Registration before drawing.</p>` :
       isClubs(t) && !clubsReady(t).ok ? `<div class="notice stack" style="gap:4px"><b>Not ready to draw yet</b>${clubsReady(t).problems.map(x => `<span>${esc(x)}</span>`).join("")}<span><button class="btn sm ghost" data-tab="entries">Go to Registration</button></span></div>` :
@@ -7465,11 +7478,12 @@ function renderDraw(t) {
     const adv = isMelee(t) && meleeMode(t) === "advance";
     const allMs = adv ? ms.filter(m => m.stage === "melee") : []; const inPlay = adv ? (allMs.filter(m => !m.done).sort((x, y) => x.round - y.round)[0]?.round || null) : null;
     // the box is red while games are still being played and turns green once the round is finished
-    if (adv) html += `<div class="panel spread ${inPlay ? "rp-live" : "rp-ready"}"><div><div class="eyebrow">Mêlée · drawn in advance</div><b>All ${rounds.length} rounds drawn</b> · ${inPlay ? `round ${inPlay} in play` : `<span class="rp-state">all rounds finished</span>`} · ${allMs.filter(m => m.done).length}/${allMs.length} games finished</div>
+    // viewers (!wr) get a plain box with no colour and no coloured state part (event-page-visitor-polish)
+    if (adv) html += `<div class="panel spread ${!wr ? "" : inPlay ? "rp-live" : "rp-ready"}"><div><div class="eyebrow">Mêlée · drawn in advance</div><b>All ${rounds.length} rounds drawn</b> · ${!wr ? "" : inPlay ? `round ${inPlay} in play · ` : `<span class="rp-state">all rounds finished</span> · `}${allMs.filter(m => m.done).length}/${allMs.length} games finished</div>
       <div class="row"><button class="btn sm" data-act="print-draw">Print the draw</button>${wr && !allMs.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo-all">Undo the draw</button>` : ""}</div></div>`;
     else {
       const state = lastDone ? (sys === "swiss" && last.round >= t.swissRounds ? "Morning complete" : "Round finished") : gamesLeft(lastMs.filter(m => !m.done).length);
-      html += `<div class="panel spread ${lastDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${SYSTEM_LABEL[sys]}</div><b>Round ${last.round} of ${t.swissRounds} planned</b> · ${lastMs.filter(m => m.done).length}/${lastMs.length} games finished · <span class="rp-state">${state}</span></div>
+      html += `<div class="panel spread ${!wr ? "" : lastDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${SYSTEM_LABEL[sys]}</div><b>Round ${last.round} of ${t.swissRounds} planned</b> · ${lastMs.filter(m => m.done).length}/${lastMs.length} games finished${wr ? ` · <span class="rp-state">${state}</span>` : ""}</div>
       ${wr && !finalsExist ? `<div class="row">${lastDone ? `<button class="btn primary" data-act="next-round">Draw round ${last.round + 1}</button>${sys === "swiss" ? `<button class="btn" data-act="own-round">Enter the games yourself</button>` : ""}` : `<button class="btn wait" disabled title="Enter every score of round ${last.round} first">Draw round ${last.round + 1}</button>`}
         ${!lastMs.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${last.id}">Undo round ${last.round}</button>` : ""}</div>` : ""}</div>`;
     }
@@ -7502,7 +7516,7 @@ function renderDraw(t) {
   for (const [gid, label] of [["RR", "Round robin"], ["SN", "Snake"]]) if (t.draws.some(d => d.id === gid)) {
     const rr = ms.filter(m => m.group === gid); if (!rr.length) continue; const maxR = Math.max(...rr.map(m => m.round));
     const rrDone = rr.every(m => m.done);
-    top.push(`<div class="panel spread ${rrDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds · <span class="rp-state">${rrDone ? "All games finished" : gamesLeft(rr.filter(m => !m.done).length)}</span></div>
+    top.push(`<div class="panel spread ${!wr ? "" : rrDone ? "rp-ready" : "rp-live"}"><div><div class="eyebrow">${label}</div><b>${rr.filter(m => m.done).length}/${rr.length} games finished</b> · ${maxR} rounds${wr ? ` · <span class="rp-state">${rrDone ? "All games finished" : gamesLeft(rr.filter(m => !m.done).length)}</span>` : ""}</div>
       ${wr ? `<div class="row">${!rr.some(m => m.done && !m.bye) ? `<button class="btn danger sm" data-act="undo" data-id="${gid}">Undo schedule</button>` : ""}</div>` : ""}</div>`);
     for (let r = 1; r <= maxR; r++) { const rm = rr.filter(m => m.round === r).sort(byOrder); parts.push({ v: gid + "-" + r, kind: "round", label: String(r), title: `Round ${r}`, games: rm, html: () => rsec(`Round ${r}`, rm) }); }
   }
