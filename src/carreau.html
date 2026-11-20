@@ -68,6 +68,10 @@ nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 nav.tabs button{background:none;border:0;padding:10px 14px;font-family:var(--display);font-size:17px;font-weight:600;letter-spacing:.03em;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
 nav.tabs button[aria-current="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 nav.tabs .t-ic,nav.tabs .t-short{display:none}
+/* event pages (event-page): the event's title beside the logo, then light/dark and language */
+body.ev .tsel{flex:1 1 auto}.ev-head{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto;line-height:1.15}
+.ev-title{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.02em;overflow-wrap:anywhere}.ev-sub{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.ev-views{align-self:flex-start}.ev-foot{margin-top:24px;gap:14px;max-width:720px}.ev-foot p{margin:0}.ev-cta a.btn{text-decoration:none}.ev-main{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--accent)}
 /* ---------- phones ---------- */
 @media (max-width:640px){
   input,select,textarea{font-size:16px} /* stops iPhone zooming in on tap */
@@ -1698,6 +1702,13 @@ Object.assign(LANG_TEXT.de, {"Run your own competition": "Richte dein eigenes Tu
 Object.assign(LANG_TEXT.nl, {"Run your own competition": "Organiseer je eigen wedstrijd", "SN Pétanque is free for clubs and organisers: draws, pistes, live scores and standings on every phone.": "SN Pétanque is gratis voor clubs en organisatoren: lotingen, banen, live scores en standen op elke telefoon.", "Start a competition": "Wedstrijd starten"}); // Pick the Winner: run your own competition (pick-game-own-competition)
 Object.assign(LANG_TEXT.pt, {"Run your own competition": "Organize a sua própria competição", "SN Pétanque is free for clubs and organisers: draws, pistes, live scores and standings on every phone.": "O SN Pétanque é gratuito para clubes e organizadores: sorteios, pistas, resultados em direto e classificações em cada telemóvel.", "Start a competition": "Criar uma competição"}); // Pick the Winner: run your own competition (pick-game-own-competition)
 Object.assign(LANG_TEXT.th, {"Run your own competition": "จัดการแข่งขันของคุณเอง", "SN Pétanque is free for clubs and organisers: draws, pistes, live scores and standings on every phone.": "SN Pétanque ใช้ฟรีสำหรับสโมสรและผู้จัด: จับสลาก สนาม ผลสด และตารางคะแนนบนทุกโทรศัพท์", "Start a competition": "เริ่มการแข่งขัน"}); // Pick the Winner: run your own competition (pick-game-own-competition)
+Object.assign(FR_TEXT, {"Go to SN Pétanque": "Aller sur SN Pétanque", "Shooting (event tab)": "Tir de précision"});
+Object.assign(LANG_TEXT.es, {"Go to SN Pétanque": "Ir a SN Pétanque", "Shooting (event tab)": "Tiro de precisión"});
+Object.assign(LANG_TEXT.it, {"Go to SN Pétanque": "Vai a SN Pétanque", "Shooting (event tab)": "Tiro di precisione"});
+Object.assign(LANG_TEXT.de, {"Go to SN Pétanque": "Zu SN Pétanque", "Shooting (event tab)": "Präzisionsschießen"});
+Object.assign(LANG_TEXT.nl, {"Go to SN Pétanque": "Naar SN Pétanque", "Shooting (event tab)": "Precisieschieten"});
+Object.assign(LANG_TEXT.pt, {"Go to SN Pétanque": "Ir para SN Pétanque", "Shooting (event tab)": "Tiro de precisão"});
+Object.assign(LANG_TEXT.th, {"Go to SN Pétanque": "ไปที่ SN Pétanque", "Shooting (event tab)": "การยิงแม่น"});
 Object.assign(FR_TEXT, {"{n} players so far": "{1} joueurs inscrits", "1 player so far": "1 joueur inscrit", "Places start when the first round's picks close: {x}.": "Le classement commence à la fin des pronostics du premier tour : {1}.", "Show all {n}": "Tout afficher ({1})"}); // Pick the Winner: players so far (pick-game-players-so-far)
 Object.assign(LANG_TEXT.es, {"{n} players so far": "{1} jugadores hasta ahora", "1 player so far": "1 jugador hasta ahora", "Places start when the first round's picks close: {x}.": "Los puestos empiezan cuando se cierran los pronósticos de la primera ronda: {1}.", "Show all {n}": "Mostrar los {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
 Object.assign(LANG_TEXT.it, {"{n} players so far": "{1} giocatori finora", "1 player so far": "1 giocatore finora", "Places start when the first round's picks close: {x}.": "La classifica parte quando si chiudono i pronostici del primo turno: {1}.", "Show all {n}": "Mostra tutti e {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
@@ -1950,8 +1961,16 @@ const T = () => S.tournaments[S.tid];
 // who can do what: replaced by the web build (owner / scorer / viewer)
 S.permFn = () => ({ edit: S.canWrite, score: S.canWrite });
 S.canCreate = () => S.canWrite;
-const canEdit = () => !!T() && S.permFn(T()).edit;
-const canScore = () => !!T() && S.permFn(T()).score;
+// event pages (event-page): snpetanque.com/<slug> is a front door onto a few competitions, one tab each. The build puts every
+// event (src/events/*.json) in SN_EVENTS, and on an event's own page its slug in SN_EVENT. Results tabs are read-only for
+// everyone, the admin included; the Pick the Winner tab works as it does on the competition itself.
+const EVENTS = Array.isArray(window.SN_EVENTS) ? window.SN_EVENTS : [];
+const EVENT = EVENTS.find(e => e.slug === window.SN_EVENT && (e.tabs || []).length) || null;
+if (EVENT) { document.body.classList.add("ev"); S.event = EVENT; S.evTab = EVENT.tabs[0].key; S.tid = EVENT.tabs[0].tid; S.tab = EVENT.tabs[0].view === "pick" ? "pick" : "draw"; S.home = false; }
+const evCur = () => S.event ? S.event.tabs.find(x => x.key === S.evTab) || S.event.tabs[0] : null;
+const evRO = () => !!S.event && evCur().view !== "pick";
+const canEdit = () => !!T() && !evRO() && S.permFn(T()).edit;
+const canScore = () => !!T() && !evRO() && S.permFn(T()).score;
 const MS = () => Object.values(S.matches);
 
 /* ---------------- domain helpers ---------------- */
@@ -3695,7 +3714,7 @@ function hofResult(t, ms) {
 }
 // a fingerprint of the result, so an organiser is told when a correction has changed it since publishing
 const hofSig = parts => parts.filter(p => p.done !== false && p.winner).map(p => [p.id, p.winner?.name, (p.winner?.players || []).join("+"), p.runnerUp?.name, (p.runnerUp?.players || []).join("+")].join("|")).join("#");
-const hofCan = t => !!(t && S.store.setHof && (S.hofCanPublish ? S.hofCanPublish(t) : canEdit()));
+const hofCan = t => !!(t && !evRO() && S.store.setHof &&(S.hofCanPublish ? S.hofCanPublish(t) : canEdit()));
 function hofWatch() {
   const t = T(); const want = t && hofCan(t) && ["standings", "setup", "draw"].includes(S.tab) ? t.id : null;
   if (!want) { if (S.hofKey && S.hofKey !== S.tid) { S.unsubH?.(); S.unsubH = null; S.hofKey = null; } return; }
@@ -6417,6 +6436,7 @@ function pageMeta() {
   const main = $("#main"), t = T(), brand = "SN Pétanque";
   let where = "", comp = "";
   if (S.liveRoute || S.overlayView) where = main.querySelector("h2, h3")?.textContent.trim() || "";
+  else if (S.event) { where = evLabel(evCur().label); comp = S.event.title; }
   else if (t) { where = tr((TABS.find(([k]) => k === S.tab) || [0, S.tab === "display" ? "Big screen" : "Draw & results"])[1]); comp = t.name || ""; }
   if (where && !main.querySelector("h1")) { const h = document.createElement("h1"); h.className = "sr-only"; h.dataset.notr = ""; h.tabIndex = -1; h.textContent = comp ? `${comp} · ${where}` : where; main.prepend(h); }
   document.title = where || comp ? [where, comp, brand].filter(Boolean).join(" · ") : `${brand} · ${tr("Competition desk")}`;
@@ -6436,6 +6456,7 @@ function drawPage() {
   if (S.liveRoute) { liveWatch(); main.innerHTML = S.loaded ? renderLiveRoute() : ""; localize(main); const lc = S.liveRoute.view === "stream" && S.loaded ? liveCtx() : null; if (lc) fitOvNames(); scheduleCardTick(lc ? lc.L : null); return; }
   if (S.overlayView) { main.innerHTML = S.overlayView(); localize($("header.app")); localize(main); return; }
   if (!S.loaded) { localize($("header.app")); return; }
+  if (S.event) { main.innerHTML = renderEvent(t); main.querySelectorAll(".pk-cta:not(.ev-cta)").forEach(n => n.remove()); localize($("header.app")); localize(main); fitBrackets(); restore(); return; }
   if (!t) { main.innerHTML = renderWelcome(); localize($("header.app")); localize(main); return; }
   const fn0 = { setup: renderSetup, entries: renderEntries, draw: renderDrawPage, courts: renderCourts, standings: renderStandings, pick: renderPickPage, display: renderDisplay, stream: x => streamingOn() ? renderStreamTab(x) : renderDisplay(x) }[S.tab] || renderDrawPage;
   // examples: visitors can open every tab, but the organiser pages are locked
@@ -6500,15 +6521,13 @@ function drawHeader() {
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();
-  $("#tsel").innerHTML = `${list.length ? `<div class="picker-wrap"><button type="button" class="picker-btn" data-act="picker" aria-expanded="${!!S.picker}" data-notr>
+  if (S.event) { drawEventHeader(); return; }
+  $("#tsel").innerHTML = `${list.length ?`<div class="picker-wrap"><button type="button" class="picker-btn" data-act="picker" aria-expanded="${!!S.picker}" data-notr>
       ${cur && logoSrc(cur.id) ? `<img class="pb-logo" src="${esc(logoSrc(cur.id))}" alt="">` : ""}<span class="pb-name">${esc(cur?.name || "Choose a competition")}</span><span class="pb-chev" aria-hidden="true">▾</span></button>
       ${S.picker ? renderPicker(list) : ""}</div>` : ""}
     <a class="cal-btn" href="#calendar" data-notr aria-label="${esc(tr("Season Calendar"))}" title="${esc(tr("Season Calendar"))}"${calOnPage() ? ' aria-current="page"' : ""}>${CAL_ICON}<span class="hide-sm">${esc(tr("Season Calendar"))}</span></a>
     <a class="hof-btn" href="#halloffame" data-notr aria-label="${esc(tr("Hall of Fame"))}" title="${esc(tr("Hall of Fame"))}"${hofOnPage() ? ' aria-current="page"' : ""}>${TROPHY_ICON}<span class="hide-sm">${esc(tr("Hall of Fame"))}</span></a>
-    <div class="theme-wrap" data-notr><div class="seg"><button type="button" class="theme-btn" data-act="theme-menu" aria-expanded="${!!S.themeMenu}" aria-label="${esc(tr("Appearance"))}" title="${esc(tr("Appearance"))}">${THEME_ICON[themePref()]}</button></div>
-      <div class="theme-menu" role="group" aria-label="${esc(tr("Appearance"))}" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" data-theme-pick="${v}" aria-pressed="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
-    <div class="lang-wrap" data-notr><div class="seg"><button type="button" class="lang-btn" data-act="lang-menu" aria-expanded="${!!S.langMenu}" aria-label="${esc(tr("Language"))}: ${I18N.lang.toUpperCase()}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
-      <div class="lang-menu" role="group" aria-label="${esc(tr("Language"))}" ${S.langMenu ? "" : "hidden"}>${LANGS.map(([c, n]) => `<button type="button" data-lang="${c}" lang="${c}" aria-pressed="${I18N.lang === c}"><b aria-hidden="true">${c.toUpperCase()}</b><span>${n}</span></button>`).join("")}</div></div>
+    ${themeLangBtns()}
     ${S.canCreate() ? `<button class="btn sm new-t" data-act="new-t" aria-label="New competition"><span aria-hidden="true">+</span><span class="hide-sm"> New competition</span><span class="show-sm"> New</span></button>` : ""}${S.headerExtra ? S.headerExtra() : ""}
     ${S.store.mode === "local" && S.loaded ? `<span class="pill" title="Saved in this browser only">This device only</span>` : ""}`;
   const t = T();
@@ -6519,6 +6538,53 @@ function drawHeader() {
   if (t && S.tab === "stream" && streamingKnown() && !streamingOn()) S.tab = "display";
   $("#tabs").innerHTML = t ? tabsNow().filter(([k]) => k !== "pick" || pickOn(t)).filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
   localize($("header.app")); // every caller (menus, outside taps, Hall of Fame, streams) gets the header in the chosen language
+}
+// the header's light/dark and language buttons (also on event pages)
+function themeLangBtns() {
+  return `<div class="theme-wrap" data-notr><div class="seg"><button type="button" class="theme-btn" data-act="theme-menu" aria-expanded="${!!S.themeMenu}" aria-label="${esc(tr("Appearance"))}" title="${esc(tr("Appearance"))}">${THEME_ICON[themePref()]}</button></div>
+      <div class="theme-menu" role="group" aria-label="${esc(tr("Appearance"))}" ${S.themeMenu ? "" : "hidden"}><div class="menu-h first">${esc(tr("Appearance"))}</div>${THEMES.map(([v, n]) => `<button type="button" data-theme-pick="${v}" aria-pressed="${themePref() === v}"><b>${THEME_ICON[v]}</b><span>${esc(tr(n))}</span></button>`).join("")}</div></div>
+    <div class="lang-wrap" data-notr><div class="seg"><button type="button" class="lang-btn" data-act="lang-menu" aria-expanded="${!!S.langMenu}" aria-label="${esc(tr("Language"))}: ${I18N.lang.toUpperCase()}" title="${esc(tr("Language"))}">${I18N.lang.toUpperCase()} <span aria-hidden="true">▾</span></button></div>
+      <div class="lang-menu" role="group" aria-label="${esc(tr("Language"))}" ${S.langMenu ? "" : "hidden"}>${LANGS.map(([c, n]) => `<button type="button" data-lang="${c}" lang="${c}" aria-pressed="${I18N.lang === c}"><b aria-hidden="true">${c.toUpperCase()}</b><span>${n}</span></button>`).join("")}</div></div>`;
+}
+/* ---------- event pages (event-page) ---------- */
+// a tab's label in the visitor's language: "Shooting" has its own key here, as the plain word already means "shooting now";
+// names such as "Nations Cup" have no translation and stay as they are
+const EV_KEYS = { Shooting: "Shooting (event tab)" };
+const evLabel = l => EV_KEYS[l] ? trAs(EV_KEYS[l], l) : tr(l);
+const EV_ICON = { pick: TAB_ICON.pick, draw: TAB_ICON.draw, standings: TAB_ICON.standings,
+  flag: ic('<path d="M5 21V4"/><path d="M5 4.5h12l-2.5 4 2.5 4H5"/>'), target: ic('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>') }; // i18n-ok: icons
+// the header: the logo (to the main site), the event's title and subtitle, light/dark and language; the tabs below
+// (the bottom bar on phones). No competition picker, + New, Calendar, Hall of Fame, organiser code or role pill.
+function drawEventHeader() {
+  const E = S.event, cur = evCur();
+  $(".brand .home")?.setAttribute("href", "/");
+  $("#tsel").innerHTML = `<div class="ev-head" data-notr><b class="ev-title">${esc(E.title)}</b>${E.subtitle ? `<span class="ev-sub">${esc(E.subtitle)}</span>` : ""}</div>${themeLangBtns()}`;
+  $("#tabs").innerHTML = E.tabs.map(x => { const l = evLabel(x.label), s = x.view === "pick" ? tr(TAB_SHORT.pick) : l;
+    return `<button type="button" data-evtab="${esc(x.key)}" aria-current="${x.key === cur.key}" aria-label="${esc(l)}" data-notr>${EV_ICON[x.icon] || EV_ICON[x.view === "pick" ? "pick" : "draw"]}<span class="t-long">${esc(l)}</span><span class="t-short">${esc(s)}</span></button>`; }).join("");
+  localize($("header.app"));
+}
+// a tab: Pick the Winner as the competition shows it, or a competition's Draw & results and Standings (read-only); then the
+// event's note, an invitation to run a competition (on the main site) and a link to the main site
+function renderEvent(t) {
+  const E = S.event, x = evCur(); let body;
+  if (!t) body = `<div class="empty">Loading competitions…</div>`;
+  else if (x.view === "pick") body = renderPickPage(t);
+  else { const st = S.tab === "standings";
+    body = `<div class="seg ev-views" role="group" aria-label="${esc(evLabel(x.label))}"><button type="button" data-evview="draw" aria-pressed="${!st}">Draw &amp; results</button><button type="button" data-evview="standings" aria-pressed="${st}">Standings</button></div>
+      <div class="ev-view">${st ? renderStandings(t) : renderDrawPage(t)}</div>`; }
+  return `<div class="ev-page stack">${S.topBanner ? S.topBanner() : ""}${body}
+    <div class="ev-foot stack">${E.note ? `<p class="small muted ev-note" data-notr>${esc(E.note)}</p>` : ""}
+      <section class="panel stack pk-cta ev-cta" style="gap:10px"><h3>Run your own competition</h3>
+        <p>SN Pétanque is free for clubs and organisers: draws, pistes, live scores and standings on every phone.</p>
+        <div><a class="btn primary" href="/#new">Start a competition</a></div></section>
+      <p><a class="ev-main" href="/">Go to SN Pétanque</a></p></div></div>`;
+}
+// switching tabs switches the watched competition, as picking one does (one competition's games listened to at a time)
+function evGo(key) {
+  const x = S.event.tabs.find(y => y.key === key); if (!x) return;
+  S.evTab = x.key; S.tab = x.view === "pick" ? "pick" : S.evView || "draw";
+  if (x.tid !== S.tid) { S.tid = x.tid; S.matches = {}; S.onSelect?.(); watchMatches(); }
+  render(); window.scrollTo(0, 0);
 }
 // the start screen: first visit, or the logo tapped. Run (or watch how it works) up top beside a small live preview,
 // then stream, the Season Calendar and the Hall of Fame, then your competitions, featured ones and the examples.
@@ -7891,7 +7957,15 @@ document.addEventListener("click", async e => {
   if (S.picker && !e.target.closest(".picker")) { S.picker = false; renderHeader(); localize($("header.app")); }
   const sr = e.target.closest(".tw.st tr[data-st]");
   if (sr) { const id = sr.dataset.st, set = S.stOpen ||= new Set(); set.has(id) ? set.delete(id) : set.add(id); sr.classList.toggle("open", set.has(id)); sr.querySelector(".st-name")?.setAttribute("aria-expanded", String(set.has(id))); return; }
-  if (e.target.closest("header .brand .home")) { e.preventDefault(); if (S.liveRoute && !hofOnPage() && !calOnPage()) return; if (S.liveRoute) leaveLive(); S.home = true; S.picker = false; S.tid = null; lsSet("carreau-tid", ""); S.matches = {}; watchMatches(); S.onHome?.(); render(); window.scrollTo(0, 0); return; }
+  // event pages: the tabs, the Draw & results / Standings switch; the logo is a plain link to the main site, and in-page
+  // links (#main, #) stay on the page (the page's <base href="/"> would otherwise send them to the main site)
+  if (S.event) {
+    const et = e.target.closest("[data-evtab]"); if (et) { evGo(et.dataset.evtab); return; }
+    const ev = e.target.closest("[data-evview]"); if (ev) { S.evView = S.tab = ev.dataset.evview; render(); return; }
+    const al = e.target.closest('a[href="#main"], a[href="#"]'); if (al) { e.preventDefault(); if (al.getAttribute("href") === "#main") { const m = $("#main"); m.tabIndex = -1; m.focus(); } return; }
+    const dt = e.target.closest("[data-tab]"); if (dt) { if (evCur().view !== "pick" && ["draw", "standings"].includes(dt.dataset.tab)) S.evView = S.tab = dt.dataset.tab; render(); return; }
+  }
+  if (!S.event && e.target.closest("header .brand .home")) { e.preventDefault(); if (S.liveRoute && !hofOnPage() && !calOnPage()) return; if (S.liveRoute) leaveLive(); S.home = true; S.picker = false; S.tid = null; lsSet("carreau-tid", ""); S.matches = {}; watchMatches(); S.onHome?.(); render(); window.scrollTo(0, 0); return; }
   const br = e.target.closest('[data-act="bk-round"]');
   if (br) { (S.bkRound ||= {})[S.tid + ":" + br.dataset.b] = { v: br.dataset.v, sig: br.dataset.sig }; render(); return; }
   const bz = e.target.closest('[data-act="bk-zoom"]');
@@ -8288,7 +8362,7 @@ function startWatching() {
     S.loaded = true;
     // on load (or when the open competition goes away): the newest of this person's own competitions (not a half-written
     // one still waiting on the server); none → the start screen
-    if ((!S.tid || !S.tournaments[S.tid]) && !S.home && S.roleKnown()) { const first = list.filter(t => !t.archived && !(t.listed || t.example) && !isFeatured(t) && Array.isArray(t.teams) && (!S.menuFilter || S.menuFilter(t))).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
+    if ((!S.tid || !S.tournaments[S.tid]) && !S.home && !S.event && S.roleKnown()) { const first = list.filter(t => !t.archived && !(t.listed || t.example) && !isFeatured(t) && Array.isArray(t.teams) && (!S.menuFilter || S.menuFilter(t))).sort((a, b) => (b.created || 0) - (a.created || 0))[0]; const changed = S.tid !== (first?.id || null); S.tid = first?.id || null; if (changed) { S.matches = {}; watchMatches(); } }
     if (T() && S.roleKnown() && !canEdit() && !viewAll(T()) && (S.tab === "setup" || S.tab === "entries")) S.tab = canScore() ? "courts" : "draw";
     S.onTournaments?.();
     if (meta?.remote && !firstLoad) renderSoon(); else render();

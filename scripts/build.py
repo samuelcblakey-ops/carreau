@@ -81,6 +81,43 @@ for name, blob in lang_files.values(): open(os.path.join(langdir, name), "w", en
 if os.environ.get("CARREAU_NO_MINIFY") != "1":
     subprocess.run(["node", os.path.join(here, "minify.js"), os.path.join(out, "index.html")], check=True)
     html = open(os.path.join(out, "index.html")).read()
+# event pages (event-page): each src/events/<slug>.json becomes dist/<slug>/index.html, the same page with the event's own
+# link-preview tags (Facebook and WhatsApp read the HTML at that address, so no redirect), <base href="/"> so every relative
+# path (fonts, icons, manifest, sw.js, firebase-config.js, lang/) still resolves from the site's root, and the event's slug.
+# Every page also gets the list of events (SN_EVENTS), so a Pick the Winner private link can point at its event page.
+SITE_URL = os.environ.get("CARREAU_SITE_URL", "https://snpetanque.com")
+events = []
+evdir = os.path.join(root, "src", "events")
+for f in sorted(os.listdir(evdir)) if os.path.isdir(evdir) else []:
+    if not f.endswith(".json"): continue
+    ev = json.load(open(os.path.join(evdir, f), encoding="utf-8"))
+    assert re.fullmatch(r"[a-z0-9][a-z0-9-]*", ev.get("slug", "")) and ev["slug"] + ".json" == f, f"{f}: slug must be the file's name (a-z, 0-9, -)"
+    assert ev["slug"] not in ("lang", "fonts", "videos"), f"{f}: slug clashes with a folder of the site"
+    assert ev.get("title") and ev.get("tabs") and all(t.get("key") and t.get("label") and re.fullmatch(r"[A-Za-z0-9]+", t.get("tid", "")) and t.get("view") in ("pick", "results") for t in ev["tabs"]), f"{f}: needs a title and tabs (key, label, tid, view pick|results)"
+    events.append(ev)
+def esc_attr(s): return (str(s).replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;"))
+ev_script = "<script>window.SN_EVENTS=" + json.dumps(events, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";</script>"
+assert 0 < html.index("</head>") < html.index("<body"), "the page's own </head> comes first"
+html = html.replace("</head>", ev_script + "\n</head>", 1)
+open(os.path.join(out, "index.html"), "w").write(html)
+pages = [html]
+for ev in events:
+    sh = ev.get("share") or {}; url = f"{SITE_URL}/{ev['slug']}"
+    title, desc = sh.get("title") or ev["title"], sh.get("description") or ev.get("subtitle") or ""
+    tags = [f'<meta property="og:type" content="website">', f'<meta property="og:site_name" content="SN Pétanque">',
+            f'<meta property="og:title" content="{esc_attr(title)}">', f'<meta property="og:description" content="{esc_attr(desc)}">',
+            f'<meta property="og:url" content="{esc_attr(url)}">']
+    if sh.get("image"): tags += [f'<meta property="og:image" content="{esc_attr(SITE_URL + "/" + sh["image"])}">', '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="630">']
+    tags += [f'<meta name="twitter:card" content="{"summary_large_image" if sh.get("image") else "summary"}">', f'<meta name="twitter:title" content="{esc_attr(title)}">', f'<meta name="twitter:description" content="{esc_attr(desc)}">']
+    if sh.get("image"): tags.append(f'<meta name="twitter:image" content="{esc_attr(SITE_URL + "/" + sh["image"])}">')
+    page = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/">', 1)
+    page = re.sub(r'<meta name="description" content="[^"]*">', lambda m: f'<meta name="description" content="{esc_attr(desc)}">', page, count=1)
+    page = re.sub(r"<title>[^<]*</title>", lambda m: f"<title>{esc_attr(title)}</title>", page, count=1)
+    page = page.replace(ev_script, ev_script + f'\n<link rel="canonical" href="{esc_attr(url)}">\n' + "\n".join(tags) + f"\n<script>window.SN_EVENT={json.dumps(ev['slug'])};</script>", 1)
+    assert "<base href=\"/\">" in page and "window.SN_EVENT=" in page and 'og:title' in page
+    d = os.path.join(out, ev["slug"]); os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w").write(page); pages.append(page)
+    print(f"built dist/{ev['slug']}/index.html (event page)")
 for f in os.listdir(os.path.join(root, "public")):
     src = os.path.join(root, "public", f)
     if os.path.isfile(src): shutil.copy(src, out)
@@ -91,6 +128,6 @@ try: sha = os.environ.get("GITHUB_SHA") or subprocess.run(["git", "rev-parse", "
 except Exception: sha = "unknown"
 open(os.path.join(out, "build.txt"), "w").write(sha + "\n")
 # stamp the service worker with this build (so phones pick up new versions) and its language files
-sw = os.path.join(out, "sw.js"); ver = hashlib.md5(html.encode()).hexdigest()[:10]
+sw = os.path.join(out, "sw.js"); ver = hashlib.md5("".join(pages).encode()).hexdigest()[:10]
 txt = open(sw).read(); open(sw, "w").write(txt.replace("__VERSION__", ver).replace("__FBV__", V).replace("__LANGS__", json.dumps({c: f for c, (f, _) in lang_files.items()})))
 print("built dist/index.html", len(html), "+ lang/", " ".join(f"{c}:{len(b.encode()) // 1024}KB" for c, (_, b) in lang_files.items()))
