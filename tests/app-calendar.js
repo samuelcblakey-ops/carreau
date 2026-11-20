@@ -66,6 +66,15 @@ const { chromium } = require('playwright');
     q('#modal [data-act="cal-save"]').click(); await w(250);
     const e2 = await S.store.getCal(C.T().id);
     L.push('updated: ' + txt(q('#toast')) + ' | name ' + e2.name + ' | created kept ' + (e2.createdAt === e.createdAt) + ' | notice gone ' + !q('.cal-changed'));
+    // a date and venue changed in the sheet go to the competition too: no "changed" notice, and the next Update shows them
+    q('[data-cal-panel] [data-act="cal-open"]').click(); await w(150);
+    type('#modal [data-cal="date"]', day(10)); type('#modal [data-cal="venue"]', 'Hitchin Bowls Club');
+    q('#modal [data-act="cal-save"]').click(); await w(300);
+    const e3 = await S.store.getCal(C.T().id);
+    L.push('sheet date and venue: competition ' + (C.T().date === day(10)) + ' ' + C.T().venue + ' | listing ' + (e3.date === day(10)) + ' ' + e3.venue + ' | notice ' + !!q('.cal-changed'));
+    q('[data-cal-panel] [data-act="cal-open"]').click(); await w(150);
+    L.push('update sheet again: date ' + (q('#modal [data-cal="date"]').value === day(10)) + ' | venue ' + q('#modal [data-cal="venue"]').value);
+    q('#modal [data-act="close"]').click(); await w(100);
     q('[data-cal-panel] [data-act="cal-remove"]').click(); await w(100);
     L.push('confirm: ' + txt(q('[data-cal-panel] .err')) + ' | ' + qa('[data-cal-panel] .row .btn').map(txt).join(','));
     q('[data-act="cal-remove-yes"]').click(); await w(250);

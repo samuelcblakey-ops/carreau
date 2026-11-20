@@ -125,6 +125,8 @@ const SUITES = {
       /^changed notice after rename: true \| The competition's name, date or venue has changed since it was listed\. Update the listing$/m,
       /^update sheet: Update the listing \| level kept true \| fee kept £5 per player \| name Hitchin Summer Triples 2026$/m,
       /^updated: Listing updated\. \| name Hitchin Summer Triples 2026 \| created kept true \| notice gone true$/m,
+      /^sheet date and venue: competition true Hitchin Bowls Club \| listing true Hitchin Bowls Club \| notice false$/m,
+      /^update sheet again: date true \| venue Hitchin Bowls Club$/m,
       /^confirm: Take it off the Season Calendar\? \| Update,Make a poster,Remove,Keep it$/m, /^remove: Taken off the Season Calendar\. \| gone from store true \| button back true$/m,
       /^archive marks gone: true \| restore unmarks: true \| panel while archived false$/m, /^past competition: yesterday true \| two days ago false$/m,
       /^no panel: spectator true \| example true$/m, /^fr: Calendrier de la saison \| Mettre à jour l'annonce \| Ouvert à tous,Masculins,Féminines \| Mettre à jour l'annonce$/m,

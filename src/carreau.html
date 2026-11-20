@@ -3749,7 +3749,12 @@ async function calAction(act, k) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(md.date || "") || md.date < calDay()) { md.err = "Pick a date from today on."; renderModal(); return; }
     const prev = S.cal?.[t.id] || null; const L = calEntry(t, md, prev);
     md.busy = true; md.err = ""; renderModal();
-    try { await S.store.setCal(t.id, L); S.cal = S.cal || {}; S.cal[t.id] = L; calReset(); S.modal = null; renderModal(); render(); toast(prev ? "Listing updated." : "Listed on the Season Calendar."); }
+    // the sheet's date and venue are the competition's (calOpen fills them in from it), so a change made here goes to the
+    // competition too; otherwise Setup says it "has changed since it was listed", and the next Update brings the old ones back
+    const sync = L.date !== (t.date || "") || L.venue !== calVenue(t);
+    try {
+      if (sync) { const nt = clone(t); nt.date = L.date; nt.venue = L.venue; await saveT(nt); }
+      await S.store.setCal(t.id, L); S.cal = S.cal || {}; S.cal[t.id] = L; calReset(); S.modal = null; renderModal(); render(); toast(prev ? "Listing updated." : "Listed on the Season Calendar."); }
     catch (err) { console.error(err); md.busy = false; md.err = err?.code === "permission-denied" ? "Only this competition's organisers can list it." : "That didn't save. Check your connection and try again."; renderModal(); }
   }
 }
