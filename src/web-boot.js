@@ -533,6 +533,7 @@ async function joinTeam(tid, teamId, code) {
 }
 async function joinWithCode(tid, raw) {
   const tm = /^t-([A-Za-z0-9]+)-([A-Z0-9]+)$/.exec(String(raw || "")); if (tm && tid && AUTH.user) return joinTeam(tid, tm[1], tm[2]);
+  const pk = /^pk-([A-Z0-9]+)-([A-Z0-9]+)$/.exec(String(raw || "")); if (pk && tid && AUTH.user) return joinPick(tid, pk[1], pk[2]);
   const code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (!code || !tid || !AUTH.user) return false;
   const ref = doc(FB.db, "tournaments", tid, "members", AUTH.user.uid);
@@ -546,6 +547,59 @@ async function joinWithCode(tid, raw) {
   }
   toast("That code didn't work. Check it with the organiser.");
   return false;
+}
+
+// ---------- Pick the Winner (pick-game) ----------
+// A player is pickers/{pid} (name, public) with a private key in pickkeys/{pid} (never readable). A device plays as that
+// player once it has proved the key in pickdev/{its uid} (like a team link, but kept out of members, so a player never gets
+// any scoring rights). The private link (#<competition>.pk-<pid>-<key>) does that on another phone. Cost: one listener on
+// this device's pickdev doc, one on its player's name, one on its own picks; nothing on anyone else's.
+const PICK = { tid: null, uid: null, ready: false, me: null, picks: {}, unsubs: [], unsubMe: null };
+function pickStop() { PICK.unsubs.forEach(u => u()); PICK.unsubs = []; PICK.unsubMe?.(); PICK.unsubMe = null; Object.assign(PICK, { tid: null, uid: null, ready: false, me: null, picks: {} }); }
+function pickPlayer(tid, pid, key) {
+  PICK.unsubMe?.(); PICK.unsubMe = null; PICK.picks = {};
+  if (!pid) { PICK.me = null; return; }
+  PICK.me = { pid, key, name: PICK.me?.pid === pid ? PICK.me.name : "" };
+  const u1 = onSnapshot(doc(FB.db, "tournaments", tid, "pickers", pid), d => { if (PICK.me?.pid === pid) { PICK.me.name = d.exists() ? d.data().name || "" : ""; render(); } }, () => {});
+  const u2 = onSnapshot(query(collection(FB.db, "tournaments", tid, "picks"), where("pid", "==", pid)), s => {
+    const m = {}; s.docs.forEach(d => { const x = d.data(); if (x.round) m[x.round] = x.team; }); PICK.picks = m; render(); }, e => console.warn("picks", e?.code || e));
+  PICK.unsubMe = () => { u1(); u2(); };
+}
+function pickWatch(t) {
+  if (!FB || !AUTH.user || !t?.pick?.on) { if (PICK.tid) pickStop(); return; }
+  if (PICK.tid === t.id && PICK.uid === AUTH.user.uid) return;
+  pickStop(); PICK.tid = t.id; PICK.uid = AUTH.user.uid; const tid = t.id;
+  // the server's copy only: a device's own pickdev write shows locally before the server has it, and the rules would refuse
+  // the picks listener started on it (and it wouldn't start again)
+  PICK.unsubs.push(onSnapshot(doc(FB.db, "tournaments", tid, "pickdev", AUTH.user.uid), { includeMetadataChanges: true }, d => {
+    if (PICK.tid !== tid || d.metadata.hasPendingWrites) return; const v = d.exists() ? d.data() : null;
+    if ((v?.pid || null) !== (PICK.me?.pid || null)) pickPlayer(tid, v?.pid, v?.key); else if (v && PICK.me) PICK.me.key = v.key;
+    PICK.ready = true; render(); }, () => { PICK.ready = true; render(); }));
+}
+const pickLink = t => PICK.me ? `${base()}#${t.id}.pk-${PICK.me.pid}-${PICK.me.key}` : "";
+S.pickGame = {
+  state(t) { pickWatch(t); const on = PICK.tid === t.id; return { ready: on && PICK.ready, me: on && PICK.me ? { pid: PICK.me.pid, name: PICK.me.name } : null, picks: on ? PICK.picks : {}, link: on ? pickLink(t) : "" }; },
+  // a new player: the name, the private key and this device's proof of it, in one batch (the rules check each against the others)
+  async join(t, name) {
+    const pid = newCode(), key = newCode() + newCode(), b = writeBatch(FB.db), now = serverTimestamp();
+    b.set(doc(FB.db, "tournaments", t.id, "pickers", pid), { name, at: now });
+    b.set(doc(FB.db, "tournaments", t.id, "pickkeys", pid), { key });
+    b.set(doc(FB.db, "tournaments", t.id, "pickdev", AUTH.user.uid), { pid, key, at: now });
+    await b.commit();
+    pickWatch(t); if (PICK.me?.pid !== pid) pickPlayer(t.id, pid, key); PICK.me.name = name; PICK.ready = true;
+  },
+  // the time is the server's; the rules refuse a pick once its round has closed
+  async pick(t, rid, team) {
+    const pid = PICK.me?.pid; if (!pid) throw new Error("not joined");
+    const before = PICK.picks[rid]; PICK.picks = { ...PICK.picks, [rid]: team };
+    try { await track(setDoc(doc(FB.db, "tournaments", t.id, "picks", `${pid}_${rid}`), { pid, round: rid, team, at: serverTimestamp() })); }
+    catch (e) { PICK.picks = { ...PICK.picks }; if (before) PICK.picks[rid] = before; else delete PICK.picks[rid]; throw e; }
+  }
+};
+// the private link on another phone: prove the key, then play as that player (a wrong key is refused by the rules)
+async function joinPick(tid, pid, key) {
+  try { await setDoc(doc(FB.db, "tournaments", tid, "pickdev", AUTH.user.uid), { pid, key, at: serverTimestamp() }); remember(tid); S.tab = "pick"; render(); return true; }
+  catch (e) { console.warn("pick link", e?.code || e); toast("That private link didn't work. Check it and try again."); return false; }
 }
 
 
@@ -1257,6 +1311,7 @@ function boot() {
       batch: ops => { const b = writeBatch(FB.db), now = v => v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, x === "__now" ? serverTimestamp() : x])) : v;
         ops.forEach(([op, path, data]) => { const r = doc(FB.db, ...path.split("/")); if (op === "del") b.delete(r); else if (op === "update") b.update(r, now(data)); else b.set(r, now(data)); }); return b.commit(); },
       list: path => getDocs(collection(FB.db, ...path.split("/"))).then(s => s.docs.map(d => d.id)),
+      where: (path, field, value) => getDocs(query(collection(FB.db, ...path.split("/")), where(field, "==", value))).then(s => s.docs.map(d => d.id)),
       hofShown: () => getDocs(query(collection(FB.db, "hallOfFame"), where("hidden", "==", false), limit(20))).then(s => s.docs.map(d => d.id)),
       hofAll: () => getDocs(query(collection(FB.db, "hallOfFame"), limit(20))).then(s => s.docs.map(d => d.id)) };
   }
