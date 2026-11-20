@@ -618,7 +618,7 @@ const SUITES = {
       /french: Des concours de pétanque, gérés depuis votre téléphone \| files fr \| first drawn Des concours de pétanque/,
       /to german: Pétanque-Turniere, vom Handy aus geleitet \| files fr,de$/m, /back to french: Des concours de pétanque, gérés depuis votre téléphone \| files fr,de$/m,
       /to english: Pétanque competitions, run from your phone \| files fr,de$/m, /missing file: Pétanque competitions, run from your phone/, /errs \[\]/],
-    'web-calendar.js': [/^web panel owner: Season Calendar ?List this competition on the Season Calendar so players can find it and see how to enter\. List on the Season Calendar$/m,
+    'web-calendar.js': [/^web panel owner: Season Calendar ?List this competition on the Season Calendar so players can find it and see how to enter\. ?List on the Season Calendar ?▶ ?Organising a competition\? Watch how to list it \(2 min\)\.$/m,
       /^web listed: Listed on the Season Calendar\. \| read read \| comp regional doubles Jane, 07700 900123 \| byUid mine true \| hidden false$/m,
       /^rules: owner create true \| organiser link update true \| stranger create false \| stranger update false \| stranger reads shown true$/m,
       /^rules more: stranger delete false \| stranger panel false \| organiser link panel true \| missing listing read none$/m,
