@@ -9,6 +9,7 @@ const { chromium } = require('playwright');
   const out = await p.evaluate(async () => {
     const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)];
     const txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim(), r = [];
+    S.pickAdmin = () => true; // only the admin sets a game up (pick-game-admin-only)
     S.pickGame = { st: { ready: true, me: null, picks: {}, link: location.href.split('#')[0] + '#x.pk-P1-KEY' },
       state() { return this.st; }, async join(t, name) { this.st.me = { pid: 'P1', name }; }, async pick(t, rid, team) { this.st.picks[rid] = team; } };
     const NAMES = ['Italy (ITA)', 'France (FRA)', 'Thailand (THA)', 'Spain (ESP)', 'Belgium (BEL)', 'Madagascar (MAD)', 'Tunisia (TUN)', 'Benin (BEN)',
@@ -22,6 +23,10 @@ const { chromium } = require('playwright');
     // a Swiss of 3 rounds, then a main knockout of 16
     await make(16, 'swiss', { swissRounds: 3, koPlan: { seeding: 'seeded', brackets: [{ id: 'A', name: 'Main knockout', from: 1, to: 16, third: false }] } });
     q('[data-tab="setup"]').click(); await w(60);
+    S.pickAdmin = () => false; q('[data-tab="draw"]').click(); await w(40); q('[data-tab="setup"]').click(); await w(60);
+    r.push('setup pick section organiser: ' + (q('#pick-setup') ? 'shown' : 'hidden'));
+    S.pickAdmin = () => true; q('[data-tab="draw"]').click(); await w(40); q('[data-tab="setup"]').click(); await w(60);
+    r.push('setup pick section admin: ' + (q('#pick-setup') ? 'shown' : 'hidden'));
     r.push('setup panel: ' + !!q('#pick-setup') + ' | rows shown ' + !!q('.pk-rows'));
     const on = q('#pick-on'); on.checked = true; on.dispatchEvent(new Event('change', { bubbles: true })); await w(120);
     r.push('game on: ' + !!C.T().pick?.on + ' | tab ' + !!q('[data-tab="pick"]'));

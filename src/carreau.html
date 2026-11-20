@@ -6878,8 +6878,10 @@ function pickDraft(t) {
   return S.pickDraft;
 }
 const pickNewId = rows => { let n = 1; while (rows.some(r => r.id === "p" + n)) n++; return "p" + n; };
+// only the admin sets a game up (pick-game-admin-only): the website says who that is; the rules refuse anyone else
+const pickAdmin = () => !!S.pickAdmin?.();
 function pickSetupPanel(t) {
-  if (!S.pickGame || !canEdit()) return "";
+  if (!S.pickGame || !canEdit() || !pickAdmin()) return "";
   const on = !!t.pick?.on;
   let rows = "";
   if (on) {
@@ -7143,7 +7145,7 @@ async function pickAction(act, a, t) {
     catch (e) { console.error(e); U.err[rid] = e?.code === "permission-denied" ? "Picks for this round have closed." : "Couldn't save your pick. Check your connection and try again."; }
     render(); return;
   }
-  if (!canEdit() || !t) return;
+  if (!canEdit() || !t || !pickAdmin()) return;
   const D = pickDraft(t);
   if (act === "pk-row-add") { D.rows.push({ id: pickNewId(D.rows), name: "", src: "", date: "", time: "" }); D.err = ""; render(); return; }
   if (act === "pk-row-x") { D.rows.splice(+a.dataset.i, 1); render(); return; }
@@ -8249,7 +8251,7 @@ document.addEventListener("change", async e => {
 
   if (el.closest("#modal")) return;
   if (S.extraChange && await S.extraChange(el)) return;
-  if (el.dataset.pickOn !== undefined) { const t = clone(T()); t.pick = Object.assign({ rounds: [] }, t.pick, { on: el.checked }); if (!t.pickClose) t.pickClose = {}; S.pickDraft = null; await guard(() => saveT(t)); return; }
+  if (el.dataset.pickOn !== undefined && pickAdmin()) { const t = clone(T()); t.pick = Object.assign({ rounds: [] }, t.pick, { on: el.checked }); if (!t.pickClose) t.pickClose = {}; S.pickDraft = null; await guard(() => saveT(t)); return; }
   if (el.dataset.pk) { const D = pickDraft(T()), r = D.rows[+el.dataset.i]; if (r) { r[el.dataset.pk] = el.value; D.err = ""; } return; }
   if (el.dataset.plansilver !== undefined) { const on = el.checked; await savePlan(pl => { pl.brackets = pl.brackets.filter(b => !b.silver); if (on) pl.brackets.push({ id: "S", name: "Silver", silver: true, from: 1, to: 9999, third: false }); }); return; }
   if (el.dataset.plan) { const i = +el.dataset.i, f = el.dataset.plan; const v = f === "third" ? el.checked : f === "name" ? (el.value.trim() || "Knockout") : parseInt(el.value, 10); if (f !== "name" && f !== "third" && isNaN(v)) return; await savePlan(pl => pl.brackets[i][f] = f === "name" ? koNameSaved(v, pl.brackets[i].name) : v); return; }

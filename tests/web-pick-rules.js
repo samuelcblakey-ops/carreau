@@ -16,10 +16,16 @@ const { chromium } = require('playwright');
   await A.click('[data-act="new-t"]'); await w(2500); const tid = await A.evaluate(() => location.hash.slice(1));
   await A.evaluate(async () => { const C = window.__carreau, S = C.S, t = JSON.parse(JSON.stringify(C.T())); t.checkin = false; t.system = 'swiss'; t.swissRounds = 3;
     ['Italy (ITA)', 'France (FRA)', 'Thailand (THA)', 'Spain (ESP)'].forEach((name, i) => t.teams.push({ id: 'e' + i, name, players: ['a', 'b', 'c'], active: true }));
-    t.pick = { on: true, rounds: [{ id: 'p1', name: 'Round 1', src: 'swiss:1' }, { id: 'p2', name: 'Round 2', src: 'swiss:2' }, { id: 'p3', name: 'Round 3', src: 'swiss:3' }] };
-    t.pickClose = { p1: Date.now() + 36e5, p2: Date.now() - 36e5, p3: Date.now() + 36e5 };
     await S.store.setTournament(t); S.tournaments[t.id] = t; });
   await w(2000);
+  // only the admin sets a game up (pick-game-admin-only); the organiser's other edits still work
+  const pickOn = { on: true, rounds: [{ id: 'p1', name: 'Round 1', src: 'swiss:1' }, { id: 'p2', name: 'Round 2', src: 'swiss:2' }, { id: 'p3', name: 'Round 3', src: 'swiss:3' }] };
+  const closes = { p1: Date.now() + 36e5, p2: Date.now() - 36e5, p3: Date.now() + 36e5 };
+  log('organiser switches pick game on: ' + await raw(A, 'update', `tournaments/${tid}`, { pick: pickOn }));
+  log('admin switches pick game on: ' + await raw(AD, 'update', `tournaments/${tid}`, { pick: pickOn, pickClose: closes }));
+  log('organiser changes pickClose: ' + await raw(A, 'update', `tournaments/${tid}`, { pickClose: { ...closes, p1: Date.now() + 72e5 } }));
+  log('organiser updates name with a pick game present: ' + await raw(A, 'update', `tournaments/${tid}`, { name: 'Pick test' }));
+  await w(1500);
   const setTid = p => p.evaluate(t => { window.__tid = t; }, tid);
   // player 1 joins on their phone and saves a pick through the page
   const P = await mk('player', 390); await P.goto(base + '#' + tid); await w(5000); await setTid(P);
@@ -47,8 +53,8 @@ const { chromium } = require('playwright');
   log('round not in the game: ' + await raw(P, 'batch', await P.evaluate(pickOp, [pid, 'p9', 'e2'])));
   log('pick id not matching: ' + await raw(P, 'batch', [['set', `tournaments/${tid}/picks/${pid}_p1x`, { pid, round: 'p1', team: 'e2', at: '__now' }]]));
   log('private key read: ' + await raw(P, 'get', `tournaments/${tid}/pickkeys/${pid}`));
-  // the organiser closes round 3: Ann's pick in it can't change any more
-  await A.evaluate(async () => { const C = window.__carreau; await C.S.store.updateTournament(C.T().id, { pickClose: Object.assign({}, C.T().pickClose, { p3: Date.now() - 1000 }) }); });
+  // the admin closes round 3: Ann's pick in it can't change any more
+  await raw(AD, 'update', `tournaments/${tid}`, { pickClose: { ...closes, p3: Date.now() - 1000 } });
   await w(1500);
   log('change pick after close: ' + await raw(P, 'batch', await P.evaluate(pickOp, [pid, 'p3', 'e3'])));
   log('delete pick after close: ' + await raw(P, 'del', `tournaments/${tid}/picks/${pid}_p3`));
