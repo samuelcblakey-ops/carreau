@@ -78,7 +78,7 @@ const { chromium } = require('playwright');
     r.push('no players: ' + txt(q('.pk-board > p')));
     const t = JSON.parse(JSON.stringify(C.T())); t.pickClose = { p1: Date.now() + 1e6, p2: Date.now() + 2e6, p3: Date.now() + 3e6 }; S.tournaments[t.id] = t;
     S.pickGame.boardData = { pickers: { ann: { name: 'Ann' } }, picks: [] }; C.render(); await w(40);
-    r.push('before close: ' + txt(q('.pk-board > p')));
+    r.push('before close: ' + txt(q('.pk-sub')));
     return r;
   });
   console.log(out2.join('\n'));

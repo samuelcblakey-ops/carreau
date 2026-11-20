@@ -163,6 +163,8 @@ input[type=time]{background:var(--surface-2);border:1px solid var(--line);border
 .pk-who{background:none;border:0;padding:6px 0;min-height:44px;color:var(--ink);font:inherit;font-weight:600;text-align:left;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
 .pk-you td{background:color-mix(in srgb,var(--accent) 14%,transparent)}.pk-hidden td{opacity:.55}.pk-det td{background:var(--surface-2)}.pk-ok{color:var(--accent)}.pk-no{color:#b3261e}
 .pk-cta .btn{min-height:44px}.pk-cta a{align-self:flex-start;padding:10px 0}
+.pk-chips{display:flex;flex-wrap:wrap;gap:6px}.pk-chip{display:inline-flex;align-items:center;gap:4px;max-width:100%;padding:4px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13px;overflow-wrap:anywhere;text-align:left}
+.pk-chip.tap{min-height:44px;padding:6px 12px;cursor:pointer}.pk-chip.pk-you{background:color-mix(in srgb,var(--accent) 18%,transparent);border-color:var(--accent);font-weight:600}.pk-chip.pk-hidden{opacity:.5}.pk-youtag{color:var(--muted);font-weight:400}.pk-det-box{padding:10px;border-radius:10px;background:var(--surface-2)}
 .pill.pk-open{background:var(--accent);color:var(--accent-ink)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
 .pill.wrap{white-space:normal;overflow-wrap:anywhere;max-width:100%;border-radius:10px;line-height:1.3;padding-block:3px}
@@ -1659,6 +1661,13 @@ Object.assign(LANG_TEXT.de, {"Run your own competition": "Richte dein eigenes Tu
 Object.assign(LANG_TEXT.nl, {"Run your own competition": "Organiseer je eigen wedstrijd", "SN Pétanque is free for clubs and organisers: draws, pistes, live scores and standings on every phone.": "SN Pétanque is gratis voor clubs en organisatoren: lotingen, banen, live scores en standen op elke telefoon.", "Start a competition": "Wedstrijd starten"}); // Pick the Winner: run your own competition (pick-game-own-competition)
 Object.assign(LANG_TEXT.pt, {"Run your own competition": "Organize a sua própria competição", "SN Pétanque is free for clubs and organisers: draws, pistes, live scores and standings on every phone.": "O SN Pétanque é gratuito para clubes e organizadores: sorteios, pistas, resultados em direto e classificações em cada telemóvel.", "Start a competition": "Criar uma competição"}); // Pick the Winner: run your own competition (pick-game-own-competition)
 Object.assign(LANG_TEXT.th, {"Run your own competition": "จัดการแข่งขันของคุณเอง", "SN Pétanque is free for clubs and organisers: draws, pistes, live scores and standings on every phone.": "SN Pétanque ใช้ฟรีสำหรับสโมสรและผู้จัด: จับสลาก สนาม ผลสด และตารางคะแนนบนทุกโทรศัพท์", "Start a competition": "เริ่มการแข่งขัน"}); // Pick the Winner: run your own competition (pick-game-own-competition)
+Object.assign(FR_TEXT, {"{n} players so far": "{1} joueurs inscrits", "1 player so far": "1 joueur inscrit", "Places start when the first round's picks close: {x}.": "Le classement commence à la fin des pronostics du premier tour : {1}.", "Show all {n}": "Tout afficher ({1})"}); // Pick the Winner: players so far (pick-game-players-so-far)
+Object.assign(LANG_TEXT.es, {"{n} players so far": "{1} jugadores hasta ahora", "1 player so far": "1 jugador hasta ahora", "Places start when the first round's picks close: {x}.": "Los puestos empiezan cuando se cierran los pronósticos de la primera ronda: {1}.", "Show all {n}": "Mostrar los {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
+Object.assign(LANG_TEXT.it, {"{n} players so far": "{1} giocatori finora", "1 player so far": "1 giocatore finora", "Places start when the first round's picks close: {x}.": "La classifica parte quando si chiudono i pronostici del primo turno: {1}.", "Show all {n}": "Mostra tutti e {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
+Object.assign(LANG_TEXT.de, {"{n} players so far": "{1} Spieler bisher", "1 player so far": "1 Spieler bisher", "Places start when the first round's picks close: {x}.": "Die Platzierungen beginnen mit dem Tippschluss der ersten Runde: {1}.", "Show all {n}": "Alle {1} zeigen"}); // Pick the Winner: players so far (pick-game-players-so-far)
+Object.assign(LANG_TEXT.nl, {"{n} players so far": "{1} spelers tot nu toe", "1 player so far": "1 speler tot nu toe", "Places start when the first round's picks close: {x}.": "De plaatsen beginnen als de keuzes voor de eerste ronde sluiten: {1}.", "Show all {n}": "Alle {1} tonen"}); // Pick the Winner: players so far (pick-game-players-so-far)
+Object.assign(LANG_TEXT.pt, {"{n} players so far": "{1} jogadores até agora", "1 player so far": "1 jogador até agora", "Places start when the first round's picks close: {x}.": "Os lugares começam quando fecham os palpites da primeira ronda: {1}.", "Show all {n}": "Mostrar todos os {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
+Object.assign(LANG_TEXT.th, {"{n} players so far": "ผู้เล่น {1} คนแล้ว", "1 player so far": "ผู้เล่น 1 คนแล้ว", "Places start when the first round's picks close: {x}.": "อันดับจะเริ่มเมื่อปิดรับการทายรอบแรก: {1}", "Show all {n}": "แสดงทั้งหมด {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -6805,11 +6814,25 @@ function pickBoard(t, st, data) {
   const ms = MS(), U = pickUi(), now = Date.now(), close = t.pickClose || {}, org = canEdit();
   const anyClosed = (t.pick?.rounds || []).some(r => now >= (close[r.id] || Infinity));
   const after = pickAfter(t, ms, now);
-  const head = `<div><h3>Leaderboard</h3>${after ? `<p class="small muted">${trAround("After {x}", esc(tr(after.name)))}</p>` : ""}</div>`;
-  let body;
+  let sub = after ? trAround("After {x}", esc(tr(after.name))) : "", body;
   if (!data.loaded) body = `<p class="muted small">Loading…</p>`;
   else if (!Object.keys(data.pickers).length) body = `<p class="muted">No one has joined yet.</p>`;
-  else if (!anyClosed) body = `<p class="muted">The leaderboard starts when the first round's picks close.</p>`;
+  else if (!anyClosed) {
+    // the build-up (pick-game-players-so-far): who has joined, newest first, as chips; no picks (open rounds stay private)
+    const me = st.me?.pid, atMs = a => a && typeof a.toMillis === "function" ? a.toMillis() : typeof a === "number" ? a : a?.seconds ? a.seconds * 1000 : Infinity;
+    const list = Object.entries(data.pickers).filter(([pid, p]) => !p.hidden || org || pid === me)
+      .map(([pid, p]) => ({ pid, name: p.name || "", hidden: !!p.hidden, at: atMs(p.at) })).sort((a, b) => b.at - a.at || a.name.localeCompare(b.name));
+    const n = list.length, shown = U.allChips || n <= 40 ? list : list.slice(0, 40);
+    const first = Math.min(...Object.values(close).filter(v => typeof v === "number" && isFinite(v)));
+    sub = esc(tr(n === 1 ? "1 player so far" : `${n} players so far`));
+    const chip = x => { const inner = `<span data-notr>${esc(x.name)}</span>${x.pid === me ? ` <span class="pk-youtag">(you)</span>` : ""}`, cls = `pk-chip${x.pid === me ? " pk-you" : ""}${x.hidden ? " pk-hidden" : ""}`;
+      return org ? `<button type="button" class="${cls} tap" data-act="pk-who" data-pid="${esc(x.pid)}" aria-expanded="${U.who === x.pid}">${inner}</button>` : `<span class="${cls}">${inner}</span>`; };
+    const sel = org && U.who ? list.find(x => x.pid === U.who) : null;
+    body = `${isFinite(first) ? `<p class="small pk-first">${trAround("Places start when the first round's picks close: {x}.", `<span data-notr>${esc(pickDay(first))}</span>`)}</p>` : ""}
+      <div class="pk-chips">${shown.map(chip).join("")}</div>
+      ${shown.length < n ? `<div><button type="button" class="btn sm" data-act="pk-all">Show all ${n}</button></div>` : ""}
+      ${sel ? `<div class="pk-det-box stack" style="gap:6px"><b data-notr>${esc(sel.name)}</b><div><button type="button" class="btn sm" data-act="pk-hide" data-pid="${esc(sel.pid)}" data-hide="${sel.hidden ? "" : "1"}">${sel.hidden ? "Show on the leaderboard" : "Hide from the leaderboard"}</button></div></div>` : ""}`;
+  }
   else {
     const me = st.me?.pid;
     // hidden players: only the organiser (to show them again) and the player see them
@@ -6822,7 +6845,7 @@ function pickBoard(t, st, data) {
       return `<tr class="${x.pid === me ? "pk-you" : ""}${x.hidden ? " pk-hidden" : ""}" data-pid="${esc(x.pid)}"><td>${x.place}</td><td class="wrap"><button type="button" class="pk-who" data-act="pk-who" data-pid="${esc(x.pid)}" aria-expanded="${open}"><span data-notr>${esc(x.name)}</span>${x.pid === me ? ` <span class="muted">(you)</span>` : ""}</button></td><td>${x.right}</td><td>${pickSigned(x.diff)}</td></tr>${det}`;
     }).join("")}</tbody></table></div>`;
   }
-  return `<section class="panel stack pk-board" style="gap:10px">${head}${body}</section>`;
+  return `<section class="panel stack pk-board" style="gap:10px"><div><h3>Leaderboard</h3>${sub ? `<p class="small muted pk-sub">${sub}</p>` : ""}</div>${body}</section>`;
 }
 // below the leaderboard (pick-game-own-competition): invite followers to run their own competition, with the header's
 // "+ New" (same data-act, so it follows any change to creating a competition). Not for this competition's organisers.
@@ -6884,6 +6907,7 @@ async function pickAction(act, a, t) {
     U.joinErr = ""; try { await S.pickGame.join(t, name); U.showLink = true; U.name = ""; } catch (e) { console.error(e); U.joinErr = "Couldn't join. Check your connection and try again."; }
     render(); return;
   }
+  if (act === "pk-all") { U.allChips = true; render(); return; }
   if (act === "pk-who") { U.who = U.who === a.dataset.pid ? null : a.dataset.pid; render(); return; }
   if (act === "pk-hide" && canEdit() && S.pickGame.hide) { try { await S.pickGame.hide(t, a.dataset.pid, !!a.dataset.hide); } catch (e) { handleWriteError(e); } render(); return; }
   if (act === "pk-show-link") { U.showLink = !U.showLink; render(); return; }
