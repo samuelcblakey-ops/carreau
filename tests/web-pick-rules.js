@@ -86,7 +86,11 @@ const { chromium } = require('playwright');
   { const V3 = await mk('leaderboard viewer', 390); await V3.goto(base + '#' + tid); await w(4000); await V3.click('[data-tab="pick"]'); await w(3000);
     log('leaderboard for a spectator: ' + await V3.evaluate(() => [...document.querySelectorAll('.pk-table tbody tr')].map(r => r.textContent.replace(/\s+/g, ' ').trim()).join(' / ') + ' | ' + (document.querySelector('.pk-board > p')?.textContent || '')));
     await V3.screenshot({ path: process.env.OUT + '/web-pick-board-390.png', fullPage: true }); }
+  // pick-game-picks-public: picks are public as soon as they're saved, but not once the competition is archived
+  log('spectator with no player reads picks: ' + await raw(V, 'get', `tournaments/${tid}/picks/${pid}_p1`) + ' | lists an open round ' + await V.evaluate(async t => { try { return (await window.__testRaw.where('tournaments/' + t + '/picks', 'round', 'p1')).length; } catch (e) { return e.code; } }, tid));
   log('stranger turns the game off: ' + await raw(E, 'update', `tournaments/${tid}`, { pick: { on: false, rounds: [] } }));
+  log('archive: ' + await raw(A, 'update', `tournaments/${tid}`, { archived: true }));
+  log('read picks of an archived competition: ' + await raw(V, 'get', `tournaments/${tid}/picks/${pid}_p1`) + ' | admin ' + await raw(AD, 'get', `tournaments/${tid}/picks/${pid}_p1`));
   await AD.click('[data-act="open-testing"]'); await w(1500); // back to the beta default
   log('errs', errs); await b.close();
 })();
