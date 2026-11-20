@@ -34,6 +34,7 @@ const { chromium } = require('playwright');
     L.push('panel owner: ' + txt(q('[data-cal-panel] [data-act="cal-open"]')) + (hofAt ? ' | above hall of fame ' + !!(calAt.compareDocumentPosition(hofAt) & Node.DOCUMENT_POSITION_FOLLOWING) : ''));
     q('[data-cal-panel] [data-act="cal-open"]').click(); await w(150);
     L.push('sheet prefill: ' + [txt(q('#modal .cal-comp b')), q('#modal [data-cal="date"]').value, q('#modal [data-cal="venue"]').value, q('#modal [data-cal="country"]').value, q('#modal .hof-pick.on')?.dataset.k].join(' | '));
+    L.push('sheet times new: check-in ' + q('#modal [data-cal="checkin"]').value + ' | play ' + q('#modal [data-cal="start"]').value);
     L.push('sheet: ' + txt(q('#modal h3')) + ' | format ' + txt(q('#modal .cal-comp span:not(.eyebrow)')) + ' | who ' + qa('#modal .cal-who [aria-pressed="true"]').map(x => x.dataset.k).join(',') + ' | public line ' + txt(q('#modal .cal-sheet')).includes('Everything here will be public.'));
   `));
   // the sheet at phone width and on desktop
@@ -248,6 +249,7 @@ const { chromium } = require('playwright');
     q('[data-act="cal-ev-new"]').click(); await w(150);
     L.push('event sheet: ' + txt(q('#modal h3')) + ' | name box ' + !!q('#modal [data-cal="name"]') + ' | formats ' + qa('#modal [data-act="cal-fmt"]').map(txt).join(',') + ' | picked ' + qa('#modal [data-act="cal-fmt"][aria-pressed="true"]').length
       + ' | date "' + q('#modal [data-cal="date"]').value + '" | venue "' + q('#modal [data-cal="venue"]').value + '" | level ' + q('#modal .hof-pick.on')?.dataset.k + ' | who ' + qa('#modal [data-act="cal-who"][aria-pressed="true"]').map(x => x.dataset.k).join(',') + ' | country ' + q('#modal [data-cal="country"]').value);
+    L.push('event sheet times new: check-in ' + q('#modal [data-cal="checkin"]').value + ' | play ' + q('#modal [data-cal="start"]').value);
     L.push('event sheet more: ' + q('#modal [data-cal="formatNote"]').placeholder + ' | ' + txt(q('#modal [data-act="cal-save"]')) + ' | no competition line ' + !q('#modal .cal-comp'));
   `));
   out.push('event sheet 390: no sideways scroll ' + await p2.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)
