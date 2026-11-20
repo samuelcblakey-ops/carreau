@@ -102,7 +102,7 @@ function fbStore() {
       for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await b.commit(); }
       // the extras may be refused by their own rules (e.g. live scores while streaming is off): best effort, side by side
       const extra = [doc(db, "tournaments", tid, "brand", "logo"), doc(db, "tournaments", tid, "private", "codes"), doc(db, "tournaments", tid, "private", "livecode"),
-        doc(db, "tournaments", tid, "private", "payments")];
+        doc(db, "tournaments", tid, "private", "teamcodes"), doc(db, "tournaments", tid, "private", "payments")];
       try { (await getDocs(collection(db, "tournaments", tid, "live"))).docs.forEach(d => extra.push(d.ref)); } catch {}
       await Promise.allSettled(extra.map(r => deleteDoc(r)));
       try { await updateDoc(doc(db, "hallOfFame", tid), { gone: true }); } catch {} // a Hall of Fame entry stays, without its link
