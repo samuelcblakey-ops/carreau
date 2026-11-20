@@ -20,7 +20,12 @@ const { chromium } = require('playwright');
     await fetch('http://127.0.0.1:8080/v1/projects/demo-carreau/databases/(default)/documents:commit', { method: 'POST', headers: { Authorization: 'Bearer owner', 'content-type': 'application/json' }, body: JSON.stringify({ writes }) }); } };
   const big = await make('Del big'); await games(big, 1000);
   const small = []; for (let i = 0; i < 4; i++) { const id = await make('Del small ' + i); await games(id, 15); small.push(id); }
+  // each competition's team links (private/teamcodes), written straight into the emulator: the delete must take them too
+  const tcUrl = tid => `${REST}/tournaments/${tid}/private/teamcodes`;
+  const tcHas = async tid => (await fetch(tcUrl(tid), { headers: { Authorization: 'Bearer owner' } })).status === 200;
+  for (const id of [big, ...small]) await fetch(tcUrl(id), { method: 'PATCH', headers: { Authorization: 'Bearer owner', 'content-type': 'application/json' }, body: JSON.stringify({ fields: { t1: { stringValue: 'ABCDEFGH' } } }) });
   await w(2000);
+  log('teamcodes before:', (await Promise.all([big, ...small].map(tcHas))).every(Boolean));
   log('before: big games', await count(big), '| small games', (await Promise.all(small.map(count))).join(','));
   await AD.goto(base + '#admin'); await w(2500);
   await AD.fill('#adm-q', 'Del '); await AD.dispatchEvent('#adm-q', 'input'); await w(400);
@@ -30,6 +35,7 @@ const { chromium } = require('playwright');
   const secs = (Date.now() - t0) / 1000;
   log('toast:', await AD.textContent('#toast'));
   log('after: big games', await count(big), 'doc', await exists(big), '| small', (await Promise.all(small.map(count))).join(','), 'docs', (await Promise.all(small.map(exists))).some(Boolean));
+  log('teamcodes after: gone', !(await Promise.all([big, ...small].map(tcHas))).some(Boolean));
   log('quick:', secs < 30, `(${secs.toFixed(1)}s)`);
   log('errs', errs); await b.close();
 })();

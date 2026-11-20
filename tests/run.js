@@ -615,7 +615,7 @@ const SUITES = {
     'web-payments.js': [/paid button: organiser true \| spectator false/, /one tap saved: true \| summary Paid: 1 of 3/,
       /rules: owner writes true \| organiser link writes true \| stranger reads false \| stranger writes false \| bad shape false/,
       /two organisers: both ticks kept true/, /untick removes the key: true/, /admin delete removes payments: true/, /^errs \[\]$/m],
-    'web-delete.js': [/before: big games 1000 \| small games 15,15,15,15/, /toast: 5 competitions deleted\./, /after: big games 0 doc false \| small 0,0,0,0 docs false/, /quick: true/, /errs \[\]/],
+    'web-delete.js': [/before: big games 1000 \| small games 15,15,15,15/, /^teamcodes before: true$/m, /toast: 5 competitions deleted\./, /^teamcodes after: gone true$/m, /after: big games 0 doc false \| small 0,0,0,0 docs false/, /quick: true/, /errs \[\]/],
     'web-shooting.js': [/final sides true done true/, /third sides true done true/, /errs \[\]/],
     'web-feed.js': [/^feed first run: \+0 teams, \+2 rounds, \+0 brackets, \+8 results, 0 conflicts \| exit 0$/m,
       /^saved on the server: 2 rounds \| R1:ITA-CAN 13-7, R1:FRA-CHN 13-10, R1:ESP-JPN 8-13, R1:MLI-BEN 11-9t, R2:ITA-FRA 13-5, R2:JPN-MLI 13-6, R2:CAN-CHN 12-13, R2:ESP-BEN 13-3$/m,
