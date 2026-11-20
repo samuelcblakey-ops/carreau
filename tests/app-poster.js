@@ -7,6 +7,9 @@
 // it), Position, Darken, the ChatGPT prompt, the picture kept in IndexedDB only (nothing to S.store), kept over a
 // reload, removed, and old listings' pictures cleaned up. Screenshots: Photo at square and Story, Bold with a picture,
 // the ChatGPT fold open at 390 px.
+// Logos (poster-sponsors): sponsor logos (up to 4, kept per device, their ticks per listing) in a strip along the foot,
+// "Your logo" for an event run elsewhere (kept per listing), nothing to the store. Screenshots: each layout with
+// sponsors (Band square with 3, Photo A4 with 4 on the white bar), an event's own logo, the Logos section at 390 px.
 const { chromium } = require('playwright'), fs = require('fs');
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, locale: 'en-GB' });
@@ -177,6 +180,78 @@ const { chromium } = require('playwright'), fs = require('fs');
     await S.modal.picSaved;
     window.__picWrites = window.__writes;
   `));
+  // logos (poster-sponsors): sponsor logos kept per device (up to 4) in a strip along the foot, their ticks per listing,
+  // and "Your logo" for an event run elsewhere (kept per listing); all in IndexedDB, nothing to the store
+  out.push(...await run(`
+    const tid = window.__tid;
+    // test logos, PNG with transparency: a round badge, a wide word mark, a tall shield, a wide one on white, and a fifth
+    const png = (w, h, name, draw) => new Promise(res => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); c.toBlob(b => res(new File([b], name, { type: 'image/png' })), 'image/png'); });
+    const word = (x, t, px, col, cx, cy, wt = 800) => { x.font = wt + ' ' + px + 'px Arial, sans-serif'; x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(t, cx, cy); };
+    const logos = await Promise.all([
+      png(400, 400, 'badge.png', (x, w) => { x.fillStyle = '#c0392b'; x.beginPath(); x.arc(200, 200, 190, 0, 7); x.fill(); x.fillStyle = '#fff'; x.beginPath(); x.arc(200, 200, 150, 0, 7); x.fill(); word(x, 'ACME', 92, '#c0392b', 200, 185); word(x, 'BOULANGERIE', 30, '#333', 200, 262, 700); }),
+      png(640, 300, 'wordmark.png', (x) => { x.fillStyle = '#1f5fbf'; x.beginPath(); x.roundRect(10, 40, 220, 220, 40); x.fill(); word(x, 'H', 170, '#fff', 120, 158); word(x, 'Hitchin', 104, '#1f5fbf', 440, 120); word(x, 'MOTORS', 64, '#222', 440, 222, 700); }),
+      png(300, 420, 'shield.png', (x) => { x.fillStyle = '#1e7a46'; x.beginPath(); x.moveTo(20, 20); x.lineTo(280, 20); x.lineTo(280, 230); x.quadraticCurveTo(280, 360, 150, 410); x.quadraticCurveTo(20, 360, 20, 230); x.closePath(); x.fill(); word(x, 'GT', 120, '#ffd166', 150, 160); word(x, 'GARDEN', 44, '#fff', 150, 270, 700); }),
+      png(560, 240, 'cafe.png', (x) => { x.fillStyle = '#fff'; x.fillRect(0, 0, 560, 240); x.strokeStyle = '#7a4b2a'; x.lineWidth = 8; x.strokeRect(12, 12, 536, 216); word(x, 'Café du Port', 76, '#7a4b2a', 280, 104, 700); word(x, 'BAR · BRASSERIE', 34, '#555', 280, 172, 600); }),
+      png(300, 300, 'fifth.png', (x) => { x.fillStyle = '#8e44ad'; x.fillRect(0, 0, 300, 300); })]);
+    const count = () => (S.modal.sponsorList || []).length;
+    const add = async f => { const n0 = count(), inp = q('#modal [data-poster="sponsor"]'), dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; inp.dispatchEvent(new Event('input', { bubbles: true }));
+      for (let i = 0; i < 60 && count() === n0; i++) await w(100); await drawn(); };
+    const sheet = async id => { q('#modal [data-act="close"]')?.click(); await w(100); await open(id); q('#cal-' + id + ' [data-act="poster-open"]').click(); await S.modal?.picReady; await drawn(); };
+    const idbKeys = () => new Promise((res, rej) => { const r = indexedDB.open('carreau-poster'); r.onerror = () => rej(r.error); r.onsuccess = () => { const db = r.result, rq = db.transaction('pictures').objectStore('pictures').getAllKeys(); rq.onsuccess = () => { db.close(); res(rq.result); }; }; });
+    await sheet(tid);
+    L.push('poster logos section: ' + txt(q('#modal .poster-logos .eyebrow')) + ' | ' + qa('#modal .poster-logos .poster-sub').map(txt).join(',') + ' | add ' + txt(q('#modal [data-act="poster-sponsor"]'))
+      + ' | ticks before any ' + qa('#modal [data-poster="sponsors"], #modal [data-poster="thanks"]').length + ' | club logo tick ' + !!q('#modal .poster-logos [data-poster="logo"]'));
+    const compOwn = !!q('#modal [data-act="poster-own"]');
+    await tap('#modal [data-act="poster-size"][data-k="square"]'); await tap('#modal [data-act="poster-layout"][data-k="band"]');
+    for (const f of logos.slice(0, 3)) await add(f);
+    const ticksOn = q('#modal [data-poster="sponsors"]')?.checked && q('#modal [data-poster="thanks"]')?.checked;
+    snap('poster-sponsors-band-square'); const band3 = S.modal.info.sponsors.length;
+    await tap('#modal [data-act="poster-layout"][data-k="bold"]'); snap('poster-sponsors-bold-square');
+    await tap('#modal [data-act="poster-layout"][data-k="classic"]'); snap('poster-sponsors-classic-square');
+    await add(logos[3]);
+    await tap('#modal [data-act="poster-layout"][data-k="classic"]'); await tap('#modal [data-act="poster-size"][data-k="a4"]'); snap('poster-sponsors-classic-a4');
+    await tap('#modal [data-act="poster-layout"][data-k="photo"]'); snap('poster-sponsors-photo-a4');
+    const cv = q('#modal canvas'), r = S.modal.info.sponsors[0], px = cv.getContext('2d').getImageData(Math.round(cv.width * .03), r.y + Math.round(r.h / 2), 1, 1).data;
+    const panel = S.modal.info.layout === 'photo' && S.modal.info.pic && px[0] === 255 && px[1] === 255 && px[2] === 255;
+    await tap('#modal [data-act="poster-size"][data-k="square"]'); snap('poster-sponsors-photo-square');
+    await tap('#modal [data-act="poster-size"][data-k="story"]'); snap('poster-sponsors-photo-story');
+    await tap('#modal [data-act="poster-layout"][data-k="band"]'); snap('poster-sponsors-band-story');
+    L.push('poster sponsors strip: band ' + band3 + ' | photo a4 ' + S.modal.sponsorList.length + ' | white panel ' + panel + ' | ticks on by default ' + ticksOn);
+    // a fifth: refused, from the button and from a file
+    q('#toast').hidden = true; q('#modal [data-act="poster-sponsor"]').click(); await w(150); const refused = txt(q('#toast'));
+    q('#toast').hidden = true; const inp = q('#modal [data-poster="sponsor"]'), dt = new DataTransfer(); dt.items.add(logos[4]); inp.files = dt.files; inp.dispatchEvent(new Event('input', { bubbles: true }));
+    for (let i = 0; i < 40 && q('#toast').hidden; i++) await w(100); const still4 = count() === 4 && txt(q('#toast')) === refused;
+    // remove two: two left, drawn at one height, with the thanks line
+    await tap('#modal [data-act="poster-size"][data-k="square"]');
+    for (let i = 0; i < 2; i++) { await tap('#modal [data-act="poster-sponsor-remove"]'); await S.modal.picSaved; }
+    const sp = S.modal.info.sponsors, same = sp.length === 2 && sp.every(x => Math.abs(x.h - sp[0].h) <= 1) && Math.abs(sp[0].h - .07 * S.modal.info.h) <= 1;
+    const thanks = S.modal.info.thanks && txt(q('#modal [data-poster-words]')).includes('With thanks to our sponsors');
+    L.push('poster sponsors: ' + sp.length + ' drawn | same height ' + same + ' | thanks line ' + thanks + ' | fifth refused ' + refused + (still4 ? '' : ' (file not refused)'));
+    const kept = (await idbKeys()).filter(k => String(k).startsWith('sponsor:')).length;
+    // the ticks are this listing's: untick the thanks line here, then a second listing still has it
+    q('#modal [data-poster="thanks"]').click(); await drawn(); const off = S.modal.info.thanks === false && S.modal.info.sponsors.length === 2;
+    await sheet('cNew');
+    const second = S.modal.sponsorList.length === 2 && S.modal.info.sponsors.length === 2 && kept === 2;
+    const otherOn = S.modal.thanks === true && S.modal.info.thanks === true;
+    q('#modal [data-poster="sponsors"]').click(); await drawn(); const hidden = S.modal.info.sponsors.length === 0; q('#modal [data-poster="sponsors"]').click(); await drawn();
+    // Your logo: only for an event run elsewhere
+    const ownBtn = !!q('#modal [data-act="poster-own"]') && txt(q('#modal [data-act="poster-own"]')) === 'Choose a logo' && !q('#modal [data-poster="logo"]');
+    L.push('poster own-event logo: button shown ' + ownBtn + ' | comp listing button shown ' + compOwn);
+    const oi = q('#modal [data-poster="own"]'), od = new DataTransfer(); od.items.add(logos[0]); oi.files = od.files; oi.dispatchEvent(new Event('input', { bubbles: true }));
+    for (let i = 0; i < 60 && !S.modal.own; i++) await w(100); await drawn(); await S.modal.picSaved;
+    const ownDrawn = S.modal.info.logo && !!q('#modal [data-poster="logo"]') && !!q('#modal [data-act="poster-own-remove"]') && (await idbKeys()).includes('logo:cNew');
+    await tap('#modal [data-act="poster-layout"][data-k="bold"]'); snap('poster-own-logo-bold-square');
+    await sheet(tid);
+    const back = S.modal.thanks === false && !q('#modal [data-poster="thanks"]').checked && S.modal.info.thanks === false && !q('#modal [data-act="poster-own"]');
+    L.push('poster sponsors kept: on a second listing 2 ' + second + ' | ticks per listing ' + (off && otherOn && back) + ' | untick hides ' + hidden);
+    q('#modal [data-poster="thanks"]').click(); await drawn();
+    await sheet('cNew'); const ownKept = !!S.modal.own && S.modal.info.logo;
+    await tap('#modal [data-act="poster-own-remove"]'); await S.modal.picSaved; const ownGone = !S.modal.own && !S.modal.info.logo && !(await idbKeys()).includes('logo:cNew') && !q('#modal [data-poster="logo"]');
+    L.push('poster own logo: drawn ' + ownDrawn + ' | kept for the listing ' + ownKept + ' | removed ' + ownGone);
+    const oi2 = q('#modal [data-poster="own"]'), od2 = new DataTransfer(); od2.items.add(logos[0]); oi2.files = od2.files; oi2.dispatchEvent(new Event('input', { bubbles: true }));
+    for (let i = 0; i < 60 && !S.modal.own; i++) await w(100); await drawn(); await S.modal.picSaved;
+    L.push('poster logos stay on device: store writes ' + window.__writes);
+  `));
   const snaps = await p.evaluate(() => window.__snaps || []);
   for (const [name, url] of snaps) fs.writeFileSync(`test-results/${name}.png`, Buffer.from(url.split(',')[1], 'base64'));
   await p.screenshot({ path: 'test-results/poster-sheet-desktop.png' });
@@ -193,6 +268,9 @@ const { chromium } = require('playwright'), fs = require('fs');
   await p.evaluate(() => { document.querySelector('#toast').hidden = true; const m = document.querySelector('#modal .poster-sheet'), f = document.querySelector('#modal .poster-pic');
     m.scrollTop += f.getBoundingClientRect().top - m.getBoundingClientRect().top - 12; }); await p.waitForTimeout(150);
   await p.screenshot({ path: 'test-results/poster-fold-390.png' });
+  await p.evaluate(() => { const m = document.querySelector('#modal .poster-sheet'), f = document.querySelector('#modal .poster-logos');
+    m.scrollTop += f.getBoundingClientRect().top - m.getBoundingClientRect().top - 12; }); await p.waitForTimeout(150);
+  await p.screenshot({ path: 'test-results/poster-logos-390.png' });
   await p.setViewportSize({ width: 1100, height: 900 }); await p.waitForTimeout(200);
   // the poster's words in French
   out.push(...await run(`

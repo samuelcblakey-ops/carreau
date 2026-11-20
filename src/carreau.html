@@ -466,6 +466,10 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .poster-fold{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}.poster-fold>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;padding:0 14px;font-weight:600;list-style-position:inside}
 .poster-fold>summary::before{content:"▸";margin-right:8px;transition:transform .15s}.poster-fold[open]>summary::before{transform:rotate(90deg)}.poster-fold>summary::-webkit-details-marker{display:none}.poster-fold>summary{list-style:none}
 .poster-fold[open]>summary{border-bottom:1px solid var(--line)}.poster-fold>.stack{padding:12px 14px 14px}.poster-steps{margin:0;padding-left:22px;display:grid;gap:4px}.poster-sheet a.btn{color:inherit;text-decoration:none}
+/* Poster maker: logos (poster-sponsors): each sponsor's thumbnail with its Remove button, two to a row on a phone */
+.poster-sub{font-weight:600;font-size:14px;margin-top:2px}.poster-spons{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:8px}
+.poster-spon{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 5px 5px 6px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.poster-logo-thumb{flex:none;width:72px;height:44px;background:#fff;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}.poster-own{align-items:center}
 @media (max-width:560px){.cal-facts{grid-template-columns:1fr;gap:2px}.cal-facts dd{margin-bottom:6px}.cal-row{gap:10px;padding:9px 10px}.cal-date{width:52px}}
 /* Hall of Fame: the header link, the start-screen card and the page */
 .hof-btn,.cal-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;flex:none;white-space:nowrap}
@@ -1371,13 +1375,21 @@ Object.assign(LANG_TEXT.nl, {"Make a poster": "Poster maken", "Size": "Formaat",
 Object.assign(LANG_TEXT.pt, {"Make a poster": "Criar um cartaz", "Size": "Tamanho", "Facebook post": "Publicação no Facebook", "Story": "Story", "A4 to print": "A4 para imprimir", "A5 to print": "A5 para imprimir", "Poster layout": "Esquema", "Bold": "Destaque", "Band": "Faixa", "Classic": "Clássico", "Main colour": "Cor principal", "Second colour": "Cor secundária", "Gold": "Dourado", "White": "Branco", "Choose any colour": "Escolher qualquer cor", "Match the logo": "Igualar ao logótipo", "Show the club logo": "Mostrar o logótipo do clube", "Headline": "Título", "Strapline": "Subtítulo", "e.g. Open triples · £300 prize fund": "ex. Triplas abertas · 300 € em prémios", "Show on the poster": "Mostrar no cartaz", "Times": "Horários", "Address": "Morada", "Show the QR code": "Mostrar o código QR", "Scan to enter": "Leia para se inscrever", "Scan for details": "Leia para ver os detalhes", "Download": "Descarregar", "Print": "Imprimir", "Check the details before you share it. Change them in the listing, not here.": "Confirme os dados antes de o partilhar. Altere-os no anúncio, não aqui.", "The poster couldn't be made. Try again.": "Não foi possível criar o cartaz. Tente de novo.", "Check-in from {x}": "Confirmação a partir das {1}", "Play starts {x}": "Início dos jogos às {1}"});
 Object.assign(LANG_TEXT.th, {"Make a poster": "ทำโปสเตอร์", "Size": "ขนาด", "Facebook post": "โพสต์ Facebook", "Story": "สตอรี่", "A4 to print": "A4 สำหรับพิมพ์", "A5 to print": "A5 สำหรับพิมพ์", "Poster layout": "รูปแบบโปสเตอร์", "Bold": "เด่นชัด", "Band": "แถบสี", "Classic": "คลาสสิก", "Main colour": "สีหลัก", "Second colour": "สีรอง", "Gold": "ทอง", "White": "ขาว", "Choose any colour": "เลือกสีใดก็ได้", "Match the logo": "ใช้สีจากโลโก้", "Show the club logo": "แสดงโลโก้สโมสร", "Headline": "หัวข้อ", "Strapline": "คำโปรย", "e.g. Open triples · £300 prize fund": "เช่น ทีม 3 คน รุ่นทั่วไป · เงินรางวัลรวม 10,000 บาท", "Show on the poster": "แสดงบนโปสเตอร์", "Times": "เวลา", "Address": "ที่อยู่", "Show the QR code": "แสดงคิวอาร์โค้ด", "Scan to enter": "สแกนเพื่อสมัคร", "Scan for details": "สแกนเพื่อดูรายละเอียด", "Download": "ดาวน์โหลด", "Print": "พิมพ์", "Check the details before you share it. Change them in the listing, not here.": "ตรวจสอบรายละเอียดก่อนแชร์ แก้ไขได้ที่รายการ ไม่ใช่ที่นี่", "The poster couldn't be made. Try again.": "ทำโปสเตอร์ไม่สำเร็จ ลองอีกครั้ง", "Check-in from {x}": "เช็คอินตั้งแต่ {1}", "Play starts {x}": "เริ่มแข่ง {1}"});
 // Poster maker: a background picture (poster-background)
-Object.assign(FR_TEXT, {"Background picture": "Image de fond", "Choose a picture": "Choisir une image", "Your picture stays on this phone. It isn't uploaded.": "Votre image reste sur ce téléphone. Elle n'est pas envoyée.", "That picture couldn't be used. Try a JPEG or PNG.": "Cette image n'a pas pu être utilisée. Essayez un JPEG ou un PNG.", "Photo": "Photo", "Position": "Cadrage", "Top": "Haut", "Centre": "Centre", "Bottom": "Bas", "Darken": "Assombrir", "Make artwork with ChatGPT": "Créer un visuel avec ChatGPT", "Sunny terrain": "Terrain au soleil", "Evening under lights": "Soirée sous les projecteurs", "Provençal village": "Village provençal", "Club colours": "Couleurs du club", "Simple boules pattern": "Motif de boules", "Copy the prompt": "Copier la consigne", "Prompt copied. Paste it into ChatGPT.": "Consigne copiée. Collez-la dans ChatGPT.", "Open ChatGPT": "Ouvrir ChatGPT", "Copy the prompt.": "Copiez la consigne.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Collez-la dans ChatGPT (Gemini ou Copilot marchent aussi) et envoyez-la.", "Save the picture to your phone or computer.": "Enregistrez l'image sur votre téléphone ou votre ordinateur.", "Tap Choose a picture above.": "Touchez Choisir une image ci-dessus.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "La consigne demande une image sans aucun texte. L'affiche ajoute vos informations et le QR code, ils sont donc toujours exacts."});
-Object.assign(LANG_TEXT.es, {"Background picture": "Imagen de fondo", "Choose a picture": "Elegir una imagen", "Your picture stays on this phone. It isn't uploaded.": "Tu imagen se queda en este teléfono. No se sube.", "That picture couldn't be used. Try a JPEG or PNG.": "No se pudo usar esa imagen. Prueba con un JPEG o PNG.", "Photo": "Foto", "Position": "Encuadre", "Top": "Arriba", "Centre": "Centro", "Bottom": "Abajo", "Darken": "Oscurecer", "Make artwork with ChatGPT": "Crear la imagen con ChatGPT", "Sunny terrain": "Terreno al sol", "Evening under lights": "Noche con focos", "Provençal village": "Pueblo provenzal", "Club colours": "Colores del club", "Simple boules pattern": "Motivo de bolas", "Copy the prompt": "Copiar la instrucción", "Prompt copied. Paste it into ChatGPT.": "Instrucción copiada. Pégala en ChatGPT.", "Open ChatGPT": "Abrir ChatGPT", "Copy the prompt.": "Copia la instrucción.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Pégala en ChatGPT (también sirven Gemini o Copilot) y envíala.", "Save the picture to your phone or computer.": "Guarda la imagen en tu teléfono u ordenador.", "Tap Choose a picture above.": "Toca Elegir una imagen arriba.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "La instrucción pide una imagen sin ningún texto. El cartel añade tus datos y el código QR, así que siempre son correctos."});
-Object.assign(LANG_TEXT.it, {"Background picture": "Immagine di sfondo", "Choose a picture": "Scegli un'immagine", "Your picture stays on this phone. It isn't uploaded.": "La tua immagine resta su questo telefono. Non viene caricata.", "That picture couldn't be used. Try a JPEG or PNG.": "Non è stato possibile usare questa immagine. Prova con un JPEG o un PNG.", "Photo": "Foto", "Position": "Inquadratura", "Top": "In alto", "Centre": "Al centro", "Bottom": "In basso", "Darken": "Scurisci", "Make artwork with ChatGPT": "Crea l'immagine con ChatGPT", "Sunny terrain": "Campo al sole", "Evening under lights": "Sera sotto i riflettori", "Provençal village": "Paese provenzale", "Club colours": "Colori del club", "Simple boules pattern": "Motivo di bocce", "Copy the prompt": "Copia il prompt", "Prompt copied. Paste it into ChatGPT.": "Prompt copiato. Incollalo in ChatGPT.", "Open ChatGPT": "Apri ChatGPT", "Copy the prompt.": "Copia il prompt.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Incollalo in ChatGPT (vanno bene anche Gemini o Copilot) e invialo.", "Save the picture to your phone or computer.": "Salva l'immagine sul telefono o sul computer.", "Tap Choose a picture above.": "Tocca Scegli un'immagine qui sopra.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "Il prompt chiede un'immagine senza scritte. La locandina aggiunge i tuoi dati e il codice QR, così sono sempre giusti."});
-Object.assign(LANG_TEXT.de, {"Background picture": "Hintergrundbild", "Choose a picture": "Bild auswählen", "Your picture stays on this phone. It isn't uploaded.": "Dein Bild bleibt auf diesem Handy. Es wird nicht hochgeladen.", "That picture couldn't be used. Try a JPEG or PNG.": "Dieses Bild konnte nicht verwendet werden. Versuche ein JPEG oder PNG.", "Photo": "Foto", "Position": "Ausschnitt", "Top": "Oben", "Centre": "Mitte", "Bottom": "Unten", "Darken": "Abdunkeln", "Make artwork with ChatGPT": "Bild mit ChatGPT erstellen", "Sunny terrain": "Bouleplatz in der Sonne", "Evening under lights": "Abends unter Flutlicht", "Provençal village": "Dorf in der Provence", "Club colours": "Vereinsfarben", "Simple boules pattern": "Kugelmuster", "Copy the prompt": "Prompt kopieren", "Prompt copied. Paste it into ChatGPT.": "Prompt kopiert. Füge ihn in ChatGPT ein.", "Open ChatGPT": "ChatGPT öffnen", "Copy the prompt.": "Kopiere den Prompt.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Füge ihn in ChatGPT ein (Gemini oder Copilot gehen auch) und sende ihn ab.", "Save the picture to your phone or computer.": "Speichere das Bild auf deinem Handy oder Computer.", "Tap Choose a picture above.": "Tippe oben auf Bild auswählen.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "Der Prompt verlangt ein Bild ohne jede Schrift. Das Plakat ergänzt deine Angaben und den QR-Code, damit sie immer stimmen."});
-Object.assign(LANG_TEXT.nl, {"Background picture": "Achtergrondfoto", "Choose a picture": "Kies een afbeelding", "Your picture stays on this phone. It isn't uploaded.": "Je afbeelding blijft op deze telefoon. Ze wordt niet geüpload.", "That picture couldn't be used. Try a JPEG or PNG.": "Die afbeelding kon niet worden gebruikt. Probeer een JPEG of PNG.", "Photo": "Foto", "Position": "Uitsnede", "Top": "Boven", "Centre": "Midden", "Bottom": "Onder", "Darken": "Donkerder", "Make artwork with ChatGPT": "Afbeelding maken met ChatGPT", "Sunny terrain": "Zonnig terrein", "Evening under lights": "Avond onder de lampen", "Provençal village": "Provençaals dorp", "Club colours": "Clubkleuren", "Simple boules pattern": "Patroon van boules", "Copy the prompt": "Kopieer de prompt", "Prompt copied. Paste it into ChatGPT.": "Prompt gekopieerd. Plak hem in ChatGPT.", "Open ChatGPT": "ChatGPT openen", "Copy the prompt.": "Kopieer de prompt.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Plak hem in ChatGPT (Gemini of Copilot werken ook) en verstuur hem.", "Save the picture to your phone or computer.": "Bewaar de afbeelding op je telefoon of computer.", "Tap Choose a picture above.": "Tik hierboven op Kies een afbeelding.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "De prompt vraagt om een afbeelding zonder tekst. De poster zet je gegevens en de QR-code erop, zodat die altijd kloppen."});
-Object.assign(LANG_TEXT.pt, {"Background picture": "Imagem de fundo", "Choose a picture": "Escolher uma imagem", "Your picture stays on this phone. It isn't uploaded.": "A sua imagem fica neste telemóvel. Não é enviada.", "That picture couldn't be used. Try a JPEG or PNG.": "Não foi possível usar essa imagem. Experimente um JPEG ou PNG.", "Photo": "Foto", "Position": "Enquadramento", "Top": "Cima", "Centre": "Centro", "Bottom": "Baixo", "Darken": "Escurecer", "Make artwork with ChatGPT": "Criar a imagem com o ChatGPT", "Sunny terrain": "Campo ao sol", "Evening under lights": "Noite sob os holofotes", "Provençal village": "Aldeia provençal", "Club colours": "Cores do clube", "Simple boules pattern": "Padrão de bolas", "Copy the prompt": "Copiar o pedido", "Prompt copied. Paste it into ChatGPT.": "Pedido copiado. Cole-o no ChatGPT.", "Open ChatGPT": "Abrir o ChatGPT", "Copy the prompt.": "Copie o pedido.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Cole-o no ChatGPT (o Gemini ou o Copilot também servem) e envie.", "Save the picture to your phone or computer.": "Guarde a imagem no telemóvel ou no computador.", "Tap Choose a picture above.": "Toque em Escolher uma imagem acima.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "O pedido é para uma imagem sem texto. O cartaz acrescenta os seus dados e o código QR, por isso estão sempre certos."});
-Object.assign(LANG_TEXT.th, {"Background picture": "ภาพพื้นหลัง", "Choose a picture": "เลือกรูปภาพ", "Your picture stays on this phone. It isn't uploaded.": "รูปภาพของคุณอยู่ในโทรศัพท์เครื่องนี้เท่านั้น ไม่ได้อัปโหลด", "That picture couldn't be used. Try a JPEG or PNG.": "ใช้รูปภาพนี้ไม่ได้ ลองใช้ไฟล์ JPEG หรือ PNG", "Photo": "ภาพถ่าย", "Position": "ตำแหน่งภาพ", "Top": "ด้านบน", "Centre": "ตรงกลาง", "Bottom": "ด้านล่าง", "Darken": "ปรับให้เข้มขึ้น", "Make artwork with ChatGPT": "สร้างภาพด้วย ChatGPT", "Sunny terrain": "สนามเปตองยามแดดจ้า", "Evening under lights": "ยามค่ำใต้แสงไฟ", "Provençal village": "หมู่บ้านโพรวองซ์", "Club colours": "สีประจำสโมสร", "Simple boules pattern": "ลายลูกเปตองเรียบง่าย", "Copy the prompt": "คัดลอกคำสั่ง", "Prompt copied. Paste it into ChatGPT.": "คัดลอกคำสั่งแล้ว วางลงใน ChatGPT ได้เลย", "Open ChatGPT": "เปิด ChatGPT", "Copy the prompt.": "คัดลอกคำสั่ง", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "วางลงใน ChatGPT (ใช้ Gemini หรือ Copilot ก็ได้) แล้วส่ง", "Save the picture to your phone or computer.": "บันทึกรูปภาพลงในโทรศัพท์หรือคอมพิวเตอร์", "Tap Choose a picture above.": "แตะ เลือกรูปภาพ ด้านบน", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "คำสั่งนี้ขอภาพที่ไม่มีตัวอักษรใดๆ โปสเตอร์จะใส่รายละเอียดและคิวอาร์โค้ดให้เอง จึงถูกต้องเสมอ"});
+Object.assign(FR_TEXT, {"Background picture": "Image de fond", "Choose a picture": "Choisir une image", "Your pictures stay on this phone. They aren't uploaded.": "Vos images restent sur ce téléphone. Elles ne sont pas envoyées.", "That picture couldn't be used. Try a JPEG or PNG.": "Cette image n'a pas pu être utilisée. Essayez un JPEG ou un PNG.", "Photo": "Photo", "Position": "Cadrage", "Top": "Haut", "Centre": "Centre", "Bottom": "Bas", "Darken": "Assombrir", "Make artwork with ChatGPT": "Créer un visuel avec ChatGPT", "Sunny terrain": "Terrain au soleil", "Evening under lights": "Soirée sous les projecteurs", "Provençal village": "Village provençal", "Club colours": "Couleurs du club", "Simple boules pattern": "Motif de boules", "Copy the prompt": "Copier la consigne", "Prompt copied. Paste it into ChatGPT.": "Consigne copiée. Collez-la dans ChatGPT.", "Open ChatGPT": "Ouvrir ChatGPT", "Copy the prompt.": "Copiez la consigne.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Collez-la dans ChatGPT (Gemini ou Copilot marchent aussi) et envoyez-la.", "Save the picture to your phone or computer.": "Enregistrez l'image sur votre téléphone ou votre ordinateur.", "Tap Choose a picture above.": "Touchez Choisir une image ci-dessus.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "La consigne demande une image sans aucun texte. L'affiche ajoute vos informations et le QR code, ils sont donc toujours exacts."});
+Object.assign(LANG_TEXT.es, {"Background picture": "Imagen de fondo", "Choose a picture": "Elegir una imagen", "Your pictures stay on this phone. They aren't uploaded.": "Tus imágenes se quedan en este teléfono. No se suben.", "That picture couldn't be used. Try a JPEG or PNG.": "No se pudo usar esa imagen. Prueba con un JPEG o PNG.", "Photo": "Foto", "Position": "Encuadre", "Top": "Arriba", "Centre": "Centro", "Bottom": "Abajo", "Darken": "Oscurecer", "Make artwork with ChatGPT": "Crear la imagen con ChatGPT", "Sunny terrain": "Terreno al sol", "Evening under lights": "Noche con focos", "Provençal village": "Pueblo provenzal", "Club colours": "Colores del club", "Simple boules pattern": "Motivo de bolas", "Copy the prompt": "Copiar la instrucción", "Prompt copied. Paste it into ChatGPT.": "Instrucción copiada. Pégala en ChatGPT.", "Open ChatGPT": "Abrir ChatGPT", "Copy the prompt.": "Copia la instrucción.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Pégala en ChatGPT (también sirven Gemini o Copilot) y envíala.", "Save the picture to your phone or computer.": "Guarda la imagen en tu teléfono u ordenador.", "Tap Choose a picture above.": "Toca Elegir una imagen arriba.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "La instrucción pide una imagen sin ningún texto. El cartel añade tus datos y el código QR, así que siempre son correctos."});
+Object.assign(LANG_TEXT.it, {"Background picture": "Immagine di sfondo", "Choose a picture": "Scegli un'immagine", "Your pictures stay on this phone. They aren't uploaded.": "Le tue immagini restano su questo telefono. Non vengono caricate.", "That picture couldn't be used. Try a JPEG or PNG.": "Non è stato possibile usare questa immagine. Prova con un JPEG o un PNG.", "Photo": "Foto", "Position": "Inquadratura", "Top": "In alto", "Centre": "Al centro", "Bottom": "In basso", "Darken": "Scurisci", "Make artwork with ChatGPT": "Crea l'immagine con ChatGPT", "Sunny terrain": "Campo al sole", "Evening under lights": "Sera sotto i riflettori", "Provençal village": "Paese provenzale", "Club colours": "Colori del club", "Simple boules pattern": "Motivo di bocce", "Copy the prompt": "Copia il prompt", "Prompt copied. Paste it into ChatGPT.": "Prompt copiato. Incollalo in ChatGPT.", "Open ChatGPT": "Apri ChatGPT", "Copy the prompt.": "Copia il prompt.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Incollalo in ChatGPT (vanno bene anche Gemini o Copilot) e invialo.", "Save the picture to your phone or computer.": "Salva l'immagine sul telefono o sul computer.", "Tap Choose a picture above.": "Tocca Scegli un'immagine qui sopra.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "Il prompt chiede un'immagine senza scritte. La locandina aggiunge i tuoi dati e il codice QR, così sono sempre giusti."});
+Object.assign(LANG_TEXT.de, {"Background picture": "Hintergrundbild", "Choose a picture": "Bild auswählen", "Your pictures stay on this phone. They aren't uploaded.": "Deine Bilder bleiben auf diesem Handy. Sie werden nicht hochgeladen.", "That picture couldn't be used. Try a JPEG or PNG.": "Dieses Bild konnte nicht verwendet werden. Versuche ein JPEG oder PNG.", "Photo": "Foto", "Position": "Ausschnitt", "Top": "Oben", "Centre": "Mitte", "Bottom": "Unten", "Darken": "Abdunkeln", "Make artwork with ChatGPT": "Bild mit ChatGPT erstellen", "Sunny terrain": "Bouleplatz in der Sonne", "Evening under lights": "Abends unter Flutlicht", "Provençal village": "Dorf in der Provence", "Club colours": "Vereinsfarben", "Simple boules pattern": "Kugelmuster", "Copy the prompt": "Prompt kopieren", "Prompt copied. Paste it into ChatGPT.": "Prompt kopiert. Füge ihn in ChatGPT ein.", "Open ChatGPT": "ChatGPT öffnen", "Copy the prompt.": "Kopiere den Prompt.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Füge ihn in ChatGPT ein (Gemini oder Copilot gehen auch) und sende ihn ab.", "Save the picture to your phone or computer.": "Speichere das Bild auf deinem Handy oder Computer.", "Tap Choose a picture above.": "Tippe oben auf Bild auswählen.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "Der Prompt verlangt ein Bild ohne jede Schrift. Das Plakat ergänzt deine Angaben und den QR-Code, damit sie immer stimmen."});
+Object.assign(LANG_TEXT.nl, {"Background picture": "Achtergrondfoto", "Choose a picture": "Kies een afbeelding", "Your pictures stay on this phone. They aren't uploaded.": "Je afbeeldingen blijven op deze telefoon. Ze worden niet geüpload.", "That picture couldn't be used. Try a JPEG or PNG.": "Die afbeelding kon niet worden gebruikt. Probeer een JPEG of PNG.", "Photo": "Foto", "Position": "Uitsnede", "Top": "Boven", "Centre": "Midden", "Bottom": "Onder", "Darken": "Donkerder", "Make artwork with ChatGPT": "Afbeelding maken met ChatGPT", "Sunny terrain": "Zonnig terrein", "Evening under lights": "Avond onder de lampen", "Provençal village": "Provençaals dorp", "Club colours": "Clubkleuren", "Simple boules pattern": "Patroon van boules", "Copy the prompt": "Kopieer de prompt", "Prompt copied. Paste it into ChatGPT.": "Prompt gekopieerd. Plak hem in ChatGPT.", "Open ChatGPT": "ChatGPT openen", "Copy the prompt.": "Kopieer de prompt.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Plak hem in ChatGPT (Gemini of Copilot werken ook) en verstuur hem.", "Save the picture to your phone or computer.": "Bewaar de afbeelding op je telefoon of computer.", "Tap Choose a picture above.": "Tik hierboven op Kies een afbeelding.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "De prompt vraagt om een afbeelding zonder tekst. De poster zet je gegevens en de QR-code erop, zodat die altijd kloppen."});
+Object.assign(LANG_TEXT.pt, {"Background picture": "Imagem de fundo", "Choose a picture": "Escolher uma imagem", "Your pictures stay on this phone. They aren't uploaded.": "As suas imagens ficam neste telemóvel. Não são enviadas.", "That picture couldn't be used. Try a JPEG or PNG.": "Não foi possível usar essa imagem. Experimente um JPEG ou PNG.", "Photo": "Foto", "Position": "Enquadramento", "Top": "Cima", "Centre": "Centro", "Bottom": "Baixo", "Darken": "Escurecer", "Make artwork with ChatGPT": "Criar a imagem com o ChatGPT", "Sunny terrain": "Campo ao sol", "Evening under lights": "Noite sob os holofotes", "Provençal village": "Aldeia provençal", "Club colours": "Cores do clube", "Simple boules pattern": "Padrão de bolas", "Copy the prompt": "Copiar o pedido", "Prompt copied. Paste it into ChatGPT.": "Pedido copiado. Cole-o no ChatGPT.", "Open ChatGPT": "Abrir o ChatGPT", "Copy the prompt.": "Copie o pedido.", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "Cole-o no ChatGPT (o Gemini ou o Copilot também servem) e envie.", "Save the picture to your phone or computer.": "Guarde a imagem no telemóvel ou no computador.", "Tap Choose a picture above.": "Toque em Escolher uma imagem acima.", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "O pedido é para uma imagem sem texto. O cartaz acrescenta os seus dados e o código QR, por isso estão sempre certos."});
+Object.assign(LANG_TEXT.th, {"Background picture": "ภาพพื้นหลัง", "Choose a picture": "เลือกรูปภาพ", "Your pictures stay on this phone. They aren't uploaded.": "รูปภาพของคุณอยู่ในโทรศัพท์เครื่องนี้เท่านั้น ไม่ได้อัปโหลด", "That picture couldn't be used. Try a JPEG or PNG.": "ใช้รูปภาพนี้ไม่ได้ ลองใช้ไฟล์ JPEG หรือ PNG", "Photo": "ภาพถ่าย", "Position": "ตำแหน่งภาพ", "Top": "ด้านบน", "Centre": "ตรงกลาง", "Bottom": "ด้านล่าง", "Darken": "ปรับให้เข้มขึ้น", "Make artwork with ChatGPT": "สร้างภาพด้วย ChatGPT", "Sunny terrain": "สนามเปตองยามแดดจ้า", "Evening under lights": "ยามค่ำใต้แสงไฟ", "Provençal village": "หมู่บ้านโพรวองซ์", "Club colours": "สีประจำสโมสร", "Simple boules pattern": "ลายลูกเปตองเรียบง่าย", "Copy the prompt": "คัดลอกคำสั่ง", "Prompt copied. Paste it into ChatGPT.": "คัดลอกคำสั่งแล้ว วางลงใน ChatGPT ได้เลย", "Open ChatGPT": "เปิด ChatGPT", "Copy the prompt.": "คัดลอกคำสั่ง", "Paste it into ChatGPT (Gemini or Copilot work too) and send it.": "วางลงใน ChatGPT (ใช้ Gemini หรือ Copilot ก็ได้) แล้วส่ง", "Save the picture to your phone or computer.": "บันทึกรูปภาพลงในโทรศัพท์หรือคอมพิวเตอร์", "Tap Choose a picture above.": "แตะ เลือกรูปภาพ ด้านบน", "The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.": "คำสั่งนี้ขอภาพที่ไม่มีตัวอักษรใดๆ โปสเตอร์จะใส่รายละเอียดและคิวอาร์โค้ดให้เอง จึงถูกต้องเสมอ"});
+// Poster maker: logos and sponsors (poster-sponsors)
+Object.assign(FR_TEXT, {"Logos": "Logos", "Your logo": "Votre logo", "Choose a logo": "Choisir un logo", "Sponsors": "Partenaires", "Add a sponsor logo": "Ajouter un logo de partenaire", "Show the sponsors": "Afficher les partenaires", "With thanks to our sponsors": "Merci à nos partenaires", "You can add up to {n} sponsor logos.": "Vous pouvez ajouter jusqu'à {1} logos de partenaires."});
+Object.assign(LANG_TEXT.es, {"Logos": "Logotipos", "Your logo": "Tu logo", "Choose a logo": "Elegir un logo", "Sponsors": "Patrocinadores", "Add a sponsor logo": "Añadir un logo de patrocinador", "Show the sponsors": "Mostrar los patrocinadores", "With thanks to our sponsors": "Gracias a nuestros patrocinadores", "You can add up to {n} sponsor logos.": "Puedes añadir hasta {1} logos de patrocinadores."});
+Object.assign(LANG_TEXT.it, {"Logos": "Loghi", "Your logo": "Il tuo logo", "Choose a logo": "Scegli un logo", "Sponsors": "Sponsor", "Add a sponsor logo": "Aggiungi il logo di uno sponsor", "Show the sponsors": "Mostra gli sponsor", "With thanks to our sponsors": "Grazie ai nostri sponsor", "You can add up to {n} sponsor logos.": "Puoi aggiungere fino a {1} loghi di sponsor."});
+Object.assign(LANG_TEXT.de, {"Logos": "Logos", "Your logo": "Dein Logo", "Choose a logo": "Logo auswählen", "Sponsors": "Sponsoren", "Add a sponsor logo": "Sponsorenlogo hinzufügen", "Show the sponsors": "Sponsoren zeigen", "With thanks to our sponsors": "Mit Dank an unsere Sponsoren", "You can add up to {n} sponsor logos.": "Du kannst bis zu {1} Sponsorenlogos hinzufügen."});
+Object.assign(LANG_TEXT.nl, {"Logos": "Logo's", "Your logo": "Je logo", "Choose a logo": "Kies een logo", "Sponsors": "Sponsors", "Add a sponsor logo": "Sponsorlogo toevoegen", "Show the sponsors": "Sponsors tonen", "With thanks to our sponsors": "Met dank aan onze sponsors", "You can add up to {n} sponsor logos.": "Je kunt tot {1} sponsorlogo's toevoegen."});
+Object.assign(LANG_TEXT.pt, {"Logos": "Logótipos", "Your logo": "O seu logótipo", "Choose a logo": "Escolher um logótipo", "Sponsors": "Patrocinadores", "Add a sponsor logo": "Adicionar o logótipo de um patrocinador", "Show the sponsors": "Mostrar os patrocinadores", "With thanks to our sponsors": "Obrigado aos nossos patrocinadores", "You can add up to {n} sponsor logos.": "Pode adicionar até {1} logótipos de patrocinadores."});
+Object.assign(LANG_TEXT.th, {"Logos": "โลโก้", "Your logo": "โลโก้ของคุณ", "Choose a logo": "เลือกโลโก้", "Sponsors": "ผู้สนับสนุน", "Add a sponsor logo": "เพิ่มโลโก้ผู้สนับสนุน", "Show the sponsors": "แสดงผู้สนับสนุน", "With thanks to our sponsors": "ขอขอบคุณผู้สนับสนุนของเรา", "You can add up to {n} sponsor logos.": "เพิ่มโลโก้ผู้สนับสนุนได้สูงสุด {1} รายการ"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -4387,7 +4399,8 @@ const posterQrLabel = e => calEntOn() && calEntOpen(e) ? "Scan to enter" : "Scan
 const posterRead = k => { try { const v = JSON.parse(lsGet(k) || "null"); return v && typeof v === "object" ? v : null; } catch { return null; } };
 function posterSave(md) {
   const d = { size: md.size, layout: md.layout, main: md.main, second: md.second, logo: md.logo, qr: md.qr, show: md.show, pos: md.pos, dark: md.dark, style: md.style };
-  lsSet(posterKey(md.id), JSON.stringify({ ...d, headline: md.headline, strap: md.strap })); lsSet(POSTER_LAST, JSON.stringify(d));
+  // the sponsor ticks are this listing's own, like the words (a listing with no design starts with them on)
+  lsSet(posterKey(md.id), JSON.stringify({ ...d, headline: md.headline, strap: md.strap, sponsors: md.sponsors, thanks: md.thanks })); lsSet(POSTER_LAST, JSON.stringify(d));
 }
 const posterBtn = id => `<button type="button" class="btn sm" data-act="poster-open" data-id="${esc(id)}">Make a poster</button>`;
 const posterKey = id => "carreau-poster:" + id;
@@ -4400,7 +4413,8 @@ function posterOpen(id) {
     main: isHex(d.main) ? d.main.toLowerCase() : t && isHex(t.accent) ? t.accent.toLowerCase() : ACCENTS[0][0], second: isHex(d.second) ? d.second.toLowerCase() : POSTER_SECOND[0][0],
     logo: d.logo !== false, qr: d.qr !== false, headline: typeof own?.headline === "string" ? own.headline : e.name || "", strap: typeof own?.strap === "string" ? own.strap : "", seq: 0,
     pos: POSTER_POS.some(x => x[0] === d.pos) ? d.pos : "center", dark: Number.isFinite(d.dark) ? Math.max(0, Math.min(80, Math.round(d.dark))) : 40,
-    style: POSTER_STYLES.some(x => x[0] === d.style) ? d.style : "sunny", pic: null };
+    style: POSTER_STYLES.some(x => x[0] === d.style) ? d.style : "sunny", pic: null,
+    sponsors: own?.sponsors !== false, thanks: own?.thanks !== false, own: null, sponsorList: null };
   S.modal.picReady = posterPicLoad(S.modal);
   posterBrand(e); renderModal();
 }
@@ -4467,14 +4481,56 @@ async function posterPicImg(blob) {
   const url = URL.createObjectURL(blob);
   try { return await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; }); } finally { setTimeout(() => URL.revokeObjectURL(url), 0); }
 }
-// when the sheet opens: clean up old pictures, then this listing's picture, if this device keeps one. Without one, a
-// remembered Photo layout falls back to Bold.
+// a kept picture, ready to draw, or null
+async function posterPicRead(key) {
+  let rec = null; try { rec = await posterPicGet(key); } catch {}
+  return rec?.blob instanceof Blob ? posterPicImg(rec.blob).catch(() => null) : null;
+}
+/* Logos (poster-sponsors), in the same store. "Your logo" (events run elsewhere, which have no club logo) is kept per
+   listing under "logo:<listing id>" with the listing's date, so it's cleaned up with the listing. Sponsor logos are
+   kept per device under "sponsor:<id>" with no date, so they're there for the next poster; their order is the order
+   they were added (`at`). Both are PNG, at most 600 px on the longer side, so transparent logos stay transparent. */
+const POSTER_LOGO_MAX = 600, POSTER_SPONSORS = 4, posterOwnKey = id => "logo:" + id;
+const posterOwnOk = e => !!e && e.kind !== "comp";
+async function posterSponsorsRead() {
+  let keys = []; try { keys = (await posterPicKeys()).filter(k => typeof k === "string" && k.startsWith("sponsor:")); } catch { return []; }
+  const recs = await Promise.all(keys.map(k => posterPicGet(k).catch(() => null)));
+  const list = await Promise.all(recs.map(async (r, i) => r?.blob instanceof Blob ? { key: keys[i], at: r.at || 0, img: await posterPicImg(r.blob).catch(() => null) } : null));
+  return list.filter(x => x?.img).sort((a, b) => a.at - b.at).slice(0, POSTER_SPONSORS);
+}
+// when the sheet opens: clean up old pictures, then this listing's picture and logo, if this device keeps them, and
+// the sponsor logos. Without a picture, a remembered Photo layout falls back to Bold.
 async function posterPicLoad(md) {
   try { await posterPicClean(); } catch {}
-  let rec = null; try { rec = await posterPicGet(md.id); } catch {}
-  const img = rec?.blob instanceof Blob ? await posterPicImg(rec.blob).catch(() => null) : null;
-  if (S.modal !== md || md.pic) return;
-  if (img) md.pic = img; else if (md.layout === "photo") md.layout = "bold"; else return;
+  const [img, own, spons] = await Promise.all([posterPicRead(md.id), posterOwnOk(posterListing(md)) ? posterPicRead(posterOwnKey(md.id)) : null, posterSponsorsRead()]);
+  if (S.modal !== md) return;
+  if (!md.pic) { if (img) md.pic = img; else if (md.layout === "photo") md.layout = "bold"; }
+  if (!md.own && own) md.own = own;
+  if (!md.sponsorList) md.sponsorList = spons;
+  renderModal();
+}
+async function posterOwnPick(el) {
+  const md = S.modal, f = el.files?.[0]; el.value = ""; if (!f || !md?.poster) return;
+  const r = await posterPicShrink(f, POSTER_LOGO_MAX, "image/png").catch(err => { console.error(err); return null; });
+  if (S.modal !== md) return;
+  if (!r) { toast("That picture couldn't be used. Try a JPEG or PNG."); return; }
+  md.own = r.img; md.logo = true;
+  md.picSaved = posterPicPut(posterOwnKey(md.id), { blob: r.blob, date: posterListing(md)?.date || "" }).catch(err => console.error(err));
+  posterSave(md); renderModal();
+}
+async function posterSponsorPick(el) {
+  const md = S.modal, files = [...(el.files || [])]; el.value = ""; if (!files.length || !md?.poster) return;
+  await md.picReady; if (S.modal !== md) return;
+  const list = md.sponsorList = md.sponsorList || [];
+  for (const f of files) {
+    if (list.length >= POSTER_SPONSORS) { toast("You can add up to 4 sponsor logos."); break; }
+    const r = await posterPicShrink(f, POSTER_LOGO_MAX, "image/png").catch(err => { console.error(err); return null; });
+    if (S.modal !== md) return;
+    if (!r) { toast("That picture couldn't be used. Try a JPEG or PNG."); continue; }
+    const key = "sponsor:" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    list.push({ key, at: Date.now(), img: r.img });
+    md.picSaved = posterPicPut(key, { blob: r.blob }).catch(err => console.error(err));
+  }
   renderModal();
 }
 async function posterPick(el) {
@@ -4518,7 +4574,8 @@ function renderPosterModal(el) {
   const md = S.modal, e = posterListing(md);
   if (!e) { S.modal = null; el.innerHTML = ""; return; }
   const fold = el.querySelector(".poster-fold"); if (fold) md.fold = fold.open;
-  const top = el.querySelector(".poster-sheet")?.scrollTop || 0, logo = posterLogoSrc(e), print = md.size === "a4" || md.size === "a5";
+  const top = el.querySelector(".poster-sheet")?.scrollTop || 0, print = md.size === "a4" || md.size === "a5";
+  const ownOk = posterOwnOk(e), hasLogo = !!(ownOk ? md.own : posterLogoSrc(e)), spons = md.sponsorList || [];
   const chip = (act, k, label, on, pre = "") => `<button type="button" class="hof-chip poster-chip" data-act="${act}" data-k="${k}" aria-pressed="${on}">${pre}<span>${label}</span></button>`;
   const sw = (act, list, cur, k) => `<div class="swatches" role="group">${list.map(([h, n]) => `<button type="button" class="swatch" data-act="${act}" data-k="${h}" aria-pressed="${cur === h}" aria-label="${n}" title="${n}" style="background:${h}"></button>`).join("")}
     <label class="swatch custom${list.some(x => x[0] === cur) ? "" : " on"}" title="Choose any colour"><input type="color" data-poster="${k}" value="${esc(cur)}" aria-label="Choose any colour"></label></div>`;
@@ -4533,7 +4590,7 @@ function renderPosterModal(el) {
         <div class="stack" style="gap:6px"><div class="eyebrow" data-notr>${esc(trAs("Poster layout", "Layout"))}</div><div class="poster-chips" role="group">${POSTER_LAYOUTS.map(([k, l]) => chip("poster-layout", k, l, md.layout === k, posterThumb(k))).join("")}</div></div>
         <div class="stack poster-pic" style="gap:8px"><div class="eyebrow">Background picture</div>
           <div class="row"><button type="button" class="btn" data-act="poster-pic">Choose a picture</button>${md.pic ? `<button type="button" class="btn" data-act="poster-pic-remove">Remove</button>` : ""}<input type="file" accept="image/*" data-poster="pic" hidden aria-hidden="true" tabindex="-1"></div>
-          <p class="small muted">Your picture stays on this phone. It isn't uploaded.</p>
+          <p class="small muted">Your pictures stay on this phone. They aren't uploaded.</p>
           ${md.pic ? `<div class="stack" style="gap:6px"><div class="eyebrow">Position</div><div class="poster-chips" role="group" aria-label="Position">${POSTER_POS.map(([k, l]) => chip("poster-pos", k, l, md.pos === k)).join("")}</div></div>
           <label class="f poster-dark"><span><span>Darken</span> <b data-notr data-poster-dark>${md.dark}%</b></span><input type="range" min="0" max="80" step="5" value="${md.dark}" data-poster="dark" aria-label="Darken"></label>` : ""}
           <details class="poster-fold"${md.fold ? " open" : ""}><summary>Make artwork with ChatGPT</summary><div class="stack" style="gap:10px">
@@ -4543,10 +4600,18 @@ function renderPosterModal(el) {
             <p class="small muted">The prompt asks for a picture with no words on it. The poster adds your details and the QR code, so they're always right.</p>
           </div></details>
         </div>
+        <div class="stack poster-logos" style="gap:8px"><div class="eyebrow">Logos</div>
+          ${ownOk ? `<div class="poster-sub">Your logo</div>
+          <div class="row poster-own">${md.own ? `<canvas class="poster-logo-thumb" data-thumb="own" aria-hidden="true"></canvas>` : ""}<button type="button" class="btn" data-act="poster-own">Choose a logo</button>${md.own ? `<button type="button" class="btn" data-act="poster-own-remove">Remove</button>` : ""}<input type="file" accept="image/*" data-poster="own" hidden aria-hidden="true" tabindex="-1"></div>` : ""}
+          ${hasLogo ? tick("logo", "Show the club logo", md.logo) : ""}
+          <div class="poster-sub">Sponsors</div>
+          ${spons.length ? `<div class="poster-spons">${spons.map((x, i) => `<div class="poster-spon"><canvas class="poster-logo-thumb" data-thumb="${i}" aria-hidden="true"></canvas><button type="button" class="btn" data-act="poster-sponsor-remove" data-k="${esc(x.key)}">Remove</button></div>`).join("")}</div>` : ""}
+          <div class="row"><button type="button" class="btn" data-act="poster-sponsor">Add a sponsor logo</button><input type="file" accept="image/*" multiple data-poster="sponsor" hidden aria-hidden="true" tabindex="-1"></div>
+          ${spons.length ? `<div class="poster-sp-ticks">${tick("sponsors", "Show the sponsors", md.sponsors)}${tick("thanks", "With thanks to our sponsors", md.thanks)}</div>` : ""}
+        </div>
         <div class="stack" style="gap:6px"><div class="eyebrow">Main colour</div>${sw("poster-main", ACCENTS, md.main, "main")}
-          ${logo ? `<div><button type="button" class="btn" data-act="poster-match">Match the logo</button></div>` : ""}</div>
+          ${hasLogo ? `<div><button type="button" class="btn" data-act="poster-match">Match the logo</button></div>` : ""}</div>
         <div class="stack" style="gap:6px"><div class="eyebrow">Second colour</div>${sw("poster-second", POSTER_SECOND, md.second, "second")}</div>
-        ${logo ? tick("logo", "Show the club logo", md.logo) : ""}
         <div class="stack" style="gap:10px">${box("headline", "Headline")}${box("strap", "Strapline", "e.g. Open triples · £300 prize fund")}</div>
         <div class="stack" style="gap:2px"><div class="eyebrow">Show on the poster</div><div class="poster-ticks">${POSTER_SHOW.filter(([k]) => posterHas(e, k)).map(([k, l]) => tick("show", l, md.show[k], k)).join("")}</div></div>
         ${tick("qr", "Show the QR code", md.qr)}
@@ -4560,6 +4625,10 @@ function renderPosterModal(el) {
   md.cv.setAttribute("aria-label", posterHeadline(md, e));
   el.querySelector("[data-poster-prev]").appendChild(md.cv);
   if (md.words) { el.querySelector("[data-poster-words]").innerHTML = md.words; }
+  // the logos' thumbnails, drawn from the pictures this device keeps
+  el.querySelectorAll("canvas[data-thumb]").forEach(c => { const img = c.dataset.thumb === "own" ? md.own : spons[+c.dataset.thumb]?.img; if (!img) return;
+    const r = Math.min(2, window.devicePixelRatio || 1), cw = c.width = Math.round(72 * r), ch = c.height = Math.round(44 * r), pad = 4 * r, iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+    const k = Math.min((cw - 2 * pad) / iw, (ch - 2 * pad) / ih), x = c.getContext("2d"); x.imageSmoothingQuality = "high"; x.drawImage(img, (cw - iw * k) / 2, (ch - ih * k) / 2, iw * k, ih * k); });
   const sheet = el.querySelector(".poster-sheet"); if (sheet) sheet.scrollTop = top;
   posterSoon();
 }
@@ -4570,9 +4639,11 @@ function posterInput(el) {
   else if (k === "main" || k === "second") { if (!isHex(el.value)) return; md[k] = el.value.toLowerCase();
     const g = el.closest(".swatches"); g?.querySelectorAll(".swatch[aria-pressed]").forEach(b => b.setAttribute("aria-pressed", "false")); el.closest(".swatch")?.classList.add("on"); }
   else if (k === "show") { if (!POSTER_SHOW.some(x => x[0] === el.dataset.k)) return; md.show[el.dataset.k] = el.checked; }
-  else if (k === "logo" || k === "qr") md[k] = el.checked;
+  else if (k === "logo" || k === "qr" || k === "sponsors" || k === "thanks") md[k] = el.checked;
   else if (k === "dark") { md.dark = Math.max(0, Math.min(80, Math.round(+el.value || 0))); const v = el.closest(".poster-dark")?.querySelector("[data-poster-dark]"); if (v) v.textContent = md.dark + "%"; }
   else if (k === "pic") { posterPick(el); return; }
+  else if (k === "own") { posterOwnPick(el); return; }
+  else if (k === "sponsor") { posterSponsorPick(el); return; }
   else return;
   posterSave(md); posterSoon();
 }
@@ -4581,11 +4652,15 @@ async function posterAction(act, k) {
   if (act === "poster-size" && POSTER_SIZES.some(x => x[0] === k)) md.size = k;
   else if (act === "poster-layout" && POSTER_LAYOUTS.some(x => x[0] === k)) md.layout = k;
   else if ((act === "poster-main" || act === "poster-second") && isHex(k)) md[act === "poster-main" ? "main" : "second"] = k.toLowerCase();
-  else if (act === "poster-match") { const src = posterLogoSrc(posterListing(md)); const c = src ? posterLogoColour(await posterImg(src).catch(() => null)) : null; if (!c || S.modal !== md) return; md.main = c; }
+  else if (act === "poster-match") { const e = posterListing(md), src = posterOwnOk(e) ? "" : posterLogoSrc(e); const c = posterLogoColour(posterOwnOk(e) ? md.own : src ? await posterImg(src).catch(() => null) : null); if (!c || S.modal !== md) return; md.main = c; }
   else if (act === "poster-pos" && POSTER_POS.some(x => x[0] === k)) md.pos = k;
   else if (act === "poster-style" && POSTER_STYLES.some(x => x[0] === k)) md.style = k;
   else if (act === "poster-pic") { document.querySelector('#modal [data-poster="pic"]')?.click(); return; }
   else if (act === "poster-pic-remove") posterPicRemove(md);
+  else if (act === "poster-own") { document.querySelector('#modal [data-poster="own"]')?.click(); return; }
+  else if (act === "poster-own-remove") { md.own = null; md.picSaved = posterPicDel(posterOwnKey(md.id)).catch(err => console.error(err)); }
+  else if (act === "poster-sponsor") { if ((md.sponsorList || []).length >= POSTER_SPONSORS) { toast("You can add up to 4 sponsor logos."); return; } document.querySelector('#modal [data-poster="sponsor"]')?.click(); return; }
+  else if (act === "poster-sponsor-remove") { if (!md.sponsorList?.some(x => x.key === k)) return; md.sponsorList = md.sponsorList.filter(x => x.key !== k); md.picSaved = posterPicDel(k).catch(err => console.error(err)); }
   else if (act === "poster-prompt") { await posterCopyPrompt(md); return; }
   else if (act === "poster-download") { await posterDownload(md); return; }
   else if (act === "poster-share") { await posterShare(md); return; }
@@ -4699,7 +4774,7 @@ function posterLogo(ctx, img, x, y, size, round) {
   ctx.save(); ctx.shadowColor = "rgba(0,0,0,.18)"; ctx.shadowBlur = size * .08; ctx.shadowOffsetY = size * .02; ctx.fillStyle = "#fff";
   if (round) { ctx.beginPath(); ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2); } else posterRect(ctx, x, y, size, size, size * .16);
   ctx.fill(); ctx.restore();
-  const pad = size * (round ? .2 : .12), box = size - 2 * pad, k = Math.min(box / img.naturalWidth, box / img.naturalHeight), w = img.naturalWidth * k, h = img.naturalHeight * k;
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height, pad = size * (round ? .2 : .12), box = size - 2 * pad, k = Math.min(box / iw, box / ih), w = iw * k, h = ih * k;
   ctx.drawImage(img, x + (size - w) / 2, y + (size - h) / 2, w, h);
 }
 // the QR code: dark modules on a white box with a 4-module quiet zone, whole pixels per module
@@ -4742,16 +4817,45 @@ function posterBall(ctx, x, y, r, colour) {
   ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
+// The sponsor strip (poster-sponsors): "With thanks to our sponsors" between two hairlines, then the logos, each
+// scaled to the same height (7% of the poster's height) in a slot at most 22% of the poster's width (a wide logo
+// shrinks to fit its slot), evenly spaced and centred. h is the height it needs; draw puts it in w at x, y and
+// returns where each logo went. null when there's nothing to show.
+function posterSponsors(md, W, H, u) {
+  const list = md.sponsors ? (md.sponsorList || []).filter(x => x.img) : [];
+  if (!list.length) return null;
+  const lh = .07 * H, tp = md.thanks ? 2.3 * u : 0, th = tp ? tp * 1.1 + 1.6 * u : 0;
+  const draw = (ctx, x, y, w, o) => {
+    const n = list.length, g0 = 3.5 * u, slot = Math.min(.22 * W, (w - g0 * (n - 1)) / n);
+    const sz = list.map(({ img }) => { const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height, k = Math.min(lh / ih, slot / iw); return [iw * k, ih * k]; });
+    const sum = sz.reduce((a, b) => a + b[0], 0), gap = n > 1 ? Math.max(g0, Math.min(8 * u, (w - sum) / (n - 1))) : 0, tot = sum + gap * (n - 1);
+    if (tp) {
+      const label = tr("With thanks to our sponsors").toLocaleUpperCase(LOCALES[I18N.lang] || "en"), cx = x + w / 2;
+      ctx.font = `700 ${tp}px ${POSTER_FONT.d}`; posterSpacing(ctx, `${(.14 * tp).toFixed(1)}px`);
+      const L = posterWrap(ctx, label, w - 12 * u, 1), tw = Math.min(w - 12 * u, ctx.measureText(L[0]).width), half = Math.min(w, Math.max(tot, tw + 24 * u)) / 2;
+      posterText(ctx, L, cx, y, tp, 1.1, o.label, "center"); posterSpacing(ctx, "0px");
+      ctx.fillStyle = o.rule; const ry = y + tp * .52, rh = Math.max(1, .12 * u);
+      ctx.fillRect(cx - half, ry, Math.max(0, half - tw / 2 - 2.2 * u), rh); ctx.fillRect(cx + tw / 2 + 2.2 * u, ry, Math.max(0, half - tw / 2 - 2.2 * u), rh);
+    }
+    let lx = x + (w - tot) / 2; const rects = [];
+    list.forEach(({ img }, i) => { const [iw, ih] = sz[i], ly = y + th + (lh - ih) / 2;
+      ctx.save(); ctx.imageSmoothingQuality = "high"; ctx.drawImage(img, lx, ly, iw, ih); ctx.restore(); rects.push({ x: Math.round(lx), y: Math.round(ly), w: Math.round(iw), h: Math.round(ih) }); lx += iw + gap; });
+    return rects;
+  };
+  return { h: th + lh, thanks: !!tp, draw };
+}
 async function posterDraw(md) {
   const e = posterListing(md); if (!e || !md.cv) return;
   const seq = md.seq = (md.seq || 0) + 1, [, , W, H] = POSTER_SIZES.find(x => x[0] === md.size);
-  const link = calLink(md.id), logoSrc0 = md.logo ? posterLogoSrc(e) : "";
-  const [, img, q] = await Promise.all([posterFontsReady(), logoSrc0 ? posterImg(logoSrc0).catch(() => null) : null,
+  const link = calLink(md.id), logoSrc0 = md.logo && !posterOwnOk(e) ? posterLogoSrc(e) : "";
+  const [, img0, q] = await Promise.all([posterFontsReady(), logoSrc0 ? posterImg(logoSrc0).catch(() => null) : null,
     md.qr && S.qrMatrix ? S.qrMatrix(link).catch(err => { console.error(err); return null; }) : null, md.picReady]);
   if (S.modal !== md || md.seq !== seq) return;
+  const img = !md.logo ? null : posterOwnOk(e) ? md.own : img0;
   const pic = md.layout === "photo" || md.layout === "bold" ? md.pic : null, dark = md.dark / 100;
   const cv = md.cv; if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
   const ctx = cv.getContext("2d"), u = W / 100, m = 7 * u, items = posterItems(e, md);
+  const SP = posterSponsors(md, W, H, u), rule = "#d6dbd8"; let spons = [];
   const head = posterHeadline(md, e), strap = String(md.strap || "").trim(), main = md.main, second = md.second, onMain = posterInk(main);
   const P = { u, link, label: tr(posterQrLabel(e)), q: md.qr ? q : null, qs: 0 };
   if (P.q) P.qs = Math.ceil(23.5 * u / (P.q.n + 8)) * (P.q.n + 8); else if (md.qr) P.qs = 24 * u;
@@ -4762,10 +4866,13 @@ async function posterDraw(md) {
   if (L === "photo") {
     // the picture fills the poster (or, with none yet, the main colour); the shade is lightest in the middle, strongest
     // at the bottom where the details sit; the words in white, the second colour as the accent where it reads
-    if (pic) posterCover(ctx, pic, 0, 0, W, H, md.pos);
-    else { const g = ctx.createLinearGradient(0, 0, W * .5, H); g.addColorStop(0, mixHex(main, "#ffffff", .1)); g.addColorStop(1, mixHex(main, "#000000", .5)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // with sponsors, a white bar along the bottom holds them and the picture fills the rest
+    const pb = 2.8 * u, bar = SP ? SP.h + 2 * pb : 0, Hp = H - bar, bot = SP ? Hp - 4.5 * u : H - m;
+    if (pic) posterCover(ctx, pic, 0, 0, W, Hp, md.pos);
+    else { const g = ctx.createLinearGradient(0, 0, W * .5, H); g.addColorStop(0, mixHex(main, "#ffffff", .1)); g.addColorStop(1, mixHex(main, "#000000", .5)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, Hp);
       ctx.fillStyle = "rgba(255,255,255,.07)"; ctx.beginPath(); ctx.arc(W * .9, H * .32, 30 * u, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(W * .66, H * .5, 11 * u, 0, Math.PI * 2); ctx.fill(); }
-    posterShade(ctx, 0, 0, W, H, pic ? dark : Math.max(dark, .25), [[0, .2], [.45, -.64], [1, 1]]);
+    posterShade(ctx, 0, 0, W, Hp, pic ? dark : Math.max(dark, .25), [[0, .2], [.45, -.64], [1, 1]]);
+    if (SP) { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, Hp, W, bar); ctx.fillStyle = second; ctx.fillRect(0, Hp, W, .5 * u); spons = SP.draw(ctx, m, Hp + pb + .25 * u, W - 2 * m, { label: onWhite, rule }); }
     const hi = contrastOf(second, "#000000") >= 6 ? second : "#ffffff", white = "#ffffff", hu = H / u;
     let y = m;
     if (img) { posterLogo(ctx, img, m, m, 14 * u, false); y = m + 18 * u; }
@@ -4776,8 +4883,8 @@ async function posterDraw(md) {
     ctx.save(); posterGlow(ctx, u, true); ctx.font = hd.font; y += posterText(ctx, hd.L, m, y, hd.px, .98, white);
     if (sL.length) { ctx.font = `600 ${strapPx}px ${POSTER_FONT.b}`; y += 1.8 * u + posterText(ctx, sL, m, y + 1.8 * u, strapPx, 1.22, white); }
     ctx.restore();
-    const fy = Math.max(y + 6 * u, H * (H > W * 1.5 ? .5 : H > W ? .48 : .5)), qy = H - m - qrH, qx = W - m - P.qs;
-    const boxes = md.qr ? [{ x: m, y: fy, w: qx - m - 4 * u, h: H - m - fy }, { x: m, y: fy, w: W - 2 * m, h: qy - 3 * u - fy }] : [{ x: m, y: fy, w: W - 2 * m, h: H - m - fy }];
+    const fy = Math.max(y + 6 * u, H * (H > W * 1.5 ? .5 : H > W ? .48 : .5)), qy = bot - qrH, qx = W - m - P.qs;
+    const boxes = md.qr ? [{ x: m, y: fy, w: qx - m - 4 * u, h: bot - fy }, { x: m, y: fy, w: W - 2 * m, h: qy - 3 * u - fy }] : [{ x: m, y: fy, w: W - 2 * m, h: bot - fy }];
     ctx.save(); posterGlow(ctx, u, true);
     posterFactsFit(ctx, items, boxes, { u, align: "left", valign: "bottom", date: hi, ink: white, label: hi, sub: "rgba(255,255,255,.82)" });
     ctx.restore();
@@ -4787,6 +4894,10 @@ async function posterDraw(md) {
     ctx.fillStyle = ground; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = accent; ctx.lineWidth = .45 * u; ctx.strokeRect(3.4 * u, 3.4 * u, W - 6.8 * u, H - 6.8 * u);
     ctx.lineWidth = .15 * u; ctx.strokeRect(4.5 * u, 4.5 * u, W - 9 * u, H - 9 * u);
+    // with sponsors, a white panel inside the frame at the foot holds them; the rest sits above it
+    const pp = 2.4 * u, pt = SP ? H - 6.4 * u - SP.h - 2 * pp : H, cb = SP ? pt - 3 * u : H - m;
+    if (SP) { ctx.save(); ctx.shadowColor = "rgba(60,45,20,.16)"; ctx.shadowBlur = 1.2 * u; ctx.shadowOffsetY = .2 * u; ctx.fillStyle = "#ffffff"; posterRect(ctx, 6.4 * u, pt, W - 12.8 * u, SP.h + 2 * pp, 1.2 * u); ctx.fill(); ctx.restore();
+      spons = SP.draw(ctx, m + 1.5 * u, pt + pp, W - 2 * m - 3 * u, { label: accent, rule: "#e4dfd4" }); }
     if (img) posterLogo(ctx, img, 8 * u, 8 * u, 13 * u, true);
     const r = 4.6 * u, my = m + 5.5 * u, cx = W / 2;
     posterBall(ctx, cx - 10.5 * u, my, r); posterBall(ctx, cx + .5 * u, my - .8 * u, r); posterBall(ctx, cx + 11.5 * u, my + .3 * u, r); posterBall(ctx, cx - 4.6 * u, my + 4.3 * u, 1.35 * u, jack);
@@ -4798,10 +4909,10 @@ async function posterDraw(md) {
     ctx.save(); ctx.translate(cx, y + .15 * u); ctx.rotate(Math.PI / 4); ctx.fillRect(-1.1 * u, -1.1 * u, 2.2 * u, 2.2 * u); ctx.restore();
     y += 3.6 * u;
     // the facts above the QR code, or beside it (whichever lets them be bigger)
-    const fx = m + 2 * u, fw = W - 2 * m - 4 * u, boxes = [{ x: fx, y, w: fw, h: H - m - (md.qr ? qrH + 2.5 * u : 0) - y }];
-    if (md.qr) boxes.push({ x: fx, y, w: fw - P.qs - 5 * u, h: H - m - 2 * u - y });
+    const fx = m + 2 * u, fw = W - 2 * m - 4 * u, boxes = [{ x: fx, y, w: fw, h: cb - (md.qr ? qrH + 2.5 * u : 0) - y }];
+    if (md.qr) boxes.push({ x: fx, y, w: fw - P.qs - 5 * u, h: cb - 2 * u - y });
     const at = posterFactsFit(ctx, items, boxes, { u, align: "center", valign: "center", date: accent, ink: POSTER_INK, label: accent, sub });
-    if (md.qr) at ? posterQrBlock(ctx, P, W - m - 2 * u - P.qs / 2, y + Math.max(0, (H - m - 2 * u - y - qrH) / 2), POSTER_INK) : posterQrBlock(ctx, P, cx, H - m - qrH, POSTER_INK);
+    if (md.qr) at ? posterQrBlock(ctx, P, W - m - 2 * u - P.qs / 2, y + Math.max(0, (cb - 2 * u - y - qrH) / 2), POSTER_INK) : posterQrBlock(ctx, P, cx, cb - qrH, POSTER_INK);
   } else {
     ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H);
     const bold = L === "bold", hu = H / u, hb = (bold ? (H > W ? .4 : .44) : .3) * hu * u, bb = 11 * u;
@@ -4828,7 +4939,10 @@ async function posterDraw(md) {
     if (sL.length) { ctx.font = `600 ${strapPx}px ${POSTER_FONT.b}`; ctx.globalAlpha = usePic ? 1 : .92; posterText(ctx, sL, hx, y0 + hd.L.length * hd.px * .98 + 1.6 * u, strapPx, 1.22, onTop); ctx.globalAlpha = 1; }
     ctx.restore();
     let qx = W - m - P.qs, qy;
-    if (bold) qy = H - m - qrH;
+    // the sponsors: Bold's along the foot; Band's just above the band (beside the QR code's card when there is one)
+    const sw = !bold && md.qr && P.q ? qx - 4 * u - m : W - 2 * m, sy = SP ? (bold ? H - 5 * u : H - bb - 3 * u) - SP.h : H, bot = SP ? sy - 4.5 * u : bold ? H - m : H - bb - 4 * u;
+    if (SP) spons = SP.draw(ctx, m, sy, sw, { label: onWhite, rule });
+    if (bold) qy = bot - qrH;
     else {
       // the thin band in the second colour along the bottom, with the QR code's words; the code's white card stands on it
       const onSecond = posterInk(second); ctx.fillStyle = second; ctx.fillRect(0, H - bb, W, bb);
@@ -4845,13 +4959,14 @@ async function posterDraw(md) {
     }
     if (bold && md.qr) posterQrBlock(ctx, P, qx + P.qs / 2, qy, POSTER_INK);
     // the facts beside the QR code, or above it (whichever lets them be bigger)
-    const fy = hb + (bold ? 1.6 * u : 0) + 6 * u, fBot = bold ? H - m : H - bb - 4 * u, qrCol = bold ? md.qr : !!P.q;
-    const boxes = qrCol ? [{ x: m, y: fy, w: qx - m - 4 * u, h: fBot - fy }, { x: m, y: fy, w: W - 2 * m, h: qy - 3 * u - fy }] : [{ x: m, y: fy, w: W - 2 * m, h: fBot - fy }];
+    const fy = hb + (bold ? 1.6 * u : 0) + 6 * u, fBot = bot, qrCol = bold ? md.qr : !!P.q;
+    const boxes = qrCol ? [{ x: m, y: fy, w: qx - m - 4 * u, h: fBot - fy }, { x: m, y: fy, w: W - 2 * m, h: Math.min(qy - 3 * u, SP && !bold ? sy - 4.5 * u : H) - fy }] : [{ x: m, y: fy, w: W - 2 * m, h: fBot - fy }];
     posterFactsFit(ctx, items, boxes, { u, align: "left", valign: "top", date: onWhite, ink: POSTER_INK, label: onWhite, sub });
   }
-  md.info = { w: W, h: H, layout: L, size: md.size, qr: !!P.q, link: md.qr ? link : "", label: md.qr ? P.label : "", onMain, head, items: items.map(i => i.k), pic: !!pic, dark: md.dark, pos: md.pos };
+  md.info = { w: W, h: H, layout: L, size: md.size, qr: !!P.q, link: md.qr ? link : "", label: md.qr ? P.label : "", onMain, head, items: items.map(i => i.k), pic: !!pic, dark: md.dark, pos: md.pos,
+    logo: !!img, sponsors: spons, thanks: !!SP?.thanks };
   // the poster's words for screen readers (what the organiser typed stays as typed)
-  md.words = `<p data-notr>${esc(head)}</p>${strap ? `<p data-notr>${esc(strap)}</p>` : ""}${items.map(i => `<p>${i.label ? `${esc(i.label)}: ` : ""}<span data-notr>${esc([i.v, i.v2].filter(Boolean).join(", "))}</span></p>`).join("")}${md.qr ? `<p>${esc(P.label)}</p>` : ""}`;
+  md.words = `<p data-notr>${esc(head)}</p>${strap ? `<p data-notr>${esc(strap)}</p>` : ""}${items.map(i => `<p>${i.label ? `${esc(i.label)}: ` : ""}<span data-notr>${esc([i.v, i.v2].filter(Boolean).join(", "))}</span></p>`).join("")}${md.qr ? `<p>${esc(P.label)}</p>` : ""}${SP?.thanks ? `<p>${esc(tr("With thanks to our sponsors"))}</p>` : ""}`;
   const box = document.querySelector("#modal [data-poster-words]"); if (box) box.innerHTML = md.words;
   md.drawn = seq;
 }
