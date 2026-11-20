@@ -6,6 +6,9 @@ const { chromium } = require('playwright');
   const b = await chromium.launch(); const errs = []; const base = process.env.WEB_URL;
   const w = ms => new Promise(r => setTimeout(r, ms)); const log = (...a) => console.log(...a);
   const mk = async (n, vw = 1100, vh = 900) => { const c = await b.newContext({ viewport: { width: vw, height: vh } }); await c.addInitScript(() => { window.__CARREAU_EMULATOR = true; }); const p = await c.newPage(); p.on('pageerror', e => errs.push(n + ': ' + e.message)); return [p, c]; };
+  // streaming is off by default: the admin switches it on (and back off at the end)
+  const [AD] = await mk('admin'); await AD.goto(base + '#admin'); await w(3000); await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
+  await AD.evaluate(() => window.__testSetSite({ streaming: true })); await w(1500);
   // the organiser sets up a stand-alone stream and runs its desk
   const [D] = await mk('desk'); await D.goto(base); await w(3500);
   await D.click('[data-act="new-t"]'); await w(2500);
@@ -31,5 +34,6 @@ const { chromium } = require('playwright');
   log('overlay follows desk: ' + res.join(' | '));
   log('overlay matches desk within 2 s every time:', res.every(r => / ok$/.test(r)));
   log('console errors', consoleErrs.length ? JSON.stringify(consoleErrs) : 'none');
+  await AD.evaluate(() => window.__testSetSite({ streaming: false })); await w(1000); // back to the default
   log('errs', JSON.stringify(errs)); await b.close();
 })();

@@ -92,8 +92,8 @@ service cloud.firestore {
     function myPid(tid) { return !signedIn() ? '' : (exists(pkdoc(tid, 'pickdev', request.auth.uid)) ? get(pkdoc(tid, 'pickdev', request.auth.uid)).data.pid : ''); }
     function pickCloseAt(tid, r) { return get(tdoc(tid)).data.get('pickClose', {}).get(r, 0); }
     function codes(tid) { return get(/databases/$(database)/documents/tournaments/$(tid)/private/codes).data; }
-    // overlays for competition games are a site switch: off, admin only, or everyone (config/site.streaming);
-    // standalone streams (the Stream tab) are open to everyone
+    // streaming is a site switch: off, admin only, or everyone (config/site.streaming). It covers competition games' live
+    // docs and standalone streams (the Stream tab) alike
     function streamingOn() { return exists(cfg()) && (get(cfg()).data.get('streaming', false) == true
                                || (get(cfg()).data.get('streaming', false) == 'admin' && isAdmin())); }
     function sRole(sid) { return signedIn() && exists(/databases/$(database)/documents/streams/$(sid)/members/$(request.auth.uid))
@@ -225,11 +225,12 @@ service cloud.firestore {
 
     // standalone streams (Stream tab): any game, in a competition or not. Anyone can read (the overlay needs no account);
     // the device that created it runs it; a phone with the desk code (role 'live') may only change the live score.
+    // Only while streaming is switched on for the site; deleting one is always allowed.
     match /streams/{sid} {
       allow get: if true;
       allow list: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
-      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow update: if request.resource.data.ownerUid == resource.data.ownerUid
+      allow create: if streamingOn() && signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if streamingOn() && request.resource.data.ownerUid == resource.data.ownerUid
                     && (ownsStream(sid) || isAdmin()
                         || (sRole(sid) == 'live' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['live', 'updated'])));
       allow delete: if ownsStream(sid) || isAdmin();
