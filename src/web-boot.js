@@ -565,7 +565,7 @@ async function joinWithCode(tid, raw) {
 // player once it has proved the key in pickdev/{its uid} (like a team link, but kept out of members, so a player never gets
 // any scoring rights). The private link (#<competition>.pk-<pid>-<key>) does that on another phone. Cost: one listener on
 // this device's pickdev doc, one on its player's name, one on its own picks; nothing on anyone else's.
-const BOARD = { tid: null, pickers: null, at: 0, busy: false, rounds: {}, asking: {}, failed: {} };
+const BOARD = { tid: null, pickers: null, at: 0, busy: false, rounds: {}, asking: {}, failed: {}, live: [], liveKey: "", liveUnsub: null, liveTimer: null };
 const PICK = { tid: null, uid: null, ready: false, me: null, picks: {}, unsubs: [], unsubMe: null };
 function pickStop() { PICK.unsubs.forEach(u => u()); PICK.unsubs = []; PICK.unsubMe?.(); PICK.unsubMe = null; Object.assign(PICK, { tid: null, uid: null, ready: false, me: null, picks: {} }); }
 function pickPlayer(tid, pid, key) {
@@ -601,9 +601,23 @@ S.pickGame = {
     pickWatch(t); if (PICK.me?.pid !== pid) pickPlayer(t.id, pid, key); PICK.me.name = name; PICK.ready = true;
   },
   // the leaderboard (pick-game-leaderboard): the players, read once and again at most every 2 minutes while the page is
-  // drawn, and each closed round's picks read once (they can't change after the close). No listeners, to keep reads down.
+  // drawn, and each closed round's picks read once (they can't change after the close). Picks are public as soon as they're
+  // saved (pick-game-picks-public): one live listener covers the open rounds only (round in [...], up to 10), and a round
+  // stays in it for a minute after its close, so a pick the server took just before its close isn't missed by a device
+  // whose clock runs ahead. Then it's read once like any closed round.
   board(t) {
-    if (BOARD.tid !== t.id) Object.assign(BOARD, { tid: t.id, pickers: null, at: 0, busy: false, rounds: {}, asking: {}, failed: {} });
+    if (BOARD.tid !== t.id) { BOARD.liveUnsub?.(); Object.assign(BOARD, { tid: t.id, pickers: null, at: 0, busy: false, rounds: {}, asking: {}, failed: {}, live: [], liveKey: "", liveUnsub: null }); }
+    { const now = Date.now(), close = t.pickClose || {}, tid = t.id;
+      const ids = (t.pick?.rounds || []).filter(r => now < (close[r.id] || Infinity) + 60e3).sort((a, b) => (close[a.id] || 0) - (close[b.id] || 0)).slice(0, 10).map(r => r.id);
+      const key = ids.join(",");
+      if (key !== BOARD.liveKey) {
+        BOARD.liveUnsub?.(); BOARD.liveUnsub = null; BOARD.liveKey = key;
+        if (ids.length) BOARD.liveUnsub = onSnapshot(query(collection(FB.db, "tournaments", tid, "picks"), where("round", "in", ids)), s => {
+          if (BOARD.tid !== tid || BOARD.liveKey !== key) return; BOARD.live = s.docs.map(d => d.data()); render(); }, e => console.warn("open picks", e?.code || e));
+        // the next round to leave the live query: draw again then, so it moves to a one-off read
+        const next = ids.map(id => (close[id] || Infinity) + 60e3).filter(v => v > now && v - now < 864e5).sort((a, b) => a - b)[0];
+        clearTimeout(BOARD.liveTimer); if (next) BOARD.liveTimer = setTimeout(() => S.tab === "pick" && render(), next - now + 500);
+      } }
     const now = Date.now(), tid = t.id;
     if (!BOARD.busy && now - BOARD.at > 120e3) { BOARD.busy = true;
       getDocs(collection(FB.db, "tournaments", tid, "pickers")).then(s => { if (BOARD.tid !== tid) return; const m = {}; s.docs.forEach(d => { m[d.id] = d.data(); }); BOARD.pickers = m; BOARD.at = Date.now(); BOARD.busy = false; render(); },
@@ -611,12 +625,13 @@ S.pickGame = {
     const close = t.pickClose || {};
     (t.pick?.rounds || []).forEach(r => {
       // a device clock running ahead of the server's is refused until the close has really passed: try again after 30 s
-      if (now < (close[r.id] || Infinity) || BOARD.rounds[r.id] || BOARD.asking[r.id] || now - (BOARD.failed[r.id] || 0) < 30e3) return;
+      if (now < (close[r.id] || Infinity) + 60e3 || BOARD.rounds[r.id] || BOARD.asking[r.id] || now - (BOARD.failed[r.id] || 0) < 30e3) return;
       BOARD.asking[r.id] = true;
       getDocs(query(collection(FB.db, "tournaments", tid, "picks"), where("round", "==", r.id))).then(s => { if (BOARD.tid !== tid) return; BOARD.rounds[r.id] = s.docs.map(d => d.data()); BOARD.asking[r.id] = false; render(); },
         e => { console.warn("picks", r.id, e?.code || e); BOARD.asking[r.id] = false; BOARD.failed[r.id] = Date.now(); setTimeout(() => S.tab === "pick" && render(), 31e3); });
     });
-    return { pickers: BOARD.pickers, picks: Object.values(BOARD.rounds).flat() };
+    const live = new Set(BOARD.liveKey ? BOARD.liveKey.split(",") : []);
+    return { pickers: BOARD.pickers, picks: [...Object.entries(BOARD.rounds).filter(([id]) => !live.has(id)).flatMap(([, l]) => l), ...(BOARD.live || []).filter(p => live.has(p.round))] };
   },
   // the organiser hides an unsuitable name (the rules let them change only hidden)
   async hide(t, pid, hidden) {
