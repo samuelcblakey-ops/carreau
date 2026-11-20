@@ -1189,8 +1189,12 @@ async function handleHash() {
 }
 window.addEventListener("hashchange", handleHash);
 
-// the file's type follows its name: a calendar file (.ics) as text/calendar, so iPhone Safari offers "Add to Calendar"; CSVs as before
-S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: /\.ics$/i.test(filename) ? "text/calendar;charset=utf-8" : "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } };
+// the file's type follows its name: a calendar file (.ics) as text/calendar, so iPhone Safari offers "Add to Calendar"; CSVs as before.
+// A Blob (the poster's PNG) is saved as it is.
+S.downloads = { async save({ filename, data }) { const a = document.createElement("a"); const blob = data instanceof Blob ? data : new Blob([data], { type: /\.ics$/i.test(filename) ? "text/calendar;charset=utf-8" : "text/csv" });
+  const url = URL.createObjectURL(blob); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60e3); } };
+// the poster's QR code: the website's generator as a grid of modules (the app on its own has none, and prints the link instead)
+S.qrMatrix = async url => { const q = (await loadQr())(0, "M"); q.addData(url); q.make(); return { n: q.getModuleCount(), dark: (r, c) => q.isDark(r, c) }; };
 
 // ---------- install to home screen ----------
 const INSTALL = { prompt: null, help: false };
