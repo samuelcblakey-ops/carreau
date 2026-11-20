@@ -88,5 +88,23 @@ const { chromium } = require('playwright');
   await p.screenshot({ path: process.env.OUT + '/pick-board-390.png', fullPage: true });
   await p.setViewportSize({ width: 1100, height: 900 }); await p.waitForTimeout(150);
   await p.screenshot({ path: process.env.OUT + '/pick-board-desktop.png', fullPage: true });
+  // pick-game-own-competition: the invitation under the leaderboard (stands in for the website's "runs this competition")
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(100);
+  const cta = await p.evaluate(async () => {
+    const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), r = [];
+    const txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim();
+    S.isMine = () => true; C.render(); await w(50);
+    r.push('pick cta organiser: ' + (q('.pk-cta') ? 'shown' : 'hidden'));
+    S.isMine = () => false; C.render(); await w(50);
+    const box = q('.pk-cta'); box.scrollIntoView();
+    const btn = box.querySelector('[data-act="new-t"]'), link = box.querySelector('a');
+    r.push('pick cta spectator: ' + txt(box.querySelector('h3')) + ' | ' + txt(box.querySelector('p')) + ' | button ' + txt(btn) + ' ' + Math.round(btn.getBoundingClientRect().height) + 'px | link ' + txt(link) + ' ' + link.getAttribute('href'));
+    r.push('pick cta below the leaderboard: ' + !!(q('.pk-board').compareDocumentPosition(box) & Node.DOCUMENT_POSITION_FOLLOWING));
+    return r; });
+  await p.screenshot({ path: process.env.OUT + '/pick-cta-390.png' });
+  const before = await p.evaluate(() => Object.keys(window.__carreau.S.tournaments).length);
+  await p.click('.pk-cta [data-act="new-t"]'); await p.waitForTimeout(300);
+  cta.push('pick cta opens quick setup: ' + await p.evaluate(() => (document.querySelector('.wiz')?.textContent || document.querySelector('#main')?.textContent || '').match(/step \d of \d/)?.[0]) + ' | new competition ' + (await p.evaluate(() => Object.keys(window.__carreau.S.tournaments).length) === before + 1) + ' | tab ' + await p.evaluate(() => window.__carreau.S.tab));
+  console.log(cta.join('\n'));
   console.log('errs', errs); await b.close();
 })();
