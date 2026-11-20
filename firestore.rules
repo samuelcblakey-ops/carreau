@@ -158,8 +158,9 @@ service cloud.firestore {
       // Pick the Winner (pick-game): followers join with a name (pickers/{pid}, public) and a private key (pickkeys/{pid},
       // never readable), written together in one batch with this device's proof of the key (pickdev/{uid}). Another device
       // proves the same key (the private link) to play as that player. A player picks one team per pick round
-      // (picks/{pid}_{round}) until the round's close time (pickClose on the competition, ms); anyone can read a pick once
-      // its round has closed, the player any time. Organisers set the game up on the competition; they can't pick for anyone.
+      // (picks/{pid}_{round}) until the round's close time (pickClose on the competition, ms); anyone can read a pick as
+      // soon as it's saved (pick-game-picks-public), unless the competition is archived. Organisers set the game up on the
+      // competition; they can't pick for anyone.
       match /pickers/{pid} {
         allow read: if notArchived(tid) || isAdmin();
         allow create: if signedIn() && pickOn(tid) && notArchived(tid)
@@ -188,8 +189,8 @@ service cloud.firestore {
         allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
       }
       match /picks/{id} {
-        allow read: if (notArchived(tid) || isAdmin())
-          && (request.time.toMillis() >= pickCloseAt(tid, resource.data.round) || resource.data.pid == myPid(tid));
+        // everyone sees every pick as soon as it's saved (pick-game-picks-public, Sam's decision of 20 Nov)
+        allow read: if notArchived(tid) || isAdmin();
         allow create, update: if myPid(tid) != '' && pickOn(tid) && notArchived(tid)
           && request.resource.data.keys().hasOnly(['pid', 'round', 'team', 'at'])
           && request.resource.data.pid == myPid(tid) && request.resource.data.round is string

@@ -68,6 +68,42 @@ const { chromium } = require('playwright');
   });
   console.log(out2.join('\n'));
   await p.screenshot({ path: process.env.OUT + '/pick-cards-390.png', fullPage: true });
+  // a team can't be saved in two rounds; an old repeat is flagged; a remembered choice saved elsewhere since resets
+  const out4 = await p.evaluate(async () => {
+    const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), r = [];
+    const txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim(), redraw = async () => { q('[data-tab="pick"]').click(); await w(60); };
+    const [r1, r2, r3] = C.T().pick.rounds.map(x => x.id), card = id => `.pk-card[data-round="${id}"]`;
+    const set = (id, v) => { const s = q('#pk-sel-' + id); s.value = v; s.dispatchEvent(new Event('change', { bubbles: true })); };
+    S.pickGame.st.picks = {}; await redraw();
+    set(r1, 'e0'); set(r2, 'e0'); q(`[data-act="pk-save"][data-r="${r1}"]`).click(); await w(80);
+    const r2After = q('#pk-sel-' + r2).value;
+    q('#pk-sel-' + r2).value = 'e0'; // a page that still has it chosen
+    q(`[data-act="pk-save"][data-r="${r2}"]`).click(); await w(80);
+    r.push(`same team two selects: ${S.pickGame.st.picks[r2] ? 'SAVED' : 'second save refused'} | ${txt(q(card(r2) + ' .err'))}` + (r2After ? ' (round 2 select kept ' + r2After + ')' : ''));
+    set(r3, 'e0'); await redraw();
+    r.push('remembered choice reset: ' + txt(q('#pk-sel-' + r3).selectedOptions[0]));
+    S.pickGame.st.picks[r2] = 'e0'; await redraw();
+    r.push('old repeat warning: ' + txt(q(card(r2) + ' .pk-dup')) + (q(card(r1) + ' .pk-dup') ? ' (ALSO ON ROUND 1)' : ''));
+    q(card(r2)).scrollIntoView(); return r;
+  });
+  console.log(out4.join('\n'));
+  await p.screenshot({ path: process.env.OUT + '/pick-repeat-390.png' });
+  // joining: Enter in the name box, and a tap on Join while a render waits for the box to lose focus (a phone blurs it as the tap starts)
+  await p.evaluate(async () => { const S = window.__carreau.S; S.pickGame.st.me = null; S.pickGame.st.picks = {}; document.querySelector('[data-tab="pick"]').click(); await new Promise(r => setTimeout(r, 60)); });
+  await p.click('#pk-you'); await p.keyboard.type('Ann'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+  console.log('join with Enter: ' + await p.evaluate(() => window.__carreau.S.pickGame.st.me?.name === 'Ann' && document.querySelector('.pk-me') ? 'joined' : 'not joined'));
+  const tapTest = async (open, inSel, btnSel, after, check) => p.evaluate(async ([open, inSel, btnSel, after, check]) => {
+    const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s);
+    await (0, eval)(open)(); await w(60);
+    const inp = q(inSel); inp.focus(); inp.value = after; inp.dispatchEvent(new Event('input', { bubbles: true }));
+    C.render(); const pending = S.pendingRender, btn = q(btnSel);
+    btn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' })); inp.blur(); inp.dispatchEvent(new Event('change', { bubbles: true }));
+    await w(120); const kept = btn.isConnected; btn.click(); await w(200);
+    return { pending, kept, ok: (0, eval)(check)() };
+  }, [open, inSel, btnSel, after, check]);
+  let tp = await tapTest(`async () => { const S = window.__carreau.S; S.pickGame.st.me = null; document.querySelector('[data-tab="pick"]').click(); }`, '#pk-you', '[data-act="pk-join"]', 'Bea',
+    `() => window.__carreau.S.pickGame.st.me?.name === 'Bea' && !!document.querySelector('.pk-me')`);
+  console.log('join tap with pending render: ' + (tp.pending && tp.kept && tp.ok ? 'joined first tap' : JSON.stringify(tp)));
   await p.evaluate(() => { document.querySelector('[data-tab="setup"]').click(); }); await p.waitForTimeout(150);
   await p.evaluate(() => document.querySelector('#pick-setup').scrollIntoView());
   console.log('setup sideways scroll 390: ' + await p.evaluate(() => document.documentElement.scrollWidth > innerWidth));
@@ -99,5 +135,9 @@ const { chromium } = require('playwright');
     return r;
   });
   console.log(out3.join('\n'));
+  // the same for an organiser form (the tap change is global): rename a pick round in Setup, then tap Save rounds straight away
+  tp = await tapTest(`async () => { const c = window.__carreau.T(); c.pickClose = { p1: Date.now() + 864e5 }; document.querySelector('[data-tab="setup"]').click(); }`, '#pk-name-0', '[data-act="pk-rows-save"]', 'Round One',
+    `() => window.__carreau.T().pick.rounds[0].name === 'Round One'`);
+  console.log('tap after typing elsewhere: ' + (tp.pending && tp.kept && tp.ok ? 'Save rounds still works first tap' : JSON.stringify(tp)));
   console.log('errs', errs); await b.close();
 })();
