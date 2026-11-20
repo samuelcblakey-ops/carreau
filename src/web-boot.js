@@ -107,6 +107,13 @@ function fbStore() {
         doc(db, "tournaments", tid, "private", "teamcodes"), doc(db, "tournaments", tid, "private", "payments")];
       try { (await getDocs(collection(db, "tournaments", tid, "live"))).docs.forEach(d => extra.push(d.ref)); } catch {}
       await Promise.allSettled(extra.map(r => deleteDoc(r)));
+      // Pick the Winner (pick-game-admin-delete): players, their private keys (one per player), picks and device links
+      try {
+        const pk = []; const pickers = (await getDocs(collection(db, "tournaments", tid, "pickers"))).docs;
+        pickers.forEach(d => pk.push(d.ref, doc(db, "tournaments", tid, "pickkeys", d.id)));
+        for (const sub of ["picks", "pickdev"]) (await getDocs(collection(db, "tournaments", tid, sub))).docs.forEach(d => pk.push(d.ref));
+        for (let i = 0; i < pk.length; i += 450) { const b = writeBatch(db); pk.slice(i, i + 450).forEach(r => b.delete(r)); await b.commit(); }
+      } catch (e) { console.warn("pick game data", e?.code || e); }
       try { await updateDoc(doc(db, "hallOfFame", tid), { gone: true }); } catch {} // a Hall of Fame entry stays, without its link
       try { await updateDoc(doc(db, "calendar", tid), { gone: true }); } catch {} // and a Season Calendar listing
       await deleteDoc(doc(db, "tournaments", tid)); // last, so a failure part-way never leaves games without their competition
@@ -656,6 +663,20 @@ S.pickGame = {
     await track(updateDoc(doc(FB.db, "tournaments", t.id, "pickers", pid), { hidden }));
     if (BOARD.tid === t.id && BOARD.pickers?.[pid]) BOARD.pickers[pid] = { ...BOARD.pickers[pid], hidden };
   },
+  // the admin deletes a player (pick-game-admin-delete): the player, every pick of theirs, their private key and every
+  // device linked to them, in one batch (a player has at most a few picks and devices). Their own phone sees its pickdev
+  // doc go and shows the join form again.
+  canDelete() { return isAdmin(); },
+  async deletePicker(t, pid) {
+    const tid = t.id, db = FB.db;
+    const [pk, dv] = await Promise.all([getDocs(query(collection(db, "tournaments", tid, "picks"), where("pid", "==", pid))),
+      getDocs(query(collection(db, "tournaments", tid, "pickdev"), where("pid", "==", pid)))]);
+    const b = writeBatch(db); pk.docs.forEach(d => b.delete(d.ref)); dv.docs.forEach(d => b.delete(d.ref));
+    b.delete(doc(db, "tournaments", tid, "pickkeys", pid)); b.delete(doc(db, "tournaments", tid, "pickers", pid));
+    await track(b.commit());
+    if (BOARD.tid === tid) { if (BOARD.pickers) { BOARD.pickers = { ...BOARD.pickers }; delete BOARD.pickers[pid]; }
+      BOARD.live = (BOARD.live || []).filter(p => p.pid !== pid); for (const k in BOARD.rounds) BOARD.rounds[k] = BOARD.rounds[k].filter(p => p.pid !== pid); }
+  },
   // the time is the server's; the rules refuse a pick once its round has closed
   async pick(t, rid, team) {
     const pid = PICK.me?.pid; if (!pid) throw new Error("not joined");
@@ -667,7 +688,11 @@ S.pickGame = {
 // the private link on another phone: prove the key, then play as that player (a wrong key is refused by the rules)
 async function joinPick(tid, pid, key) {
   try { await setDoc(doc(FB.db, "tournaments", tid, "pickdev", AUTH.user.uid), { pid, key, at: serverTimestamp() }); remember(tid); S.tab = "pick"; render(); return true; }
-  catch (e) { console.warn("pick link", e?.code || e); toast("That private link didn't work. Check it and try again."); return false; }
+  catch (e) { console.warn("pick link", e?.code || e);
+    // the admin deleted this player (pick-game-admin-delete): say so, and show the join form
+    let gone = false; try { gone = !(await getDocFromServer(doc(FB.db, "tournaments", tid, "pickers", pid))).exists(); } catch {}
+    if (gone) { S.tab = "pick"; render(); toast("This player has been removed. Join again with your name."); }
+    else toast("That private link didn't work. Check it and try again."); return false; }
 }
 
 

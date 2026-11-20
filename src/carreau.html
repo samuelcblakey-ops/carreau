@@ -174,6 +174,7 @@ input[type=time]{background:var(--surface-2);border:1px solid var(--line);border
 .pk-slot.pk-empty{background:none;color:var(--line);font-size:18px}.pk-slot.pk-nopick{color:var(--muted);font-size:12px}
 .pk-slot i{position:absolute;right:-2px;bottom:-3px;font-style:normal;font-size:10px;font-weight:800;line-height:1}.pk-slot.ok i{color:var(--accent)}.pk-slot.no i{color:#b3261e}
 .pk-table tr.pk-main td{border-bottom:0}
+.pk-del{color:#b3261e}.pk-det td{white-space:normal}
 .pill.pk-open{background:var(--accent);color:var(--accent-ink)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
 .pill.wrap{white-space:normal;overflow-wrap:anywhere;max-width:100%;border-radius:10px;line-height:1.3;padding-block:3px}
@@ -1723,6 +1724,13 @@ Object.assign(LANG_TEXT.de, {"Everyone can see your pick.": "Alle können deinen
 Object.assign(LANG_TEXT.nl, {"Everyone can see your pick.": "Iedereen kan je keuze zien.", "right": "goed", "wrong": "fout"}); // Pick the Winner: picks shown to everyone (pick-game-picks-public)
 Object.assign(LANG_TEXT.pt, {"Everyone can see your pick.": "Todos podem ver o seu palpite.", "right": "certo", "wrong": "errado"}); // Pick the Winner: picks shown to everyone (pick-game-picks-public)
 Object.assign(LANG_TEXT.th, {"Everyone can see your pick.": "ทุกคนเห็นทีมที่คุณเลือกได้", "right": "ถูก", "wrong": "ผิด"}); // Pick the Winner: picks shown to everyone (pick-game-picks-public)
+Object.assign(FR_TEXT, {"Delete player": "Supprimer le joueur", "Delete {x} and all their picks? This can't be undone.": "Supprimer {1} et tous ses pronostics ? C'est définitif.", "Keep": "Garder", "This player has been removed. Join again with your name.": "Ce joueur a été supprimé. Rejoignez le jeu avec votre nom."}); // Pick the Winner: the admin deletes a player (pick-game-admin-delete)
+Object.assign(LANG_TEXT.es, {"Delete player": "Eliminar jugador", "Delete {x} and all their picks? This can't be undone.": "¿Eliminar a {1} y todas sus elecciones? No se puede deshacer.", "Keep": "Conservar", "This player has been removed. Join again with your name.": "Este jugador ha sido eliminado. Únete de nuevo con tu nombre."}); // Pick the Winner: the admin deletes a player (pick-game-admin-delete)
+Object.assign(LANG_TEXT.it, {"Delete player": "Elimina giocatore", "Delete {x} and all their picks? This can't be undone.": "Eliminare {1} e tutti i suoi pronostici? Non si può annullare.", "Keep": "Tieni", "This player has been removed. Join again with your name.": "Questo giocatore è stato rimosso. Partecipa di nuovo con il tuo nome."}); // Pick the Winner: the admin deletes a player (pick-game-admin-delete)
+Object.assign(LANG_TEXT.de, {"Delete player": "Spieler löschen", "Delete {x} and all their picks? This can't be undone.": "{1} und alle Tipps löschen? Das kann nicht rückgängig gemacht werden.", "Keep": "Behalten", "This player has been removed. Join again with your name.": "Dieser Spieler wurde entfernt. Spiel mit deinem Namen neu mit."}); // Pick the Winner: the admin deletes a player (pick-game-admin-delete)
+Object.assign(LANG_TEXT.nl, {"Delete player": "Speler verwijderen", "Delete {x} and all their picks? This can't be undone.": "{1} en alle keuzes verwijderen? Dit kan niet ongedaan worden gemaakt.", "Keep": "Houden", "This player has been removed. Join again with your name.": "Deze speler is verwijderd. Doe opnieuw mee met je naam."}); // Pick the Winner: the admin deletes a player (pick-game-admin-delete)
+Object.assign(LANG_TEXT.pt, {"Delete player": "Eliminar jogador", "Delete {x} and all their picks? This can't be undone.": "Eliminar {1} e todos os palpites? Não pode ser desfeito.", "Keep": "Manter", "This player has been removed. Join again with your name.": "Este jogador foi removido. Entre de novo com o seu nome."}); // Pick the Winner: the admin deletes a player (pick-game-admin-delete)
+Object.assign(LANG_TEXT.th, {"Delete player": "ลบผู้เล่น", "Delete {x} and all their picks? This can't be undone.": "ลบ {1} และการทายทั้งหมดหรือไม่? ย้อนกลับไม่ได้", "Keep": "เก็บไว้", "This player has been removed. Join again with your name.": "ผู้เล่นนี้ถูกลบแล้ว เข้าร่วมใหม่ด้วยชื่อของคุณ"}); // Pick the Winner: the admin deletes a player (pick-game-admin-delete)
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -6958,6 +6966,15 @@ function pickSlots(t, row, mine, now) {
     return `<span class="pk-slot${/^[A-Z]{2,4}$|^\w/u.test(m) ? " pk-code" : ""}${mark ? (res === "right" ? " ok" : " no") : ""}" role="img" aria-label="${esc(label)}" title="${esc(label)}">${esc(m)}${mark ? `<i>${mark}</i>` : ""}</span>`;
   }).join("");
 }
+// a player's controls for organisers: Hide / Show; and for the admin only, Delete player with an inline confirm
+// (pick-game-admin-delete: only the admin deletes)
+function pickCtl(x) {
+  const U = pickUi(), hide = `<button type="button" class="btn sm" data-act="pk-hide" data-pid="${esc(x.pid)}" data-hide="${x.hidden ? "" : "1"}">${x.hidden ? "Show on the leaderboard" : "Hide from the leaderboard"}</button>`;
+  if (!S.pickGame?.canDelete?.()) return `<div>${hide}</div>`;
+  if (U.del === x.pid) return `<div class="stack pk-del-ask" style="gap:6px"><span class="err">${trAround("Delete {x} and all their picks? This can't be undone.", `<b data-notr>${esc(x.name)}</b>`)}</span>
+    <div class="row" style="gap:6px"><button type="button" class="btn sm danger" data-act="pk-del-yes" data-pid="${esc(x.pid)}">Delete</button><button type="button" class="btn sm" data-act="pk-del-no">Keep</button></div></div>`;
+  return `<div class="row" style="gap:6px">${hide}<button type="button" class="btn sm ghost pk-del" data-act="pk-del" data-pid="${esc(x.pid)}">Delete player</button></div>`;
+}
 function pickBoard(t, st, data) {
   const ms = MS(), U = pickUi(), now = Date.now(), close = t.pickClose || {}, org = canEdit(), rounds = t.pick?.rounds || [];
   const anyClosed = rounds.some(r => now >= (close[r.id] || Infinity));
@@ -6987,7 +7004,7 @@ function pickBoard(t, st, data) {
       // the detail: every saved pick (picks are public as soon as they're saved), with its result once in
       const lines = rounds.filter(r => mine[r.id]).map(r => { const p = sc[r.id] || {}; return `<div class="pk-line"><span>${esc(tr(r.name))}</span> · <span data-notr>${esc(entName(t, mine[r.id]))}</span>${p.st === "right" ? ` <b class="pk-ok" data-notr>✓ ${p.score}</b>` : p.st === "wrong" ? ` <b class="pk-no" data-notr>✗ ${p.score}</b>` : p.st === "wait" ? ` <span class="muted">${esc(tr("Waiting for the result"))}</span>` : ""}</div>`; }).join("");
       const det = open ? `<tr class="pk-det"><td colspan="4"><div class="stack" style="gap:6px">${lines || `<span class="muted">No pick</span>`}
-        ${org ? `<div><button type="button" class="btn sm" data-act="pk-hide" data-pid="${esc(x.pid)}" data-hide="${x.hidden ? "" : "1"}">${x.hidden ? "Show on the leaderboard" : "Hide from the leaderboard"}</button></div>` : ""}</div></td></tr>` : "";
+        ${org ? pickCtl(x) : ""}</div></td></tr>` : "";
       return `<tr class="pk-main ${cls}" data-pid="${esc(x.pid)}"><td>${x.place}</td><td class="wrap"><button type="button" class="pk-who" data-act="pk-who" data-pid="${esc(x.pid)}" aria-expanded="${open}"><span data-notr>${esc(x.name)}</span>${x.pid === me ? ` <span class="muted">(you)</span>` : ""}</button></td><td>${x.right}</td><td>${pickSigned(x.diff)}</td></tr>`
         + (rounds.length ? `<tr class="pk-strip-row ${cls}" data-pid="${esc(x.pid)}"><td colspan="4"><div class="pk-strip" ${cols}>${pickSlots(t, x, mine, now)}</div></td></tr>` : "") + det;
     }).join("")}</tbody></table></div>${list.length < n ? `<div><button type="button" class="btn sm" data-act="pk-all">Show all ${n}</button></div>` : ""}`;
@@ -7087,6 +7104,9 @@ async function pickAction(act, a, t) {
   }
   if (act === "pk-all") { U.allChips = true; render(); return; }
   if (act === "pk-who") { U.who = U.who === a.dataset.pid ? null : a.dataset.pid; render(); return; }
+  if (act === "pk-del" && S.pickGame.canDelete?.()) { U.del = a.dataset.pid; render(); return; }
+  if (act === "pk-del-no") { U.del = null; render(); return; }
+  if (act === "pk-del-yes" && S.pickGame.canDelete?.()) { const pid = a.dataset.pid; try { await S.pickGame.deletePicker(t, pid); U.del = null; if (U.who === pid) U.who = null; } catch (e) { handleWriteError(e); } render(); return; }
   if (act === "pk-hide" && canEdit() && S.pickGame.hide) { try { await S.pickGame.hide(t, a.dataset.pid, !!a.dataset.hide); } catch (e) { handleWriteError(e); } render(); return; }
   if (act === "pk-show-link") { U.showLink = !U.showLink; render(); return; }
   if (act === "pk-copy") { const el = document.getElementById("pk-link"); if (!el) return; try { await navigator.clipboard.writeText(el.value); } catch { el.select(); try { document.execCommand("copy"); } catch {} } a.textContent = tr("Copied"); return; }
