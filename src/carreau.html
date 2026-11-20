@@ -46,6 +46,7 @@ header.app{background:var(--surface);border-bottom:1px solid var(--line)}
 .brand-txt{display:flex;flex-direction:column;line-height:1}.brand-name{white-space:nowrap}
 .memorial{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .site-foot{font-size:12px;color:var(--muted);text-align:center;padding:12px 16px 24px}.site-foot a{color:inherit}
+.foot-support{margin-top:8px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:4px 6px}.foot-support a{color:var(--ink);font-weight:600}.fs-ic{display:inline-flex;color:#e0457b}.fs-ic svg{width:14px;height:14px}
 .disp-memorial{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:8px}
 .brand small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-left:6px}
 .tsel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
@@ -401,10 +402,11 @@ button.start-card,a.start-card{cursor:pointer}button.start-card:hover,a.start-ca
 .start-card.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -14px var(--accent)}.start-card.go span{color:var(--accent-ink);opacity:.85}
 .start-card.watch b{display:flex;align-items:center;gap:9px}
 .start-card .sh-play{flex:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-family:var(--body);font-size:11px;padding-left:2px;opacity:1}
-.start-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.start-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}@media (min-width:600px){.start-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .start-card.tile{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
 .start-card .tile-ic{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
 .start-card .tile-ic svg{width:24px;height:24px}
+.start-card.ext .tile-ic{background:color-mix(in srgb,#e0457b 16%,var(--surface));color:#e0457b}.start-card .ext-ic{margin-left:6px;font-family:var(--body);font-size:14px;font-weight:600;color:var(--muted)}
 .start-card[href="#streams"] .tile-ic{background:var(--danger-soft);color:var(--danger)}.start-card[href="#halloffame"] .tile-ic{background:var(--jack-soft);color:var(--jack-ink)}
 .start-card .tile-txt{display:flex;flex-direction:column;gap:2px;min-width:0;color:var(--ink);font-size:inherit}.start-card .tile-txt>span{color:var(--muted)}.start-card.tile b{font-size:19px}
 .ex-more{align-self:flex-start;min-height:44px}
@@ -1217,6 +1219,14 @@ Object.assign(LANG_TEXT.de, {"Following a competition?": "Du folgst einem Turnie
 Object.assign(LANG_TEXT.nl, {"Following a competition?": "Volg je een toernooi?", "No app to install": "Geen app nodig", "{n} languages": "{1} talen", "Show all ({n})": "Alles tonen ({1})"});
 Object.assign(LANG_TEXT.pt, {"Following a competition?": "Está a seguir uma competição?", "No app to install": "Sem aplicação para instalar", "{n} languages": "{1} idiomas", "Show all ({n})": "Mostrar tudo ({1})"});
 Object.assign(LANG_TEXT.th, {"Following a competition?": "กำลังติดตามการแข่งขันอยู่ใช่ไหม?", "No app to install": "ไม่ต้องติดตั้งแอป", "{n} languages": "{1} ภาษา", "Show all ({n})": "แสดงทั้งหมด ({1})"});
+// support the site (Ko-fi): the start screen tile, the footer line and the "Free to use" tick
+Object.assign(FR_TEXT, {"Support the site": "Soutenir le site", "Tips on Ko-fi help cover the running costs": "Une contribution sur Ko-fi aide à couvrir les frais du site", "Free to use": "Gratuit", "(opens in a new tab)": "(s'ouvre dans un nouvel onglet)"});
+Object.assign(LANG_TEXT.es, {"Support the site": "Apoyar el sitio", "Tips on Ko-fi help cover the running costs": "Una aportación en Ko-fi ayuda a cubrir los gastos del sitio", "Free to use": "Gratis", "(opens in a new tab)": "(se abre en una pestaña nueva)"});
+Object.assign(LANG_TEXT.it, {"Support the site": "Sostieni il sito", "Tips on Ko-fi help cover the running costs": "Un contributo su Ko-fi aiuta a coprire i costi del sito", "Free to use": "Gratuito", "(opens in a new tab)": "(si apre in una nuova scheda)"});
+Object.assign(LANG_TEXT.de, {"Support the site": "Die Seite unterstützen", "Tips on Ko-fi help cover the running costs": "Ein Beitrag auf Ko-fi hilft, die laufenden Kosten zu decken", "Free to use": "Kostenlos", "(opens in a new tab)": "(öffnet sich in einem neuen Tab)"});
+Object.assign(LANG_TEXT.nl, {"Support the site": "De site steunen", "Tips on Ko-fi help cover the running costs": "Een bijdrage via Ko-fi helpt de kosten van de site te dekken", "Free to use": "Gratis", "(opens in a new tab)": "(opent in een nieuw tabblad)"});
+Object.assign(LANG_TEXT.pt, {"Support the site": "Apoiar o site", "Tips on Ko-fi help cover the running costs": "Uma contribuição no Ko-fi ajuda a cobrir os custos do site", "Free to use": "Gratuito", "(opens in a new tab)": "(abre num novo separador)"});
+Object.assign(LANG_TEXT.th, {"Support the site": "สนับสนุนเว็บไซต์", "Tips on Ko-fi help cover the running costs": "การสนับสนุนผ่าน Ko-fi ช่วยเป็นค่าใช้จ่ายในการดูแลเว็บไซต์", "Free to use": "ใช้ฟรี", "(opens in a new tab)": "(เปิดในแท็บใหม่)"});
 // featured competitions (front page)
 Object.assign(FR_TEXT, {"Featured": "À la une", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Il figure dans « À la une », au-dessus des exemples. Rien d'autre ne change : vous gérez le concours comme avant, et les spectateurs ne peuvent rien modifier."});
 Object.assign(LANG_TEXT.es, {"Featured": "Destacados", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Aparece en Destacados, encima de los ejemplos. Nada más cambia: lo gestionas como antes y los espectadores no pueden cambiar nada."});
@@ -6350,7 +6360,8 @@ function drawHeader() {
   const sub = $(".brand-name small"); if (sub) sub.textContent = "Competition desk";
   // the dedication to Steve Noel sits at the foot of every page, above the copyright line
   const foot = $("#foot"); if (foot) { foot.innerHTML = `<div class="memorial">In loving memory of Steve Noel</div>
-    <div>© 2026 Sam Blakey · SN Pétanque Competition Desk · <span>All rights reserved</span> · <a href="privacy.html">Privacy</a> · <a href="how-it-works.html">How it works</a>${S.guideLink ? ` · <a href="#guides">Guides</a>` : ""} · <a href="#calendar">Season Calendar</a> · <a href="#halloffame">Hall of Fame</a> · <span>No cookies, no tracking</span></div>`; localize(foot); }
+    <div>© 2026 Sam Blakey · SN Pétanque Competition Desk · <span>All rights reserved</span> · <a href="privacy.html">Privacy</a> · <a href="how-it-works.html">How it works</a>${S.guideLink ? ` · <a href="#guides">Guides</a>` : ""} · <a href="#calendar">Season Calendar</a> · <a href="#halloffame">Hall of Fame</a> · <span>No cookies, no tracking</span></div>
+    <div class="foot-support"><span class="fs-ic" aria-hidden="true">${HEART_ICON}</span><a href="${SUPPORT_URL}" target="_blank" rel="noopener">Support the site${newTab}</a> · <span>Tips on Ko-fi help cover the running costs</span></div>`; localize(foot); }
   const list = Object.values(S.tournaments).filter(t => !S.menuFilter || t.id === S.tid || S.menuFilter(t)).sort((a, b) => (b.created || 0) - (a.created || 0));
   if (S.picker && document.activeElement?.id === "picker-q") return; // don't wipe the search box while typing
   const cur = T();
@@ -6376,6 +6387,11 @@ function drawHeader() {
 // the start screen: first visit, or the logo tapped. Run (or watch how it works) up top beside a small live preview,
 // then stream, the Season Calendar and the Hall of Fame, then your competitions, featured ones and the examples.
 const STREAM_ICON = thIc('<rect x="3" y="7" width="13" height="11" rx="2"/><path d="M16 11l5-3v9l-5-3z"/>');
+// "Support the site": Sam's Ko-fi page (tips by PayPal, card, Apple Pay or Google Pay). A plain link that opens in a new tab,
+// so nothing is loaded from Ko-fi until someone chooses to open it (the site keeps "No cookies, no tracking").
+const SUPPORT_URL = "https://ko-fi.com/snpetanque";
+const HEART_ICON = thIc('<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>');
+const newTab = `<span class="sr-only">(opens in a new tab)</span>`;
 const START_LIMIT = 6; // cards shown per list before the Show all button
 // a made-up round in play: what players and spectators see on Draw & results (decoration only, hidden from screen readers)
 function startDemo() {
@@ -6395,7 +6411,7 @@ function renderWelcome() {
   // long lists show the newest few, with a button for the rest
   const list = (k, ts) => { const open = S.startAll?.[k] || ts.length <= START_LIMIT;
     return `<div class="ex-grid" data-list="${k}">${(open ? ts : ts.slice(0, START_LIMIT)).map(card).join("")}</div>${open ? "" : `<button type="button" class="btn ex-more" data-act="start-all" data-k="${k}">Show all (${ts.length})</button>`}`; }; // i18n-ok: "Show all ({n})" (the checker stops at the bracket)
-  const tile = (href, icon, name, line) => `<a class="start-card tile" href="${href}"><span class="tile-ic" aria-hidden="true">${icon}</span><span class="tile-txt"><b>${name}</b><span>${line}</span></span></a>`;
+  const tile = (href, icon, name, line, ext) => `<a class="start-card tile${ext ? " ext" : ""}" href="${href}"${ext ? ' target="_blank" rel="noopener"' : ""}><span class="tile-ic" aria-hidden="true">${icon}</span><span class="tile-txt"><b>${name}${ext ? `<span class="ext-ic" aria-hidden="true">↗</span>` : ""}</b><span>${line}</span>${ext ? newTab : ""}</span></a>`;
   return `<div class="start stack">
     <section class="start-hero"><div class="sh-text"><h1>Pétanque competitions, run from your phone</h1>
       <p class="muted">Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.</p>
@@ -6404,12 +6420,13 @@ function renderWelcome() {
         ${S.guideLink ? `<button type="button" class="start-card watch" data-act="guide-play" data-id="first"><b><span class="sh-play" aria-hidden="true">▶</span>Watch how it works</b><span>A 2½-minute walk-through of a first competition</span></button>` : ""}
       </div>
       <p class="sh-follow"><b>Following a competition?</b> <span>Open the link or scan the QR code the organiser shares</span></p>
-      <ul class="sh-points"><li>No app to install</li><li>${LANGS.length} languages</li><li>No cookies, no tracking</li></ul></div>
+      <ul class="sh-points"><li>Free to use</li><li>No app to install</li><li>${LANGS.length} languages</li><li>No cookies, no tracking</li></ul></div>
       ${startDemo()}</section>
     <div class="start-actions">
       ${tile("#streams", STREAM_ICON, "Stream a game", "A live score overlay for Facebook Live or YouTube")}
       ${tile("#calendar", CAL_ICON, "Season Calendar", "Upcoming competitions and how to enter")}
       ${tile("#halloffame", TROPHY_ICON, "Hall of Fame", "Winners of competitions run on SN Pétanque")}
+      ${tile(SUPPORT_URL, HEART_ICON, "Support the site", "Tips on Ko-fi help cover the running costs", true)}
     </div>
     ${mine.length ? `<section class="stack" style="gap:10px"><h2>Your competitions</h2>${list("mine", mine)}</section>` : ""}
     ${feat.length ? `<section class="stack" style="gap:10px" data-featured><h2>Featured</h2>${list("feat", feat)}</section>` : ""}
