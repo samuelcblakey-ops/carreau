@@ -220,5 +220,16 @@ const { chromium } = require('playwright');
   await E.click('#cal-' + cid + ' [data-act="cal-page-remove"]'); await w(300); await E.click('#cal-' + cid + ' [data-act="cal-page-remove-yes"]');
   const removed = await toastOf(E, /Taken off|organisers|didn't save/); await w(1500);
   log('web event remove: ' + removed + ' | read', await raw(AD, 'get', 'calendar/' + cid), '| code', await raw(AD, 'get', 'calendar/' + cid + '/private/code'));
+  // the admin removes someone else's listing from the strip on the full listing (Sam, 20 Nov 2026); visitors never see it
+  await raw(A, 'set', 'calendar/' + tid5, Object.assign({}, L5, { updatedAt: Date.now() }));
+  await AD.goto(W + '#calendar.' + tid5); await AD.reload(); await w(4500);
+  const aStrip = await txt(AD, '#cal-' + tid5 + ' .cal-admin');
+  await V.goto(W + '#calendar.' + tid5); await V.reload(); await w(3500);
+  const vStrip = await V.evaluate(t => !!document.querySelector('#cal-' + t + ' .cal-admin, #cal-' + t + ' [data-act="cal-page-remove"]'), tid5);
+  await AD.click('#cal-' + tid5 + ' .cal-admin [data-act="cal-page-remove"]'); await w(1500);
+  const aAsk = await txt(AD, '#cal-' + tid5 + ' .cal-admin .err');
+  await AD.click('#cal-' + tid5 + ' .cal-admin [data-act="cal-page-remove-yes"]');
+  const aRemoved = await toastOf(AD, /Taken off|organisers|didn't save/); await w(1500);
+  log('admin remove: strip ' + aStrip + ' | ask ' + aAsk + ' | ' + aRemoved + ' | read', await raw(AD, 'get', 'calendar/' + tid5), '| gone from page', !(await onPage(AD)), '| stranger strip', vStrip);
   log('errs', errs); await b.close();
 })();
