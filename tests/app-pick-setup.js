@@ -153,5 +153,39 @@ const { chromium } = require('playwright');
   tp = await tapTest(`async () => { const c = window.__carreau.T(); c.pickClose = { p1: Date.now() + 864e5 }; document.querySelector('[data-tab="setup"]').click(); }`, '#pk-name-0', '[data-act="pk-rows-save"]', 'Round One',
     `() => window.__carreau.T().pick.rounds[0].name === 'Round One'`);
   console.log('tap after typing elsewhere: ' + (tp.pending && tp.kept && tp.ok ? 'Save rounds still works first tap' : JSON.stringify(tp)));
+  // How to play (pick-game-how-to-play): rounds 1-3 close together, the Final a day later
+  await p.setViewportSize({ width: 390, height: 844 });
+  console.log((await p.evaluate(async () => {
+    const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)], r = [];
+    const txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim();
+    document.querySelector('[data-act="new-t"]').click(); await w(80);
+    const t = JSON.parse(JSON.stringify(C.T())); t.checkin = false; t.system = 'swiss'; t.swissRounds = 3;
+    for (let i = 0; i < 4; i++) t.teams.push({ id: 'h' + i, name: 'Team ' + i, players: ['a'], active: true });
+    const d1 = Date.now() + 864e5, d2 = d1 + 864e5;
+    t.pick = { on: true, rounds: [{ id: 'q1', name: 'Round 1', src: 'swiss:1' }, { id: 'q2', name: 'Round 2', src: 'swiss:2' }, { id: 'q3', name: 'Round 3', src: 'swiss:3' }, { id: 'q4', name: 'Final', src: 'swiss:3' }] };
+    t.pickClose = { q4: d2, q1: d1, q2: d1, q3: d1 };
+    await S.store.setTournament(t); S.tournaments[t.id] = t; await w(40);
+    S.pickGame.st.me = null; S.pickGame.st.picks = {}; q('[data-tab="pick"]').click(); await w(60);
+    r.push('how to play open before joining: ' + !!q('.pk-how')?.open + (q('.pk-how + #pk-join-form') ? '' : ' (join form not below it)'));
+    r.push('when to pick: ' + qa('.pk-when li').map(txt).join(' | '));
+    q('#pk-you').value = 'Cy'; q('[data-act="pk-join"]').click(); await w(80);
+    r.push('how to play closed after joining: ' + (!!q('.pk-me') && !q('.pk-how').open));
+    window.__howShot = true; return r;
+  })).join('\n'));
+  await p.evaluate(() => { document.querySelector('.pk-how').open = true; window.scrollTo(0, 0); }); await p.waitForTimeout(100);
+  await p.screenshot({ path: process.env.OUT + '/pick-howto-390.png', fullPage: true });
+  console.log('390 px: ' + (await p.evaluate(() => document.documentElement.scrollWidth > innerWidth) ? 'sideways scroll' : 'no sideways scroll'));
+  console.log((await p.evaluate(async () => {
+    const C = window.__carreau, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), r = [];
+    const c = C.T(); c.pickClose = { ...c.pickClose, q1: Date.now() - 1000, q2: Date.now() - 1000, q3: Date.now() - 1000 }; q('[data-tab="pick"]').click(); await w(60);
+    r.push('closed group marked: ' + (q('.pk-when li .muted')?.textContent || 'none') + (q('.pk-when li:nth-child(2) .muted') ? ' (FINAL ALSO MARKED)' : ''));
+    q('[data-lang="fr"]').click(); await w(150);
+    r.push('french list format: ' + (q('.pk-when li span[data-notr]')?.textContent || '') + ' | ' + (q('.pk-how summary')?.textContent || ''));
+    return r;
+  })).join('\n'));
+  await p.evaluate(() => { document.querySelector('.pk-how').open = true; window.scrollTo(0, 0); }); await p.waitForTimeout(100);
+  await p.screenshot({ path: process.env.OUT + '/pick-howto-fr-390.png', fullPage: true });
+  await p.evaluate(() => { document.querySelector('.pk-how').open = false; }); await p.waitForTimeout(100);
+  await p.screenshot({ path: process.env.OUT + '/pick-howto-closed-390.png' });
   console.log('errs', errs); await b.close();
 })();
