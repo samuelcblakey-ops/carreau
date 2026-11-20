@@ -1,7 +1,8 @@
 // Poster maker (poster-maker) on the website: the QR code drawn with the site's generator (S.qrMatrix, from web-boot.js),
 // opening the listing (#calendar.<id>), at least 22% of the poster's width with a 4-module quiet zone; Download saves the
 // PNG Blob as it is (S.downloads.save takes a Blob); with "Show the QR code" unticked there's no code.
-// Screenshots: each layout with its QR code (square), and Band as a Story.
+// Sponsor logos on Band sit beside the QR code's card (poster-sponsors).
+// Screenshots: each layout with its QR code (square), Band as a Story, and each layout with three sponsors.
 const { chromium } = require('playwright'), fs = require('fs');
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -44,6 +45,17 @@ const { chromium } = require('playwright'), fs = require('fs');
   await tap('#modal [data-act="poster-size"][data-k="story"]'); await tap('#modal [data-act="poster-layout"][data-k="band"]'); await snap('poster-web-band-story');
   await tap('#modal [data-act="poster-size"][data-k="a4"]'); await tap('#modal [data-act="poster-layout"][data-k="bold"]'); await snap('poster-web-bold-a4');
   await tap('#modal [data-act="poster-size"][data-k="square"]');
+  // sponsor logos (poster-sponsors): on Band they sit beside the QR code's card, clear of it
+  await A.evaluate(async () => { const S = window.__carreau.S; await S.modal.picReady;
+    const png = (w, h, col) => new Promise(res => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.fillStyle = col; x.beginPath(); x.roundRect(4, 4, w - 8, h - 8, 30); x.fill(); c.toBlob(b => res(new File([b], 'logo.png', { type: 'image/png' })), 'image/png'); });
+    for (const f of [await png(300, 300, '#c0392b'), await png(600, 300, '#1f5fbf'), await png(300, 420, '#1e7a46')]) { const n0 = (S.modal.sponsorList || []).length, inp = document.querySelector('#modal [data-poster="sponsor"]'), dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; inp.dispatchEvent(new Event('input', { bubbles: true }));
+      for (let i = 0; i < 60 && (S.modal.sponsorList || []).length === n0; i++) await new Promise(r => setTimeout(r, 100)); } });
+  await tap('#modal [data-act="poster-layout"][data-k="band"]'); await snap('poster-web-band-sponsors');
+  const clear = await A.evaluate(() => { const md = window.__carreau.S.modal, W = md.info.w, H = md.info.h, u = W / 100; // the card starts at least 7 + 23.5 units from the right; the band is 11 units tall
+    return md.info.sponsors.length === 3 && md.info.qr && md.info.sponsors.every(r => r.x + r.w < W - 30.5 * u && r.y + r.h < H - 11 * u); });
+  log('poster web sponsors: band 3 clear of the QR code', clear);
+  for (const k of ['bold', 'classic', 'photo']) { await tap(`#modal [data-act="poster-layout"][data-k="${k}"]`); await snap(`poster-web-${k}-sponsors`); }
+  await tap('#modal [data-act="poster-layout"][data-k="bold"]');
 
   // Download through the website's S.downloads: the PNG as it is
   const [dl] = await Promise.all([A.waitForEvent('download', { timeout: 15000 }), A.click('#modal [data-act="poster-download"]')]);
