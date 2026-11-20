@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
   const pickOp = ([pid, round, team]) => [['set', `tournaments/${window.__tid}/picks/${pid}_${round}`, { pid, round, team, at: '__now' }]];
   const AD = await mk('admin'); await AD.goto(base + '#admin'); await w(3000);
   await AD.evaluate(() => window.__testGoogle('samuelcblakey@gmail.com')); await w(3500);
-  await AD.click('[data-act="open-testing"]'); await w(2500); // strict mode: the rules decide
+  await AD.evaluate(() => window.__testSetSite({ openTesting: false })); await w(1500); // strict mode: the rules decide (set, not toggled, so a slow admin page can't flip it the wrong way)
   // the organiser: a competition with 4 teams and three pick rounds: p1 open, p2 closed, p3 open (closed later)
   const A = await mk('organiser'); await A.goto(base); await w(3500);
   await A.click('[data-act="new-t"]'); await w(2500); const tid = await A.evaluate(() => location.hash.slice(1));
@@ -90,8 +90,26 @@ const { chromium } = require('playwright');
   // pick-game-picks-public: picks are public as soon as they're saved, but not once the competition is archived
   log('spectator with no player reads picks: ' + await raw(V, 'get', `tournaments/${tid}/picks/${pid}_p1`) + ' | lists an open round ' + await V.evaluate(async t => { try { return (await window.__testRaw.where('tournaments/' + t + '/picks', 'round', 'p1')).length; } catch (e) { return e.code; } }, tid));
   log('stranger turns the game off: ' + await raw(E, 'update', `tournaments/${tid}`, { pick: { on: false, rounds: [] } }));
+  // pick-game-admin-delete: only the admin deletes a player, with their picks, key and device links
+  const qpid = /\.pk-([A-Z0-9]+)-/.exec(await Q.evaluate(() => { if (!document.querySelector('#pk-link')) document.querySelector('[data-act="pk-show-link"]')?.click(); return new Promise(r => setTimeout(() => r(document.querySelector('#pk-link')?.value || ''), 500)); }))?.[1] || '';
+  const qkey = /-([A-Z0-9]{16})$/.exec(await Q.evaluate(() => document.querySelector('#pk-link')?.value || ''))?.[1] || '';
+  log('bob picks: ' + await raw(Q, 'batch', await Q.evaluate(pickOp, [qpid, 'p1', 'e1'])));
+  log('organiser deletes a player: ' + await raw(A, 'del', `tournaments/${tid}/pickers/${qpid}`));
+  log('player deletes another player: ' + await raw(Q, 'del', `tournaments/${tid}/pickers/${pid}`));
+  log('player deletes own player doc: ' + await raw(Q, 'del', `tournaments/${tid}/pickers/${qpid}`) + ' | own key ' + await raw(Q, 'del', `tournaments/${tid}/pickkeys/${qpid}`));
+  log('admin deletes player, picks, key, device links: ' + await AD.evaluate(async ([t, q]) => { try { await window.__carreau.S.pickGame.deletePicker({ id: t }, q); return 'allowed'; } catch (e) { return e.code === 'permission-denied' ? 'denied' : e.code || e.message; } }, [tid, qpid]));
+  log('after: player ' + JSON.stringify(await AD.evaluate(p => window.__testRaw.get(p), `tournaments/${tid}/pickers/${qpid}`))
+    + ' | picks ' + (await AD.evaluate(([t, q]) => window.__testRaw.where('tournaments/' + t + '/picks', 'pid', q), [tid, qpid])).length
+    + ' | devices ' + (await AD.evaluate(([t, q]) => window.__testRaw.where('tournaments/' + t + '/pickdev', 'pid', q), [tid, qpid])).length);
+  await w(2000);
+  log("deleted player's phone: join form " + await Q.evaluate(() => !!document.querySelector('#pk-you') && !document.querySelector('.pk-me')));
+  log('old key joins again: ' + await raw(Q, 'batch', [['set', `tournaments/${tid}/pickdev/${await Q.evaluate(() => window.__testUid())}`, { pid: qpid, key: qkey, at: '__now' }]]));
+  { const R = await mk('old link', 390); await R.goto(base + '#' + tid + '.pk-' + qpid + '-' + qkey); await w(6000);
+    log('old private link: ' + await R.evaluate(() => (document.querySelector('#toast')?.textContent || '').trim()) + ' | join form ' + await R.evaluate(() => !!document.querySelector('#pk-you'))); }
   log('archive: ' + await raw(A, 'update', `tournaments/${tid}`, { archived: true }));
   log('read picks of an archived competition: ' + await raw(V, 'get', `tournaments/${tid}/picks/${pid}_p1`) + ' | admin ' + await raw(AD, 'get', `tournaments/${tid}/picks/${pid}_p1`));
-  await AD.click('[data-act="open-testing"]'); await w(1500); // back to the beta default
+  log('admin deletes competition: ' + await AD.evaluate(async t => { try { await window.__carreau.S.store.deleteTournament(t); return 'ok'; } catch (e) { return e.code || e.message; } }, tid)
+    + ' | pick data ' + await AD.evaluate(async t => { const n = []; for (const sub of ['pickers', 'picks', 'pickdev']) n.push((await window.__testRaw.list('tournaments/' + t + '/' + sub)).length); return n.every(x => x === 0) ? 'gone' : 'left ' + n.join(','); }, tid));
+  await AD.evaluate(() => window.__testSetSite({ openTesting: true })); await w(1000); // back to the beta default
   log('errs', errs); await b.close();
 })();

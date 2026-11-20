@@ -181,7 +181,9 @@ service cloud.firestore {
         allow delete: if isAdmin();
       }
       match /pickdev/{uid} {
-        allow get: if signedIn() && request.auth.uid == uid;
+        allow get: if (signedIn() && request.auth.uid == uid) || isAdmin();
+        // the admin finds a player's devices to delete them with the player, or with the competition (pick-game-admin-delete)
+        allow list: if isAdmin();
         allow create, update: if signedIn() && request.auth.uid == uid
           && request.resource.data.keys().hasOnly(['pid', 'key', 'at']) && request.resource.data.pid is string && request.resource.data.key is string
           && request.resource.data.at == request.time
