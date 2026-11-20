@@ -71,7 +71,7 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
 /* event pages (event-page): the event's title beside the logo, then light/dark and language */
 body.ev .tsel{flex:1 1 auto}.ev-head{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto;line-height:1.15}
 .ev-title{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.02em;overflow-wrap:anywhere}.ev-sub{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
-.ev-views{align-self:flex-start}.ev-foot{margin-top:24px;gap:14px;max-width:720px}.ev-foot p{margin:0}.ev-cta a.btn{text-decoration:none}.ev-main{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--accent)}
+.ev-views{align-self:flex-start}.ev-foot{margin-top:24px;gap:14px;max-width:720px}.ev-foot p{margin:0}.ev-cta a.btn{text-decoration:none}.panel.ev-banner{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;border-color:var(--accent);background:var(--accent-soft)}.ev-banner h2{margin:0;font-size:22px}.ev-banner p{margin:0}.ev-banner .btn{text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding-inline:22px}.ev-notice a{font-weight:600;color:var(--accent)}.ev-main{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--accent)}
 /* ---------- phones ---------- */
 @media (max-width:640px){
   input,select,textarea{font-size:16px} /* stops iPhone zooming in on tap */
@@ -1710,6 +1710,13 @@ Object.assign(LANG_TEXT.de, {"Go to SN Pétanque": "Zu SN Pétanque", "Shooting 
 Object.assign(LANG_TEXT.nl, {"Go to SN Pétanque": "Naar SN Pétanque", "Shooting (event tab)": "Precisieschieten"});
 Object.assign(LANG_TEXT.pt, {"Go to SN Pétanque": "Ir para SN Pétanque", "Shooting (event tab)": "Tiro de precisão"});
 Object.assign(LANG_TEXT.th, {"Go to SN Pétanque": "ไปที่ SN Pétanque", "Shooting (event tab)": "การยิงแม่น"});
+Object.assign(FR_TEXT, {"World Championships live": "Championnats du monde en direct", "Follow the results and play Pick the Winner. Free to play.": "Suivez les résultats et jouez aux pronostics. Gratuit.", "Open": "Ouvrir", "Part of {x}.": "Fait partie de {1}.", "Open the event page": "Ouvrir la page de l'événement"});
+Object.assign(LANG_TEXT.es, {"World Championships live": "Campeonato del Mundo en directo", "Follow the results and play Pick the Winner. Free to play.": "Sigue los resultados y juega a Elige al ganador. Gratis.", "Part of {x}.": "Forma parte de {1}.", "Open the event page": "Abrir la página del evento", "Open": "Abrir"});
+Object.assign(LANG_TEXT.it, {"World Championships live": "Campionati del mondo in diretta", "Follow the results and play Pick the Winner. Free to play.": "Segui i risultati e gioca a Indovina il vincitore. Gratis.", "Part of {x}.": "Fa parte di {1}.", "Open the event page": "Apri la pagina dell'evento", "Open": "Apri"});
+Object.assign(LANG_TEXT.de, {"World Championships live": "Weltmeisterschaft live", "Follow the results and play Pick the Winner. Free to play.": "Verfolge die Ergebnisse und spiel beim Tippspiel mit. Kostenlos.", "Part of {x}.": "Teil von {1}.", "Open the event page": "Zur Veranstaltungsseite", "Open": "Öffnen"});
+Object.assign(LANG_TEXT.nl, {"World Championships live": "Wereldkampioenschap live", "Follow the results and play Pick the Winner. Free to play.": "Volg de uitslagen en speel Voorspel de winnaar. Gratis.", "Part of {x}.": "Onderdeel van {1}.", "Open the event page": "Open de evenementpagina", "Open": "Openen"});
+Object.assign(LANG_TEXT.pt, {"World Championships live": "Campeonato do Mundo em direto", "Follow the results and play Pick the Winner. Free to play.": "Acompanhe os resultados e jogue Escolha o vencedor. Grátis.", "Open": "Abrir", "Part of {x}.": "Faz parte de {1}.", "Open the event page": "Abrir a página do evento"});
+Object.assign(LANG_TEXT.th, {"World Championships live": "ชิงแชมป์โลกสด", "Follow the results and play Pick the Winner. Free to play.": "ติดตามผลการแข่งขันและร่วมเล่นทายผู้ชนะ เล่นฟรี", "Part of {x}.": "เป็นส่วนหนึ่งของ {1}", "Open the event page": "เปิดหน้ากิจกรรม", "Open": "เปิด"});
 Object.assign(FR_TEXT, {"{n} players so far": "{1} joueurs inscrits", "1 player so far": "1 joueur inscrit", "Places start when the first round's picks close: {x}.": "Le classement commence à la fin des pronostics du premier tour : {1}.", "Show all {n}": "Tout afficher ({1})"}); // Pick the Winner: players so far (pick-game-players-so-far)
 Object.assign(LANG_TEXT.es, {"{n} players so far": "{1} jugadores hasta ahora", "1 player so far": "1 jugador hasta ahora", "Places start when the first round's picks close: {x}.": "Los puestos empiezan cuando se cierran los pronósticos de la primera ronda: {1}.", "Show all {n}": "Mostrar los {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
 Object.assign(LANG_TEXT.it, {"{n} players so far": "{1} giocatori finora", "1 player so far": "1 giocatore finora", "Places start when the first round's picks close: {x}.": "La classifica parte quando si chiudono i pronostici del primo turno: {1}.", "Show all {n}": "Mostra tutti e {1}"}); // Pick the Winner: players so far (pick-game-players-so-far)
@@ -6470,6 +6477,7 @@ function drawPage() {
   // examples: visitors can open every tab, but the organiser pages are locked
   const fn = viewAll(t) && ["setup", "entries", "courts"].includes(S.tab) ? (x => `<div class="notice" style="margin-bottom:16px"><b>Example competition.</b> You can look around every page, but nothing here can be changed. Tap + to make your own.</div><fieldset class="ro-view" disabled>${fn0(x)}</fieldset>`) : fn0;
   main.innerHTML = (S.topBanner ? S.topBanner() : "") + (t.archived ? `<div class="notice" style="margin-bottom:16px">Archived. Only the site admin can see this competition.${S.canSeeArchived() ? ` <button class="btn sm" data-act="restore">Restore</button>` : ""}</div>` : "") + (t.template ? `<div class="notice spread" style="margin-bottom:16px"><span><b>Run-through template.</b> Get your own copy with these settings and shooters, then run it start to finish with the live scorer.</span>${S.canCreate() ? `<button class="btn primary sm" data-act="use-template">Try it yourself</button>` : ""}</div>` : "") + (t.example ? `<div class="notice example" style="margin-bottom:16px">This is an example competition with made-up teams, so you can see how everything works. Create your own from the menu above, then delete this one in Setup.</div>` : "") + fn(t);
+  main.insertAdjacentHTML("afterbegin", evNotice(t)); // a competition of a live event page (event-page-share)
   localize($("header.app")); localize(main);
   fitBrackets(); restore();
 }
@@ -6594,6 +6602,20 @@ function evGo(key) {
   if (x.tid !== S.tid) { S.tid = x.tid; S.matches = {}; S.onSelect?.(); watchMatches(); }
   render(); window.scrollTo(0, 0);
 }
+// events live today (UK date, live.from to live.to): the front page's banner and the notice on their competitions
+// (event-page-share)
+const ukToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+const liveEvents = () => { const d = ukToday(); return EVENTS.filter(e => e.live && e.live.from <= d && d <= e.live.to); };
+function evBanners() {
+  return liveEvents().map(e => `<section class="panel ev-banner"><div class="stack" style="gap:4px"><h2>World Championships live</h2>
+    <p>Follow the results and play Pick the Winner. Free to play.</p></div><a class="btn primary" href="/${esc(e.slug)}" data-ev="${esc(e.slug)}">Open</a></section>`).join("");
+}
+// a competition that's one of a live event's tabs: a slim notice for anyone who doesn't run it, pointing at the event page
+function evNotice(t) {
+  if (S.event || !t || (S.isMine ? S.isMine(t) : canEdit())) return "";
+  const e = liveEvents().find(x => x.tabs.some(y => y.tid === t.id)); if (!e) return "";
+  return `<div class="notice ev-notice" style="margin-bottom:16px">${trAround("Part of {x}.", `<b data-notr>${esc(e.title)}</b>`)} <a href="/${esc(e.slug)}">Open the event page</a></div>`;
+}
 // the start screen: first visit, or the logo tapped. Run (or watch how it works) up top beside a small live preview,
 // then stream, the Season Calendar and the Hall of Fame, then your competitions, featured ones and the examples.
 const STREAM_ICON = thIc('<rect x="3" y="7" width="13" height="11" rx="2"/><path d="M16 11l5-3v9l-5-3z"/>');
@@ -6622,7 +6644,7 @@ function renderWelcome() {
   const list = (k, ts) => { const open = S.startAll?.[k] || ts.length <= START_LIMIT;
     return `<div class="ex-grid" data-list="${k}">${(open ? ts : ts.slice(0, START_LIMIT)).map(card).join("")}</div>${open ? "" : `<button type="button" class="btn ex-more" data-act="start-all" data-k="${k}">Show all (${ts.length})</button>`}`; }; // i18n-ok: "Show all ({n})" (the checker stops at the bracket)
   const tile = (href, icon, name, line, ext) => `<a class="start-card tile${ext ? " ext" : ""}" href="${href}"${ext ? ' target="_blank" rel="noopener"' : ""}><span class="tile-ic" aria-hidden="true">${icon}</span><span class="tile-txt"><b>${name}${ext ? `<span class="ext-ic" aria-hidden="true">↗</span>` : ""}</b><span>${line}</span>${ext ? newTab : ""}</span></a>`;
-  return `<div class="start stack">
+  return `<div class="start stack">${evBanners()}
     <section class="start-hero"><div class="sh-text"><h1>Pétanque competitions, run from your phone</h1>
       <p class="muted">Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.</p>
       <div class="sh-cta">
