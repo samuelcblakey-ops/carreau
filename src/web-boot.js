@@ -295,8 +295,10 @@ S.calEntryOn = () => SITE.calendarEntry === true || (SITE.calendarEntry === "adm
 S.hofWho = () => ({ byUid: AUTH.user?.uid || "", byCode: orgActive() ? ORG.code : "" });
 // live desk: a phone that opened the live desk link (stream code) can run the desk for this competition's games, nothing else
 S.liveRole = t => !!(t && ROLE[t.id] === "live");
-// streaming is a site switch: Off / Admin only / Everyone (config/site.streaming, enforced in firestore.rules)
+// streaming is a site switch: Off / Admin only / Everyone (config/site.streaming, enforced in firestore.rules). It covers the
+// Stream a game card, the Stream tab, stand-alone streams and the competition games' overlays and live desks.
 S.streamingOn = () => SITE.streaming === true || (SITE.streaming === "admin" && isAdmin());
+S.streamingKnown = () => SITE.loaded;
 // standalone streams: the device that created one owns it; a phone with the desk link joins as 'live'
 S.me = () => AUTH.user?.uid || ""; // this device, so the live desk can tell another phone's mène from its own
 S.streamMine = st => isAdmin() || st.ownerUid === AUTH.user?.uid;
@@ -471,7 +473,7 @@ S.extraAction = async (act, a) => {
   }
   if (act === "streaming-mode") {
     const mode = a.dataset.mode; const on = mode === "all" ? true : mode === "admin" ? "admin" : false;
-    try { await setDoc(doc(FB.db, "config", "site"), { streaming: on, updated: Date.now() }, { merge: true }); toast(on === true ? "Competition game overlays are on for everyone." : on === "admin" ? "Competition game overlays are on for you only." : "Competition game overlays are switched off."); }
+    try { await setDoc(doc(FB.db, "config", "site"), { streaming: on, updated: Date.now() }, { merge: true }); toast(on === true ? "Streaming is on for everyone." : on === "admin" ? "Streaming is on for you only." : "Streaming is switched off."); }
     catch (e) { console.error(e); toast("That setting didn't save."); }
     return;
   }
@@ -661,7 +663,7 @@ S.guideLink = id => { const g = guideOf(id); return g ? `<button type="button" c
 function guidesView() {
   return `<div class="stack" style="max-width:900px"><div class="spread"><h2>Guides</h2><button class="btn sm" data-act="org-back">Back to competitions</button></div>
     <p class="muted">Short videos that walk you through the competition desk, step by step.</p>
-    <div class="guide-grid">${GUIDES.map(g => `<div class="panel stack guide-card" id="guide-${g.id}">
+    <div class="guide-grid">${GUIDES.filter(g => g.id !== "stream" || S.streamingOn()).map(g => `<div class="panel stack guide-card" id="guide-${g.id}">
       <button type="button" class="guide-thumb" data-act="guide-play" data-id="${g.id}" aria-label="Play: ${g.title}"><img src="${g.file}.jpg" alt="" loading="lazy" width="960" height="600"><span class="gp" aria-hidden="true">▶</span></button>
       <div class="guide-body"><b>${g.title}</b><span class="small muted">${g.len}</span><p class="small muted" style="margin:4px 0 0">${g.desc}</p></div></div>`).join("")}</div>
     ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}
@@ -1030,8 +1032,8 @@ function adminView() {
       <div class="seg" role="group" aria-label="Team score entry">${[["off", "Off"], ["admin", "Admin only"], ["all", "Everyone"]].map(([m, l]) => `<button type="button" data-act="team-scoring" data-mode="${m}" aria-pressed="${(SITE.teamScoring === true ? "all" : SITE.teamScoring === "admin" ? "admin" : "off") === m}">${l}</button>`).join("")}</div>
     </div>
     <div class="panel stack">
-      <div class="spread"><h3>Competition game overlays <span class="small muted">beta</span></h3><span class="pill ${SITE.streaming ? "playing" : ""}">${SITE.streaming === true ? "Everyone" : SITE.streaming === "admin" ? "Admin only" : "Off"}</span></div>
-      <p class="muted">The Stream tab (stand-alone streams: type two team names, get the overlay and live desk) is open to everyone. This switch adds the competition's own games to that tab, with overlays and live desks fed by the competition's scores. ${SITE.streaming === true ? "Currently on for every organiser." : SITE.streaming === "admin" ? "Currently only you see it." : "Currently hidden, and the rules refuse live-score writes on competition games."}</p>
+      <div class="spread"><h3>Streaming <span class="small muted">beta</span></h3><span class="pill ${SITE.streaming ? "playing" : ""}">${SITE.streaming === true ? "Everyone" : SITE.streaming === "admin" ? "Admin only" : "Off"}</span></div>
+      <p class="muted">Everything to do with streaming: the Stream a game card on the start screen, the Stream tab in competitions (stand-alone streams, and the competition's own games with overlays and live desks fed by its scores) and the streaming guide. ${SITE.streaming === true ? "Currently on for everyone." : SITE.streaming === "admin" ? "Currently only you see it." : "Currently off for everyone: the card, the tab and the guide are hidden (competitions show a Big screen tab instead), open overlays go blank, and the rules refuse new streams and live-score writes."}</p>
       <div class="seg" role="group" aria-label="Streaming">${[["off", "Off"], ["admin", "Admin only"], ["all", "Everyone"]].map(([m, l]) => `<button type="button" data-act="streaming-mode" data-mode="${m}" aria-pressed="${(SITE.streaming === true ? "all" : SITE.streaming === "admin" ? "admin" : "off") === m}">${l}</button>`).join("")}</div>
     </div>
     <div class="panel stack" id="adm-cal-entry">
