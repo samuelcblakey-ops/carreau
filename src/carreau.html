@@ -82,7 +82,7 @@ nav.tabs .t-ic,nav.tabs .t-short{display:none}
   nav.tabs button[aria-current="true"]{color:var(--accent);background:var(--accent-soft)}
   nav.tabs .t-ic,nav.tabs .t-short{display:block}nav.tabs .t-long{display:none}
   nav.tabs button{flex:1 1 auto}nav.tabs .t-short{max-width:100%;text-align:center;line-height:1.15;white-space:normal;overflow-wrap:anywhere;hyphens:auto;-webkit-hyphens:auto}
-  .erow:has(> .who + .pill, > .who + .btn.ci + .pill) .who{flex:1 1 calc(100% - 2.5ch - 10px)}.erow .who b{overflow-wrap:break-word}
+  .erow:has(> .who + .pill, > .who + .btn.ci + .pill) .who{flex:1 1 calc(100% - 2.5ch - 10px)}.erow:has(> .btn.pay) .who{flex:1 1 calc(100% - 2.5ch - 10px)}.erow:has(> .btn.pay) > .btn:is(.ci,.pay){flex:1 1 0}.erow .who b{overflow-wrap:break-word}
   .lu-slots{grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr))}
   main{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   .site-foot{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
@@ -291,6 +291,11 @@ fieldset.ro-view{border:0;padding:0;margin:0;min-width:0}fieldset.ro-view :is(in
 .btn.ci{min-height:44px;min-width:132px;justify-content:center;border:2px solid var(--accent);background:var(--surface);color:var(--accent);font-weight:700;font-size:14px;padding:6px 14px}
 .btn.ci:hover{background:var(--accent-soft);border-color:var(--accent)}
 .btn.ci.checked{background:var(--accent);color:var(--accent-ink)}
+/* payments: "Not paid" outlined, "Paid" filled green with a tick (a fixed green, whatever the competition's colours) */
+:root{--paid:#1f7a3a;--paid-ink:#fff}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paid:#4fbf72;--paid-ink:#08140c}}:root[data-theme="dark"]{--paid:#4fbf72;--paid-ink:#08140c}
+.btn.pay{min-height:44px;min-width:112px;justify-content:center;gap:6px;border:2px solid var(--line);background:var(--surface);color:var(--muted);font-weight:700;font-size:14px;padding:6px 12px}
+.btn.pay.paid{background:var(--paid);border-color:var(--paid);color:var(--paid-ink)}
+.pay-sum{gap:8px;align-items:center;flex-wrap:wrap}.pay-chip{min-height:44px}
 .btn.ci-all{min-height:44px;padding:10px 18px;font-size:15px}
 .btn .ic{flex:none}
 .reg-count{font-family:var(--display);font-size:22px}.reg-count b{font-size:30px}
@@ -1578,6 +1583,14 @@ Object.assign(LANG_TEXT.de, {"Example competition, view only": "Beispielturnier,
 Object.assign(LANG_TEXT.nl, {"Example competition, view only": "Voorbeeldwedstrijd, alleen bekijken"});
 Object.assign(LANG_TEXT.pt, {"Example competition, view only": "Torneio de exemplo, só leitura"});
 Object.assign(LANG_TEXT.th, {"Example competition, view only": "การแข่งขันตัวอย่าง ดูได้อย่างเดียว"});
+// payments (payments-registration): the Paid button in Registration, its toast and the summary line
+Object.assign(FR_TEXT, {"Paid": "Payé", "Not paid": "Non payé", "Marked as paid.": "Marqué comme payé.", "Marked as not paid.": "Marqué comme non payé.", "Paid: {n} of {x}": "Payé : {1} sur {2}"});
+Object.assign(LANG_TEXT.es, {"Paid": "Pagado", "Not paid": "No pagado", "Marked as paid.": "Marcado como pagado.", "Marked as not paid.": "Marcado como no pagado.", "Paid: {n} of {x}": "Pagado: {1} de {2}"});
+Object.assign(LANG_TEXT.it, {"Paid": "Pagato", "Not paid": "Non pagato", "Marked as paid.": "Segnato come pagato.", "Marked as not paid.": "Segnato come non pagato.", "Paid: {n} of {x}": "Pagato: {1} su {2}"});
+Object.assign(LANG_TEXT.de, {"Paid": "Bezahlt", "Not paid": "Nicht bezahlt", "Marked as paid.": "Als bezahlt markiert.", "Marked as not paid.": "Als nicht bezahlt markiert.", "Paid: {n} of {x}": "Bezahlt: {1} von {2}"});
+Object.assign(LANG_TEXT.nl, {"Paid": "Betaald", "Not paid": "Niet betaald", "Marked as paid.": "Gemarkeerd als betaald.", "Marked as not paid.": "Gemarkeerd als niet betaald.", "Paid: {n} of {x}": "Betaald: {1} van {2}"});
+Object.assign(LANG_TEXT.pt, {"Paid": "Pago", "Not paid": "Não pago", "Marked as paid.": "Marcado como pago.", "Marked as not paid.": "Marcado como não pago.", "Paid: {n} of {x}": "Pago: {1} de {2}"});
+Object.assign(LANG_TEXT.th, {"Paid": "จ่ายแล้ว", "Not paid": "ยังไม่จ่าย", "Marked as paid.": "บันทึกว่าจ่ายแล้ว", "Marked as not paid.": "บันทึกว่ายังไม่จ่าย", "Paid: {n} of {x}": "จ่ายแล้ว: {1} จาก {2}"});
 // Swiss: a round entered by hand (games drawn by someone else, e.g. a federation)
 Object.assign(FR_TEXT, {"Line {n}: a game needs at least one team.": "Ligne {1} : une rencontre a besoin d'au moins une équipe.", "Enter the games yourself": "Saisir les parties vous-même", "Round {n}: enter the games": "Partie {1} : saisir les rencontres", "Round name": "Nom de la partie", "One game per line: Team A v Team B": "Une rencontre par ligne : Équipe A v Équipe B", "\"v\", \"vs\" or \"-\" between the teams. You can use a team's code in brackets, e.g. ITA for \"Italy (ITA)\".": "« v », « vs » ou « - » entre les équipes. Vous pouvez utiliser le code d'une équipe entre parenthèses, par ex. ITA pour « Italy (ITA) ».", "Save round": "Enregistrer la partie", "Line {n}: no team called \"{x}\".": "Ligne {1} : aucune équipe nommée « {2} ».", "Line {n}: \"{x}\" matches more than one team.": "Ligne {1} : « {2} » correspond à plusieurs équipes.", "{x} is in more than one game.": "{1} est dans plusieurs rencontres.", "Line {n}: a team can't play itself.": "Ligne {1} : une équipe ne peut pas jouer contre elle-même.", "Add at least one game.": "Ajoutez au moins une rencontre.", "{n} rematch(es) in this round.": "{1} rencontre(s) déjà jouée(s) dans cette partie.", "{n} team(s) have no game this round: {x}.": "{1} équipe(s) sans rencontre dans cette partie : {2}."});
 Object.assign(LANG_TEXT.es, {"Line {n}: a game needs at least one team.": "Línea {1}: una partida necesita al menos un equipo.", "Enter the games yourself": "Introducir las partidas tú mismo", "Round {n}: enter the games": "Ronda {1}: introduce las partidas", "Round name": "Nombre de la ronda", "One game per line: Team A v Team B": "Una partida por línea: Equipo A v Equipo B", "\"v\", \"vs\" or \"-\" between the teams. You can use a team's code in brackets, e.g. ITA for \"Italy (ITA)\".": "\"v\", \"vs\" o \"-\" entre los equipos. Puedes usar el código de un equipo entre paréntesis, p. ej. ITA para \"Italy (ITA)\".", "Save round": "Guardar ronda", "Line {n}: no team called \"{x}\".": "Línea {1}: ningún equipo se llama \"{2}\".", "Line {n}: \"{x}\" matches more than one team.": "Línea {1}: \"{2}\" coincide con más de un equipo.", "{x} is in more than one game.": "{1} está en más de una partida.", "Line {n}: a team can't play itself.": "Línea {1}: un equipo no puede jugar contra sí mismo.", "Add at least one game.": "Añade al menos una partida.", "{n} rematch(es) in this round.": "{1} partida(s) repetida(s) en esta ronda.", "{n} team(s) have no game this round: {x}.": "{1} equipo(s) sin partida en esta ronda: {2}."});
@@ -1719,6 +1732,12 @@ function localStore() {
     async getCalFlyer(cid) { return data.cf?.[cid] ? clone(data.cf[cid]) : null; },
     async setCalFlyer(cid, f) { if (!data.cal[cid]) throw { code: "permission-denied" }; (data.cf ||= {})[cid] = clone(f); persist(); },
     async deleteCalFlyer(cid) { if (data.cf?.[cid]) { delete data.cf[cid]; persist(); } },
+    // payments (payments-registration): data.pay[tid] = { <team or player id>: { at, by } }; the website keeps them in
+    // tournaments/{tid}/private/payments, { paid: { … } }, which only the competition's organisers can read
+    watchPayments(tid, cb) { const k = "pay:" + tid, f = () => cb(clone(data.pay?.[tid] || {}));
+      setTimeout(f); if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(f); return () => subsL.get(k).delete(f); },
+    async setPayment(tid, id, rec) { const m = ((data.pay ||= {})[tid] ||= {}); if (rec) m[id] = clone(rec); else delete m[id]; persist();
+      setTimeout(() => (subsL.get("pay:" + tid) || new Set()).forEach(f => f())); },
     watchStreams(cb) { subsS.add(cb); emitS(); return () => subsS.delete(cb); },
     watchStream(sid, cb) { if (!subsS1.has(sid)) subsS1.set(sid, new Set()); subsS1.get(sid).add(cb); emitS(sid); return () => subsS1.get(sid).delete(cb); },
     async setStream(st) { data.s[st.id] = clone(st); persist(); emitS(st.id); },
@@ -1728,7 +1747,7 @@ function localStore() {
     watchTournaments(cb) { subsT.add(cb); emitT(); return () => subsT.delete(cb); },
     watchMatches(tid, cb) { if (!subsM.has(tid)) subsM.set(tid, new Set()); subsM.get(tid).add(cb); emitM(tid); return () => subsM.get(tid).delete(cb); },
     async setTournament(t) { data.t[t.id] = clone(t); persist(); emitT(); },
-    async deleteTournament(tid) { delete data.t[tid]; delete data.m[tid]; delete data.l[tid]; if (data.hof[tid]) data.hof[tid].gone = true; if (data.cal[tid]) data.cal[tid].gone = true; persist(); emitT(); },
+    async deleteTournament(tid) { delete data.t[tid]; delete data.m[tid]; delete data.l[tid]; if (data.pay) delete data.pay[tid]; if (data.hof[tid]) data.hof[tid].gone = true; if (data.cal[tid]) data.cal[tid].gone = true; persist(); emitT(); },
     async setMatch(tid, m) { (data.m[tid] ||= {})[m.id] = clone(m); persist(); emitM(tid); },
     async updateMatch(tid, id, patch) { const m = data.m[tid]?.[id]; if (!m) throw { code: "invalid_argument" }; Object.assign(m, clone(patch)); persist(); emitM(tid); },
     async deleteMatch(tid, id) { delete data.m[tid]?.[id]; persist(); emitM(tid); },
@@ -1772,6 +1791,9 @@ function dbStore(db) {
     getCalFlyer(cid) { return new Promise((res, rej) => { let u = null; u = db.doc(`calendar/${cid}/media/flyer`).onSnapshot(d => { setTimeout(() => u && u()); res(d.exists ? clone(d.data()) : null); }, rej); }); },
     setCalFlyer(cid, f) { return db.doc(`calendar/${cid}/media/flyer`).set(clone(f)); },
     deleteCalFlyer(cid) { return db.doc(`calendar/${cid}/media/flyer`).delete(); },
+    // payments: one small document per team here (a shared db has no field merges), so two organisers never overwrite each other
+    watchPayments(tid, cb, onErr) { return db.collection(`tournaments/${tid}/payments`).limit(1000).onSnapshot(s => { const m = {}; s.docs.forEach(d => m[d.id] = clone(d.data())); cb(m); }, onErr); },
+    setPayment(tid, id, rec) { const ref = db.doc(`tournaments/${tid}/payments/${id}`); return rec ? ref.set(clone(rec)) : ref.delete(); },
     watchStreams(cb, onErr) { return db.collection("streams").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
     watchStream(sid, cb, onErr) { return db.doc(`streams/${sid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setStream(st) { return db.doc(`streams/${st.id}`).set(clone(st)); },
@@ -1784,6 +1806,7 @@ function dbStore(db) {
     async deleteTournament(tid) {
       const s = await db.collection(`tournaments/${tid}/matches`).limit(1000).get();
       for (const d of s.docs) await db.doc(`tournaments/${tid}/matches/${d.id}`).delete();
+      try { const ps = await db.collection(`tournaments/${tid}/payments`).limit(1000).get(); for (const d of ps.docs) await db.doc(`tournaments/${tid}/payments/${d.id}`).delete(); } catch {}
       await db.doc(`tournaments/${tid}`).delete();
     },
     setMatch(tid, m) { return db.doc(`tournaments/${tid}/matches/${m.id}`).set(clone(m)); },
@@ -6555,6 +6578,38 @@ async function wizFinish(t) {
 const CI_TICK = `<svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 const CI_RING = `<svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>`;
 // "Check in everyone", offered wherever someone could get stuck because entries haven't checked in yet
+/* ---------- payments (payments-registration): organisers tick who has paid, one tap either way. Kept apart from the
+   competition (anyone can read that) in a private document only organisers can read, and read only on a device that can edit,
+   so players, spectators and the big screen never see it. The draw, check-in and standings ignore it. ---------- */
+// who has paid in this competition, by team (or player) id: { id: { at, by } }; starts watching the first time it's asked
+function payOf(t) {
+  if (!t || !canEdit() || !S.store.watchPayments) return {};
+  if (S.payW?.tid !== t.id || S.payW.store !== S.store) { S.payW?.unsub?.(); S.payW = { tid: t.id, store: S.store, paid: {}, tries: 0 }; payListen(S.payW); }
+  return S.payW.paid;
+}
+// a refusal (a new competition not on the server yet, an organiser link still joining) or a cut-off ends a listener: try again shortly
+function payListen(w) {
+  w.unsub = w.store.watchPayments(w.tid, m => { if (S.payW !== w) return; w.paid = m || {}; w.tries = 0; render(); }, err => {
+    if (err?.code !== "permission-denied") console.error(err);
+    if (S.payW !== w) return; w.tries++;
+    setTimeout(() => { if (S.payW === w && canEdit()) { w.unsub?.(); payListen(w); } }, Math.min(30000, 1500 * w.tries)); });
+}
+const payBtn = (on, id, act = "pay") => `<button type="button" class="btn pay ${on ? "paid" : ""}" data-act="${act}" data-id="${esc(id)}" aria-pressed="${!!on}">${on ? `${CI_TICK}<span>Paid</span>` : "Not paid"}</button>`;
+// the summary over the list (entries not withdrawn), with the "Not paid" chip that shows only those still to pay
+function paySum(t, paid) {
+  const live = entities(t).filter(e => e.active !== false), n = live.filter(e => paid[e.id]).length, only = !!S.payOnly?.[t.id];
+  return `<div class="row pay-sum"><span class="small" id="pay-count">Paid: ${n} of ${live.length}</span>
+    <button type="button" class="rchip txt pay-chip" data-act="pay-only" aria-pressed="${only}">Not paid</button></div>`;
+}
+// one tap: paid ↔ not paid, saved straight away, with Undo for a slip
+async function paySet(t, id, on, undo = true) {
+  const w = S.payW?.tid === t.id ? S.payW : null, rec = on ? { at: Date.now(), by: S.store.uid?.() || "" } : null;
+  if (w) { if (rec) w.paid[id] = rec; else delete w.paid[id]; } render(); // shown at once; the store's answer follows
+  const ok = await guard(async () => { await S.store.setPayment(t.id, id, rec); return true; });
+  if (!ok) return false;
+  if (undo) toast(on ? "Marked as paid." : "Marked as not paid.", async () => { await paySet(t, id, !on, false); });
+  return true;
+}
 const checkinAllBtn = t => t.checkin && canEdit() && !t.draws.length && enteredIds(t).length > activeIds(t).length ? `<button type="button" class="btn primary ci-all" data-act="checkin-all">${CI_TICK}Check in everyone</button>` : "";
 function renderEntries(t) {
   const melee = isIndiv(t); const size = SIZE[t.format]; const noun = melee ? "players" : isEuro(t) ? "clubs" : "teams";
@@ -6566,6 +6621,7 @@ function renderEntries(t) {
   const pct = entered.length ? Math.round(100 * here.length / entered.length) : 0;
   const q = (S.regFilter || "").toLowerCase();
   const match = e => !q || [entName(t, e.id), ...(e.players || []), e.club || "", e.name || ""].join(" ").toLowerCase().includes(q);
+  const paid = canEdit() && S.store.watchPayments ? payOf(t) : null, payOnly = !!(paid && S.payOnly?.[t.id]); // organisers only
   // a new competition: the quick setup on its own; once entries exist (imported, or added after leaving it) it sits above the list
   const wz = wizPanel(t); if (wz && !list.length) return `<div class="wiz-page">${wz}</div>`;
   return wz + `<div class="stack">
@@ -6603,11 +6659,13 @@ function renderEntries(t) {
     ${calRegPanel(t)}
     <div class="panel stack" style="gap:8px">
       <div class="spread"><h3>${melee ? "Players" : isEuro(t) ? "Clubs" : "Teams"}</h3>${list.length > 6 ? `<input type="search" id="reg-search" placeholder="Find a ${melee ? "player" : "team or player"}" value="${esc(S.regFilter || "")}" style="max-width:260px" aria-label="Search entries">` : ""}</div>
-      ${list.length ? `<div class="elist">${list.map((e, i) => `<div class="erow ${e.active === false ? "out" : ""} ${t.checkin && e.checkedIn && e.active !== false ? "here" : ""}" data-row="${e.id}" ${match(e) ? "" : "hidden"} data-text="${esc([entName(t, e.id), ...(e.players || []), e.club || ""].join(" ").toLowerCase())}">
+      ${paid ? paySum(t, paid) : ""}
+      ${list.length ? `<div class="elist">${list.map((e, i) => `<div class="erow ${e.active === false ? "out" : ""} ${t.checkin && e.checkedIn && e.active !== false ? "here" : ""}" data-row="${e.id}" ${paid ? `data-paid="${paid[e.id] ? 1 : 0}"` : ""} ${match(e) && !(payOnly && paid[e.id]) ? "" : "hidden"} data-text="${esc([entName(t, e.id), ...(e.players || []), e.club || ""].join(" ").toLowerCase())}">
         <span class="num">${i + 1}</span>
         <div class="who">${melee ? `<b>${esc(e.name)}</b>` : isEuro(t) ? `<b>${esc(entName(t, e.id))}</b><span class="small muted">${squadOf(t, e.id).map(p => esc(p.name) + (p.sex ? " " + EURO_SEX[p.sex] : "")).join(", ")}</span>` : `<b>${esc(entName(t, e.id))}</b><span class="small muted">${esc((e.players || []).filter(Boolean).join(", "))}${e.club ? " · " + esc(e.club) : ""}</span>`}</div>
         ${e.active === false ? `<span class="pill">Withdrawn</span>` : t.checkin ? (canEdit() ? `<button class="btn ci ${e.checkedIn ? "checked" : ""}" data-act="checkin" data-id="${e.id}" aria-pressed="${!!e.checkedIn}">${e.checkedIn ? "✓ Checked in" : `${CI_RING}Check in`}</button>` : e.checkedIn ? `<span class="pill done">Checked in</span>` : `<span class="pill">Not here yet</span>`) : ""}
         ${isEuro(t) && e.active !== false ? euroSquadPill(t, e.id) : ""}${calRegPill(t, e)}
+        ${paid ? payBtn(!!paid[e.id], e.id) : ""}
         ${canEdit() ? `<div class="row">
           ${isEuro(t) ? `<button class="btn sm ghost" data-act="eu-edit" data-id="${e.id}">Edit squad</button>` : ""}
           ${(t.seeding === "entry" || isClubs(t)) && !drawn ? `<button class="btn sm ghost" data-act="up" data-id="${e.id}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button>` : ""}
@@ -7496,6 +7554,8 @@ document.addEventListener("click", async e => {
     }
     // a tap on a row that has gone (removed on another phone, say) does nothing
     case "checkin": { if (!t) break; const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); if (!e2) break; e2.checkedIn = !e2.checkedIn; e2.checkedInAt = e2.checkedIn ? Date.now() : null; await guard(() => saveT(nt)); break; }
+    case "pay": { if (!t || !canEdit()) break; const id = a.dataset.id; if (!entities(t).some(x => x.id === id)) break; await paySet(t, id, !payOf(t)[id]); break; }
+    case "pay-only": { if (!t) break; (S.payOnly ||= {})[t.id] = !S.payOnly[t.id]; render(); break; }
     case "checkin-all": { const nt = clone(t); entities(nt).forEach(x => { if (x.active !== false && !x.checkedIn) { x.checkedIn = true; x.checkedInAt = Date.now(); } }); await guard(() => saveT(nt)); toast("Everyone is checked in."); break; }
     case "checkin-clear": { if (!S.confirmClear) { S.confirmClear = true; toast("Tap Clear check-ins again to confirm."); setTimeout(() => S.confirmClear = false, 4000); break; } S.confirmClear = false; const nt = clone(t); entities(nt).forEach(x => { x.checkedIn = false; x.checkedInAt = null; }); await guard(() => saveT(nt)); toast("Check-ins cleared."); break; }
     case "toggle-e": { if (!t) break; const nt = clone(t); const e2 = entities(nt).find(x => x.id === a.dataset.id); if (!e2) break; e2.active = e2.active === false; await guard(() => saveT(nt)); break; }
@@ -7562,7 +7622,7 @@ document.addEventListener("input", e => {
   if (e.target.closest?.("#add-form") && S.euDraft && isEuro(T() || {})) { euroReadForm(); return; }
   if (e.target.id !== "reg-search") return;
   S.regFilter = e.target.value; const q = S.regFilter.toLowerCase();
-  document.querySelectorAll("[data-row]").forEach(r => r.hidden = !!q && !r.dataset.text.includes(q));
+  const po = !!S.payOnly?.[S.tid]; document.querySelectorAll("[data-row]").forEach(r => r.hidden = (!!q && !r.dataset.text.includes(q)) || (po && r.dataset.paid === "1"));
 });
 document.addEventListener("focusout", () => setTimeout(() => { if (S.pendingRender) render(); }, 0));
 document.addEventListener("submit", async e => {
