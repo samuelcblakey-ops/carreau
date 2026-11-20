@@ -23,19 +23,20 @@ const { chromium } = require('playwright');
       picks: [{ pid: 'ann', round: 'p1', team: 'fr' }, { pid: 'bob', round: 'p1', team: 'it' }] },
       state() { return this.st; }, board() { return this.data; }, async join() {}, async pick() {} };
     C.render(); await w(40); q('[data-tab="pick"]').click(); await w(80);
-    r.push('open round chips: ' + qa('.pk-prow').map(el => txt(el.querySelector('.pk-chip [data-notr]')) + ' ' + [...el.querySelectorAll('.pk-pc')].map(c => c.textContent).join(' ')).reverse().join(' | '));
+    const slots = pid => [...q(`.pk-strip-row[data-pid="${pid}"]`).querySelectorAll('.pk-slot')].map(c => c.textContent).filter(x => x !== '·');
+    r.push('open round chips: ' + ['ann', 'bob'].map(pid => txt(q(`tr.pk-main[data-pid="${pid}"] .pk-who [data-notr]`)) + ' ' + slots(pid).join(' ')).join(' | '));
     S.pickGame.data.picks.push({ pid: 'ann', round: 'p2', team: 'tw' }, { pid: 'bob', round: 'p2', team: 'xx' }); C.render(); await w(40);
-    r.push('chip no flag: ' + q('.pk-prow:last-child .pk-pc:nth-child(2)')?.textContent + ' | no code either: ' + q('.pk-prow:first-child .pk-pc:nth-child(2)')?.textContent);
+    r.push('chip no flag: ' + slots('ann')[1] + ' | no code either: ' + slots('bob')[1]);
     // rounds 1 to 3 closed and played: Ann right in R1, wrong in R2, no pick in R3, a pick for the open R4
     const t2 = JSON.parse(JSON.stringify(C.T())); t2.pickClose = { p1: now - 3 * day, p2: now - 2 * day, p3: now - day, p4: now + day }; S.tournaments[t2.id] = t2;
     const g = (id, round, a, sa, bb, sb) => ({ id, stage: 'swiss', group: 'R' + round, round, order: 0, a: [a], b: [bb], sa, sb, done: true });
     S.matches = Object.fromEntries([g('m1', 1, 'fr', 13, 'it', 4), g('m2', 2, 'it', 6, 'es', 13), g('m3', 3, 'th', 13, 'fr', 2)].map(m => [m.id, m]));
     S.pickGame.data.picks = [{ pid: 'ann', round: 'p1', team: 'fr' }, { pid: 'ann', round: 'p2', team: 'it' }, { pid: 'ann', round: 'p4', team: 'es' }, { pid: 'bob', round: 'p1', team: 'it' }];
     C.render(); await w(60);
-    const annRow = q('.pk-table tr[data-pid="ann"]');
-    r.push('closed chips: Ann ' + [...annRow.querySelectorAll('.pk-pc')].map(c => c.textContent).join(' '));
-    r.push('chip label: ' + annRow.querySelector('.pk-pc').getAttribute('aria-label') + ' | title same ' + (annRow.querySelector('.pk-pc').title === annRow.querySelector('.pk-pc').getAttribute('aria-label')));
-    r.push('bob, no pick for R2 and R3: ' + [...q('.pk-table tr[data-pid="bob"]').querySelectorAll('.pk-pc')].map(c => c.textContent).join(' '));
+    const annRow = q('.pk-table tr.pk-main[data-pid="ann"]'), annSlots = q('.pk-strip-row[data-pid="ann"]');
+    r.push('closed chips: Ann ' + slots('ann').join(' '));
+    r.push('chip label: ' + annSlots.querySelector('.pk-slot').getAttribute('aria-label') + ' | title same ' + (annSlots.querySelector('.pk-slot').title === annSlots.querySelector('.pk-slot').getAttribute('aria-label')));
+    r.push('bob, no pick for R2 and R3: ' + slots('bob').join(' '));
     r.push('place/right/diff kept: ' + [...annRow.cells].filter((c, i) => i !== 1).map(txt).join(' '));
     // the player: the note under Save pick
     S.pickGame.st = { ready: true, me: { pid: 'ann', name: 'Ann' }, picks: { p1: 'fr', p2: 'it', p4: 'es' }, link: 'x' }; C.render(); await w(40);
@@ -47,7 +48,7 @@ const { chromium } = require('playwright');
     for (let i = 1; i <= 45; i++) { const pid = 'x' + i; pickers[pid] = { name: i === 7 ? 'Annabelle Christophersen-Smyth' : 'Player ' + i, at: i };
       for (let k = 1; k <= 10; k++) if ((i + k) % 4) picks.push({ pid, round: 'p' + k, team: teams[(i + k) % 6] }); }
     S.pickGame.data = { pickers, picks }; S.pickGame.st = { ready: true, me: { pid: 'x7', name: 'Annabelle Christophersen-Smyth' }, picks: {}, link: 'x' }; C.render(); await w(80);
-    r.push(`390 px, 10 rounds, 30-char name: ${document.documentElement.scrollWidth > innerWidth ? 'SIDEWAYS SCROLL' : 'no sideways scroll'} | chips on the long name's row ${q('.pk-table tr[data-pid="x7"]').querySelectorAll('.pk-pc').length}`);
+    r.push(`390 px, 10 rounds, 30-char name: ${document.documentElement.scrollWidth > innerWidth || q('.pk-board .tw').scrollWidth > q('.pk-board .tw').clientWidth ? 'SIDEWAYS SCROLL' : 'no sideways scroll'} | slots on the long name's row ${q('.pk-strip-row[data-pid="x7"]').querySelectorAll('.pk-slot').length}`);
     window.__t3 = t3; return r;
   });
   console.log(out.join('\n'));
@@ -56,7 +57,7 @@ const { chromium } = require('playwright');
   const out2 = await p.evaluate(async () => { const C = window.__carreau, S = C.S, t = JSON.parse(JSON.stringify(C.T()));
     t.pickClose = Object.fromEntries(t.pick.rounds.map((x, i) => [x.id, Date.now() + (i + 1) * 36e5])); S.tournaments[t.id] = t; C.render(); await new Promise(r => setTimeout(r, 80));
     document.querySelector('.pk-board').scrollIntoView();
-    return ['390 px before close: ' + (document.documentElement.scrollWidth > innerWidth ? 'SIDEWAYS SCROLL' : 'no sideways scroll') + ' | rows ' + document.querySelectorAll('.pk-prow').length + ' | ' + document.querySelector('.pk-sub').textContent]; });
+    return ['390 px before close: ' + (document.documentElement.scrollWidth > innerWidth ? 'SIDEWAYS SCROLL' : 'no sideways scroll') + ' | rows ' + document.querySelectorAll('tr.pk-main').length + ' | ' + document.querySelector('.pk-sub').textContent]; });
   console.log(out2.join('\n'));
   await p.screenshot({ path: process.env.OUT + '/pick-public-before-390.png' });
   await p.setViewportSize({ width: 1100, height: 900 }); await p.waitForTimeout(100);
