@@ -295,6 +295,7 @@ fieldset.ro-view{border:0;padding:0;margin:0;min-width:0}fieldset.ro-view :is(in
 :root{--paid:#1f7a3a;--paid-ink:#fff}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paid:#4fbf72;--paid-ink:#08140c}}:root[data-theme="dark"]{--paid:#4fbf72;--paid-ink:#08140c}
 .btn.pay{min-height:44px;min-width:112px;justify-content:center;gap:6px;border:2px solid var(--line);background:var(--surface);color:var(--muted);font-weight:700;font-size:14px;padding:6px 12px}
 .btn.pay.paid{background:var(--paid);border-color:var(--paid);color:var(--paid-ink)}
+.cal-ent-paid{display:flex;align-items:center;gap:6px;color:var(--paid);font-weight:700}.cal-pay-gone-row{gap:8px;align-items:center;justify-content:space-between}
 .pay-sum{gap:8px;align-items:center;flex-wrap:wrap}.pay-chip{min-height:44px}
 .btn.ci-all{min-height:44px;padding:10px 18px;font-size:15px}
 .btn .ic{flex:none}
@@ -1607,6 +1608,14 @@ Object.assign(LANG_TEXT.de, {"Set the bracket yourself": "KO-Baum selbst festleg
 Object.assign(LANG_TEXT.nl, {"Set the bracket yourself": "Zelf het afvalschema invullen", "Set the knockout yourself": "Zelf de afvalronde invullen", "{x}: set the bracket": "{1}: afvalschema invullen", "One first-round game per line, top of the bracket first: Team A v Team B": "Eén partij van de eerste ronde per regel, bovenaan het schema eerst: Team A v Team B", "Write \"bye\" for a team that goes straight through, e.g. \"Italy v bye\". You need 2, 4, 8, 16 or 32 lines.": "Schrijf \"bye\" voor een team met vrijloting dat meteen doorgaat, bijv. \"Italy v bye\". Je hebt 2, 4, 8, 16 of 32 regels nodig.", "Save bracket": "Afvalschema opslaan", "A bracket needs 2, 4, 8, 16 or 32 first-round games. You have {n}.": "Een afvalschema heeft 2, 4, 8, 16 of 32 partijen in de eerste ronde nodig. Je hebt er {1}."});
 Object.assign(LANG_TEXT.pt, {"Set the bracket yourself": "Definir o quadro você mesmo", "Set the knockout yourself": "Definir a eliminatória você mesmo", "{x}: set the bracket": "{1}: definir o quadro", "One first-round game per line, top of the bracket first: Team A v Team B": "Um jogo da primeira ronda por linha, do topo do quadro: Equipa A v Equipa B", "Write \"bye\" for a team that goes straight through, e.g. \"Italy v bye\". You need 2, 4, 8, 16 or 32 lines.": "Escreva \"bye\" para uma equipa isenta que passa diretamente, p. ex. \"Italy v bye\". Precisa de 2, 4, 8, 16 ou 32 linhas.", "Save bracket": "Guardar quadro", "A bracket needs 2, 4, 8, 16 or 32 first-round games. You have {n}.": "Um quadro precisa de 2, 4, 8, 16 ou 32 jogos na primeira ronda. Tem {1}."});
 Object.assign(LANG_TEXT.th, {"Set the bracket yourself": "จัดสายน็อคเอาท์เอง", "Set the knockout yourself": "จัดรอบน็อคเอาท์เอง", "{x}: set the bracket": "{1}: จัดสายน็อคเอาท์", "One first-round game per line, top of the bracket first: Team A v Team B": "หนึ่งเกมรอบแรกต่อบรรทัด เริ่มจากบนสุดของสาย: ทีม A v ทีม B", "Write \"bye\" for a team that goes straight through, e.g. \"Italy v bye\". You need 2, 4, 8, 16 or 32 lines.": "เขียน \"bye\" สำหรับทีมที่ได้บายผ่านเข้ารอบถัดไปเลย เช่น \"Italy v bye\" ต้องมี 2, 4, 8, 16 หรือ 32 บรรทัด", "Save bracket": "บันทึกสายน็อคเอาท์", "A bracket needs 2, 4, 8, 16 or 32 first-round games. You have {n}.": "สายน็อคเอาท์ต้องมีเกมรอบแรก 2, 4, 8, 16 หรือ 32 เกม ตอนนี้มี {1}"});
+// payments on online entries (payments-online-entries): the Online entries panel, its CSV and the player's own entry
+Object.assign(FR_TEXT, {"{n} of {x} paid": "{1} sur {2} payés", "Withdrew after paying": "Désistés après avoir payé", "Clear": "Effacer", "Payment received": "Paiement reçu", "Yes": "Oui"});
+Object.assign(LANG_TEXT.es, {"{n} of {x} paid": "{1} de {2} pagados", "Withdrew after paying": "Se retiraron después de pagar", "Clear": "Borrar", "Payment received": "Pago recibido", "Yes": "Sí"});
+Object.assign(LANG_TEXT.it, {"{n} of {x} paid": "{1} su {2} pagati", "Withdrew after paying": "Ritirati dopo aver pagato", "Clear": "Cancella", "Payment received": "Pagamento ricevuto", "Yes": "Sì"});
+Object.assign(LANG_TEXT.de, {"{n} of {x} paid": "{1} von {2} bezahlt", "Withdrew after paying": "Nach dem Bezahlen zurückgezogen", "Clear": "Entfernen", "Payment received": "Zahlung erhalten", "Yes": "Ja"});
+Object.assign(LANG_TEXT.nl, {"{n} of {x} paid": "{1} van {2} betaald", "Withdrew after paying": "Teruggetrokken na betaling", "Clear": "Wissen", "Payment received": "Betaling ontvangen", "Yes": "Ja"});
+Object.assign(LANG_TEXT.pt, {"{n} of {x} paid": "{1} de {2} pagos", "Withdrew after paying": "Desistiram depois de pagar", "Clear": "Limpar", "Payment received": "Pagamento recebido", "Yes": "Sim"});
+Object.assign(LANG_TEXT.th, {"{n} of {x} paid": "จ่ายแล้ว {1} จาก {2}", "Withdrew after paying": "ถอนตัวหลังจ่ายเงินแล้ว", "Clear": "ล้าง", "Payment received": "ได้รับเงินแล้ว", "Yes": "ใช่"});
 /* @@I18N-DATA-END */
 
 const LANGS = [["en", "English"], ["fr", "Français"], ["es", "Español"], ["it", "Italiano"], ["de", "Deutsch"], ["nl", "Nederlands"], ["pt", "Português"], ["th", "ไทย"]];
@@ -1734,7 +1743,14 @@ function localStore() {
     watchCalContacts(cid, cb) { const k = "ct:" + cid, f = () => cb(Object.fromEntries(Object.entries(data.ce?.[cid]?.contacts || {}).map(([id, x]) => [id, x?.contact || ""])));
       setTimeout(f); if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(f); return () => subsL.get(k).delete(f); },
     async acceptCalEntry(cid, eid) { const x = data.ce?.[cid]?.entries?.[eid]; if (!x) throw { code: "not-found" }; if (x.status === "pending") Object.assign(x, { status: "in", queuedAt: Date.now() }); persist(); this._ce(cid); },
-    async deleteCalEntries(cid) { if (data.ce?.[cid]) { delete data.ce[cid]; persist(); this._ce(cid); } },
+    async deleteCalEntries(cid) { if (data.ce?.[cid] || data.cp?.[cid]) { delete data.ce?.[cid]; delete data.cp?.[cid]; persist(); this._ce(cid); this._cp(cid); } },
+    // online entries marked as paid (payments-online-entries): data.cp[cid][eid] = { at, by, team }; the website keeps them in
+    // calendar/{cid}/payments/{eid}
+    watchCalPayments(cid, cb) { const k = "cp:" + cid, f = () => cb(clone(data.cp?.[cid] || {}));
+      setTimeout(f); if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(f); return () => subsL.get(k).delete(f); },
+    async getCalPayment(cid, eid) { const r = data.cp?.[cid]?.[eid]; return r ? clone(r) : null; },
+    async setCalPayment(cid, eid, rec) { const m = ((data.cp ||= {})[cid] ||= {}); if (rec) m[eid] = clone(rec); else delete m[eid]; if (!Object.keys(m).length) delete data.cp[cid]; persist(); this._cp(cid); },
+    _cp(cid) { setTimeout(() => (subsL.get("cp:" + cid) || new Set()).forEach(f => f())); },
     _ce(cid) { setTimeout(() => ["ce:", "ct:"].forEach(k => (subsL.get(k + cid) || new Set()).forEach(f => f()))); },
     // a listing's own flyer (poster-flyer): data.cf[cid] = { flyer, w, h, at }; the website keeps it in calendar/{cid}/media/flyer
     async getCalFlyer(cid) { return data.cf?.[cid] ? clone(data.cf[cid]) : null; },
@@ -1795,7 +1811,11 @@ function dbStore(db) {
     async deleteCalEntries(cid) {
       const ids = k => new Promise((res, rej) => { let u = null; u = db.collection(`calendar/${cid}/${k}`).limit(600).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => d.id)); }, rej); });
       const all = new Set(); for (const k of ["entries", "teams", "contacts"]) (await ids(k)).forEach(id => all.add(id));
-      for (const id of all) await this.withdrawCalEntry(cid, id); },
+      for (const id of all) await this.withdrawCalEntry(cid, id);
+      for (const id of await ids("payments").catch(() => [])) await this.setCalPayment(cid, id, null); },
+    watchCalPayments(cid, cb, onErr) { return db.collection(`calendar/${cid}/payments`).limit(600).onSnapshot(s => { const m = {}; s.docs.forEach(d => m[d.id] = clone(d.data())); cb(m); }, onErr); },
+    getCalPayment(cid, eid) { return new Promise((res, rej) => { let u = null; u = db.doc(`calendar/${cid}/payments/${eid}`).onSnapshot(d => { setTimeout(() => u && u()); res(d.exists ? clone(d.data()) : null); }, rej); }); },
+    setCalPayment(cid, eid, rec) { const ref = db.doc(`calendar/${cid}/payments/${eid}`); return rec ? ref.set(clone(rec)) : ref.delete(); },
     getCalFlyer(cid) { return new Promise((res, rej) => { let u = null; u = db.doc(`calendar/${cid}/media/flyer`).onSnapshot(d => { setTimeout(() => u && u()); res(d.exists ? clone(d.data()) : null); }, rej); }); },
     setCalFlyer(cid, f) { return db.doc(`calendar/${cid}/media/flyer`).set(clone(f)); },
     deleteCalFlyer(cid) { return db.doc(`calendar/${cid}/media/flyer`).delete(); },
@@ -4399,10 +4419,11 @@ function calEntWatch(e) {
   // the listing's organisers also read every team, and the contacts (calendar-entries-desk)
   const org = calOrg(e);
   if ((e.showEntrants || org) && !w.unsubT && S.store.watchCalTeams) w.unsubT = S.store.watchCalTeams(id, m => { if (P.ent !== w) return; w.teams = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
+  if (org && !w.unsubP && S.store.watchCalPayments) w.unsubP = S.store.watchCalPayments(id, m => { if (P.ent !== w) return; w.pay = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
   if (org && !w.unsubC && S.store.watchCalContacts) w.unsubC = S.store.watchCalContacts(id, m => { if (P.ent !== w) return; w.contacts = m; if (calOnPage()) calPaint(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
   return w;
 }
-function calEntStop() { const P = calPage(), w = P.ent; if (!w) return; w.unsub?.(); w.unsubT?.(); w.unsubC?.(); P.ent = null; S.calEntConfirm = null; S.calDeskConfirm = null; }
+function calEntStop() { const P = calPage(), w = P.ent; if (!w) return; w.unsub?.(); w.unsubT?.(); w.unsubC?.(); w.unsubP?.(); P.ent = null; S.calEntConfirm = null; S.calDeskConfirm = null; }
 // on the full listing: the places line and bar, Enter online, "Your entries" and "Who's entered"
 function calEntHtml(e) {
   if (!calEntOn() || !e.online || !calEntFmt(e.fmt)) return "";
@@ -4424,9 +4445,18 @@ function calMyEntHtml(e, w, q, open) {
     ${w.gone ? `<div class="notice small cal-ent-gone">This entry was withdrawn or removed.</div>` : ""}
     ${mine.map(x => { const nm = calTeamName(w.teams?.[x.id]) || rec[x.id] || "";
       return `<div class="cal-ent-row stack" data-eid="${esc(x.id)}" style="gap:4px"><div><b data-notr>${esc(nm)}</b></div><div class="small cal-ent-state">${esc(calEntState(x, q))}</div>
+        ${calMyPaid(w, id, x.id) ? `<div class="small cal-ent-paid">${CI_TICK}<span>Payment received</span></div>` : ""}
         <div class="row">${S.calEntConfirm === x.id ? `<span class="err">Withdraw this entry? Your place goes to the next team.</span>
           <button type="button" class="btn sm danger" data-act="cal-ent-withdraw-yes" data-id="${esc(id)}" data-eid="${esc(x.id)}"><span data-notr>${esc(trAs("Withdraw my entry", "Withdraw"))}</span></button><button type="button" class="btn sm" data-act="cal-ent-keep">Keep it</button>`
           : `${open ? `<button type="button" class="btn sm" data-act="cal-ent-edit" data-id="${esc(id)}" data-eid="${esc(x.id)}">Edit</button>` : ""}${calIcsBtn(e)}<button type="button" class="btn sm" data-act="cal-ent-withdraw" data-eid="${esc(x.id)}"><span data-notr>${esc(trAs("Withdraw my entry", "Withdraw"))}</span></button>`}</div></div>`; }).join("")}</div>`;
+}
+// "Payment received" on this device's own entry (payments-online-entries): from the organisers' list when this device is one
+// of them, else this entry's own payment document, read once each time the listing opens (never the whole list)
+function calMyPaid(w, cid, eid) {
+  if (w.pay) return !!w.pay[eid];
+  const m = w.myPay ||= {};
+  if (!(eid in m) && S.store.getCalPayment) { m[eid] = false; S.store.getCalPayment(cid, eid).then(r => { if (calPage().ent !== w || !r) return; m[eid] = true; if (calOnPage()) calPaint(); }, () => {}); }
+  return !!m[eid];
 }
 // the teams in queue order, then the waiting list; entries waiting for approval aren't listed
 function calWhoHtml(w, q) {
@@ -4520,18 +4550,21 @@ function calContactHtml(c) {
 const calTeamSub = tm => { const name = String(tm?.name || "").trim(), ps = (tm?.players || []).filter(Boolean);
   return [ps.length > 1 && name ? ps.join(", ") : "", tm?.club || ""].filter(Boolean).join(" · "); }; // players, unless they're already the name
 function calDeskHtml(e, w, q) {
-  if (!w.list.length) return "";
-  const id = calId(e), rows = calDeskOrder(q);
+  const id = calId(e), rows = calDeskOrder(q), pay = w.pay, gone = pay ? Object.keys(pay).filter(eid => !w.list.some(x => x.id === eid)) : [];
+  if (!w.list.length && !gone.length) return "";
+  const sum = calDeskSum(q); if (pay) sum.push(`${w.list.filter(x => pay[x.id]).length} of ${w.list.length} paid`);
   return `<section class="cal-desk stack" style="gap:8px"><h4>Online entries</h4>
-    <div class="small cal-desk-sum">${calDeskSum(q).map(x => `<span>${esc(x)}</span>`).join(" · ")}</div>
+    <div class="small cal-desk-sum">${sum.map(x => `<span>${esc(x)}</span>`).join(" · ")}</div>
     <ol class="cal-desk-list">${rows.map(x => { const tm = w.teams?.[x.id], sub = calTeamSub(tm), lab = calDeskLabel(x, q);
       return `<li class="cal-desk-row${x.status !== "in" ? " pending" : ""}" data-eid="${esc(x.id)}"><span class="cal-desk-n${/^\d+$/.test(lab) ? "" : " pill"}">${esc(lab)}</span>
         <div class="cal-desk-main stack" style="gap:2px"><b data-notr>${esc(calTeamName(tm) || "…")}</b>${sub ? `<span class="small muted" data-notr>${esc(sub)}</span>` : ""}
           <span class="small cal-desk-meta">${calContactHtml(w.contacts?.[x.id])}${w.contacts?.[x.id] ? " · " : ""}<span class="muted" data-notr>${esc(calSent(x.at))}</span></span>
           <div class="row">${S.calDeskConfirm === x.id ? `<span class="err">Remove this entry? The team won't be told.</span>
             <button type="button" class="btn sm danger" data-act="cal-desk-remove-yes" data-id="${esc(id)}" data-eid="${esc(x.id)}">Remove</button><button type="button" class="btn sm" data-act="cal-desk-keep">Keep it</button>`
-            : `${x.status !== "in" ? `<button type="button" class="btn sm primary" data-act="cal-desk-accept" data-id="${esc(id)}" data-eid="${esc(x.id)}">Accept</button>` : ""}<button type="button" class="btn sm" data-act="cal-desk-remove" data-eid="${esc(x.id)}">Remove</button>`}</div></div></li>`; }).join("")}</ol>
-    ${S.downloads ? `<div><button type="button" class="btn sm" data-act="cal-desk-csv" data-id="${esc(id)}">Download the entries (CSV)</button></div>` : ""}</section>`;
+            : `${pay ? payBtn(!!pay[x.id], x.id, "cal-pay", `data-cid="${esc(id)}" data-eid="${esc(x.id)}"`) : ""}${x.status !== "in" ? `<button type="button" class="btn sm primary" data-act="cal-desk-accept" data-id="${esc(id)}" data-eid="${esc(x.id)}">Accept</button>` : ""}<button type="button" class="btn sm" data-act="cal-desk-remove" data-eid="${esc(x.id)}">Remove</button>`}</div></div></li>`; }).join("")}</ol>
+    ${gone.length ? `<div class="cal-pay-gone stack" style="gap:6px"><h4>Withdrew after paying</h4>${gone.map(eid => `<div class="row cal-pay-gone-row" data-eid="${esc(eid)}"><b data-notr>${esc(pay[eid].team || "…")}</b>
+      <button type="button" class="btn sm" data-act="cal-pay-clear" data-cid="${esc(id)}" data-eid="${esc(eid)}">Clear</button></div>`).join("")}</div>` : ""}
+    ${S.downloads && w.list.length ? `<div><button type="button" class="btn sm" data-act="cal-desk-csv" data-id="${esc(id)}">Download the entries (CSV)</button></div>` : ""}</section>`;
 }
 // Accept (on the listing, or in Registration): the entry joins the queue now
 async function calDeskAccept(cid, eid) {
@@ -4543,13 +4576,29 @@ async function calDeskRemove(cid, eid) {
   try { await S.store.withdrawCalEntry(cid, eid); S.calDeskConfirm = null; calPaint(); }
   catch (err) { console.error(err); toast("That didn't save. Check your connection and try again."); }
 }
+// Paid on the Online entries panel (payments-online-entries): one tap either way, with Undo. The payment names the team as it
+// was then, so "Withdrew after paying" can still name it after its entry has gone. A competition's team that came from this
+// entry (calEntry) is ticked in Registration too.
+async function calPaySet(cid, eid, on, undo = true) {
+  const w = calPage().ent?.cid === cid ? calPage().ent : null;
+  const team = String(calTeamName(w?.teams?.[eid]) || w?.pay?.[eid]?.team || "").slice(0, 60);
+  const rec = on ? { at: Date.now(), by: S.store.uid?.() || "", team } : null;
+  if (w?.pay) { if (rec) w.pay[eid] = rec; else delete w.pay[eid]; } if (calOnPage()) calPaint();
+  const ok = await guard(async () => { await S.store.setCalPayment(cid, eid, rec); return true; }); if (!ok) return;
+  const t = S.tournaments[cid], ent = t && entities(t).find(x => x.calEntry === eid);
+  if (ent && S.store.setPayment && calCan(t)) {
+    const r2 = rec && { at: rec.at, by: rec.by };
+    try { await S.store.setPayment(cid, ent.id, r2); if (S.payW?.tid === cid) { if (r2) S.payW.paid[ent.id] = r2; else delete S.payW.paid[ent.id]; } } catch (err) { console.warn("registration payment", err); }
+  }
+  if (undo) toast(on ? "Marked as paid." : "Marked as not paid.", () => calPaySet(cid, eid, !on, false));
+}
 // a date and time a spreadsheet can sort: 2026-11-19 14:05
 const calStamp = ms => { if (!ms) return ""; const d = new Date(ms), p = n => String(n).padStart(2, "0"); return `${calYmd(ms)} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 async function calDeskCsv(cid) {
   const e = calFind(cid), w = calPage().ent; if (!e || !w?.list || w.cid !== cid || !S.downloads) return;
-  const q = calQueue(e, w.list), rows = [["Number", "Status", "Team", "Players", "Club", "Contact", "Sent"].map(tr)];
+  const q = calQueue(e, w.list), rows = [["Number", "Status", "Team", "Players", "Club", "Contact", "Sent", "Paid"].map(tr)];
   calDeskOrder(q).forEach(x => { const tm = w.teams?.[x.id] || {};
-    rows.push([x.status === "in" ? q.pos[x.id] : "", tr(calPlaced(x, q) ? "With a place" : calDeskLabel(x, q)), calTeamName(tm), (tm.players || []).filter(Boolean).join(", "), tm.club || "", w.contacts?.[x.id] || "", calStamp(x.at)]); });
+    rows.push([x.status === "in" ? q.pos[x.id] : "", tr(calPlaced(x, q) ? "With a place" : calDeskLabel(x, q)), calTeamName(tm), (tm.players || []).filter(Boolean).join(", "), tm.club || "", w.contacts?.[x.id] || "", calStamp(x.at), w.pay?.[x.id] ? tr("Yes") : ""]); });
   await csvSave(`${e.name || ""} · ${tr("Online entries")}`, csvText(rows, true));
 }
 // the question before a listing goes: how many online entries go with it (read once, from the server where there is one)
@@ -4562,7 +4611,7 @@ function calRemoveAsk(cid, done) {
 const calRemoveQ = n => !n ? "Take it off the Season Calendar?" : n === 1 ? "Remove the listing and its online entry? Contact details are deleted too." : `Remove the listing and its ${n} online entries? Contact details are deleted too.`;
 // Registration
 const calRegOn = t => { const e = t && S.cal?.[t.id]; return !!(e && calEntOn() && e.online && calEntFmt(e.fmt) && canEdit() && calCan(t)); };
-function calRegStop() { const r = S.calReg; if (!r) return; r.unsub?.(); r.unsubT?.(); S.calReg = null; }
+function calRegStop() { const r = S.calReg; if (!r) return; r.unsub?.(); r.unsubT?.(); r.unsubP?.(); S.calReg = null; }
 function calRegWatch(t) {
   let r = S.calReg; if (r && r.cid === t.id && r.store === S.store) return r;
   calRegStop(); r = S.calReg = { cid: t.id, store: S.store, list: null, teams: null, server: false };
@@ -4570,6 +4619,8 @@ function calRegWatch(t) {
   else r.unsub = S.store.watchCalEntries(t.id, (list, meta) => { if (S.calReg !== r) return; r.list = list; r.server = !meta?.fromCache; render(); }, err => { console.error(err); if (S.calReg === r) { r.list = []; render(); } });
   if (!S.store.watchCalTeams) r.teams = {};
   else r.unsubT = S.store.watchCalTeams(t.id, m => { if (S.calReg !== r) return; r.teams = m; render(); }, err => { if (err?.code !== "permission-denied") console.error(err); if (S.calReg === r) { r.teams = {}; render(); } });
+  // the entries' payments, so a paid entry arrives in Registration paid
+  if (S.store.watchCalPayments) r.unsubP = S.store.watchCalPayments(t.id, m => { if (S.calReg !== r) return; r.pay = m; }, err => { if (err?.code !== "permission-denied") console.error(err); });
   return r;
 }
 // above the Teams (or Players) list
@@ -4593,14 +4644,18 @@ const calRegPill = (t, e) => { const r = S.calReg; return e.calEntry && r?.cid =
 // copy entries into the competition, not checked in: names and club only, each entry once
 async function calRegAdd(eids) {
   const t0 = T(), r = S.calReg; if (!t0 || !r || r.cid !== t0.id || !r.teams || S.calRegBusy || !calRegOn(t0)) return;
-  const t = clone(t0), list = entities(t), size = SIZE[t.format] || 1; let n = 0;
+  const t = clone(t0), list = entities(t), size = SIZE[t.format] || 1, added = []; let n = 0;
   eids.forEach(eid => { const tm = r.teams[eid]; if (!tm || list.some(x => x.calEntry === eid)) return;
     const ps = (tm.players || []).map(v => String(v || "").trim()).filter(Boolean), name = String(tm.name || "").trim(), club = String(tm.club || "").trim();
     if (isIndiv(t)) list.push(Object.assign({ id: "p" + uid(), name: ps[0] || name, active: true, calEntry: eid }, club ? { club } : {}));
     else list.push({ id: "e" + uid(), name: ps.length === 1 && name === ps[0] ? "" : name, players: Array.from({ length: size }, (_, i) => ps[i] || ""), club, active: true, calEntry: eid });
-    n++; });
+    added.push(list[list.length - 1]); n++; });
   if (!n) return;
-  S.calRegBusy = true; try { await guard(() => saveT(t)); } finally { S.calRegBusy = false; }
+  let ok = false; S.calRegBusy = true; try { ok = await guard(async () => { await saveT(t); return true; }); } finally { S.calRegBusy = false; }
+  // an entry already paid online arrives paid (payments-online-entries)
+  if (ok && S.store.setPayment) for (const x of added) { const p = r.pay?.[x.calEntry]; if (!p) continue; const rec = { at: p.at || Date.now(), by: p.by || "" };
+    if (S.payW?.tid === t.id) S.payW.paid[x.id] = rec; await guard(() => S.store.setPayment(t.id, x.id, rec)); }
+  if (ok && added.some(x => r.pay?.[x.calEntry])) render();
 }
 /* ---------------- Poster maker (poster-maker): a poster for a Season Calendar listing ---------------- */
 // The listing's organisers (and the admin) make a PNG from the listing in a few taps: a size, a layout (POSTER_LAYOUTS,
@@ -6632,7 +6687,7 @@ function payListen(w) {
     if (S.payW !== w) return; w.tries++;
     setTimeout(() => { if (S.payW === w && canEdit()) { w.unsub?.(); payListen(w); } }, Math.min(30000, 1500 * w.tries)); });
 }
-const payBtn = (on, id, act = "pay") => `<button type="button" class="btn pay ${on ? "paid" : ""}" data-act="${act}" data-id="${esc(id)}" aria-pressed="${!!on}">${on ? `${CI_TICK}<span>Paid</span>` : "Not paid"}</button>`;
+const payBtn = (on, id, act = "pay", attrs = "") => `<button type="button" class="btn pay ${on ? "paid" : ""}" data-act="${act}" data-id="${esc(id)}" ${attrs} aria-pressed="${!!on}">${on ? `${CI_TICK}<span>Paid</span>` : "Not paid"}</button>`;
 // the summary over the list (entries not withdrawn), with the "Not paid" chip that shows only those still to pay
 function paySum(t, paid) {
   const live = entities(t).filter(e => e.active !== false), n = live.filter(e => paid[e.id]).length, only = !!S.payOnly?.[t.id];
@@ -6645,8 +6700,17 @@ async function paySet(t, id, on, undo = true) {
   if (w) { if (rec) w.paid[id] = rec; else delete w.paid[id]; } render(); // shown at once; the store's answer follows
   const ok = await guard(async () => { await S.store.setPayment(t.id, id, rec); return true; });
   if (!ok) return false;
+  await payToEntry(t, id, rec);
   if (undo) toast(on ? "Marked as paid." : "Marked as not paid.", async () => { await paySet(t, id, !on, false); });
   return true;
+}
+// a team that came from an online entry (payments-online-entries): its entry, while it's still there, says the same, so the
+// player's "Payment received" stays right
+async function payToEntry(t, id, rec) {
+  const e = entities(t).find(x => x.id === id), r = S.calReg;
+  if (!e?.calEntry || !S.store.setCalPayment || r?.cid !== t.id || !r.list?.some(x => x.id === e.calEntry)) return;
+  const team = String(calTeamName(r.teams?.[e.calEntry]) || entName(t, id) || "").slice(0, 60);
+  try { await S.store.setCalPayment(t.id, e.calEntry, rec && { at: rec.at, by: rec.by, team }); } catch (err) { console.warn("entry payment", err); }
 }
 const checkinAllBtn = t => t.checkin && canEdit() && !t.draws.length && enteredIds(t).length > activeIds(t).length ? `<button type="button" class="btn primary ci-all" data-act="checkin-all">${CI_TICK}Check in everyone</button>` : "";
 function renderEntries(t) {
@@ -7459,6 +7523,8 @@ document.addEventListener("click", async e => {
     case "cal-ent-withdraw-yes": await calEntWithdraw(a.dataset.id, a.dataset.eid); break;
     case "cal-desk-remove": S.calDeskConfirm = a.dataset.eid; calPaint(); break;
     case "cal-desk-keep": S.calDeskConfirm = null; calPaint(); break;
+    case "cal-pay": { const w = calPage().ent; if (!w || w.cid !== a.dataset.cid || !w.pay) break; await calPaySet(a.dataset.cid, a.dataset.eid, !w.pay[a.dataset.eid]); break; }
+    case "cal-pay-clear": await calPaySet(a.dataset.cid, a.dataset.eid, false, false); break;
     case "cal-desk-remove-yes": { const e2 = calFind(a.dataset.id); if (calOrg(e2)) await calDeskRemove(a.dataset.id, a.dataset.eid); break; }
     case "cal-desk-accept": { const id = a.dataset.id, e2 = calFind(id), t2 = S.tournaments[id]; if (calOrg(e2) || (t2 && T()?.id === id && calRegOn(t2))) await calDeskAccept(id, a.dataset.eid); break; }
     case "cal-desk-csv": await calDeskCsv(a.dataset.id); break;
