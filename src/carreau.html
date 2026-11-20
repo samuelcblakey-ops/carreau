@@ -6448,11 +6448,15 @@ const CI_RING = `<svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill
 // who has paid in this competition, by team (or player) id: { id: { at, by } }; starts watching the first time it's asked
 function payOf(t) {
   if (!t || !canEdit() || !S.store.watchPayments) return {};
-  if (S.payW?.tid !== t.id) {
-    S.payW?.unsub?.(); const w = S.payW = { tid: t.id, paid: {} };
-    w.unsub = S.store.watchPayments(t.id, m => { if (S.payW !== w) return; w.paid = m || {}; render(); }, err => { if (err?.code !== "permission-denied") console.error(err); });
-  }
+  if (S.payW?.tid !== t.id || S.payW.store !== S.store) { S.payW?.unsub?.(); S.payW = { tid: t.id, store: S.store, paid: {}, tries: 0 }; payListen(S.payW); }
   return S.payW.paid;
+}
+// a refusal (a new competition not on the server yet, an organiser link still joining) or a cut-off ends a listener: try again shortly
+function payListen(w) {
+  w.unsub = w.store.watchPayments(w.tid, m => { if (S.payW !== w) return; w.paid = m || {}; w.tries = 0; render(); }, err => {
+    if (err?.code !== "permission-denied") console.error(err);
+    if (S.payW !== w) return; w.tries++;
+    setTimeout(() => { if (S.payW === w && canEdit()) { w.unsub?.(); payListen(w); } }, Math.min(30000, 1500 * w.tries)); });
 }
 const payBtn = (on, id, act = "pay") => `<button type="button" class="btn pay ${on ? "paid" : ""}" data-act="${act}" data-id="${esc(id)}" aria-pressed="${!!on}">${on ? `${CI_TICK}<span>Paid</span>` : "Not paid"}</button>`;
 // the summary over the list (entries not withdrawn), with the "Not paid" chip that shows only those still to pay
