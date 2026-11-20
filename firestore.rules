@@ -371,6 +371,19 @@ service cloud.firestore {
           && request.resource.data.code == get(/databases/$(database)/documents/calendar/$(cid)/private/code).data.get('code', '#');
         allow delete: if signedIn() && (request.auth.uid == uid || isAdmin() || evOrgOf(cid));
       }
+      // the listing's own flyer (poster-flyer): one document, "flyer", a JPEG or WebP data URL under 700,000 characters, public
+      // like the listing (hidden with it), added and removed by the listing's organisers and removed by the admin. No list.
+      match /media/{m} {
+        allow get: if m == 'flyer' && (isAdmin() || calOrganiser(cid) || (exists(cdoc(cid)) && get(cdoc(cid)).data.get('hidden', false) != true));
+        allow create, update: if m == 'flyer' && (isAdmin() || calOrganiser(cid)) && exists(cdoc(cid))
+          && request.resource.data.keys().hasOnly(['flyer', 'w', 'h', 'at'])
+          && request.resource.data.flyer is string && request.resource.data.flyer.size() < 700000
+          && request.resource.data.flyer.matches('data:image/(jpeg|webp);base64,[A-Za-z0-9+/=]+')
+          && request.resource.data.w is int && request.resource.data.w > 0 && request.resource.data.w <= 2000
+          && request.resource.data.h is int && request.resource.data.h > 0 && request.resource.data.h <= 2000
+          && request.resource.data.at is int;
+        allow delete: if m == 'flyer' && (isAdmin() || calOrganiser(cid));
+      }
     }
     // SN Pétanque Academy (academy.snpetanque.com): one document per player, keyed by their uid, with their results underneath.
     // A player reads and writes only their own; the admin can read everyone's (the Academy admin page).

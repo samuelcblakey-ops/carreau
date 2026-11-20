@@ -201,13 +201,17 @@ function fbStore() {
       const refs = [...ids].flatMap(id => subs.map(k => doc(db, "calendar", cid, k, id)));
       for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await track(b.commit()); }
     },
+    // a listing's own flyer (poster-flyer): one document, calendar/{cid}/media/flyer, read once when the full listing opens
+    getCalFlyer(cid) { return getDocFromServer(doc(db, "calendar", cid, "media", "flyer")).then(d => d.exists() ? d.data() : null); },
+    setCalFlyer(cid, f) { return track(setDoc(doc(db, "calendar", cid, "media", "flyer"), clone(f))); },
+    deleteCalFlyer(cid) { return track(deleteDoc(doc(db, "calendar", cid, "media", "flyer"))); },
     // the admin's clean-up (calendar-cleanup): every listing, hidden ones included (the rules let only the admin list them all)
     listAllCal() { return getDocs(collection(db, "calendar")).then(s => s.docs.map(d => Object.assign(d.data(), { cid: d.id }))); },
-    // a listing with everything under it: entries, teams, contacts, members and the private code in batches of up to 450,
-    // then the listing last, so a failure part-way never leaves entries without their listing ("private" can't be listed:
-    // its only document is "code")
+    // a listing with everything under it: entries, teams, contacts, members, the private code and the flyer in batches of up
+    // to 450, then the listing last, so a failure part-way never leaves entries without their listing ("private" and "media"
+    // can't be listed: their only documents are "code" and "flyer")
     async purgeCal(cid) {
-      const refs = [doc(db, "calendar", cid, "private", "code")];
+      const refs = [doc(db, "calendar", cid, "private", "code"), doc(db, "calendar", cid, "media", "flyer")];
       for (const k of ["entries", "teams", "contacts", "members"]) (await getDocs(collection(db, "calendar", cid, k))).docs.forEach(d => refs.push(d.ref));
       for (let i = 0; i < refs.length; i += 450) { const b = writeBatch(db); refs.slice(i, i + 450).forEach(r => b.delete(r)); await track(b.commit()); }
       await track(deleteDoc(doc(db, "calendar", cid)));

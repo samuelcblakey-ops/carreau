@@ -470,6 +470,15 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .poster-sub{font-weight:600;font-size:14px;margin-top:2px}.poster-spons{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:8px}
 .poster-spon{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 5px 5px 6px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .poster-logo-thumb{flex:none;width:72px;height:44px;background:#fff;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}.poster-own{align-items:center}
+/* Season Calendar: a listing's own flyer (poster-flyer): on the full listing at most 360 px wide (full width on a phone), and its
+   thumbnail in the poster sheet with the QR code's box (22% of the width) shown in the chosen corner */
+.cal-flyer{display:block;width:100%;max-width:360px;padding:0;border:0;background:none;cursor:zoom-in;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.cal-flyer img{display:block;width:100%;height:auto}
+@media (max-width:560px){.cal-flyer{max-width:none}}
+.poster-flyer-thumb{position:relative;width:132px;flex:none;line-height:0;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}.poster-flyer-thumb img{width:100%;height:auto}
+.poster-flyer-qr{position:absolute;width:22%;aspect-ratio:1;background:#fff;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+.poster-flyer-qr.br{right:3%;bottom:3%}.poster-flyer-qr.bl{left:3%;bottom:3%}.poster-flyer-qr.tr{right:3%;top:3%}.poster-flyer-qr.tl{left:3%;top:3%}
+.poster-flyer-row{align-items:flex-start;flex-wrap:wrap}
 @media (max-width:560px){.cal-facts{grid-template-columns:1fr;gap:2px}.cal-facts dd{margin-bottom:6px}.cal-row{gap:10px;padding:9px 10px}.cal-date{width:52px}}
 /* Hall of Fame: the header link, the start-screen card and the page */
 .hof-btn,.cal-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;flex:none;white-space:nowrap}
@@ -1390,6 +1399,13 @@ Object.assign(LANG_TEXT.de, {"Logos": "Logos", "Your logo": "Dein Logo", "Choose
 Object.assign(LANG_TEXT.nl, {"Logos": "Logo's", "Your logo": "Je logo", "Choose a logo": "Kies een logo", "Sponsors": "Sponsors", "Add a sponsor logo": "Sponsorlogo toevoegen", "Show the sponsors": "Sponsors tonen", "With thanks to our sponsors": "Met dank aan onze sponsors", "You can add up to {n} sponsor logos.": "Je kunt tot {1} sponsorlogo's toevoegen."});
 Object.assign(LANG_TEXT.pt, {"Logos": "Logótipos", "Your logo": "O seu logótipo", "Choose a logo": "Escolher um logótipo", "Sponsors": "Patrocinadores", "Add a sponsor logo": "Adicionar o logótipo de um patrocinador", "Show the sponsors": "Mostrar os patrocinadores", "With thanks to our sponsors": "Obrigado aos nossos patrocinadores", "You can add up to {n} sponsor logos.": "Pode adicionar até {1} logótipos de patrocinadores."});
 Object.assign(LANG_TEXT.th, {"Logos": "โลโก้", "Your logo": "โลโก้ของคุณ", "Choose a logo": "เลือกโลโก้", "Sponsors": "ผู้สนับสนุน", "Add a sponsor logo": "เพิ่มโลโก้ผู้สนับสนุน", "Show the sponsors": "แสดงผู้สนับสนุน", "With thanks to our sponsors": "ขอขอบคุณผู้สนับสนุนของเรา", "You can add up to {n} sponsor logos.": "เพิ่มโลโก้ผู้สนับสนุนได้สูงสุด {1} รายการ"});
+Object.assign(FR_TEXT, {"Your own flyer": "Votre propre affiche", "Add your flyer": "Ajouter votre affiche", "Flyer added. It shows on your listing.": "Affiche ajoutée. Elle apparaît sur votre annonce.", "Replace": "Remplacer", "Take the flyer off your listing?": "Retirer l'affiche de votre annonce ?", "Flyer removed.": "Affiche retirée.", "Download with our QR code": "Télécharger avec notre QR code", "Share with our QR code": "Partager avec notre QR code", "Bottom right": "En bas à droite", "Bottom left": "En bas à gauche", "Top right": "En haut à droite", "Top left": "En haut à gauche", "Copy a full-flyer prompt for ChatGPT": "Copier une consigne d'affiche complète pour ChatGPT", "Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.": "Vérifiez chaque détail de votre affiche avant de la partager. Les outils d'IA peuvent se tromper sur les dates, les noms et les chiffres.", "Flyer for {x}": "Affiche de {1}", "Only this listing's organisers can add a flyer.": "Seuls les organisateurs de cette annonce peuvent ajouter une affiche.", "Remove the flyer": "Retirer l'affiche"});
+Object.assign(LANG_TEXT.es, {"Your own flyer": "Tu propio cartel", "Add your flyer": "Añadir tu cartel", "Flyer added. It shows on your listing.": "Cartel añadido. Aparece en tu anuncio.", "Replace": "Sustituir", "Take the flyer off your listing?": "¿Quitar el cartel de tu anuncio?", "Flyer removed.": "Cartel quitado.", "Download with our QR code": "Descargar con nuestro código QR", "Share with our QR code": "Compartir con nuestro código QR", "Bottom right": "Abajo a la derecha", "Bottom left": "Abajo a la izquierda", "Top right": "Arriba a la derecha", "Top left": "Arriba a la izquierda", "Copy a full-flyer prompt for ChatGPT": "Copiar una instrucción de cartel completo para ChatGPT", "Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.": "Revisa cada detalle de tu cartel antes de compartirlo. Las herramientas de IA pueden equivocarse con fechas, nombres y números.", "Flyer for {x}": "Cartel de {1}", "Only this listing's organisers can add a flyer.": "Solo los organizadores de este anuncio pueden añadir un cartel.", "Remove the flyer": "Quitar el cartel"});
+Object.assign(LANG_TEXT.it, {"Your own flyer": "La tua locandina", "Add your flyer": "Aggiungi la tua locandina", "Flyer added. It shows on your listing.": "Locandina aggiunta. Appare nel tuo annuncio.", "Replace": "Sostituisci", "Take the flyer off your listing?": "Togliere la locandina dal tuo annuncio?", "Flyer removed.": "Locandina rimossa.", "Download with our QR code": "Scarica con il nostro codice QR", "Share with our QR code": "Condividi con il nostro codice QR", "Bottom right": "In basso a destra", "Bottom left": "In basso a sinistra", "Top right": "In alto a destra", "Top left": "In alto a sinistra", "Copy a full-flyer prompt for ChatGPT": "Copia un prompt per una locandina completa per ChatGPT", "Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.": "Controlla ogni dettaglio della locandina prima di condividerla. Gli strumenti di IA possono sbagliare date, nomi e numeri.", "Flyer for {x}": "Locandina di {1}", "Only this listing's organisers can add a flyer.": "Solo gli organizzatori di questo annuncio possono aggiungere una locandina.", "Remove the flyer": "Rimuovi la locandina"});
+Object.assign(LANG_TEXT.de, {"Your own flyer": "Dein eigenes Plakat", "Add your flyer": "Plakat hinzufügen", "Flyer added. It shows on your listing.": "Plakat hinzugefügt. Es erscheint in deinem Eintrag.", "Replace": "Ersetzen", "Take the flyer off your listing?": "Plakat aus deinem Eintrag entfernen?", "Flyer removed.": "Plakat entfernt.", "Download with our QR code": "Mit unserem QR-Code herunterladen", "Share with our QR code": "Mit unserem QR-Code teilen", "Bottom right": "Unten rechts", "Bottom left": "Unten links", "Top right": "Oben rechts", "Top left": "Oben links", "Copy a full-flyer prompt for ChatGPT": "Prompt für ein komplettes Plakat für ChatGPT kopieren", "Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.": "Prüfe jedes Detail auf deinem Plakat, bevor du es teilst. KI-Tools können Daten, Namen und Zahlen falsch wiedergeben.", "Flyer for {x}": "Plakat für {1}", "Only this listing's organisers can add a flyer.": "Nur die Organisatoren dieses Eintrags können ein Plakat hinzufügen.", "Remove the flyer": "Plakat entfernen"});
+Object.assign(LANG_TEXT.nl, {"Your own flyer": "Je eigen poster", "Add your flyer": "Je poster toevoegen", "Flyer added. It shows on your listing.": "Poster toegevoegd. Hij staat bij je vermelding.", "Replace": "Vervangen", "Take the flyer off your listing?": "Poster van je vermelding halen?", "Flyer removed.": "Poster verwijderd.", "Download with our QR code": "Downloaden met onze QR-code", "Share with our QR code": "Delen met onze QR-code", "Bottom right": "Rechtsonder", "Bottom left": "Linksonder", "Top right": "Rechtsboven", "Top left": "Linksboven", "Copy a full-flyer prompt for ChatGPT": "Prompt voor een complete poster kopiëren voor ChatGPT", "Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.": "Controleer elk detail op je poster voordat je hem deelt. AI-tools kunnen datums, namen en getallen verkeerd hebben.", "Flyer for {x}": "Poster voor {1}", "Only this listing's organisers can add a flyer.": "Alleen de organisatoren van deze vermelding kunnen een poster toevoegen.", "Remove the flyer": "Poster verwijderen"});
+Object.assign(LANG_TEXT.pt, {"Your own flyer": "O seu próprio cartaz", "Add your flyer": "Adicionar o seu cartaz", "Flyer added. It shows on your listing.": "Cartaz adicionado. Aparece no seu anúncio.", "Replace": "Substituir", "Take the flyer off your listing?": "Retirar o cartaz do seu anúncio?", "Flyer removed.": "Cartaz retirado.", "Download with our QR code": "Descarregar com o nosso código QR", "Share with our QR code": "Partilhar com o nosso código QR", "Bottom right": "Em baixo à direita", "Bottom left": "Em baixo à esquerda", "Top right": "Em cima à direita", "Top left": "Em cima à esquerda", "Copy a full-flyer prompt for ChatGPT": "Copiar um pedido de cartaz completo para o ChatGPT", "Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.": "Verifique cada detalhe do seu cartaz antes de o partilhar. As ferramentas de IA podem errar datas, nomes e números.", "Flyer for {x}": "Cartaz de {1}", "Only this listing's organisers can add a flyer.": "Só os organizadores deste anúncio podem adicionar um cartaz.", "Remove the flyer": "Retirar o cartaz"});
+Object.assign(LANG_TEXT.th, {"Your own flyer": "ใบปลิวของคุณเอง", "Add your flyer": "เพิ่มใบปลิวของคุณ", "Flyer added. It shows on your listing.": "เพิ่มใบปลิวแล้ว แสดงอยู่ในรายการของคุณ", "Replace": "แทนที่", "Take the flyer off your listing?": "นำใบปลิวออกจากรายการของคุณไหม", "Flyer removed.": "นำใบปลิวออกแล้ว", "Download with our QR code": "ดาวน์โหลดพร้อมคิวอาร์โค้ดของเรา", "Share with our QR code": "แชร์พร้อมคิวอาร์โค้ดของเรา", "Bottom right": "ล่างขวา", "Bottom left": "ล่างซ้าย", "Top right": "บนขวา", "Top left": "บนซ้าย", "Copy a full-flyer prompt for ChatGPT": "คัดลอกคำสั่งทำใบปลิวทั้งใบสำหรับ ChatGPT", "Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.": "ตรวจสอบทุกรายละเอียดบนใบปลิวก่อนแชร์ เครื่องมือ AI อาจใส่วันที่ ชื่อ และตัวเลขผิดได้", "Flyer for {x}": "ใบปลิวของ {1}", "Only this listing's organisers can add a flyer.": "เฉพาะผู้จัดของรายการนี้เท่านั้นที่เพิ่มใบปลิวได้", "Remove the flyer": "นำใบปลิวออก"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -1628,6 +1644,10 @@ function localStore() {
     async acceptCalEntry(cid, eid) { const x = data.ce?.[cid]?.entries?.[eid]; if (!x) throw { code: "not-found" }; if (x.status === "pending") Object.assign(x, { status: "in", queuedAt: Date.now() }); persist(); this._ce(cid); },
     async deleteCalEntries(cid) { if (data.ce?.[cid]) { delete data.ce[cid]; persist(); this._ce(cid); } },
     _ce(cid) { setTimeout(() => ["ce:", "ct:"].forEach(k => (subsL.get(k + cid) || new Set()).forEach(f => f()))); },
+    // a listing's own flyer (poster-flyer): data.cf[cid] = { flyer, w, h, at }; the website keeps it in calendar/{cid}/media/flyer
+    async getCalFlyer(cid) { return data.cf?.[cid] ? clone(data.cf[cid]) : null; },
+    async setCalFlyer(cid, f) { if (!data.cal[cid]) throw { code: "permission-denied" }; (data.cf ||= {})[cid] = clone(f); persist(); },
+    async deleteCalFlyer(cid) { if (data.cf?.[cid]) { delete data.cf[cid]; persist(); } },
     watchStreams(cb) { subsS.add(cb); emitS(); return () => subsS.delete(cb); },
     watchStream(sid, cb) { if (!subsS1.has(sid)) subsS1.set(sid, new Set()); subsS1.get(sid).add(cb); emitS(sid); return () => subsS1.get(sid).delete(cb); },
     async setStream(st) { data.s[st.id] = clone(st); persist(); emitS(st.id); },
@@ -1678,6 +1698,9 @@ function dbStore(db) {
       const ids = k => new Promise((res, rej) => { let u = null; u = db.collection(`calendar/${cid}/${k}`).limit(600).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => d.id)); }, rej); });
       const all = new Set(); for (const k of ["entries", "teams", "contacts"]) (await ids(k)).forEach(id => all.add(id));
       for (const id of all) await this.withdrawCalEntry(cid, id); },
+    getCalFlyer(cid) { return new Promise((res, rej) => { let u = null; u = db.doc(`calendar/${cid}/media/flyer`).onSnapshot(d => { setTimeout(() => u && u()); res(d.exists ? clone(d.data()) : null); }, rej); }); },
+    setCalFlyer(cid, f) { return db.doc(`calendar/${cid}/media/flyer`).set(clone(f)); },
+    deleteCalFlyer(cid) { return db.doc(`calendar/${cid}/media/flyer`).delete(); },
     watchStreams(cb, onErr) { return db.collection("streams").limit(200).onSnapshot(s => cb(s.docs.map(d => clone(d.data()))), onErr); },
     watchStream(sid, cb, onErr) { return db.doc(`streams/${sid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setStream(st) { return db.doc(`streams/${st.id}`).set(clone(st)); },
@@ -3731,7 +3754,7 @@ async function calAction(act, k) {
   }
 }
 async function calRemove(t) {
-  try { if (S.store.deleteCalEntries) await S.store.deleteCalEntries(t.id); await S.store.deleteCal(t.id); S.cal = S.cal || {}; S.cal[t.id] = null; calReset(); S.calConfirmRemove = null; render(); toast("Taken off the Season Calendar."); }
+  try { if (S.store.deleteCalFlyer) await S.store.deleteCalFlyer(t.id); if (S.store.deleteCalEntries) await S.store.deleteCalEntries(t.id); await S.store.deleteCal(t.id); if (S.calFlyer) delete S.calFlyer[t.id]; S.cal = S.cal || {}; S.cal[t.id] = null; calReset(); S.calConfirmRemove = null; render(); toast("Taken off the Season Calendar."); }
   catch (err) { console.error(err); toast(err?.code === "permission-denied" ? "Only this competition's organisers can list it." : "That didn't save. Check your connection and try again."); }
 }
 // archiving marks the listing gone, so the calendar doesn't link to it (restoring unmarks it); no listing is fine
@@ -3865,6 +3888,7 @@ function calCard(e, close) {
     ${calStNotice(e)}
     <div class="hof-where">${hofLabel(e.level)}<span class="small muted" data-notr>${esc([hofCountryName(e.country), e.region].filter(Boolean).join(" · "))}</span>${calStPill(e)}${calLivePill(e)}</div>
     <h3 data-notr>${esc(e.name)}</h3>
+    ${calFlyerHtml(e)}
     <dl class="cal-facts">
       ${fact("Date", esc(calDate(e, { weekday: "long", day: "numeric", month: "long", year: "numeric" })))}
       ${fact("Check-in from", esc(e.checkin || ""))}${fact("Play starts", esc(e.start || ""))}
@@ -3881,7 +3905,7 @@ function calCard(e, close) {
       ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === id ? S.calRemoveN.n : 0))}</span><button type="button" class="btn sm danger" data-act="cal-page-remove-yes" data-id="${esc(id)}">Remove</button><button type="button" class="btn sm" data-act="cal-page-remove-no">Keep it</button>`
       : `<button type="button" class="btn sm" data-act="cal-page-remove" data-id="${esc(id)}">Remove</button>`}` : posterCan(e) ? posterBtn(id) : ""}${close ? `<button type="button" class="btn sm ghost" data-act="cal-close-entry" data-id="${esc(id)}">Close</button>` : ""}</div>
     ${ev && org ? calOrgLinkBox(id) : ""}
-    ${calAdmin() ? `<div class="cal-admin spread"><span class="small"><b>Only you see this</b></span><button type="button" class="btn sm${e.hidden ? "" : " danger"}" data-act="cal-hide" data-id="${esc(id)}" data-on="${e.hidden ? "0" : "1"}">${e.hidden ? "Show again" : "Hide from the Season Calendar"}</button></div>` : ""}
+    ${calAdmin() ? `<div class="cal-admin spread"><span class="small"><b>Only you see this</b></span><div class="row">${calFlyerHas(id) ? `<button type="button" class="btn sm danger" data-act="cal-flyer-admin-remove" data-id="${esc(id)}">Remove the flyer</button>` : ""}<button type="button" class="btn sm${e.hidden ? "" : " danger"}" data-act="cal-hide" data-id="${esc(id)}" data-on="${e.hidden ? "0" : "1"}">${e.hidden ? "Show again" : "Hide from the Season Calendar"}</button></div></div>` : ""}
   </article>`;
 }
 /* Season Calendar 7 (calendar-share): Add to calendar (an .ics file), Open in Maps and Share on the full listing */
@@ -3993,7 +4017,7 @@ function calEdit(id) {
 }
 async function calPageRemove(id) {
   const ev = calFind(id)?.kind === "event";
-  try { if (S.store.deleteCalEntries) await S.store.deleteCalEntries(id); await (ev && S.store.deleteCalEvent ? S.store.deleteCalEvent(id) : S.store.deleteCal(id)); if (S.cal) S.cal[id] = null; S.calPageRemove = null; const P = calPage(); P.open = null; if (P.hl === id) P.hl = null; if (P.deepItem && calId(P.deepItem) === id) P.deepItem = null; calReset(); toast("Taken off the Season Calendar."); hofRedraw(); }
+  try { if (S.store.deleteCalFlyer) await S.store.deleteCalFlyer(id); if (S.store.deleteCalEntries) await S.store.deleteCalEntries(id); if (S.calFlyer) delete S.calFlyer[id]; await (ev && S.store.deleteCalEvent ? S.store.deleteCalEvent(id) : S.store.deleteCal(id)); if (S.cal) S.cal[id] = null; S.calPageRemove = null; const P = calPage(); P.open = null; if (P.hl === id) P.hl = null; if (P.deepItem && calId(P.deepItem) === id) P.deepItem = null; calReset(); toast("Taken off the Season Calendar."); hofRedraw(); }
   catch (err) { console.error(err); toast(err?.code === "permission-denied" ? (ev ? "Only this event's organisers can change it." : "Only this competition's organisers can list it.") : "That didn't save. Check your connection and try again."); }
 }
 // the admin hides a listing (it drops off the page at once) or shows it again; organisers can't (firestore.rules)
@@ -4554,8 +4578,9 @@ function posterPrompt(md) {
   const calm = md.layout === "bold" || md.layout === "band" ? "top half" : "whole centre", style = (POSTER_STYLES.find(x => x[0] === md.style) || POSTER_STYLES[0])[2]; // i18n-ok
   return `Create a background illustration for a poster advertising a pétanque competition. Shape: ${shape}. Style: ${style}. Use ${posterColourWord(md.main)} (${md.main}) and ${posterColourWord(md.second)} (${md.second}) as the main colours. Keep the ${calm} calm and uncluttered so text can go on top of it. Do not include any words, letters, numbers, logos, watermarks or QR codes. No recognisable real people, brands or famous landmarks.`; // i18n-ok
 }
-async function posterCopyPrompt(md) {
-  const text = md.copied = posterPrompt(md); let ok = false;
+const posterCopyPrompt = md => posterCopy(md, posterPrompt(md));
+async function posterCopy(md, text) {
+  md.copied = text; let ok = false;
   try { await navigator.clipboard.writeText(text); ok = true; } catch {}
   if (!ok) { const back = document.activeElement; try { const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
     document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); ta.remove(); } catch {} back?.focus?.(); }
@@ -4617,6 +4642,7 @@ function renderPosterModal(el) {
         ${tick("qr", "Show the QR code", md.qr)}
         <div class="row poster-btns"><button type="button" class="btn primary" data-act="poster-download">Download</button>${posterCanShare() ? `<button type="button" class="btn" data-act="poster-share">Share</button>` : ""}${print ? `<button type="button" class="btn" data-act="poster-print">Print</button>` : ""}<button type="button" class="btn" data-act="close">Close</button></div>
         <p class="small muted">Check the details before you share it. Change them in the listing, not here.</p>
+        ${posterFlyerHtml(md, e)}
       </div>
     </div>
   </div></div>`;
@@ -4644,6 +4670,7 @@ function posterInput(el) {
   else if (k === "pic") { posterPick(el); return; }
   else if (k === "own") { posterOwnPick(el); return; }
   else if (k === "sponsor") { posterSponsorPick(el); return; }
+  else if (k === "flyer") { posterFlyerPick(el); return; }
   else return;
   posterSave(md); posterSoon();
 }
@@ -4665,6 +4692,13 @@ async function posterAction(act, k) {
   else if (act === "poster-download") { await posterDownload(md); return; }
   else if (act === "poster-share") { await posterShare(md); return; }
   else if (act === "poster-print") { await posterPrint(md); return; }
+  else if (act === "poster-flyer") { if (!md.flyerBusy) document.querySelector('#modal [data-poster="flyer"]')?.click(); return; }
+  else if (act === "poster-flyer-remove" || act === "poster-flyer-remove-no") { md.flyerAsk = act === "poster-flyer-remove"; renderModal(); return; }
+  else if (act === "poster-flyer-remove-yes") { if (!md.flyerBusy) await posterFlyerRemove(md); return; }
+  else if (act === "poster-corner" && FLYER_CORNERS.some(x => x[0] === k)) { md.corner = k; renderModal(); return; }
+  else if (act === "poster-flyer-download") { await posterFlyerDownload(md); return; }
+  else if (act === "poster-flyer-share") { await posterFlyerShare(md); return; }
+  else if (act === "poster-flyer-prompt") { const e = posterListing(md); if (e) await posterCopy(md, calFlyerPrompt(e)); return; }
   else return;
   posterSave(md); renderModal();
 }
@@ -5000,6 +5034,143 @@ async function posterPrint(md) {
   try { await img.decode(); } catch {}
   addEventListener("afterprint", posterPrintClear, { once: true });
   window.print();
+}
+/* Season Calendar: a listing's own flyer (poster-flyer). The listing's organisers add a finished flyer (made in ChatGPT,
+   Canva or Word) from the poster sheet; it's shrunk on the device to a JPEG or WebP data URL under 700,000 characters and
+   kept in the store (calendar/{cid}/media/flyer on the website: { flyer, w, h, at }), public like the listing. The full
+   listing shows it (one read when it opens; rows on the page never read it). "Download with our QR code" draws the QR code
+   that opens the listing in a white box (22% of the flyer's width) in the chosen corner; the saved flyer doesn't change.
+   Removing the listing deletes its flyer first; the admin can remove a flyer from the listing's admin strip. */
+const FLYER_MAX = 700000, FLYER_CORNERS = [["br", "Bottom right"], ["bl", "Bottom left"], ["tr", "Top right"], ["tl", "Top left"]];
+// the flyer of a listing: undefined (not read yet), "loading", null (none) or { flyer, w, h, at }; read once, when asked
+function calFlyerOf(id) {
+  const F = S.calFlyer || (S.calFlyer = {});
+  if (id in F || !S.store.getCalFlyer) return F[id];
+  F[id] = "loading";
+  S.store.getCalFlyer(id).then(f => { F[id] = f && typeof f.flyer === "string" && f.flyer.startsWith("data:image/") ? f : null; },
+    err => { if (err?.code !== "permission-denied") console.error(err); F[id] = null; }).then(() => { if (calFlyerHas(id) || (S.modal?.poster && S.modal.id === id)) calFlyerPaint(id); }); // no flyer: nothing to redraw (focus stays put)
+  return F[id];
+}
+const calFlyerHas = id => { const f = S.calFlyer?.[id]; return !!(f && typeof f === "object"); };
+function calFlyerPaint(id) {
+  if (calOnPage()) calPaint();
+  if (S.modal?.poster && S.modal.id === id) renderModal();
+}
+// on the full listing: the flyer, opened full size in a new tab when tapped
+function calFlyerHtml(e) {
+  const id = calId(e), f = calFlyerOf(id); if (!f || typeof f !== "object") return "";
+  return `<button type="button" class="cal-flyer" data-act="cal-flyer-full" data-id="${esc(id)}"><img src="${esc(f.flyer)}" width="${f.w}" height="${f.h}" alt="${esc(tr(`Flyer for ${e.name || ""}`))}" data-notr></button>`;
+}
+// a data URL as a Blob (no fetch, so the new tab still opens from the tap)
+function flyerBlob(d) {
+  const [head, b64] = String(d).split(","), type = (head.match(/^data:([^;]+)/) || [])[1] || "image/jpeg", bin = atob(b64 || ""), a = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+  return new Blob([a], { type });
+}
+function calFlyerFull(id) {
+  const f = S.calFlyer?.[id]; if (!f || typeof f !== "object") return;
+  const url = URL.createObjectURL(flyerBlob(f.flyer)); window.open(url, "_blank", "noopener"); setTimeout(() => URL.revokeObjectURL(url), 60e3);
+}
+// the admin's Remove the flyer (no question asked)
+async function calFlyerAdminRemove(id) {
+  try { await S.store.deleteCalFlyer(id); (S.calFlyer || (S.calFlyer = {}))[id] = null; toast("Flyer removed."); calFlyerPaint(id); }
+  catch (err) { console.error(err); toast("That didn't save. Check your connection and try again."); }
+}
+// a picture file as the flyer: the right way up, at most 1600 px on its longer side on white, then WebP 0.85, JPEG 0.85,
+// WebP 0.7, JPEG 0.7, then JPEG 0.7 at 1200 px, until it's under 700,000 characters (as logoFromFile). Null when it can't be used.
+async function flyerFromFile(file) {
+  if (file.type && !/^image\/(jpeg|png|webp)$/.test(file.type)) return null;
+  const r = await posterPicShrink(file, 1600); if (!r) return null;
+  const enc = (cv, type, q) => { const d = cv.toDataURL(type, q); return d.startsWith(`data:${type};base64,`) && d.length < FLYER_MAX ? d : null; };
+  let cv = r.img;
+  for (const [type, q] of [["image/webp", .85], ["image/jpeg", .85], ["image/webp", .7], ["image/jpeg", .7]]) { const d = enc(cv, type, q); if (d) return { flyer: d, w: cv.width, h: cv.height }; }
+  const k = Math.min(1, 1200 / Math.max(cv.width, cv.height)), sm = document.createElement("canvas"); sm.width = Math.max(1, Math.round(cv.width * k)); sm.height = Math.max(1, Math.round(cv.height * k));
+  const c = sm.getContext("2d"); c.fillStyle = "#ffffff"; c.fillRect(0, 0, sm.width, sm.height); c.imageSmoothingQuality = "high"; c.drawImage(cv, 0, 0, sm.width, sm.height); cv = sm;
+  const d = enc(cv, "image/jpeg", .7); return d ? { flyer: d, w: cv.width, h: cv.height } : null;
+}
+async function posterFlyerPick(el) {
+  const md = S.modal, file = el.files?.[0]; el.value = ""; if (!file || !md?.poster || md.flyerBusy) return;
+  md.flyerBusy = true; renderModal();
+  const r = await flyerFromFile(file).catch(err => { console.error(err); return null; });
+  if (!r) toast("That picture couldn't be used. Try a JPEG or PNG.");
+  else {
+    const f = { flyer: r.flyer, w: r.w, h: r.h, at: Date.now() };
+    try { await S.store.setCalFlyer(md.id, f); (S.calFlyer || (S.calFlyer = {}))[md.id] = f; md.flyerAsk = false; toast("Flyer added. It shows on your listing."); }
+    catch (err) { if (err?.code !== "permission-denied") console.error(err); toast(err?.code === "permission-denied" ? "Only this listing's organisers can add a flyer." : "That didn't save. Check your connection and try again."); }
+  }
+  md.flyerBusy = false; calFlyerPaint(md.id);
+}
+async function posterFlyerRemove(md) {
+  md.flyerBusy = true; renderModal();
+  try { await S.store.deleteCalFlyer(md.id); (S.calFlyer || (S.calFlyer = {}))[md.id] = null; md.flyerAsk = false; toast("Flyer removed."); }
+  catch (err) { console.error(err); toast("That didn't save. Check your connection and try again."); }
+  md.flyerBusy = false; calFlyerPaint(md.id);
+}
+const flyerImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("flyer")); i.src = src; });
+// the flyer with the QR code in a white rounded box (22% of its width) in the chosen corner, "Scan to enter" / "Scan for
+// details" and snpetanque.com under it; without the generator (the app on its own) the link is printed in its place
+async function flyerStamp(md) {
+  const e = posterListing(md), f = S.calFlyer?.[md.id]; if (!e || !f || typeof f !== "object") throw new Error("flyer");
+  const link = calLink(md.id), [img, q] = await Promise.all([flyerImg(f.flyer), S.qrMatrix ? S.qrMatrix(link).catch(err => { console.error(err); return null; }) : null, posterFontsReady()]);
+  const W = img.naturalWidth, H = img.naturalHeight, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d"); ctx.drawImage(img, 0, 0, W, H);
+  const corner = FLYER_CORNERS.some(x => x[0] === md.corner) ? md.corner : "br", label = tr(posterQrLabel(e));
+  const bw = Math.round(W * .22), pad = Math.max(2, Math.round(bw * .06)), inner = bw - 2 * pad, m = Math.round(W * .03);
+  const fit = (s, weight, font, px) => { ctx.font = `${weight} ${px}px ${font}`; while (px > 4 && ctx.measureText(s).width > inner) { px *= .92; ctx.font = `${weight} ${px}px ${font}`; } return px; };
+  const lp = fit(label, 700, POSTER_FONT.d, bw * .13), wp = fit("snpetanque.com", 500, POSTER_FONT.b, bw * .085);
+  let qs = 0, lines = [];
+  if (q) { const n = q.n + 8, k = Math.floor(inner / n); qs = k >= 1 ? k * n : inner; }
+  else { ctx.font = `500 ${wp}px ${POSTER_FONT.b}`; lines = posterWrap(ctx, link, inner, 5); }
+  const bh = Math.round(q ? pad * .4 + qs + lp * 1.15 + wp * 1.2 + pad : pad + lp * 1.15 + lines.length * wp * 1.25 + pad);
+  const x = corner[1] === "r" ? W - m - bw : m, y = corner[0] === "b" ? H - m - bh : m, cx = x + bw / 2;
+  ctx.save(); ctx.shadowColor = "rgba(0,0,0,.25)"; ctx.shadowBlur = bw * .04; ctx.shadowOffsetY = bw * .01; ctx.fillStyle = "#ffffff"; posterRect(ctx, x, y, bw, bh, bw * .07); ctx.fill(); ctx.restore();
+  let ty = y + pad;
+  if (q) { posterQr(ctx, q, x + (bw - qs) / 2, y + pad * .4, qs); ty = y + pad * .4 + qs; }
+  ctx.font = `700 ${lp}px ${POSTER_FONT.d}`; ty += posterText(ctx, [label], cx, ty, lp, 1.15, POSTER_INK, "center");
+  ctx.font = `500 ${wp}px ${POSTER_FONT.b}`; posterText(ctx, q ? ["snpetanque.com"] : lines, cx, ty, wp, q ? 1.2 : 1.25, POSTER_INK, "center");
+  md.flyerInfo = { w: W, h: H, corner, box: { x, y, w: bw, h: bh }, label, qr: !!q, link };
+  return cv;
+}
+const flyerFile = md => `${fileBase(posterListing(md)?.name, "flyer")} flyer.jpg`; // i18n-ok
+const flyerJpeg = async md => { const cv = await flyerStamp(md); return new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error("toBlob")), "image/jpeg", .92)); };
+async function posterFlyerDownload(md) {
+  if (!S.downloads) return;
+  let blob; try { blob = await flyerJpeg(md); } catch (err) { console.error(err); toast("That picture couldn't be used. Try a JPEG or PNG."); return; }
+  try { await S.downloads.save({ filename: flyerFile(md), data: blob }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
+}
+async function posterFlyerShare(md) {
+  let file; try { file = new File([await flyerJpeg(md)], flyerFile(md), { type: "image/jpeg" }); } catch (err) { console.error(err); toast("That picture couldn't be used. Try a JPEG or PNG."); return; }
+  if (!navigator.canShare?.({ files: [file] })) return;
+  try { await navigator.share({ files: [file], title: posterListing(md)?.name || "", text: calLink(md.id) }); } catch (err) { if (err?.name !== "AbortError") toast("The file wasn't saved."); }
+}
+// the full-flyer prompt for ChatGPT, always in English; the parts the listing doesn't have are left out
+function calFlyerPrompt(e) {
+  const d = new Date(e.date + "T12:00"), en = (o) => d.toLocaleDateString("en-GB", o);
+  const date = isNaN(d) ? String(e.date || "") : `${en({ weekday: "long" })} ${d.getDate()} ${en({ month: "long" })} ${d.getFullYear()}`;
+  const v = k => String(e[k] || "").trim(), part = (label, x) => x ? `${label}${x}. ` : "";
+  const fmt = e.kind === "event" ? [CAL_EV_FMTS.find(x => x[0] === e.fmt)?.[1] || "", v("formatNote")].filter(Boolean).join(" · ") : calFmtLabel(e);
+  const venue = [v("venue"), v("address")].filter(Boolean).join(", ");
+  return "Design a poster advertising a pétanque competition. Shape: portrait A4. Spell every detail exactly as written here and add nothing else: " // i18n-ok
+    + `Title: ${v("name")}. Date: ${date}. ` + part("Check-in from ", v("checkin")) + part("Play starts ", v("start")) + part("Venue: ", venue) + part("Format: ", fmt) // i18n-ok
+    + part("Who can enter: ", calWhoLabel(e)) + part("Entry fee: ", v("fee")) + part("Prizes: ", v("prizes")) + part("Contact: ", v("contact")) // i18n-ok
+    + "Leave the bottom-right corner empty, a plain square about a fifth of the poster's width, for a QR code that will be added later. No recognisable real people, brands or famous landmarks."; // i18n-ok
+}
+// the poster sheet's "Your own flyer" section, for the listing's organisers
+function posterFlyerHtml(md, e) {
+  if (!calOrg(e) || !S.store.setCalFlyer) return "";
+  const f = calFlyerOf(md.id), has = !!(f && typeof f === "object"), busy = f === "loading" || !!md.flyerBusy, corner = md.corner || "br";
+  const chip = (k, l) => `<button type="button" class="hof-chip poster-chip" data-act="poster-corner" data-k="${k}" aria-pressed="${corner === k}"><span>${l}</span></button>`;
+  return `<div class="stack poster-flyer" style="gap:8px"><div class="eyebrow">Your own flyer</div>
+    ${has ? `<div class="row poster-flyer-row"><div class="poster-flyer-thumb"><img src="${esc(f.flyer)}" alt=""><span class="poster-flyer-qr ${corner}" aria-hidden="true"></span></div>
+      <div class="row"><button type="button" class="btn" data-act="poster-flyer"${busy ? " disabled" : ""}>Replace</button>${md.flyerAsk ? "" : `<button type="button" class="btn" data-act="poster-flyer-remove"${busy ? " disabled" : ""}>Remove</button>`}</div></div>
+      ${md.flyerAsk ? `<div class="row poster-flyer-ask"><span class="err">Take the flyer off your listing?</span><button type="button" class="btn danger" data-act="poster-flyer-remove-yes"${busy ? " disabled" : ""}>Remove</button><button type="button" class="btn" data-act="poster-flyer-remove-no">Keep it</button></div>` : ""}
+      <div class="poster-chips" role="group">${FLYER_CORNERS.map(([k, l]) => chip(k, l)).join("")}</div>
+      <div class="row">${S.downloads ? `<button type="button" class="btn" data-act="poster-flyer-download">Download with our QR code</button>` : ""}${posterCanShare() ? `<button type="button" class="btn" data-act="poster-flyer-share">Share with our QR code</button>` : ""}</div>`
+    : `<div class="row"><button type="button" class="btn" data-act="poster-flyer"${busy ? " disabled" : ""}>Add your flyer</button></div>`}
+    <input type="file" accept="image/jpeg,image/png,image/webp" data-poster="flyer" hidden aria-hidden="true" tabindex="-1">
+    <div class="row"><button type="button" class="btn" data-act="poster-flyer-prompt">Copy a full-flyer prompt for ChatGPT</button></div>
+    <p class="small muted">Check every detail on your flyer before you share it. AI tools can get dates, names and numbers wrong.</p>
+  </div>`;
 }
 function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
@@ -6982,6 +7153,8 @@ document.addEventListener("click", async e => {
     case "cal-ev-edit": { const e2 = calFind(a.dataset.id); if (calEvCan(e2)) calEvOpen(e2); break; }
     case "cal-mine-open": { const id = a.dataset.id, P = calPage(); S.calPageRemove = null; if (location.hash === "#calendar." + id) { P.deepFor = null; hofRedraw(); } else location.hash = "calendar." + id; break; }
     case "cal-hide": if (calAdmin()) await calHide(a.dataset.id, a.dataset.on === "1"); break;
+    case "cal-flyer-admin-remove": if (calAdmin()) await calFlyerAdminRemove(a.dataset.id); break;
+    case "cal-flyer-full": calFlyerFull(a.dataset.id); break;
     case "cal-remove": { const id = t?.id; S.calConfirmRemove = id; S.calRemoveN = null; render(); if (id) calRemoveAsk(id, n => { if (S.calConfirmRemove !== id) return; S.calRemoveN = { id, n }; render(); }); break; }
     case "cal-remove-no": S.calConfirmRemove = null; render(); break;
     case "cal-remove-yes": if (t && calCan(t)) await calRemove(t); break;

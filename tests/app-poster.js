@@ -309,6 +309,110 @@ const { chromium } = require('playwright'), fs = require('fs');
     L.push('poster picture cleanup: 40 days past gone ' + !k.includes('cOld') + ' | 10 days past kept ' + k.includes('cRecent') + ' | per-device kept ' + k.includes('device:test') + ' | photo with no picture opens as ' + S.modal.layout);
     q('#modal [data-act="close"]').click(); await w(100);
   `));
+  // Your own flyer (poster-flyer): added from the poster sheet (shrunk on the device, kept in the store), shown on the full
+  // listing, stamped with the QR code's box (here the link, the app has no generator) in the chosen corner, the full-flyer
+  // prompt, removed (and with the listing, and by the admin). Screenshots: the stamped download in each corner, the listing
+  // with its flyer at 390 px and on desktop.
+  const fpre = `const tid = ${JSON.stringify(tid)};
+    const sheet = async id => { await open(id); q('#cal-' + id + ' [data-act="poster-open"]').click(); await S.modal?.picReady; await drawn(); for (let i = 0; i < 40 && S.calFlyer?.[id] === 'loading'; i++) await w(50); await w(50); };
+    const toastTxt = () => txt(q('#toast'));
+    const until = async (f, n = 100) => { for (let i = 0; i < n && !f(); i++) await w(100); return !!f(); };
+    // a flyer made elsewhere: a portrait picture with gradients, shapes and words (dark in every corner)
+    const flyerFile = (W, H, type = 'image/png', name = 'flyer.png') => new Promise(res => { const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+      const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#123a6b'); g.addColorStop(.5, '#7a1f3d'); g.addColorStop(1, '#0d3b2a'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+      for (let i = 0; i < 40; i++) { x.fillStyle = 'hsla(' + (i * 37 % 360) + ',70%,' + (30 + i % 4 * 8) + '%,.55)'; x.beginPath(); x.arc((i * 211) % W, (i * 397) % H, 20 + (i * 13) % 90, 0, 7); x.fill(); }
+      x.fillStyle = '#f2c45a'; x.font = 'bold ' + Math.round(W / 9) + 'px sans-serif'; x.fillText('GRAND', W * .1, H * .25); x.fillText('CONCOURS', W * .1, H * .38);
+      x.fillStyle = '#000'; [[0, 0], [W - W * .3, 0], [0, H - W * .3], [W - W * .3, H - W * .3]].forEach(([a, b2]) => x.fillRect(a, b2, W * .3, W * .3));
+      c.toBlob(b => res(new File([b], name, { type })), 'image/png'); });
+    const pick = async f => { const inp = q('#modal [data-poster="flyer"]'), dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; inp.dispatchEvent(new Event('input', { bubbles: true })); };
+    const px = (cv, x, y) => cv.getContext('2d').getImageData(Math.round(x), Math.round(y), 1, 1).data;
+    const white = p => p[0] > 235 && p[1] > 235 && p[2] > 235;
+    const blobCv = async b => { const img = await createImageBitmap(b), c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); return c; };`;
+  out.push(...await run(`${fpre}
+    await sheet(tid);
+    const sec = q('#modal .poster-flyer');
+    L.push('flyer section: ' + txt(sec?.querySelector('.eyebrow')) + ' | add ' + txt(q('#modal [data-act="poster-flyer"]')) + ' | prompt ' + txt(q('#modal [data-act="poster-flyer-prompt"]'))
+      + ' | last ' + (q('#modal .poster-ctl').lastElementChild === sec) + ' | note ' + txt(sec?.querySelector('p.small')));
+    // a picture that isn't a JPEG, PNG or WebP
+    await pick(new File(['GIF89a'], 'a.gif', { type: 'image/gif' })); await until(() => /couldn't be used/.test(toastTxt()), 30);
+    const t1 = toastTxt(); q('#toast').innerHTML = '';
+    await pick(new File(['not a picture'], 'b.png', { type: 'image/png' })); await w(300); await until(() => !S.modal.flyerBusy, 50);
+    L.push('flyer unreadable: ' + t1 + ' | broken png refused ' + (!S.calFlyer[tid] && /couldn't be used/.test(toastTxt())));
+    await pick(await flyerFile(2000, 2828)); await until(() => S.calFlyer[tid] && typeof S.calFlyer[tid] === 'object' && !S.modal.flyerBusy);
+    const saved = await S.store.getCalFlyer(tid);
+    L.push('flyer added: ' + toastTxt() + ' | ' + (saved?.flyer || '').slice(0, 15) + ' | ' + saved.w + 'x' + saved.h + ' | under 700000 ' + (saved.flyer.length < 700000) + ' | thumbnail ' + !!q('#modal .poster-flyer-thumb img')
+      + ' | buttons ' + qa('#modal .poster-flyer .btn').map(txt).join(','));
+    L.push('flyer corners offered: ' + qa('#modal [data-act="poster-corner"]').map(txt).join(',') + ' | default ' + txt(q('#modal [data-act="poster-corner"][aria-pressed="true"]')));
+    // Download with our QR code: the stamped JPEG; the box in the chosen corner, 22% of the width; the saved flyer as it was
+    window.__file = null; S.downloads = { save: async f => { window.__file = f; } };
+    const shots = {}, boxes = {};
+    for (const k of ['br', 'bl', 'tr', 'tl']) {
+      q('#modal [data-act="poster-corner"][data-k="' + k + '"]').click(); await w(80); window.__file = null;
+      q('#modal [data-act="poster-flyer-download"]').click(); await until(() => window.__file, 60);
+      const cv = await blobCv(window.__file.data), i = S.modal.flyerInfo, b2 = i.box, m = Math.round(i.w * .03);
+      const inBox = white(px(cv, b2.x + 3, b2.y + b2.h / 2)) && white(px(cv, b2.x + b2.w - 4, b2.y + b2.h / 2));
+      const others = [[m + 3, m + 3], [i.w - m - 4, m + 3], [m + 3, i.h - m - 4], [i.w - m - 4, i.h - m - 4]].filter(([x, y]) => !(x >= b2.x && x <= b2.x + b2.w && y >= b2.y && y <= b2.y + b2.h)).every(([x, y]) => !white(px(cv, x, y)));
+      boxes[k] = { right: Math.abs(b2.x + b2.w - (i.w - m)) <= 1, left: b2.x === m, bottom: Math.abs(b2.y + b2.h - (i.h - m)) <= 1, top: b2.y === m, pct: b2.w / i.w, inBox, others, type: window.__file.data.type, name: window.__file.filename, label: i.label };
+      const k2 = Math.min(1, 1000 / cv.height), c2 = document.createElement('canvas'); c2.width = Math.round(cv.width * k2); c2.height = Math.round(cv.height * k2); c2.getContext('2d').drawImage(cv, 0, 0, c2.width, c2.height);
+      (window.__snaps = window.__snaps || []).push(['flyer-stamp-' + k, c2.toDataURL('image/png')]);
+    }
+    const after = await S.store.getCalFlyer(tid), br = boxes.br;
+    L.push('flyer qr: corner bottom right ' + (br.right && br.bottom && br.inBox && br.others) + ' | box 22% ' + (Math.abs(br.pct - .22) < .002) + ' | saved flyer unchanged ' + (after.flyer === saved.flyer && after.at === saved.at && S.calFlyer[tid].flyer === saved.flyer) + ' | label ' + br.label);
+    L.push('flyer corners: bottom left ' + (boxes.bl.left && boxes.bl.bottom && boxes.bl.others) + ' | top right ' + (boxes.tr.right && boxes.tr.top && boxes.tr.others) + ' | top left ' + (boxes.tl.left && boxes.tl.top && boxes.tl.others)
+      + ' | file ' + br.type + ' ' + br.name + ' | thumbnail corner ' + (q('#modal .poster-flyer-qr')?.classList.contains('tl')));
+    q('#modal [data-act="poster-corner"][data-k="br"]').click(); await w(50);
+    // the full-flyer prompt (in English)
+    q('#modal [data-act="poster-flyer-prompt"]').click(); await until(() => /Prompt copied/.test(toastTxt()) || S.modal.copied, 30);
+    const pr = S.modal.copied || '';
+    L.push('flyer prompt full: ' + pr.replace(/Date: \\w+ \\d+ \\w+ \\d{4}\\./, 'Date: <date>.'));
+    q('#modal [data-act="close"]').click(); await w(100);
+    await S.store.setCal('cFly', mk('cFly', { name: 'Summer Singles', venue: 'Baldock Green', fmt: 'singles', date: '2026-12-06' }));
+    await sheet('cFly'); q('#modal [data-act="poster-flyer-prompt"]').click(); await w(200);
+    const p2 = S.modal.copied || '';
+    L.push('flyer prompt: name ' + pr.includes('Title: Spring Triples. ') + ' | Leave the bottom-right corner empty ' + pr.includes('Leave the bottom-right corner empty, a plain square about a fifth') + ' | fee left out when empty ' + (!p2.includes('Entry fee') && pr.includes('Entry fee: £5 per player. ')));
+    L.push('flyer prompt short: ' + p2.slice(p2.indexOf('Title:'), p2.indexOf(' Leave')));
+    q('#modal [data-act="close"]').click(); await w(100);
+  `));
+  // the full listing with its flyer, on desktop and at 390 px
+  const card = async (width, shot) => { await p.setViewportSize({ width, height: width < 500 ? 844 : 900 }); await p.waitForTimeout(250);
+    const r = await run(`${fpre} await open(tid); await until(() => q('#cal-' + tid + ' .cal-flyer img')?.complete); await w(200);
+      const fl = q('#cal-' + tid + ' .cal-flyer'), cardEl = card(tid), dl = q('#cal-' + tid + ' .cal-facts');
+      fl.scrollIntoView({ block: 'start' }); window.scrollBy(0, -80); await w(150);
+      L.push('listing flyer ' + ${width} + ': shown ' + !!fl + ' | alt ' + fl?.querySelector('img').alt + ' | above the details ' + !!(fl && dl && (fl.compareDocumentPosition(dl) & 4))
+        + ' | width ' + (Math.abs(fl.getBoundingClientRect().width - (cardEl.clientWidth - parseFloat(getComputedStyle(cardEl).paddingLeft) - parseFloat(getComputedStyle(cardEl).paddingRight))) < 2 ? 'full' : fl.getBoundingClientRect().width <= 360.5 ? 'at most 360' : fl.getBoundingClientRect().width)
+        + ' | no sideways scroll ' + (document.documentElement.scrollWidth <= innerWidth + 1) + ' | rows show flyers ' + qa('.cal-row img').length);`);
+    await p.screenshot({ path: `test-results/${shot}.png` }); return r; };
+  out.push(...await card(1100, 'flyer-listing-desktop'), ...await card(390, 'flyer-listing-390'));
+  await p.setViewportSize({ width: 1100, height: 900 }); await p.waitForTimeout(200);
+  out.push(...await run(`${fpre}
+    // tapping it opens it full size in a new tab
+    const opened = []; const wo = window.open; window.open = (u, t) => { opened.push([u, t]); return null; };
+    await open(tid); q('#cal-' + tid + ' .cal-flyer').click(); await w(50); window.open = wo;
+    L.push('flyer tapped: new tab ' + (opened.length === 1 && /^blob:/.test(opened[0][0]) && opened[0][1] === '_blank'));
+    // Remove, after the question
+    await sheet(tid); q('#modal [data-act="poster-flyer-remove"]').click(); await w(80);
+    const ask = txt(q('#modal .poster-flyer-ask .err')) + ' | ' + qa('#modal .poster-flyer-ask .btn').map(txt).join(',');
+    q('#modal [data-act="poster-flyer-remove-no"]').click(); await w(80); const kept = !!(await S.store.getCalFlyer(tid));
+    q('#modal [data-act="poster-flyer-remove"]').click(); await w(80); q('#modal [data-act="poster-flyer-remove-yes"]').click(); await until(() => S.calFlyer[tid] === null);
+    L.push('flyer remove: ask ' + ask + ' | keep it kept ' + kept + ' | removed ' + ((await S.store.getCalFlyer(tid)) === null) + ' | toast ' + toastTxt() + ' | add again ' + txt(q('#modal [data-act="poster-flyer"]')));
+    q('#modal [data-act="close"]').click(); await w(100);
+    // the admin's strip: Remove the flyer, no question asked
+    const f0 = { flyer: 'data:image/jpeg;base64,' + (await flyerFile(300, 420).then(f => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result.split(',')[1]); fr.readAsDataURL(f); }))), w: 300, h: 420, at: Date.now() };
+    await S.store.setCalFlyer(tid, f0); delete S.calFlyer[tid];
+    const adm = S.calAdmin; S.calAdmin = () => true; await open(tid); await until(() => q('#cal-' + tid + ' .cal-flyer'));
+    const strip = txt(q('#cal-' + tid + ' .cal-admin'));
+    q('#cal-' + tid + ' [data-act="cal-flyer-admin-remove"]').click(); await until(() => S.calFlyer[tid] === null, 30); await w(100);
+    L.push('flyer admin strip: ' + strip + ' | removed ' + ((await S.store.getCalFlyer(tid)) === null) + ' | toast ' + toastTxt() + ' | gone from listing ' + !q('#cal-' + tid + ' .cal-flyer') + ' | button gone ' + !q('[data-act="cal-flyer-admin-remove"]'));
+    S.calAdmin = adm;
+    // removing the listing deletes its flyer first
+    await S.store.setCalFlyer('cFly', f0); delete S.calFlyer.cFly; await open('cFly');
+    q('#cal-cFly [data-act="cal-page-remove"]').click(); await w(150); q('#cal-cFly [data-act="cal-page-remove-yes"]').click(); await until(() => !card('cFly'), 30); await w(100);
+    L.push('flyer with listing (app): listing gone ' + !(await S.store.getCal('cFly')) + ' | flyer gone ' + ((await S.store.getCalFlyer('cFly')) === null));
+    // a listing that isn't on the calendar can't take a flyer
+    let err = ''; try { await S.store.setCalFlyer('nope', f0); } catch (e) { err = e.code; }
+    L.push('flyer without listing (app): ' + err);
+  `));
+  for (const [name, url] of (await p.evaluate(() => window.__snaps || [])).filter(([n]) => n.startsWith('flyer-'))) fs.writeFileSync(`test-results/${name}.png`, Buffer.from(url.split(',')[1], 'base64'));
   console.log(out.join('\n'));
   console.log('errs', JSON.stringify(errs));
   await b.close();
