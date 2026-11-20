@@ -453,6 +453,15 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .cal-desk-main{flex:1;min-width:0;overflow-wrap:anywhere}.cal-desk-main .row{margin-top:4px}.cal-desk-main .row .err,.cal-reg-row .err{flex-basis:100%}.cal-desk-meta a{color:var(--accent);font-weight:600}
 @media (max-width:560px),(pointer:coarse){.cal-desk .btn,.cal-reg .btn{min-height:44px}}
 @media (max-width:560px),(pointer:coarse){.cal-share .btn,.cal-ent-row .btn{min-height:44px}} /* Season Calendar 7: Add to calendar, Open in Maps, Share */
+/* Poster maker: the preview beside the controls on a computer; full screen on a phone, the preview on top */
+.poster-sheet{max-width:1040px}.poster-body{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:start}
+.poster-prev-col{position:sticky;top:0;z-index:1}.poster-prev{display:flex;justify-content:center;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:200px}
+.poster-prev canvas{display:block;max-width:100%;max-height:calc(100vh - 150px);width:auto;height:auto;box-shadow:0 6px 22px rgba(0,0,0,.2);border-radius:2px;background:#fff}
+.poster-chips{display:flex;flex-wrap:wrap;gap:8px}.poster-sheet .poster-chip{min-height:44px}.poster-chip .poster-thumb{flex:none;margin:-2px 0 -2px -6px;color:var(--ink)}.poster-chip[aria-pressed="true"] .poster-thumb{color:var(--surface)}
+.poster-sheet .swatches .swatch{width:44px;height:44px}.poster-sheet .swatch.custom.on{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink)}
+.poster-ticks{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.poster-sheet input[type=text]{font-size:16px;min-height:44px}.poster-sheet .btn{min-height:44px}
+@media (max-width:760px){.poster-scrim{padding:0}.poster-sheet{max-width:none;height:100%;max-height:100%;border-radius:0;border:0;padding:16px}.poster-body{grid-template-columns:minmax(0,1fr)}.poster-prev-col{position:static}.poster-prev{padding:10px}.poster-prev canvas{max-height:60vh}}
+@media (max-width:360px){.poster-ticks{grid-template-columns:1fr}}
 @media (max-width:560px){.cal-facts{grid-template-columns:1fr;gap:2px}.cal-facts dd{margin-bottom:6px}.cal-row{gap:10px;padding:9px 10px}.cal-date{width:52px}}
 /* Hall of Fame: the header link, the start-screen card and the page */
 .hof-btn,.cal-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;flex:none;white-space:nowrap}
@@ -1349,6 +1358,14 @@ Object.assign(LANG_TEXT.de, {"Add to calendar": "Zum Kalender hinzufügen", "Ope
 Object.assign(LANG_TEXT.nl, {"Add to calendar": "Toevoegen aan agenda", "Open in Maps": "Openen in Maps"});
 Object.assign(LANG_TEXT.pt, {"Add to calendar": "Adicionar ao calendário", "Open in Maps": "Abrir no Maps"});
 Object.assign(LANG_TEXT.th, {"Add to calendar": "เพิ่มลงในปฏิทิน", "Open in Maps": "เปิดในแผนที่"});
+// Poster maker (poster-maker)
+Object.assign(FR_TEXT, {"Make a poster": "Créer une affiche", "Size": "Taille", "Facebook post": "Publication Facebook", "Story": "Story", "A4 to print": "A4 à imprimer", "A5 to print": "A5 à imprimer", "Poster layout": "Mise en page", "Bold": "Percutante", "Band": "Bandeau", "Classic": "Classique", "Main colour": "Couleur principale", "Second colour": "Couleur secondaire", "Gold": "Or", "White": "Blanc", "Choose any colour": "Choisir une couleur", "Match the logo": "Assortir au logo", "Show the club logo": "Afficher le logo du club", "Headline": "Titre", "Strapline": "Accroche", "e.g. Open triples · £300 prize fund": "ex. Triplettes ouvert à tous · 300 € de prix", "Show on the poster": "Afficher sur l'affiche", "Times": "Horaires", "Address": "Adresse", "Show the QR code": "Afficher le QR code", "Scan to enter": "Scannez pour vous inscrire", "Scan for details": "Scannez pour en savoir plus", "Download": "Télécharger", "Print": "Imprimer", "Check the details before you share it. Change them in the listing, not here.": "Vérifiez les informations avant de la partager. Modifiez-les dans l'annonce, pas ici.", "The poster couldn't be made. Try again.": "L'affiche n'a pas pu être créée. Réessayez.", "Check-in from {x}": "Pointage à partir de {1}", "Play starts {x}": "Début des parties à {1}"});
+Object.assign(LANG_TEXT.es, {"Make a poster": "Crear un cartel", "Size": "Tamaño", "Facebook post": "Publicación de Facebook", "Story": "Historia", "A4 to print": "A4 para imprimir", "A5 to print": "A5 para imprimir", "Poster layout": "Diseño", "Bold": "Impacto", "Band": "Franja", "Classic": "Clásico", "Main colour": "Color principal", "Second colour": "Color secundario", "Gold": "Dorado", "White": "Blanco", "Choose any colour": "Elegir cualquier color", "Match the logo": "Igualar al logo", "Show the club logo": "Mostrar el logo del club", "Headline": "Título", "Strapline": "Subtítulo", "e.g. Open triples · £300 prize fund": "p. ej. Tripletas abiertas · 300 € en premios", "Show on the poster": "Mostrar en el cartel", "Times": "Horarios", "Address": "Dirección", "Show the QR code": "Mostrar el código QR", "Scan to enter": "Escanea para inscribirte", "Scan for details": "Escanea para más información", "Download": "Descargar", "Print": "Imprimir", "Check the details before you share it. Change them in the listing, not here.": "Revisa los datos antes de compartirlo. Cámbialos en el anuncio, no aquí.", "The poster couldn't be made. Try again.": "No se pudo crear el cartel. Inténtalo de nuevo.", "Check-in from {x}": "Acreditación desde las {1}", "Play starts {x}": "Inicio del juego a las {1}"});
+Object.assign(LANG_TEXT.it, {"Make a poster": "Crea una locandina", "Size": "Dimensione", "Facebook post": "Post Facebook", "Story": "Storia", "A4 to print": "A4 da stampare", "A5 to print": "A5 da stampare", "Poster layout": "Impaginazione", "Bold": "Deciso", "Band": "Fascia", "Classic": "Classico", "Main colour": "Colore principale", "Second colour": "Colore secondario", "Gold": "Oro", "White": "Bianco", "Choose any colour": "Scegli un colore", "Match the logo": "Abbina al logo", "Show the club logo": "Mostra il logo del club", "Headline": "Titolo", "Strapline": "Sottotitolo", "e.g. Open triples · £300 prize fund": "es. Terne aperte a tutti · Montepremi 300 €", "Show on the poster": "Mostra sulla locandina", "Times": "Orari", "Address": "Indirizzo", "Show the QR code": "Mostra il codice QR", "Scan to enter": "Inquadra per iscriverti", "Scan for details": "Inquadra per i dettagli", "Download": "Scarica", "Print": "Stampa", "Check the details before you share it. Change them in the listing, not here.": "Controlla i dati prima di condividerla. Modificali nell'annuncio, non qui.", "The poster couldn't be made. Try again.": "Non è stato possibile creare la locandina. Riprova.", "Check-in from {x}": "Accredito dalle {1}", "Play starts {x}": "Inizio partite alle {1}"});
+Object.assign(LANG_TEXT.de, {"Make a poster": "Plakat erstellen", "Size": "Größe", "Facebook post": "Facebook-Beitrag", "Story": "Story", "A4 to print": "A4 zum Drucken", "A5 to print": "A5 zum Drucken", "Poster layout": "Gestaltung", "Bold": "Kräftig", "Band": "Banner", "Classic": "Klassisch", "Main colour": "Hauptfarbe", "Second colour": "Zweitfarbe", "Gold": "Gold", "White": "Weiß", "Choose any colour": "Beliebige Farbe wählen", "Match the logo": "Farbe aus dem Logo", "Show the club logo": "Vereinslogo zeigen", "Headline": "Überschrift", "Strapline": "Unterzeile", "e.g. Open triples · £300 prize fund": "z. B. Offenes Triplette · 300 € Preisgeld", "Show on the poster": "Auf dem Plakat zeigen", "Times": "Uhrzeiten", "Address": "Adresse", "Show the QR code": "QR-Code zeigen", "Scan to enter": "Scannen zum Anmelden", "Scan for details": "Scannen für Details", "Download": "Herunterladen", "Print": "Drucken", "Check the details before you share it. Change them in the listing, not here.": "Prüfe die Angaben, bevor du es teilst. Ändere sie im Eintrag, nicht hier.", "The poster couldn't be made. Try again.": "Das Plakat konnte nicht erstellt werden. Versuch es noch einmal.", "Check-in from {x}": "Einchecken ab {1}", "Play starts {x}": "Spielbeginn {1}"});
+Object.assign(LANG_TEXT.nl, {"Make a poster": "Poster maken", "Size": "Formaat", "Facebook post": "Facebookbericht", "Story": "Story", "A4 to print": "A4 om te printen", "A5 to print": "A5 om te printen", "Poster layout": "Opmaak", "Bold": "Krachtig", "Band": "Band", "Classic": "Klassiek", "Main colour": "Hoofdkleur", "Second colour": "Tweede kleur", "Gold": "Goud", "White": "Wit", "Choose any colour": "Kies een kleur", "Match the logo": "Kleur van het logo", "Show the club logo": "Clublogo tonen", "Headline": "Kop", "Strapline": "Ondertitel", "e.g. Open triples · £300 prize fund": "bijv. Open tripletten · € 300 prijzengeld", "Show on the poster": "Op de poster tonen", "Times": "Tijden", "Address": "Adres", "Show the QR code": "QR-code tonen", "Scan to enter": "Scan om in te schrijven", "Scan for details": "Scan voor details", "Download": "Downloaden", "Print": "Printen", "Check the details before you share it. Change them in the listing, not here.": "Controleer de gegevens voordat je hem deelt. Wijzig ze in de vermelding, niet hier.", "The poster couldn't be made. Try again.": "De poster kon niet worden gemaakt. Probeer het opnieuw.", "Check-in from {x}": "Inchecken vanaf {1}", "Play starts {x}": "Aanvang {1}"});
+Object.assign(LANG_TEXT.pt, {"Make a poster": "Criar um cartaz", "Size": "Tamanho", "Facebook post": "Publicação no Facebook", "Story": "Story", "A4 to print": "A4 para imprimir", "A5 to print": "A5 para imprimir", "Poster layout": "Esquema", "Bold": "Destaque", "Band": "Faixa", "Classic": "Clássico", "Main colour": "Cor principal", "Second colour": "Cor secundária", "Gold": "Dourado", "White": "Branco", "Choose any colour": "Escolher qualquer cor", "Match the logo": "Igualar ao logótipo", "Show the club logo": "Mostrar o logótipo do clube", "Headline": "Título", "Strapline": "Subtítulo", "e.g. Open triples · £300 prize fund": "ex. Triplas abertas · 300 € em prémios", "Show on the poster": "Mostrar no cartaz", "Times": "Horários", "Address": "Morada", "Show the QR code": "Mostrar o código QR", "Scan to enter": "Leia para se inscrever", "Scan for details": "Leia para ver os detalhes", "Download": "Descarregar", "Print": "Imprimir", "Check the details before you share it. Change them in the listing, not here.": "Confirme os dados antes de o partilhar. Altere-os no anúncio, não aqui.", "The poster couldn't be made. Try again.": "Não foi possível criar o cartaz. Tente de novo.", "Check-in from {x}": "Confirmação a partir das {1}", "Play starts {x}": "Início dos jogos às {1}"});
+Object.assign(LANG_TEXT.th, {"Make a poster": "ทำโปสเตอร์", "Size": "ขนาด", "Facebook post": "โพสต์ Facebook", "Story": "สตอรี่", "A4 to print": "A4 สำหรับพิมพ์", "A5 to print": "A5 สำหรับพิมพ์", "Poster layout": "รูปแบบโปสเตอร์", "Bold": "เด่นชัด", "Band": "แถบสี", "Classic": "คลาสสิก", "Main colour": "สีหลัก", "Second colour": "สีรอง", "Gold": "ทอง", "White": "ขาว", "Choose any colour": "เลือกสีใดก็ได้", "Match the logo": "ใช้สีจากโลโก้", "Show the club logo": "แสดงโลโก้สโมสร", "Headline": "หัวข้อ", "Strapline": "คำโปรย", "e.g. Open triples · £300 prize fund": "เช่น ทีม 3 คน รุ่นทั่วไป · เงินรางวัลรวม 10,000 บาท", "Show on the poster": "แสดงบนโปสเตอร์", "Times": "เวลา", "Address": "ที่อยู่", "Show the QR code": "แสดงคิวอาร์โค้ด", "Scan to enter": "สแกนเพื่อสมัคร", "Scan for details": "สแกนเพื่อดูรายละเอียด", "Download": "ดาวน์โหลด", "Print": "พิมพ์", "Check the details before you share it. Change them in the listing, not here.": "ตรวจสอบรายละเอียดก่อนแชร์ แก้ไขได้ที่รายการ ไม่ใช่ที่นี่", "The poster couldn't be made. Try again.": "ทำโปสเตอร์ไม่สำเร็จ ลองอีกครั้ง", "Check-in from {x}": "เช็คอินตั้งแต่ {1}", "Play starts {x}": "เริ่มแข่ง {1}"});
 // EuroCup set points
 Object.assign(FR_TEXT, {"Triples & doubles: set points": "Triplettes et doublettes : vos points", "Points for a triples win": "Points pour une triplette gagnée", "Points for a doubles win": "Points pour une doublette gagnée", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Une rencontre vaut {1} points : triplettes {2} chacune, doublettes {3} chacune. Le premier club à {4} gagne la rencontre ; les parties restantes se jouent quand même et comptent pour les points.", "With an even total a tie can end level.": "Avec un total pair, une rencontre peut finir à égalité.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP = points de partie : {1} pour une triplette gagnée, {2} pour une doublette.", "A tie counts as won as soon as a club has more than half its points.": "Une rencontre compte comme gagnée dès qu'un club a plus de la moitié de ses points.", "win the tie": "gagne la rencontre", "First to {n}": "Premier à {1}", "Triples & doubles": "Triplettes et doublettes", "Your own points for each win": "Vos propres points pour chaque victoire", "{n} and {n} to start": "{1} et {2} au départ", "Ties level": "Rencontres à égalité"});
 Object.assign(LANG_TEXT.es, {"Triples & doubles: set points": "Tripletas y dupletas: tus puntos", "Points for a triples win": "Puntos por tripleta ganada", "Points for a doubles win": "Puntos por dupleta ganada", "A tie is worth {n} points: triples {n} each, doubles {n} each. The first club to {n} wins the tie; the rest of its games are still played and count towards the points.": "Un encuentro vale {1} puntos: tripletas {2} cada una, dupletas {3} cada una. El primer club en llegar a {4} gana el encuentro; las partidas restantes se juegan igualmente y cuentan para los puntos.", "With an even total a tie can end level.": "Con un total par, un encuentro puede acabar en empate.", "GP is game points: {n} for a triples win, {n} for doubles.": "GP son puntos de partida: {1} por tripleta ganada, {2} por dupleta.", "A tie counts as won as soon as a club has more than half its points.": "Un encuentro cuenta como ganado en cuanto un club tiene más de la mitad de sus puntos.", "win the tie": "gana el encuentro", "First to {n}": "Primero a {1}", "Triples & doubles": "Tripletas y dupletas", "Your own points for each win": "Tus propios puntos por cada victoria", "{n} and {n} to start": "{1} y {2} para empezar", "Ties level": "Encuentros empatados"});
@@ -3604,7 +3621,7 @@ function calPanel(t) {
     <button class="btn primary" data-act="cal-open">List on the Season Calendar</button></div>`;
   return `<div class="panel stack cal-panel" data-cal-panel style="gap:8px"><div class="spread"><div>${head}
       <div class="small">${e.hidden ? `<b class="err">Hidden from the Season Calendar by the site admin.</b>` : `<b>On the Season Calendar</b>`}${calStPill(e) ? " " + calStPill(e) : ""} · ${hofLabel(e.level)} <span data-notr>${esc(hofCountryName(e.country))}</span></div></div>
-      <div class="row">${e.hidden ? "" : `<button class="btn" data-act="cal-open">Update</button>`}${S.calConfirmRemove === t.id ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === t.id ? S.calRemoveN.n : 0))}</span><button class="btn danger" data-act="cal-remove-yes">Remove</button><button class="btn" data-act="cal-remove-no">Keep it</button>` : `<button class="btn" data-act="cal-remove">Remove</button>`}</div></div>
+      <div class="row">${e.hidden ? "" : `<button class="btn" data-act="cal-open">Update</button><button class="btn" data-act="poster-open" data-id="${esc(t.id)}">Make a poster</button>`}${S.calConfirmRemove === t.id ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === t.id ? S.calRemoveN.n : 0))}</span><button class="btn danger" data-act="cal-remove-yes">Remove</button><button class="btn" data-act="cal-remove-no">Keep it</button>` : `<button class="btn" data-act="cal-remove">Remove</button>`}</div></div>
     ${e.hidden ? `<div class="small muted cal-hidden-note">Questions? Contact Info@FoundryITadvisory.com.</div>` : ""}
     ${calChanged(t, e) && !e.hidden ? `<div class="notice small cal-changed">The competition's name, date or venue has changed since it was listed. <button class="btn" data-act="cal-open">Update the listing</button></div>` : ""}</div>`;
 }
@@ -3836,9 +3853,9 @@ function calCard(e, close) {
     ${calShareRow(e)}
     ${org && e.hidden ? `<div class="notice small err cal-hidden-mark">Hidden by the site admin</div>` : ""}
     ${calEntHtml(e)}
-    <div class="row">${link}${org ? `${ev && e.hidden ? "" : `<button type="button" class="btn sm" data-act="${ev ? "cal-ev-edit" : "cal-edit"}" data-id="${esc(id)}">Edit</button>`}${confirm
+    <div class="row">${link}${org ? `${ev && e.hidden ? "" : `<button type="button" class="btn sm" data-act="${ev ? "cal-ev-edit" : "cal-edit"}" data-id="${esc(id)}">Edit</button>`}${posterCan(e) ? posterBtn(id) : ""}${confirm
       ? `<span class="err">${esc(calRemoveQ(S.calRemoveN?.id === id ? S.calRemoveN.n : 0))}</span><button type="button" class="btn sm danger" data-act="cal-page-remove-yes" data-id="${esc(id)}">Remove</button><button type="button" class="btn sm" data-act="cal-page-remove-no">Keep it</button>`
-      : `<button type="button" class="btn sm" data-act="cal-page-remove" data-id="${esc(id)}">Remove</button>`}` : ""}${close ? `<button type="button" class="btn sm ghost" data-act="cal-close-entry" data-id="${esc(id)}">Close</button>` : ""}</div>
+      : `<button type="button" class="btn sm" data-act="cal-page-remove" data-id="${esc(id)}">Remove</button>`}` : posterCan(e) ? posterBtn(id) : ""}${close ? `<button type="button" class="btn sm ghost" data-act="cal-close-entry" data-id="${esc(id)}">Close</button>` : ""}</div>
     ${ev && org ? calOrgLinkBox(id) : ""}
     ${calAdmin() ? `<div class="cal-admin spread"><span class="small"><b>Only you see this</b></span><button type="button" class="btn sm${e.hidden ? "" : " danger"}" data-act="cal-hide" data-id="${esc(id)}" data-on="${e.hidden ? "0" : "1"}">${e.hidden ? "Show again" : "Hide from the Season Calendar"}</button></div>` : ""}
   </article>`;
@@ -4321,6 +4338,369 @@ async function calRegAdd(eids) {
   if (!n) return;
   S.calRegBusy = true; try { await guard(() => saveT(t)); } finally { S.calRegBusy = false; }
 }
+/* ---------------- Poster maker (poster-maker): a poster for a Season Calendar listing ---------------- */
+// The listing's organisers (and the admin) make a PNG from the listing in a few taps: a size, a layout (POSTER_LAYOUTS,
+// which later specs extend), colours, ticks for what to show and a QR code that opens the listing (the website's generator,
+// S.qrMatrix; the app on its own prints the link in its place). It's drawn on a canvas at full size, laid out in units of
+// the poster's width so every size comes out in proportion; the preview is that canvas scaled down. The poster's own words
+// are in the site's language; what the organiser typed stays as typed. Nothing goes to the store: the design is kept on
+// this device per listing (carreau-poster:<listing id>), and a listing with no design of its own starts from the last one.
+const POSTER_SIZES = [["square", "Facebook post", 1080, 1080], ["story", "Story", 1080, 1920], ["a4", "A4 to print", 2480, 3508], ["a5", "A5 to print", 1748, 2480]];
+const POSTER_LAYOUTS = [["bold", "Bold"], ["band", "Band"], ["classic", "Classic"]];
+const POSTER_SHOW = [["date", "Date"], ["times", "Times"], ["venue", "Venue"], ["address", "Address"], ["format", "Format"], ["who", "Who can enter"], ["fee", "Entry fee"], ["prizes", "Prizes"], ["howTo", "How to enter"], ["contact", "Contact"]];
+const POSTER_OFF = ["address", "howTo"]; // offered, but not ticked to start with
+const POSTER_SECOND = [["#d4a72c", "Gold"], ["#ffffff", "White"], ["#1a2320", "Black"], ...ACCENTS.filter(a => a[0] !== "#1a2320")];
+const POSTER_INK = "#14201c", POSTER_CREAM = "#f6f1e7", POSTER_LAST = "carreau-poster-last";
+const POSTER_FONT = { d: '"Barlow Condensed", "Arial Narrow", sans-serif', b: 'Barlow, Arial, sans-serif' }; // i18n-ok
+// text on a coloured block: white or near-black, whichever has more contrast
+const posterInk = bg => contrastOf(bg, "#ffffff") >= contrastOf(bg, POSTER_INK) ? "#ffffff" : POSTER_INK;
+const posterCan = e => !!e && !e.hidden && (calOrg(e) || calAdmin());
+const posterListing = md => S.cal?.[md.id] || calFind(md.id) || md.e || null;
+const posterLogoSrc = e => e?.kind === "comp" ? logoSrc(e.tid) : "";
+const posterFmt = e => e.kind === "event" ? [tr(CAL_EV_FMTS.find(x => x[0] === e.fmt)?.[1] || ""), String(e.formatNote || "").trim()].filter(Boolean).join(" · ") : tr(calFmtLabel(e));
+const posterWho = e => (e.who || []).map(k => CAL_WHO.find(x => x[0] === k)?.[1]).filter(Boolean).map(tr).join(", ");
+const posterHas = (e, k) => !!(k === "times" ? e.checkin || e.start : k === "format" ? posterFmt(e) : k === "who" ? (e.who || []).length : String(e[k] || "").trim());
+const posterHeadline = (md, e) => String(md.headline || "").trim() || e?.name || "";
+// "Scan to enter" while the listing takes entries online and they're open
+const posterQrLabel = e => calEntOn() && calEntOpen(e) ? "Scan to enter" : "Scan for details";
+const posterRead = k => { try { const v = JSON.parse(lsGet(k) || "null"); return v && typeof v === "object" ? v : null; } catch { return null; } };
+function posterSave(md) {
+  const d = { size: md.size, layout: md.layout, main: md.main, second: md.second, logo: md.logo, qr: md.qr, show: md.show };
+  lsSet(posterKey(md.id), JSON.stringify({ ...d, headline: md.headline, strap: md.strap })); lsSet(POSTER_LAST, JSON.stringify(d));
+}
+const posterBtn = id => `<button type="button" class="btn sm" data-act="poster-open" data-id="${esc(id)}">Make a poster</button>`;
+const posterKey = id => "carreau-poster:" + id;
+function posterOpen(id) {
+  const e = S.cal?.[id] || calFind(id); if (!posterCan(e)) return;
+  const t = e.kind === "comp" ? S.tournaments[e.tid] : null, own = posterRead(posterKey(id)), d = own || posterRead(POSTER_LAST) || {};
+  const show = {}; POSTER_SHOW.forEach(([k]) => { show[k] = typeof d.show?.[k] === "boolean" ? d.show[k] : !POSTER_OFF.includes(k); });
+  S.calPageRemove = null;
+  S.modal = { poster: true, id, e, show, size: POSTER_SIZES.some(x => x[0] === d.size) ? d.size : "square", layout: POSTER_LAYOUTS.some(x => x[0] === d.layout) ? d.layout : "bold",
+    main: isHex(d.main) ? d.main.toLowerCase() : t && isHex(t.accent) ? t.accent.toLowerCase() : ACCENTS[0][0], second: isHex(d.second) ? d.second.toLowerCase() : POSTER_SECOND[0][0],
+    logo: d.logo !== false, qr: d.qr !== false, headline: typeof own?.headline === "string" ? own.headline : e.name || "", strap: typeof own?.strap === "string" ? own.strap : "", seq: 0 };
+  posterBrand(e); renderModal();
+}
+// the club logo of a competition this device isn't following right now: read it once
+function posterBrand(e) {
+  if (e.kind !== "comp" || S.brand?.[e.tid] !== undefined || !S.store.watchBrand) return;
+  let u = null, done = false;
+  u = S.store.watchBrand(e.tid, b => { S.brand = S.brand || {}; S.brand[e.tid] = b || null; if (!done) { done = true; setTimeout(() => u?.()); } if (S.modal?.poster) renderModal(); }, () => {});
+}
+const POSTER_THUMB = {
+  bold: '<rect x="2" y="2" width="32" height="15" fill="currentColor"/><rect x="2" y="17" width="32" height="2" fill="#d4a72c"/><rect x="5" y="22" width="15" height="2.5" rx="1" fill="currentColor" opacity=".55"/><rect x="5" y="27" width="11" height="2" rx="1" fill="currentColor" opacity=".35"/><rect x="25" y="24" width="7" height="7" fill="currentColor" opacity=".8"/>',
+  band: '<rect x="2" y="2" width="32" height="10" fill="currentColor"/><rect x="2" y="30" width="32" height="4" fill="#d4a72c"/><rect x="5" y="16" width="15" height="2.5" rx="1" fill="currentColor" opacity=".55"/><rect x="5" y="21" width="11" height="2" rx="1" fill="currentColor" opacity=".35"/><rect x="25" y="23" width="7" height="7" fill="#fff" stroke="currentColor"/>',
+  classic: '<rect x="2" y="2" width="32" height="32" fill="#f6f1e7"/><rect x="4" y="4" width="28" height="28" fill="none" stroke="currentColor" stroke-width=".8"/><circle cx="13" cy="10" r="2.6" fill="#7b838a"/><circle cx="19" cy="10.5" r="2.6" fill="#7b838a"/><circle cx="23.5" cy="12" r="1" fill="#d4a72c"/><rect x="10" y="16" width="16" height="3" rx="1" fill="currentColor"/><rect x="12" y="22" width="12" height="2" rx="1" fill="currentColor" opacity=".4"/><rect x="15" y="26" width="6" height="5" fill="currentColor" opacity=".8"/>',
+};
+const posterThumb = k => POSTER_THUMB[k] ? `<svg class="poster-thumb" width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" fill="#fff" stroke="currentColor" stroke-opacity=".35"/>${POSTER_THUMB[k]}</svg>` : "";
+// file sharing (phones whose browser can share an image)
+const posterCanShare = () => { try { return matchMedia("(pointer: coarse)").matches && !!navigator.canShare?.({ files: [new File([""], "poster.png", { type: "image/png" })] }); } catch { return false; } };
+function renderPosterModal(el) {
+  const md = S.modal, e = posterListing(md);
+  if (!e) { S.modal = null; el.innerHTML = ""; return; }
+  const top = el.querySelector(".poster-sheet")?.scrollTop || 0, logo = posterLogoSrc(e), print = md.size === "a4" || md.size === "a5";
+  const chip = (act, k, label, on, pre = "") => `<button type="button" class="hof-chip poster-chip" data-act="${act}" data-k="${k}" aria-pressed="${on}">${pre}<span>${label}</span></button>`;
+  const sw = (act, list, cur, k) => `<div class="swatches" role="group">${list.map(([h, n]) => `<button type="button" class="swatch" data-act="${act}" data-k="${h}" aria-pressed="${cur === h}" aria-label="${n}" title="${n}" style="background:${h}"></button>`).join("")}
+    <label class="swatch custom${list.some(x => x[0] === cur) ? "" : " on"}" title="Choose any colour"><input type="color" data-poster="${k}" value="${esc(cur)}" aria-label="Choose any colour"></label></div>`;
+  const tick = (k, label, on, sub = "") => `<label class="chk cal-chk"><input type="checkbox" data-poster="${k}" ${sub ? `data-k="${sub}"` : ""} ${on ? "checked" : ""}><span>${label}</span></label>`;
+  const box = (k, label, ph) => `<label class="f"><span>${label}</span><input type="text" maxlength="120" data-poster="${k}" value="${esc(md[k])}" ${ph ? `placeholder="${ph}"` : ""}></label>`;
+  el.innerHTML = `<div class="scrim poster-scrim" data-act="close-bg"><div class="modal poster-sheet" role="dialog" aria-modal="true" aria-label="Make a poster">
+    <div class="spread"><div><div class="eyebrow" data-notr>${esc(e.name)}</div><h3>Make a poster</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
+    <div class="poster-body">
+      <div class="poster-prev-col"><div class="poster-prev" data-poster-prev></div><div class="sr-only poster-words" data-poster-words></div></div>
+      <div class="poster-ctl stack">
+        <div class="stack" style="gap:6px"><div class="eyebrow">Size</div><div class="poster-chips" role="group" aria-label="Size">${POSTER_SIZES.map(([k, l]) => chip("poster-size", k, l, md.size === k)).join("")}</div></div>
+        <div class="stack" style="gap:6px"><div class="eyebrow" data-notr>${esc(trAs("Poster layout", "Layout"))}</div><div class="poster-chips" role="group">${POSTER_LAYOUTS.map(([k, l]) => chip("poster-layout", k, l, md.layout === k, posterThumb(k))).join("")}</div></div>
+        <div class="stack" style="gap:6px"><div class="eyebrow">Main colour</div>${sw("poster-main", ACCENTS, md.main, "main")}
+          ${logo ? `<div><button type="button" class="btn" data-act="poster-match">Match the logo</button></div>` : ""}</div>
+        <div class="stack" style="gap:6px"><div class="eyebrow">Second colour</div>${sw("poster-second", POSTER_SECOND, md.second, "second")}</div>
+        ${logo ? tick("logo", "Show the club logo", md.logo) : ""}
+        <div class="stack" style="gap:10px">${box("headline", "Headline")}${box("strap", "Strapline", "e.g. Open triples · £300 prize fund")}</div>
+        <div class="stack" style="gap:2px"><div class="eyebrow">Show on the poster</div><div class="poster-ticks">${POSTER_SHOW.filter(([k]) => posterHas(e, k)).map(([k, l]) => tick("show", l, md.show[k], k)).join("")}</div></div>
+        ${tick("qr", "Show the QR code", md.qr)}
+        <div class="row poster-btns"><button type="button" class="btn primary" data-act="poster-download">Download</button>${posterCanShare() ? `<button type="button" class="btn" data-act="poster-share">Share</button>` : ""}${print ? `<button type="button" class="btn" data-act="poster-print">Print</button>` : ""}<button type="button" class="btn" data-act="close">Close</button></div>
+        <p class="small muted">Check the details before you share it. Change them in the listing, not here.</p>
+      </div>
+    </div>
+  </div></div>`;
+  localize(el);
+  if (!md.cv) { md.cv = document.createElement("canvas"); md.cv.setAttribute("role", "img"); }
+  md.cv.setAttribute("aria-label", posterHeadline(md, e));
+  el.querySelector("[data-poster-prev]").appendChild(md.cv);
+  if (md.words) { el.querySelector("[data-poster-words]").innerHTML = md.words; }
+  const sheet = el.querySelector(".poster-sheet"); if (sheet) sheet.scrollTop = top;
+  posterSoon();
+}
+function posterSoon() { clearTimeout(S.posterTimer); S.posterTimer = setTimeout(() => { const md = S.modal; if (md?.poster) posterDraw(md).catch(err => { console.error(err); toast("The poster couldn't be made. Try again."); }); }, 150); }
+function posterInput(el) {
+  const md = S.modal, k = el.dataset.poster;
+  if (k === "headline" || k === "strap") md[k] = el.value;
+  else if (k === "main" || k === "second") { if (!isHex(el.value)) return; md[k] = el.value.toLowerCase();
+    const g = el.closest(".swatches"); g?.querySelectorAll(".swatch[aria-pressed]").forEach(b => b.setAttribute("aria-pressed", "false")); el.closest(".swatch")?.classList.add("on"); }
+  else if (k === "show") { if (!POSTER_SHOW.some(x => x[0] === el.dataset.k)) return; md.show[el.dataset.k] = el.checked; }
+  else if (k === "logo" || k === "qr") md[k] = el.checked;
+  else return;
+  posterSave(md); posterSoon();
+}
+async function posterAction(act, k) {
+  const md = S.modal;
+  if (act === "poster-size" && POSTER_SIZES.some(x => x[0] === k)) md.size = k;
+  else if (act === "poster-layout" && POSTER_LAYOUTS.some(x => x[0] === k)) md.layout = k;
+  else if ((act === "poster-main" || act === "poster-second") && isHex(k)) md[act === "poster-main" ? "main" : "second"] = k.toLowerCase();
+  else if (act === "poster-match") { const src = posterLogoSrc(posterListing(md)); const c = src ? posterLogoColour(await posterImg(src).catch(() => null)) : null; if (!c || S.modal !== md) return; md.main = c; }
+  else if (act === "poster-download") { await posterDownload(md); return; }
+  else if (act === "poster-share") { await posterShare(md); return; }
+  else if (act === "poster-print") { await posterPrint(md); return; }
+  else return;
+  posterSave(md); renderModal();
+}
+// the logo's strongest colour: the most common colour bucket, weighted by how saturated it is, ignoring near-white,
+// near-black and see-through pixels
+function posterLogoColour(img) {
+  if (!img) return null;
+  const n = 64, cv = document.createElement("canvas"); cv.width = cv.height = n; const c = cv.getContext("2d", { willReadFrequently: true });
+  c.drawImage(img, 0, 0, n, n); const d = c.getImageData(0, 0, n, n).data, bins = new Map();
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i + 1], b = d[i + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    if (d[i + 3] < 128 || mn > 225 || mx < 40) continue;
+    const key = (r >> 5) << 6 | (g >> 5) << 3 | (b >> 5), o = bins.get(key) || { w: 0, n: 0, r: 0, g: 0, b: 0 };
+    o.w += .15 + (mx - mn) / mx; o.n++; o.r += r; o.g += g; o.b += b; bins.set(key, o);
+  }
+  let best = null; bins.forEach(o => { if (!best || o.w > best.w) best = o; });
+  return best ? hexOf([best.r / best.n, best.g / best.n, best.b / best.n]) : null;
+}
+const posterImgs = new Map();
+const posterImg = src => { if (!posterImgs.has(src)) posterImgs.set(src, new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => { posterImgs.delete(src); rej(new Error("image")); }; i.src = src; })); return posterImgs.get(src); };
+let posterFonts = null;
+const posterFontsReady = () => posterFonts || (posterFonts = Promise.all(['700 100px "Barlow Condensed"', '600 100px "Barlow Condensed"', "400 100px Barlow", "500 100px Barlow", "600 100px Barlow"]
+  .map(f => document.fonts?.load(f))).catch(() => {}));
+// what goes on the poster, in the site's language; v (and v2, the address) as typed
+function posterItems(e, md) {
+  const on = k => md.show[k] && posterHas(e, k), items = [];
+  if (on("date")) items.push({ k: "date", v: calDate(e, { weekday: "long", day: "numeric", month: "long", year: "numeric" }) });
+  if (on("times")) items.push({ k: "times", v: [e.checkin ? tr(`Check-in from ${e.checkin}`) : "", e.start ? tr(`Play starts ${e.start}`) : ""].filter(Boolean).join("  ·  ") });
+  if (on("venue") || on("address")) items.push({ k: "venue", label: tr(on("venue") ? "Venue" : "Address"), v: on("venue") ? e.venue : e.address, v2: on("venue") && on("address") ? e.address : "" });
+  if (on("format")) items.push({ k: "format", label: tr("Format"), v: posterFmt(e) });
+  if (on("who")) items.push({ k: "who", label: tr("Who can enter"), v: posterWho(e) });
+  if (on("fee")) items.push({ k: "fee", label: tr("Entry fee"), v: e.fee });
+  if (on("prizes")) items.push({ k: "prizes", label: tr("Prizes"), v: e.prizes });
+  if (on("howTo")) items.push({ k: "howTo", label: tr("How to enter"), v: e.howTo });
+  if (on("contact")) items.push({ k: "contact", label: tr("Contact"), v: e.contact });
+  return items;
+}
+// lines that fit maxW; past maxLines the last one ends in "…" (a word too long for a line is broken)
+function posterWrap(ctx, text, maxW, maxLines = 2) {
+  const fit = s => ctx.measureText(s).width <= maxW, lines = []; let cur = "";
+  for (let w of String(text || "").replace(/\s+/g, " ").trim().split(" ").filter(Boolean)) {
+    const next = cur ? cur + " " + w : w;
+    if (fit(next)) { cur = next; continue; }
+    if (cur) lines.push(cur);
+    while (w.length > 1 && !fit(w)) { let i = w.length - 1; while (i > 1 && !fit(w.slice(0, i))) i--; lines.push(w.slice(0, i)); w = w.slice(i); }
+    cur = w;
+  }
+  if (cur) lines.push(cur);
+  if (lines.length <= maxLines) return lines;
+  let last = lines.slice(maxLines - 1).join(" "); posterWrap.cut = true;
+  while (last.length > 1 && !fit(last + "…")) last = last.slice(0, -1).trimEnd();
+  return [...lines.slice(0, maxLines - 1), last + "…"];
+}
+// the headline: the biggest size (down to minPx) at which it fits in 3 lines and maxH
+function posterHead(ctx, text, maxW, maxH, maxPx, minPx) {
+  const font = px => `700 ${px}px ${POSTER_FONT.d}`;
+  for (let px = maxPx; px > minPx; px *= .94) { ctx.font = font(px); const L = posterWrap(ctx, text, maxW, 99); if (L.length <= 3 && L.length * px * .98 <= maxH) return { px, L, font: font(px) }; }
+  ctx.font = font(minPx); return { px: minPx, L: posterWrap(ctx, text, maxW, 3), font: font(minPx) };
+}
+function posterText(ctx, L, x, y, px, lh, colour, align = "left") {
+  ctx.fillStyle = colour; ctx.textAlign = align; ctx.textBaseline = "alphabetic";
+  L.forEach((ln, i) => ctx.fillText(ln, x, y + px * .8 + i * px * lh)); return L.length * px * lh;
+}
+const posterSpacing = (ctx, v) => { if ("letterSpacing" in ctx) ctx.letterSpacing = v; };
+// the details: the date (large) and the times across the column, then the labelled facts in `cols` columns.
+// Returns the height used at scale s; draws only when asked.
+function posterFacts(ctx, items, o, s, draw) {
+  const u = o.u, gap = 4 * u, cols = o.cols, colW = (o.w - gap * (cols - 1)) / cols, c = o.align === "center";
+  let y = o.y;
+  const put = (text, font, px, lh, colour, x, w, lines, yy) => { ctx.font = font; const L = posterWrap(ctx, text, w, lines); if (draw) posterText(ctx, L, c ? x + w / 2 : x, yy, px, lh, colour, c ? "center" : "left"); return L.length * px * lh; };
+  const date = items.find(i => i.k === "date"), times = items.find(i => i.k === "times"), facts = items.filter(i => i.label);
+  if (date) { const px = 6.4 * u * s; y += put(date.v, `700 ${px}px ${POSTER_FONT.d}`, px, 1.02, o.date, o.x, o.w, 2, y); }
+  if (times) { const px = 3.3 * u * s; y += (date ? .6 * u * s : 0) + put(times.v, `600 ${px}px ${POSTER_FONT.b}`, px, 1.2, o.ink, o.x, o.w, 2, y + (date ? .6 * u * s : 0)); }
+  if ((date || times) && facts.length) y += 3 * u * s;
+  for (let i = 0; i < facts.length; i += cols) {
+    let rowH = 0;
+    facts.slice(i, i + cols).forEach((f, j) => {
+      const x = o.x + j * (colW + gap), lp = 2.25 * u * s, vp = 3.2 * u * s, ap = 2.7 * u * s;
+      posterSpacing(ctx, `${(.12 * lp).toFixed(1)}px`);
+      let h = put(f.label.toLocaleUpperCase(LOCALES[I18N.lang] || "en"), `700 ${lp}px ${POSTER_FONT.d}`, lp, 1.1, o.label, x, colW, 1, y);
+      posterSpacing(ctx, "0px");
+      h += .7 * u * s + put(f.v, `500 ${vp}px ${POSTER_FONT.b}`, vp, 1.2, o.ink, x, colW, 2, y + h + .7 * u * s);
+      if (f.v2) h += put(f.v2, `400 ${ap}px ${POSTER_FONT.b}`, ap, 1.2, o.sub, x, colW, 2, y + h);
+      rowH = Math.max(rowH, h);
+    });
+    y += rowH + (i + cols < facts.length ? 2.4 * u * s : 0);
+  }
+  return y - o.y;
+}
+// the facts at the largest scale that fits in o.h (one column or two, whichever lets them be bigger), then drawn
+// Each box is a place the facts could go (beside the QR code, or above it); returns the one used.
+function posterFactsFit(ctx, items, boxes, o) {
+  let best = null;
+  const fits = (oo, s) => { posterWrap.cut = false; const h = posterFacts(ctx, items, oo, s, false); return h <= oo.h && !posterWrap.cut; };
+  boxes.forEach((b, i) => { for (const cols of b.w >= 50 * o.u ? [1, 2] : [1]) {
+    const oo = { ...o, ...b, cols }; let s = 2; while (s > .5 && !fits(oo, s)) s -= .05;
+    if (!best || s > best.s + .001 || (s > best.s - .001 && oo.w > best.oo.w)) best = { s, oo, i };
+  } });
+  const oo = best.oo, h = posterFacts(ctx, items, oo, best.s, false);
+  if (o.valign === "center") oo.y += Math.max(0, (oo.h - h) / 2);
+  posterFacts(ctx, items, oo, best.s, true);
+  return best.i;
+}
+const posterRect = (ctx, x, y, w, h, r) => { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else { ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); } };
+// the logo, kept in proportion, centred in a white tile (round or rounded square) so any logo reads
+function posterLogo(ctx, img, x, y, size, round) {
+  ctx.save(); ctx.shadowColor = "rgba(0,0,0,.18)"; ctx.shadowBlur = size * .08; ctx.shadowOffsetY = size * .02; ctx.fillStyle = "#fff";
+  if (round) { ctx.beginPath(); ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2); } else posterRect(ctx, x, y, size, size, size * .16);
+  ctx.fill(); ctx.restore();
+  const pad = size * (round ? .2 : .12), box = size - 2 * pad, k = Math.min(box / img.naturalWidth, box / img.naturalHeight), w = img.naturalWidth * k, h = img.naturalHeight * k;
+  ctx.drawImage(img, x + (size - w) / 2, y + (size - h) / 2, w, h);
+}
+// the QR code: dark modules on a white box with a 4-module quiet zone, whole pixels per module
+function posterQr(ctx, q, x, y, size) {
+  const n = q.n + 8, mod = size / n; x = Math.round(x); y = Math.round(y);
+  ctx.fillStyle = "#fff"; posterRect(ctx, x, y, size, size, mod * 1.5); ctx.fill(); ctx.fillStyle = "#000";
+  for (let r = 0; r < q.n; r++) for (let c = 0; c < q.n; c++) if (q.dark(r, c)) ctx.fillRect(x + (c + 4) * mod, y + (r + 4) * mod, mod, mod);
+}
+// the QR code with "Scan to enter" / "Scan for details" and snpetanque.com under it (centred on cx); without the
+// generator (the app on its own) the link is printed in its place. Returns the height used.
+function posterQrBlock(ctx, P, cx, y, colour, draw = true) {
+  const u = P.u, lp = 3 * u, wp = 2.4 * u;
+  let h = 0;
+  if (P.q) { if (draw) posterQr(ctx, P.q, cx - P.qs / 2, y, P.qs); h = P.qs + 1.6 * u; }
+  else { ctx.font = `500 ${wp}px ${POSTER_FONT.b}`; const L = posterWrap(ctx, P.link, P.qs * 1.25, 4); if (draw) posterText(ctx, L, cx, y, wp, 1.25, colour, "center"); return L.length * wp * 1.25; }
+  ctx.font = `700 ${lp}px ${POSTER_FONT.d}`; if (draw) posterText(ctx, [P.label], cx, y + h, lp, 1.1, colour, "center"); h += lp * 1.15;
+  ctx.font = `500 ${wp}px ${POSTER_FONT.b}`; if (draw) posterText(ctx, ["snpetanque.com"], cx, y + h, wp, 1.2, colour, "center"); h += wp * 1.2;
+  return h;
+}
+// a boule (shaded steel) or the jack, for Classic
+function posterBall(ctx, x, y, r, colour) {
+  ctx.save(); ctx.fillStyle = "rgba(60,45,20,.16)"; ctx.beginPath(); ctx.ellipse(x + r * .15, y + r * .95, r * .95, r * .22, 0, 0, Math.PI * 2); ctx.fill();
+  const g = ctx.createRadialGradient(x - r * .35, y - r * .4, r * .08, x, y, r);
+  if (colour) { g.addColorStop(0, mixHex(colour, "#ffffff", .45)); g.addColorStop(1, mixHex(colour, "#000000", .25)); }
+  else { g.addColorStop(0, "#f4f6f7"); g.addColorStop(.45, "#9aa3aa"); g.addColorStop(1, "#4a5157"); }
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+async function posterDraw(md) {
+  const e = posterListing(md); if (!e || !md.cv) return;
+  const seq = md.seq = (md.seq || 0) + 1, [, , W, H] = POSTER_SIZES.find(x => x[0] === md.size);
+  const link = calLink(md.id), logoSrc0 = md.logo ? posterLogoSrc(e) : "";
+  const [, img, q] = await Promise.all([posterFontsReady(), logoSrc0 ? posterImg(logoSrc0).catch(() => null) : null,
+    md.qr && S.qrMatrix ? S.qrMatrix(link).catch(err => { console.error(err); return null; }) : null]);
+  if (S.modal !== md || md.seq !== seq) return;
+  const cv = md.cv; if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  const ctx = cv.getContext("2d"), u = W / 100, m = 7 * u, items = posterItems(e, md);
+  const head = posterHeadline(md, e), strap = String(md.strap || "").trim(), main = md.main, second = md.second, onMain = posterInk(main);
+  const P = { u, link, label: tr(posterQrLabel(e)), q: md.qr ? q : null, qs: 0 };
+  if (P.q) P.qs = Math.ceil(23.5 * u / (P.q.n + 8)) * (P.q.n + 8); else if (md.qr) P.qs = 24 * u;
+  const qrH = md.qr ? posterQrBlock(ctx, P, 0, 0, "#000", false) : 0;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, W, H); posterSpacing(ctx, "0px");
+  const onWhite = readableOn(main, "#ffffff"), sub = "#4d5a55";
+  const L = md.layout;
+  if (L === "classic") {
+    const ground = POSTER_CREAM, accent = readableOn(main, ground), jack = contrastOf(second, ground) < 1.6 ? main : second;
+    ctx.fillStyle = ground; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = accent; ctx.lineWidth = .45 * u; ctx.strokeRect(3.4 * u, 3.4 * u, W - 6.8 * u, H - 6.8 * u);
+    ctx.lineWidth = .15 * u; ctx.strokeRect(4.5 * u, 4.5 * u, W - 9 * u, H - 9 * u);
+    if (img) posterLogo(ctx, img, 8 * u, 8 * u, 13 * u, true);
+    const r = 4.6 * u, my = m + 5.5 * u, cx = W / 2;
+    posterBall(ctx, cx - 10.5 * u, my, r); posterBall(ctx, cx + .5 * u, my - .8 * u, r); posterBall(ctx, cx + 11.5 * u, my + .3 * u, r); posterBall(ctx, cx - 4.6 * u, my + 4.3 * u, 1.35 * u, jack);
+    let y = my + r + 4.5 * u;
+    const hd = posterHead(ctx, head, W - 2 * m - 4 * u, (H > W ? 30 : 17) * u, (H > W * 1.5 ? 15 : H > W ? 14 : 12) * u, 5.5 * u);
+    ctx.font = hd.font; y += posterText(ctx, hd.L, cx, y, hd.px, .98, accent, "center");
+    if (strap) { const px = 3.6 * u; ctx.font = `600 ${px}px ${POSTER_FONT.b}`; y += 1.2 * u + posterText(ctx, posterWrap(ctx, strap, W - 2 * m - 6 * u, 2), cx, y + 1.2 * u, px, 1.2, POSTER_INK, "center"); }
+    y += 2.4 * u; ctx.fillStyle = jack; ctx.fillRect(cx - 14 * u, y, 10 * u, .3 * u); ctx.fillRect(cx + 4 * u, y, 10 * u, .3 * u);
+    ctx.save(); ctx.translate(cx, y + .15 * u); ctx.rotate(Math.PI / 4); ctx.fillRect(-1.1 * u, -1.1 * u, 2.2 * u, 2.2 * u); ctx.restore();
+    y += 3.6 * u;
+    // the facts above the QR code, or beside it (whichever lets them be bigger)
+    const fx = m + 2 * u, fw = W - 2 * m - 4 * u, boxes = [{ x: fx, y, w: fw, h: H - m - (md.qr ? qrH + 2.5 * u : 0) - y }];
+    if (md.qr) boxes.push({ x: fx, y, w: fw - P.qs - 5 * u, h: H - m - 2 * u - y });
+    const at = posterFactsFit(ctx, items, boxes, { u, align: "center", valign: "center", date: accent, ink: POSTER_INK, label: accent, sub });
+    if (md.qr) at ? posterQrBlock(ctx, P, W - m - 2 * u - P.qs / 2, y + Math.max(0, (H - m - 2 * u - y - qrH) / 2), POSTER_INK) : posterQrBlock(ctx, P, cx, H - m - qrH, POSTER_INK);
+  } else {
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H);
+    const bold = L === "bold", hu = H / u, hb = (bold ? (H > W ? .4 : .44) : .3) * hu * u, bb = 11 * u;
+    ctx.fillStyle = main; ctx.fillRect(0, 0, W, hb);
+    // two big faint boules in the corner of the block
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, hb); ctx.clip(); ctx.fillStyle = onMain === "#ffffff" ? "rgba(255,255,255,.07)" : "rgba(0,0,0,.06)";
+    ctx.beginPath(); ctx.arc(W * .93, hb * (bold ? .2 : .1), 30 * u, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(W * .7, hb * 1.02, 12 * u, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    let hx = m, hTop = m, hw = W - 2 * m;
+    if (bold) {
+      ctx.fillStyle = second; ctx.fillRect(0, hb, W, 1.6 * u);
+      if (img) { posterLogo(ctx, img, m, m, 15 * u, false); hTop = m + 19 * u; }
+    } else if (img) { const ls = Math.min(20 * u, hb - 8 * u); posterLogo(ctx, img, m, (hb - ls) / 2, ls, true); hx = m + ls + 5 * u; hw = W - hx - m; hTop = 4 * u; }
+    const strapPx = 3.7 * u; ctx.font = `600 ${strapPx}px ${POSTER_FONT.b}`; const sL = strap ? posterWrap(ctx, strap, hw, 2) : [];
+    const sH = sL.length ? sL.length * strapPx * 1.22 + 1.6 * u : 0, hBot = bold ? hb - 5.5 * u : hb - 4 * u;
+    const hd = posterHead(ctx, head.toLocaleUpperCase(LOCALES[I18N.lang] || "en"), hw, hBot - hTop - sH, (H > W * 1.5 ? 17 : bold ? 14 : 11) * u, 5 * u);
+    const blockH = hd.L.length * hd.px * .98 + sH, y0 = bold ? hBot - blockH : hTop + (hBot - hTop - blockH) / 2;
+    ctx.font = hd.font; posterText(ctx, hd.L, hx, y0, hd.px, .98, onMain);
+    if (sL.length) { ctx.font = `600 ${strapPx}px ${POSTER_FONT.b}`; ctx.globalAlpha = .92; posterText(ctx, sL, hx, y0 + hd.L.length * hd.px * .98 + 1.6 * u, strapPx, 1.22, onMain); ctx.globalAlpha = 1; }
+    let qx = W - m - P.qs, qy;
+    if (bold) qy = H - m - qrH;
+    else {
+      // the thin band in the second colour along the bottom, with the QR code's words; the code's white card stands on it
+      const onSecond = posterInk(second); ctx.fillStyle = second; ctx.fillRect(0, H - bb, W, bb);
+      if (contrastOf(second, "#ffffff") < 1.3) { ctx.fillStyle = "#e3ded3"; ctx.fillRect(0, H - bb, W, .25 * u); }
+      if (md.qr && P.q) {
+        qy = H - 3 * u - P.qs;
+        ctx.save(); ctx.shadowColor = "rgba(0,0,0,.22)"; ctx.shadowBlur = 2 * u; ctx.shadowOffsetY = .5 * u; ctx.fillStyle = "#fff"; posterRect(ctx, qx, qy, P.qs, P.qs, u); ctx.fill(); ctx.restore();
+        posterQr(ctx, P.q, qx, qy, P.qs);
+        const lp = 4 * u, wp = 2.8 * u, tw = qx - m - 3 * u, ty = H - bb + (bb - lp * 1.1 - wp * 1.25) / 2;
+        ctx.font = `700 ${lp}px ${POSTER_FONT.d}`; posterText(ctx, posterWrap(ctx, P.label + "  →", tw, 1), m, ty, lp, 1.1, onSecond);
+        ctx.font = `500 ${wp}px ${POSTER_FONT.b}`; posterText(ctx, ["snpetanque.com"], m, ty + lp * 1.1, wp, 1.25, onSecond);
+      } else if (md.qr) { const wp = 2.6 * u; ctx.font = `500 ${wp}px ${POSTER_FONT.b}`; const lk = posterWrap(ctx, link, W - 2 * m, 2); posterText(ctx, lk, m, H - bb + (bb - lk.length * wp * 1.25) / 2, wp, 1.25, onSecond); }
+      else { const wp = 3 * u; ctx.font = `600 ${wp}px ${POSTER_FONT.b}`; posterText(ctx, ["snpetanque.com"], W / 2, H - bb + (bb - wp * 1.2) / 2, wp, 1.2, onSecond, "center"); }
+    }
+    if (bold && md.qr) posterQrBlock(ctx, P, qx + P.qs / 2, qy, POSTER_INK);
+    // the facts beside the QR code, or above it (whichever lets them be bigger)
+    const fy = hb + (bold ? 1.6 * u : 0) + 6 * u, fBot = bold ? H - m : H - bb - 4 * u, qrCol = bold ? md.qr : !!P.q;
+    const boxes = qrCol ? [{ x: m, y: fy, w: qx - m - 4 * u, h: fBot - fy }, { x: m, y: fy, w: W - 2 * m, h: qy - 3 * u - fy }] : [{ x: m, y: fy, w: W - 2 * m, h: fBot - fy }];
+    posterFactsFit(ctx, items, boxes, { u, align: "left", valign: "top", date: onWhite, ink: POSTER_INK, label: onWhite, sub });
+  }
+  md.info = { w: W, h: H, layout: L, size: md.size, qr: !!P.q, link: md.qr ? link : "", label: md.qr ? P.label : "", onMain, head, items: items.map(i => i.k) };
+  // the poster's words for screen readers (what the organiser typed stays as typed)
+  md.words = `<p data-notr>${esc(head)}</p>${strap ? `<p data-notr>${esc(strap)}</p>` : ""}${items.map(i => `<p>${i.label ? `${esc(i.label)}: ` : ""}<span data-notr>${esc([i.v, i.v2].filter(Boolean).join(", "))}</span></p>`).join("")}${md.qr ? `<p>${esc(P.label)}</p>` : ""}`;
+  const box = document.querySelector("#modal [data-poster-words]"); if (box) box.innerHTML = md.words;
+  md.drawn = seq;
+}
+// the PNG, from a fresh drawing
+async function posterBlob(md) {
+  clearTimeout(S.posterTimer); await posterDraw(md);
+  if (!md.info) throw new Error("poster");
+  return new Promise((res, rej) => md.cv.toBlob(b => b ? res(b) : rej(new Error("toBlob")), "image/png"));
+}
+const posterFile = md => `${fileBase(posterHeadline(md, posterListing(md)), "poster")} poster.png`; // i18n-ok
+async function posterDownload(md) {
+  if (!S.downloads) return;
+  let blob; try { blob = await posterBlob(md); } catch (err) { console.error(err); toast("The poster couldn't be made. Try again."); return; }
+  try { await S.downloads.save({ filename: posterFile(md), data: blob }); } catch (err) { if (err?.code !== "cancelled") toast("The file wasn't saved."); }
+}
+async function posterShare(md) {
+  let file; try { file = new File([await posterBlob(md)], posterFile(md), { type: "image/png" }); } catch (err) { console.error(err); toast("The poster couldn't be made. Try again."); return; }
+  if (!navigator.canShare?.({ files: [file] })) return;
+  try { await navigator.share({ files: [file], title: posterHeadline(md, posterListing(md)), text: calLink(md.id) }); } catch (err) { if (err?.name !== "AbortError") toast("The poster couldn't be made. Try again."); }
+}
+// A4 or A5: the poster alone on one page of that size (which also gives "Save as PDF"), removed once printed
+function posterPrintClear() { const b = $("#poster-print"); if (b) { URL.revokeObjectURL(b.querySelector("img")?.src || ""); b.remove(); } $("#poster-print-css")?.remove(); }
+async function posterPrint(md) {
+  const size = md.size === "a4" ? ["A4", 210, 297] : md.size === "a5" ? ["A5", 148, 210] : null; if (!size) return;
+  let blob; try { blob = await posterBlob(md); } catch (err) { console.error(err); toast("The poster couldn't be made. Try again."); return; }
+  posterPrintClear();
+  const box = document.createElement("div"); box.id = "poster-print"; const img = new Image(); img.alt = ""; img.src = URL.createObjectURL(blob); box.appendChild(img);
+  const st = document.createElement("style"); st.id = "poster-print-css";
+  st.textContent = `@page{size:${size[0]} portrait;margin:0}@media screen{#poster-print{display:none}}@media print{html,body{margin:0!important;padding:0!important;background:#fff!important}body>*:not(#poster-print){display:none!important}#poster-print{display:block!important;width:${size[1]}mm;height:${size[2]}mm;overflow:hidden}#poster-print img{display:block;width:100%;height:100%}}`;
+  document.head.appendChild(st); document.body.appendChild(box);
+  try { await img.decode(); } catch {}
+  addEventListener("afterprint", posterPrintClear, { once: true });
+  window.print();
+}
 function overrideBox(list, ko) {
   return `<div class="notice stack" style="gap:6px"><b>This correction changes who went through.</b>
     ${ko ? `<span>The knockouts were drawn from these standings. Saving keeps them as they are. To redraw them, cancel and use Undo bracket first, while no knockout game has finished.</span>` : ""}
@@ -4524,6 +4904,7 @@ function drawModal() {
   const el = $("#modal"); const t = T();
   if (S.modal?.cal && S.modal.ev) { renderCalModal(null, el); return; } // an event run elsewhere has no competition
   if (S.modal?.calEnt) { renderCalEntModal(el); return; } // a player's online entry (the Season Calendar page)
+  if (S.modal?.poster) { renderPosterModal(el); return; } // the poster maker (a Season Calendar listing)
   if (!S.modal || !t) { el.innerHTML = ""; return; }
   if (S.modal.hof) { if (S.modal.tid !== t.id) { S.modal = null; el.innerHTML = ""; return; } renderHofModal(t, el); return; }
   if (S.modal.cal) { if (S.modal.tid !== t.id) { S.modal = null; el.innerHTML = ""; return; } renderCalModal(t, el); return; }
@@ -4584,6 +4965,7 @@ async function modalAction(act, k, a) {
   if (md.hof) { await hofAction(act, k); return; }
   if (md.cal) { await calAction(act, k); return; }
   if (md.calEnt) { if (act === "cal-ent-send") await calEntSend(); return; }
+  if (md.poster) { await posterAction(act, k); return; }
   // the game went while its dialog was open (a draw undone on another phone, say): close it rather than save into nothing
   if (!t || (md.id && !S.matches[md.id]) || (md.so && (md.ids || []).some(id => !S.matches[id]))) { S.modal = null; renderModal(); toast("That game isn't in the draw any more."); return; }
   if (act === "shoot-save") { await saveShooting(a?.dataset.final === "1"); return; }
@@ -6265,6 +6647,7 @@ document.addEventListener("click", async e => {
     case "hof-share": await hofShare(a.dataset.id); break;
     case "cal-ics": await calIcsSave(a.dataset.id); break;
     case "cal-share": await calShare(a.dataset.id); break;
+    case "poster-open": posterOpen(a.dataset.id); break;
     case "hof-view": if (HOF_VIEWS.some(x => x[0] === a.dataset.k)) { hofPage().view = a.dataset.k; hofPage().open = null; lsSet("carreau-hof-view", a.dataset.k); } hofRedraw(); break;
     case "hof-open-entry": hofPage().open = a.dataset.id; hofPaint(); document.querySelector(`#hof-${CSS.escape(a.dataset.id)} [data-act="hof-close-entry"]`)?.focus({ preventScroll: true }); break;
     case "hof-close-entry": { const id = a.dataset.id; hofPage().open = null; if (hofPage().hl === id) hofPage().hl = null; hofPaint(); document.getElementById("hof-" + id)?.focus({ preventScroll: true }); break; }
@@ -6464,6 +6847,7 @@ document.addEventListener("input", e => {
   if (e.target.dataset?.hof && S.modal?.hof) { hofInput(e.target); return; }
   if (e.target.dataset?.cal && S.modal?.cal) { calInput(e.target); return; }
   if (e.target.dataset?.calent && S.modal?.calEnt) { calEntInput(e.target); return; }
+  if (e.target.dataset?.poster && S.modal?.poster) { posterInput(e.target); return; }
   if (e.target.id === "hof-q") { hofPage().q = e.target.value; hofPaint(); return; }
   if (e.target.id === "cal-q") { calPage().q = e.target.value; calPaint(); return; }
   if (e.target.id === "picker-q") {
