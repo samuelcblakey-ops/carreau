@@ -20,6 +20,10 @@ const { chromium } = require('playwright');
       + ' | preview hidden ' + (q('.sh-demo')?.getAttribute('aria-hidden') === 'true') + ' inert ' + !!q('.sh-demo')?.inert + ' games ' + qa('.sh-demo .shd-g').length
       + ' | ' + [q('.shd-bar'), ...qa('.shd-gh'), q('.shd-table .eyebrow')].map(txt).join(' / ') + ' | first focusable ' + q('#main button, #main a')?.dataset.act; });
   console.log('hero: ' + await hero());
+  // support the site: a tile and a footer line, both opening Sam's Ko-fi page in a new tab
+  const support = () => p.evaluate(() => { const t = document.querySelector('.start-actions a.ext'), f = document.querySelector('#foot .foot-support a'), txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim();
+    return 'tile ' + txt(t) + ' | ' + t?.getAttribute('href') + ' ' + t?.target + ' ' + t?.rel + ' | footer ' + txt(f.closest('.foot-support')) + ' | ' + f?.getAttribute('href') + ' ' + f?.target + ' ' + f?.rel; });
+  console.log('support: ' + await support());
   // 2. an example exists: still the start screen, the example is a card
   await p.evaluate(async () => { const S = window.__carreau.S; await S.store.setTournament({ id: 'tex1', name: 'Example Swiss', system: 'swiss', format: 'triples', entry: 'teams', teams: [], players: [], draws: [], pools: [], brackets: [], courts: [], archived: false, listed: true, created: 5 }); });
   await p.reload(); await w(400);
@@ -58,6 +62,7 @@ const { chromium } = require('playwright');
   await p.click('header .brand .home'); await w(150);
   await p.click('[data-act="lang-menu"]'); await w(60); await p.click('[data-lang="fr"]'); await w(150);
   console.log('french: ' + await p.evaluate(() => [document.querySelector('.start-hero h1'), ...document.querySelectorAll('.start-card b')].map(e => e.textContent.trim()).join(' | ')) + ' | ' + await p.getAttribute('header .brand .home', 'aria-label'));
+  console.log('french support: ' + await support());
   console.log('french hero: ' + await hero() + ' | ' + (await exs()).replace(/ \| focus.*/, ''));
   await p.click('[data-act="lang-menu"]'); await w(60); await p.click('[data-lang="en"]'); await w(150);
   // 9. phone: "+ New" keeps its word, nothing scrolls sideways
