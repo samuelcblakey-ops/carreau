@@ -373,6 +373,8 @@ const SUITES = {
       /picker from stream page: true \| true \| #\w+ \| Registration \| stream page false/, /errs \[\]/],
     'app-overlay-layout.js': [/landscape default at 390: overlaps none/, /portrait default at 390: overlaps none/,
       /drag moves box: l bar moved \| l line moved \| l card moved \| p bar moved \| p line moved \| p card moved/, /errs \[\]/],
+    'app-flags.js': [/flag font face: Twemoji Country Flags \| range U\+1F1E6-1F1FF, U\+1F3F4, U\+E0062-E007F/, /flag font first in stacks: true/, /flag font used for 🇮🇹: true/,
+      /latin text still Barlow: true/, /draw shows flags: true \| flag font loaded true/, /row height plain \d+ flags \d+ \| grew ≤4px true \| one line true/, /no sideways scroll: true/, /errs \[\]/],
     'app-overlay-names.js': [/landscape 1280x720: truncated none \| holding dot visible true/, /portrait 720x1280: truncated none \| holding dot visible true/, /errs \[\]/],
     'app-streams.js': [/desk: Who won the mène\? \| label MÈNE/, /overlay: Mène 3 \| bar label Mène/, /fr desk: Mène \| Qui a gagné la mène \?/, /welcome link: true/, /tabs: entries,setup,draw,courts,standings,stream \| no big screen tab true/, /stream tab: Stream \| new stream true \| comp games panel true \| big screen button true/, /big screen: true tab highlighted none true/,
       /home: true picker closed true \| Stream a game/, /created: true true \| title Team A v Team B \| player boxes 2/, /saved: Les Carreaux \/ Marc Dupont\+Sophie Martin v Boule d'Or \/ Pierre Lefèvre\+Aline Rossi \| Club friendly piste 3 to 11 \| title Les Carreaux v Boule d'Or/,
