@@ -563,6 +563,7 @@ const SUITES = {
       // calendar-page
       /^web page listing: ok$/m, /^web page: title Season Calendar \| listed true \| no competition watched true \| wide false$/m,
       /^web open listing: How to enter true \| Follow the draw false before draw \| view true \| Follow the draw true after draw$/m,
+      /^web ics: file \*\.ics \| type text\/calendar;charset=utf-8$/m,
       /^web deep link: opens true \| strip for visitor false$/m,
       /^admin hide: hidden true \| gone from page true \| organiser notice true \| stranger hides false$/m,
       /^admin hide more: strip Only you see this ?Hide from the Season Calendar \| visitor link That listing isn't on the Season Calendar any more\. \| organiser panel .*Remove Questions\? Contact Info@FoundryITadvisory\.com\.$/m,
