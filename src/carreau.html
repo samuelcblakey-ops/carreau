@@ -368,12 +368,51 @@ details.day1-table>summary{cursor:pointer;list-style-position:inside}details.day
 .rr-sc{font-family:var(--display);font-size:18px;font-weight:700;white-space:nowrap;text-align:center;min-width:52px}.rr-sc.rr-bye{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted)}
 .ko-plan > summary{cursor:pointer;list-style-position:inside;padding:2px 0}.ko-plan[open] > summary{margin-bottom:10px}
 .show-sm{display:none}.code-btn{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;flex:none}.code-btn .code-ic{display:none}
-.start{max-width:960px;gap:22px}.start-hero h1{font-family:var(--display);font-size:clamp(28px,6vw,42px);line-height:1.05;margin:4px 0 8px}.start-hero p{max-width:640px}.start p{margin:0}
-.start-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
-.start-card{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;text-decoration:none}
-.start-card b{font-family:var(--display);font-size:20px}.start-card span{color:var(--muted);font-size:14px}
+.start{max-width:1080px;gap:26px}.start p{margin:0}
+/* start screen: the hero (headline, the two main buttons, a small live preview beside them), then smaller tiles */
+.start-hero{position:relative;isolation:isolate;display:grid;gap:26px;align-items:center;padding:6px 0 2px}
+@media (min-width:880px){.start-hero{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;padding:20px 0 10px}}
+.start-hero h1{font-family:var(--display);font-size:clamp(34px,6.4vw,56px);line-height:.98;margin:0 0 14px}
+.sh-text>p.muted{max-width:600px;font-size:16px}
+.sh-cta{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;margin-top:22px;max-width:600px}
+.sh-follow{margin-top:16px!important;font-size:14px;color:var(--muted);max-width:600px}.sh-follow b{color:var(--ink);font-weight:600}
+.sh-points{list-style:none;display:flex;flex-wrap:wrap;gap:8px 20px;padding:0;margin:16px 0 0;font-size:14px;font-weight:600}
+.sh-points li{display:inline-flex;align-items:center;gap:8px}
+.sh-points li::before{content:"✓";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:800}
+.start-card{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;text-decoration:none;transition:border-color .15s,transform .15s}
+.start-card b{font-family:var(--display);font-size:21px;line-height:1.15}.start-card span{color:var(--muted);font-size:14px}
 button.start-card,a.start-card{cursor:pointer}button.start-card:hover,a.start-card:hover{border-color:var(--accent)}
-.start-card.info{background:transparent;border-style:dashed}.start-card.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.start-card.go span{color:var(--accent-ink);opacity:.85}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){button.start-card:hover,a.start-card:hover{transform:translateY(-1px)}}
+.start-card.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -14px var(--accent)}.start-card.go span{color:var(--accent-ink);opacity:.85}
+.start-card.watch b{display:flex;align-items:center;gap:9px}
+.start-card .sh-play{flex:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-family:var(--body);font-size:11px;padding-left:2px;opacity:1}
+.start-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.start-card.tile{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
+.start-card .tile-ic{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
+.start-card .tile-ic svg{width:24px;height:24px}
+.start-card[href="#streams"] .tile-ic{background:var(--danger-soft);color:var(--danger)}.start-card[href="#halloffame"] .tile-ic{background:var(--jack-soft);color:var(--jack-ink)}
+.start-card .tile-txt{display:flex;flex-direction:column;gap:2px;min-width:0;color:var(--ink);font-size:inherit}.start-card .tile-txt>span{color:var(--muted)}.start-card.tile b{font-size:19px}
+.ex-more{align-self:flex-start;min-height:44px}
+/* the live preview: a made-up round on Draw & results */
+.sh-demo{position:relative;display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 30px 60px -36px rgba(0,0,0,.55);user-select:none;max-width:460px;width:100%;justify-self:center}
+.sh-demo::before,.sh-demo::after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(36px);pointer-events:none}.sh-demo::before{width:70%;height:60%;right:0;top:-14%;background:var(--accent-soft)}.sh-demo::after{width:55%;height:45%;left:0;bottom:-12%;background:var(--jack-soft);opacity:.8}
+.shd-bar{display:flex;align-items:center;gap:10px;font-size:13px}.shd-bar b{font-family:var(--display);font-size:20px}.shd-tab{margin-left:auto;color:var(--muted);font-weight:600}
+.shd-live{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.shd-live::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.shd-games{display:grid;gap:8px}
+.shd-g{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:8px 12px 6px}
+.shd-g.live{border-color:var(--jack)}
+.shd-gh{display:flex;justify-content:space-between;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px}
+.shd-g.live .shd-st{display:inline-flex;align-items:center;gap:5px;color:var(--jack-ink)}.shd-g.live .shd-st::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--jack)}
+.shd-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px}
+.shd-r b{font-family:var(--display);font-size:21px;line-height:1.15;font-variant-numeric:tabular-nums}
+.shd-g:not(.live) .shd-r{color:var(--muted)}.shd-g:not(.live) .shd-r.win{color:var(--ink);font-weight:700}.shd-r.win b{color:var(--accent)}
+.shd-table table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+.shd-table th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;text-align:right;padding:2px 4px}
+.shd-table td{padding:5px 4px;border-top:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.shd-table td:nth-child(2){text-align:left;width:100%}.shd-table td:first-child{color:var(--muted)}.shd-table tbody tr:first-child td:nth-child(2){font-weight:700}
+@media (prefers-reduced-motion:no-preference){.shd-live::before,.shd-g.live .shd-st::before{animation:netpulse 1.6s ease-in-out infinite}}
+@media (max-width:559px){.shd-g:nth-child(3){display:none}.sh-demo{padding:14px}}
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px}
 .ex-card{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-width:0}
 .ex-card:hover{border-color:var(--accent)}.ex-card b{overflow-wrap:anywhere}
@@ -485,7 +524,6 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .hof-btn svg,.cal-btn svg{display:block;color:#b8860b}.cal-btn svg{color:var(--accent)}.hof-btn:hover,.cal-btn:hover{border-color:var(--accent)}.hof-btn[aria-current="page"],.cal-btn[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.hof-btn[aria-current="page"] svg,.cal-btn[aria-current="page"] svg{color:inherit}
 @media (pointer:coarse){.hof-btn,.cal-btn{min-height:44px;min-width:44px}}
 .hof-ic{display:inline-flex;vertical-align:-3px;margin-right:8px;color:#b8860b}.hof-ic svg{width:1em;height:1em}
-.hof-start b{display:flex;align-items:center}.hof-start .hof-ic svg{width:24px;height:24px}
 .hof-page a.btn,.hof-panel a.btn{color:inherit;text-decoration:none}
 .hof-page{max-width:760px;margin:0 auto}
 .hof-hero{align-items:flex-start}.hof-hero h2{display:flex;align-items:center}.hof-hero p{margin:0}
@@ -1141,6 +1179,14 @@ Object.assign(LANG_TEXT.de, {"Pétanque competitions, run from your phone": "Pé
 Object.assign(LANG_TEXT.nl, {"Pétanque competitions, run from your phone": "Petanquetoernooien, geregeld vanaf je telefoon", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Lotingen, banen, live uitslagen en standen voor Zwitsers systeem, barrage, competities, knock-outs, mêlée, interclub en precisieschieten. Spelers volgen alles op hun eigen telefoon.", "Run a competition": "Een toernooi organiseren", "Set it up in four quick steps": "Klaar in vier korte stappen", "Follow a competition": "Een toernooi volgen", "Open the link or scan the QR code the organiser shares": "Open de link of scan de QR-code die de organisator deelt", "Stream a game": "Een partij streamen", "A live score overlay for Facebook Live or YouTube": "Een live scorebalk voor Facebook Live of YouTube", "Look around a competition in each format. Nothing can be changed.": "Bekijk een toernooi in elk formaat. Er kan niets worden gewijzigd.", "New": "Nieuw"});
 Object.assign(LANG_TEXT.pt, {"Pétanque competitions, run from your phone": "Competições de petanca, geridas a partir do telemóvel", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "Sorteios, campos, resultados em direto e classificações para suíço, barrage, ligas, quadros, mêlée, interclubes e tiro de precisão. Os jogadores acompanham no próprio telemóvel.", "Run a competition": "Organizar uma competição", "Set it up in four quick steps": "Pronta em quatro passos rápidos", "Follow a competition": "Seguir uma competição", "Open the link or scan the QR code the organiser shares": "Abra a ligação ou leia o código QR que o organizador partilha", "Stream a game": "Transmitir um jogo", "A live score overlay for Facebook Live or YouTube": "Um marcador em direto para Facebook Live ou YouTube", "Look around a competition in each format. Nothing can be changed.": "Veja uma competição em cada formato. Nada pode ser alterado.", "New": "Nova"});
 Object.assign(LANG_TEXT.th, {"Pétanque competitions, run from your phone": "จัดการแข่งขันเปตองได้จากมือถือ", "Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.": "จับสลาก จัดสนาม ผลสด และตารางคะแนน สำหรับระบบสวิส บาราจ ลีก น็อกเอาต์ เมเล่ อินเตอร์คลับ และการยิงแม่นยำ ผู้เล่นติดตามได้จากมือถือของตัวเอง", "Run a competition": "จัดการแข่งขัน", "Set it up in four quick steps": "ตั้งค่าเสร็จใน 4 ขั้นตอน", "Follow a competition": "ติดตามการแข่งขัน", "Open the link or scan the QR code the organiser shares": "เปิดลิงก์หรือสแกน QR โค้ดที่ผู้จัดแชร์", "Stream a game": "ถ่ายทอดสดเกม", "A live score overlay for Facebook Live or YouTube": "แถบคะแนนสดสำหรับ Facebook Live หรือ YouTube", "Look around a competition in each format. Nothing can be changed.": "ดูการแข่งขันตัวอย่างในแต่ละรูปแบบ แก้ไขอะไรไม่ได้", "New": "ใหม่"});
+// start screen refresh: the follow hint, the ticks under the buttons, "Show all" under long lists
+Object.assign(FR_TEXT, {"Following a competition?": "Vous suivez un concours ?", "No app to install": "Aucune application à installer", "{n} languages": "{1} langues", "Show all ({n})": "Tout afficher ({1})"});
+Object.assign(LANG_TEXT.es, {"Following a competition?": "¿Sigues una competición?", "No app to install": "Sin aplicación que instalar", "{n} languages": "{1} idiomas", "Show all ({n})": "Mostrar todo ({1})"});
+Object.assign(LANG_TEXT.it, {"Following a competition?": "Segui una gara?", "No app to install": "Nessuna app da installare", "{n} languages": "{1} lingue", "Show all ({n})": "Mostra tutto ({1})"});
+Object.assign(LANG_TEXT.de, {"Following a competition?": "Du folgst einem Turnier?", "No app to install": "Keine App nötig", "{n} languages": "{1} Sprachen", "Show all ({n})": "Alle anzeigen ({1})"});
+Object.assign(LANG_TEXT.nl, {"Following a competition?": "Volg je een toernooi?", "No app to install": "Geen app nodig", "{n} languages": "{1} talen", "Show all ({n})": "Alles tonen ({1})"});
+Object.assign(LANG_TEXT.pt, {"Following a competition?": "Está a seguir uma competição?", "No app to install": "Sem aplicação para instalar", "{n} languages": "{1} idiomas", "Show all ({n})": "Mostrar tudo ({1})"});
+Object.assign(LANG_TEXT.th, {"Following a competition?": "กำลังติดตามการแข่งขันอยู่ใช่ไหม?", "No app to install": "ไม่ต้องติดตั้งแอป", "{n} languages": "{1} ภาษา", "Show all ({n})": "แสดงทั้งหมด ({1})"});
 // featured competitions (front page)
 Object.assign(FR_TEXT, {"Featured": "À la une", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Il figure dans « À la une », au-dessus des exemples. Rien d'autre ne change : vous gérez le concours comme avant, et les spectateurs ne peuvent rien modifier."});
 Object.assign(LANG_TEXT.es, {"Featured": "Destacados", "It's listed under Featured, above the examples. Nothing else changes: you run it as before, and spectators can't change anything.": "Aparece en Destacados, encima de los ejemplos. Nada más cambia: lo gestionas como antes y los espectadores no pueden cambiar nada."});
@@ -6090,26 +6136,47 @@ function drawHeader() {
   $("#tabs").innerHTML = t ? TABS.filter(([k]) => canEdit() || viewAll(t) || (canScore() ? k !== "setup" : SPECTATOR_TABS.includes(k))).map(([k, l]) => `<button data-tab="${k}" aria-current="${onTab === k}" aria-label="${l}">${TAB_ICON[k] || ""}<span class="t-long">${l}</span><span class="t-short">${TAB_SHORT[k] || l}</span></button>`).join("") : "";
   localize($("header.app")); // every caller (menus, outside taps, Hall of Fame, streams) gets the header in the chosen language
 }
-// the start screen: first visit, or the logo tapped. Run, follow or stream, then your competitions and the examples.
+// the start screen: first visit, or the logo tapped. Run (or watch how it works) up top beside a small live preview,
+// then stream, the Season Calendar and the Hall of Fame, then your competitions, featured ones and the examples.
+const STREAM_ICON = thIc('<rect x="3" y="7" width="13" height="11" rx="2"/><path d="M16 11l5-3v9l-5-3z"/>');
+const START_LIMIT = 6; // cards shown per list before the Show all button
+// a made-up round in play: what players and spectators see on Draw & results (decoration only, hidden from screen readers)
+function startDemo() {
+  const game = (p, a, sa, b, sb, live) => `<div class="shd-g${live ? " live" : ""}"><div class="shd-gh"><span>Piste ${p}</span><span class="shd-st">${live ? "Playing" : "Finished"}</span></div>
+    <div class="shd-r${!live && sa > sb ? " win" : ""}"><span data-notr>${a}</span><b>${sa}</b></div><div class="shd-r${!live && sb > sa ? " win" : ""}"><span data-notr>${b}</span><b>${sb}</b></div></div>`;
+  const row = (n, name, w, d) => `<tr><td>${n}</td><td data-notr>${name}</td><td>${w}</td><td>${d}</td></tr>`;
+  return `<div class="sh-demo" aria-hidden="true" inert><div class="shd-bar"><span class="shd-live">Live</span><b>Round 3</b><span class="shd-tab">Draw &amp; results</span></div>
+    <div class="shd-games">${game(1, "Les Pointeurs", 13, "Boule d'Or", 7)}${game(2, "Carreau Club", 11, "Hitchin A", 9, true)}${game(3, "Les Tireurs", 6, "Cochonnet 13", 8, true)}</div>
+    <div class="shd-table"><div class="eyebrow">Standings</div><table><thead><tr><th>#</th><th></th><th>Wins</th><th>+/-</th></tr></thead>
+      <tbody>${row(1, "Les Pointeurs", 3, "+21")}${row(2, "Carreau Club", 2, "+12")}${row(3, "Hitchin A", 2, "+5")}</tbody></table></div></div>`;
+}
 function renderWelcome() {
   const all = Object.values(S.tournaments).filter(t => !t.archived), isEx = t => t.listed || t.example;
   const byNew = (a, b) => (b.created || 0) - (a.created || 0);
   const mine = all.filter(t => !isEx(t) && !isFeatured(t)).sort(byNew), feat = all.filter(t => !isEx(t) && isFeatured(t)).sort(byNew), ex = all.filter(isEx).sort(byNew);
   const card = t => `<button type="button" class="ex-card" data-act="pick-t" data-id="${t.id}"><b data-notr>${esc(t.name)}</b><span class="small muted">${esc(compMeta(t))}</span></button>`;
+  // long lists show the newest few, with a button for the rest
+  const list = (k, ts) => { const open = S.startAll?.[k] || ts.length <= START_LIMIT;
+    return `<div class="ex-grid" data-list="${k}">${(open ? ts : ts.slice(0, START_LIMIT)).map(card).join("")}</div>${open ? "" : `<button type="button" class="btn ex-more" data-act="start-all" data-k="${k}">Show all (${ts.length})</button>`}`; }; // i18n-ok: "Show all ({n})" (the checker stops at the bracket)
+  const tile = (href, icon, name, line) => `<a class="start-card tile" href="${href}"><span class="tile-ic" aria-hidden="true">${icon}</span><span class="tile-txt"><b>${name}</b><span>${line}</span></span></a>`;
   return `<div class="start stack">
-    <section class="start-hero"><h1>Pétanque competitions, run from your phone</h1>
-      <p class="muted">Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.</p></section>
+    <section class="start-hero"><div class="sh-text"><h1>Pétanque competitions, run from your phone</h1>
+      <p class="muted">Draws, pistes, live scores and standings for Swiss, barrage, leagues, knockouts, mêlée, inter-club and precision shooting. Players follow along on their own phones.</p>
+      <div class="sh-cta">
+        ${S.canCreate() ? `<button type="button" class="start-card go" data-act="new-t"><b>Run a competition</b><span>Set it up in four quick steps</span></button>` : S.startLogin?.() || ""}
+        ${S.guideLink ? `<button type="button" class="start-card watch" data-act="guide-play" data-id="first"><b><span class="sh-play" aria-hidden="true">▶</span>Watch how it works</b><span>A 2½-minute walk-through of a first competition</span></button>` : ""}
+      </div>
+      <p class="sh-follow"><b>Following a competition?</b> <span>Open the link or scan the QR code the organiser shares</span></p>
+      <ul class="sh-points"><li>No app to install</li><li>${LANGS.length} languages</li><li>No cookies, no tracking</li></ul></div>
+      ${startDemo()}</section>
     <div class="start-actions">
-      ${S.canCreate() ? `<button type="button" class="start-card go" data-act="new-t"><b>Run a competition</b><span>Set it up in four quick steps</span></button>` : S.startLogin?.() || ""}
-      <div class="start-card info"><b>Follow a competition</b><span>Open the link or scan the QR code the organiser shares</span></div>
-      <a class="start-card" href="#streams"><b>Stream a game</b><span>A live score overlay for Facebook Live or YouTube</span></a>
-      <a class="start-card hof-start cal-start" href="#calendar"><b><span class="hof-ic cal-ic" aria-hidden="true">${CAL_ICON}</span>Season Calendar</b><span>Upcoming competitions and how to enter</span></a>
-      <a class="start-card hof-start" href="#halloffame"><b><span class="hof-ic" aria-hidden="true">${TROPHY_ICON}</span>Hall of Fame</b><span>Winners of competitions run on SN Pétanque</span></a>
-      ${S.guideLink ? `<button type="button" class="start-card" data-act="guide-play" data-id="first"><b>Watch how it works</b><span>A 2½-minute walk-through of a first competition</span></button>` : ""}
+      ${tile("#streams", STREAM_ICON, "Stream a game", "A live score overlay for Facebook Live or YouTube")}
+      ${tile("#calendar", CAL_ICON, "Season Calendar", "Upcoming competitions and how to enter")}
+      ${tile("#halloffame", TROPHY_ICON, "Hall of Fame", "Winners of competitions run on SN Pétanque")}
     </div>
-    ${mine.length ? `<section class="stack" style="gap:10px"><h2>Your competitions</h2><div class="ex-grid">${mine.map(card).join("")}</div></section>` : ""}
-    ${feat.length ? `<section class="stack" style="gap:10px" data-featured><h2>Featured</h2><div class="ex-grid">${feat.map(card).join("")}</div></section>` : ""}
-    ${ex.length ? `<section class="stack" style="gap:10px"><h2>Examples</h2><p class="small muted">Look around a competition in each format. Nothing can be changed.</p><div class="ex-grid">${ex.map(card).join("")}</div></section>` : ""}
+    ${mine.length ? `<section class="stack" style="gap:10px"><h2>Your competitions</h2>${list("mine", mine)}</section>` : ""}
+    ${feat.length ? `<section class="stack" style="gap:10px" data-featured><h2>Featured</h2>${list("feat", feat)}</section>` : ""}
+    ${ex.length ? `<section class="stack" style="gap:10px"><h2>Examples</h2><p class="small muted">Look around a competition in each format. Nothing can be changed.</p>${list("ex", ex)}</section>` : ""}
   </div>`;
 }
 function newTournament() {
@@ -7161,6 +7228,7 @@ document.addEventListener("click", async e => {
     case "logo-remove": { try { await S.store.setBrand(t.id, null); setBrandLocal(t.id, null); toast("Logo removed."); } catch (err) { handleWriteError(err); } break; }
     case "lv-links": S.lvLinks = S.lvLinks === a.dataset.id ? null : a.dataset.id; render(); break;
     case "copy": { const el = document.getElementById(a.dataset.target); if (!el) break; try { await navigator.clipboard.writeText(el.value); toast("Copied."); } catch { el.select(); } break; }
+    case "start-all": { const k = a.dataset.k; S.startAll = { ...S.startAll, [k]: true }; render(); $(`[data-list="${k}"] .ex-card:nth-child(${START_LIMIT + 1})`)?.focus(); break; }
     case "new-t": { S.home = false; const nt = newTournament(); if (S.decorateNew) S.decorateNew(nt); S.tid = nt.id; lsSet("carreau-tid", nt.id); S.tab = "entries"; S.matches = {}; leaveLive(); await guard(() => saveT(nt)); S.onSelect?.(); watchMatches(); break; }
     case "use-template": {
       const src = clone(t); const nt = newTournament();

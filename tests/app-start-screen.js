@@ -14,6 +14,12 @@ const { chromium } = require('playwright');
   // 1. first visit, nothing saved
   console.log('first visit: ' + await st());
   console.log('stream card: ' + await p.getAttribute('.start-actions a.start-card', 'href'));
+  // the hero: run (and, on the website, watch how it works) up top, the follow hint, three ticks and a made-up round as a preview
+  const hero = () => p.evaluate(() => { const q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)], txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim();
+    return 'buttons ' + qa('.start-hero .start-card b').map(txt).join(',') + ' | follow ' + txt(q('.sh-follow')) + ' | ticks ' + qa('.sh-points li').map(txt).join(',')
+      + ' | preview hidden ' + (q('.sh-demo')?.getAttribute('aria-hidden') === 'true') + ' inert ' + !!q('.sh-demo')?.inert + ' games ' + qa('.sh-demo .shd-g').length
+      + ' | ' + [q('.shd-bar'), ...qa('.shd-gh'), q('.shd-table .eyebrow')].map(txt).join(' / ') + ' | first focusable ' + q('#main button, #main a')?.dataset.act; });
+  console.log('hero: ' + await hero());
   // 2. an example exists: still the start screen, the example is a card
   await p.evaluate(async () => { const S = window.__carreau.S; await S.store.setTournament({ id: 'tex1', name: 'Example Swiss', system: 'swiss', format: 'triples', entry: 'teams', teams: [], players: [], draws: [], pools: [], brackets: [], courts: [], archived: false, listed: true, created: 5 }); });
   await p.reload(); await w(400);
@@ -39,13 +45,24 @@ const { chromium } = require('playwright');
   console.log('both lists: ' + await st());
   await p.click('.start section .ex-card[data-id="' + own + '"]'); await w(200);
   console.log('own opened: ' + (await p.evaluate(() => window.__carreau.S.tid) === own));
+  // 7b. long lists: the six newest, then "Show all (n)", which opens the rest and moves focus to the first card that was hidden
+  await p.evaluate(async () => { const S = window.__carreau.S; for (let i = 2; i <= 8; i++) await S.store.setTournament({ id: 'tex' + i, name: 'Example ' + i, system: 'swiss', format: 'triples', entry: 'teams', teams: [], players: [], draws: [], pools: [], brackets: [], courts: [], archived: false, listed: true, created: 5 + i }); });
+  await p.click('header .brand .home'); await w(200);
+  const exs = () => p.evaluate(() => { const sec = [...document.querySelectorAll('.start section')].find(s => /Examples|Exemples/.test(s.querySelector('h2')?.textContent)), cards = [...sec.querySelectorAll('.ex-card')];
+    return 'examples ' + cards.length + ' | newest first ' + (cards[0]?.dataset.id) + ' | button ' + (sec.querySelector('[data-act="start-all"]')?.textContent.trim() || 'none') + ' | focus ' + (cards.indexOf(document.activeElement) + 1 || 'none'); });
+  console.log('long list: ' + await exs());
+  await p.click('[data-act="start-all"][data-k="ex"]'); await w(200);
+  console.log('show all: ' + await exs());
+  await p.evaluate(() => { window.__carreau.S.startAll = null; });
   // 8. French
   await p.click('header .brand .home'); await w(150);
   await p.click('[data-act="lang-menu"]'); await w(60); await p.click('[data-lang="fr"]'); await w(150);
   console.log('french: ' + await p.evaluate(() => [document.querySelector('.start-hero h1'), ...document.querySelectorAll('.start-card b')].map(e => e.textContent.trim()).join(' | ')) + ' | ' + await p.getAttribute('header .brand .home', 'aria-label'));
+  console.log('french hero: ' + await hero() + ' | ' + (await exs()).replace(/ \| focus.*/, ''));
   await p.click('[data-act="lang-menu"]'); await w(60); await p.click('[data-lang="en"]'); await w(150);
   // 9. phone: "+ New" keeps its word, nothing scrolls sideways
   await p.setViewportSize({ width: 375, height: 800 }); await w(250);
+  console.log("phone ticks rows: " + await p.evaluate(() => new Set([...document.querySelectorAll(".sh-points li")].map(l => Math.round(l.getBoundingClientRect().top))).size) + " | preview games shown " + await p.evaluate(() => [...document.querySelectorAll(".sh-demo .shd-g")].filter(g => g.offsetParent).length));
   console.log('phone: new button "' + await p.evaluate(() => document.querySelector('header .new-t').innerText.replace(/\s+/g, ' ').trim()) + '" | overflow ' + await p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1));
   console.log('errs', errs); await b.close();
 })();
