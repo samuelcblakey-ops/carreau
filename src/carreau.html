@@ -1710,6 +1710,13 @@ Object.assign(LANG_TEXT.de, {"Go to SN Pétanque": "Zu SN Pétanque", "Shooting 
 Object.assign(LANG_TEXT.nl, {"Go to SN Pétanque": "Naar SN Pétanque", "Shooting (event tab)": "Precisieschieten"});
 Object.assign(LANG_TEXT.pt, {"Go to SN Pétanque": "Ir para SN Pétanque", "Shooting (event tab)": "Tiro de precisão"});
 Object.assign(LANG_TEXT.th, {"Go to SN Pétanque": "ไปที่ SN Pétanque", "Shooting (event tab)": "การยิงแม่น"});
+Object.assign(FR_TEXT, {"Watch how to play": "Voir comment jouer", "A 1½-minute video guide": "Un guide vidéo d'une minute et demie", "How to play Pick the Winner": "Comment jouer aux pronostics"});
+Object.assign(LANG_TEXT.es, {"Watch how to play": "Mira cómo se juega", "A 1½-minute video guide": "Una guía en vídeo de minuto y medio", "How to play Pick the Winner": "Cómo jugar a Elige al ganador"});
+Object.assign(LANG_TEXT.it, {"Watch how to play": "Guarda come si gioca", "A 1½-minute video guide": "Una video guida di un minuto e mezzo", "How to play Pick the Winner": "Come si gioca a Indovina il vincitore"});
+Object.assign(LANG_TEXT.de, {"Watch how to play": "So wird gespielt", "A 1½-minute video guide": "Eine Videoanleitung von anderthalb Minuten", "How to play Pick the Winner": "So funktioniert das Tippspiel"});
+Object.assign(LANG_TEXT.nl, {"Watch how to play": "Bekijk hoe je speelt", "A 1½-minute video guide": "Een video-uitleg van anderhalve minuut", "How to play Pick the Winner": "Zo speel je Voorspel de winnaar"});
+Object.assign(LANG_TEXT.pt, {"Watch how to play": "Veja como se joga", "A 1½-minute video guide": "Um guia em vídeo de minuto e meio", "How to play Pick the Winner": "Como jogar Escolha o vencedor"});
+Object.assign(LANG_TEXT.th, {"Watch how to play": "ดูวิธีเล่น", "A 1½-minute video guide": "วิดีโอแนะนำ 1 นาทีครึ่ง", "How to play Pick the Winner": "วิธีเล่นทายผู้ชนะ"});
 Object.assign(FR_TEXT, {"See the leaderboard": "Voir le classement"});
 Object.assign(LANG_TEXT.es, {"See the leaderboard": "Ver la clasificación"});
 Object.assign(LANG_TEXT.it, {"See the leaderboard": "Vedi la classifica"});
@@ -1998,7 +2005,7 @@ const EVENT = EVENTS.find(e => e.slug === window.SN_EVENT && (e.tabs || []).leng
 // a tab's own address on the event page (event-page-leaderboard-tab): #leaderboard for the board, the tab's key for the others.
 // Keys hold no "." so they can't be mistaken for a private link (#<competition>.pk-<pid>-<key>)
 const evHash = x => x.view === "board" ? "leaderboard" : x.key;
-const evFromHash = h => EVENT && h ? EVENT.tabs.find(x => evHash(x) === h || x.key === h) || null : null;
+const evFromHash = h => EVENT && h ? EVENT.tabs.find(x => evHash(x) === h || x.key === h || (h === "guide" && x.view === "pick")) || null : null; // #guide: the Picks tab, with the guide video
 const evGame = v => v === "pick" || v === "board"; // Pick the Winner's own tabs: the game's page and its leaderboard
 if (EVENT) { const x0 = evFromHash(location.hash.slice(1)) || EVENT.tabs[0]; document.body.classList.add("ev"); S.event = EVENT; S.evTab = x0.key; S.tid = x0.tid; S.tab = evGame(x0.view) ? "pick" : "draw"; S.home = false; }
 const evCur = () => S.event ? S.event.tabs.find(x => x.key === S.evTab) || S.event.tabs[0] : null;
@@ -7111,11 +7118,14 @@ function pickHowTo(t, open) {
     <li>A pick scores nothing if its team has no game in that round (a bye, or already knocked out), or if you've already used that team in an earlier round.</li><li>Results are added as they come in, and the leaderboard updates on its own.</li></ul></div></details>`;
 }
 document.addEventListener("toggle", e => { if (e.target.classList?.contains("pk-how")) pickUi().how = e.target.open; }, true);
+// the guide video (pick-game-guide-video), above How to play and outside it, so joined players still see it with the
+// panel closed. Only where the site's guide player exists (the website); the artifact version has none.
+const pickGuideBtn = () => S.guideLink ? `<button type="button" class="start-card watch pk-watch" data-act="guide-play" data-id="pick"><b><span class="sh-play" aria-hidden="true">▶</span>Watch how to play</b><span>A 1½-minute video guide</span></button>` : "";
 function renderPickPage(t) {
   if (!pickOn(t)) return renderDrawPage(t);
   const G = S.pickGame, st = G.state(t), U = pickUi(), rounds = t.pick.rounds || []; pickTimer(t);
   const data = pickBoardData(t, st), board = pickBoard(t, st, data) + pickCta(t);
-  const intro = pickHowTo(t, U.how ?? !st.me);
+  const intro = pickGuideBtn() + pickHowTo(t, U.how ?? !st.me);
   let h = `<div class="stack pick-page" style="max-width:720px"><h2>Pick the Winner</h2>`;
   if (!st.ready) return h + intro + board + `</div>`;
   if (!st.me) {

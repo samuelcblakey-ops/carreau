@@ -97,6 +97,18 @@ const { chromium } = require('playwright'), http = require('http');
   // fresh loads (a new page each, as when a link is opened)
   const fresh = async h => { const x = await mk('link ' + h, 390); await x.goto(base + 'worlds2026/' + h); await w(4500); return x.evaluate(() => document.querySelector('#tabs [aria-current="true"]')?.dataset.evtab); };
   log('#nations opens: ' + await fresh('#nations') + ' | unknown hash: ' + await fresh('#nope'));
+  // the guide video (pick-game-guide-video): /worlds2026#guide opens it on the Picks tab; closing it leaves #pick; the
+  // button above How to play opens it too
+  const G = await mk('guide link', 390); await G.goto(base + 'worlds2026/#guide'); await w(5500);
+  log('#guide opens the player on the Picks tab: ' + await G.evaluate(() => document.querySelector('#tabs [aria-current="true"]')?.dataset.evtab === 'pick' && /pick-the-winner\.mp4$/.test(document.querySelector('#guide-modal video')?.getAttribute('src') || '')));
+  await G.click('#guide-modal [data-act="guide-close"]'); await w(500);
+  log('closing the guide -> #pick: ' + await G.evaluate(() => location.hash === '#pick' && !document.getElementById('guide-modal') && document.querySelector('#tabs [aria-current="true"]')?.dataset.evtab === 'pick'));
+  log('picks tab: Watch how to play -> guide player: ' + await G.evaluate(async () => { const b = document.querySelector('main .pick-page > .pk-watch');
+    const above = !!b && !!(b.compareDocumentPosition(document.querySelector('main .pick-page .pk-how, main .pick-page details, main .pick-page form')) & Node.DOCUMENT_POSITION_FOLLOWING);
+    b?.click(); await new Promise(r => setTimeout(r, 600)); const ok = /pick-the-winner\.mp4$/.test(document.querySelector('#guide-modal video')?.getAttribute('src') || '');
+    document.querySelector('#guide-modal [data-act="guide-close"]')?.click(); const words = b?.textContent || ''; return above && ok && words.includes('Watch how to play') && words.includes('A 1½-minute video guide') || `above ${above} | opens ${ok} | ${words}`; }));
+  log('390 px with the watch button: ' + (await G.evaluate(() => document.documentElement.scrollWidth > innerWidth) ? 'sideways scroll' : 'no sideways scroll'));
+  await G.screenshot({ path: OUT + '/web-event-page-390-guide.png', fullPage: true });
   // the main site's Pick the Winner tab keeps its leaderboard
   const M = await mk('main site', 390); await M.goto(base + '#tkpo1655'); await w(5000); await M.click('[data-tab="pick"]'); await w(1500);
   log('main site pick tab still has the board: ' + await M.evaluate(() => !!document.querySelector('main .pk-board') && !document.querySelector('.ev-to-board')));

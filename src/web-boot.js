@@ -715,6 +715,9 @@ const GUIDES = [
   { id: "calendar", title: "Putting your competition on the calendar", len: "2 min", file: "videos/season-calendar",
     desc: "For regional organisers: log in, list your competition on the Season Calendar, take entries online, add them to Registration, make a poster, and add events run elsewhere.",
     cta: "Organising a competition? Watch how to list it (2 min)." },
+  // for followers, not organisers: opened from the Pick the Winner page and /worlds2026#guide (pick-game-guide-video); no sound
+  { id: "pick", title: "How to play Pick the Winner", len: "1½ min", file: "videos/pick-the-winner", desc: "",
+    cta: "Watch how to play" },
 ];
 const guideOf = id => GUIDES.find(g => g.id === id);
 S.guideLink = id => { const g = guideOf(id); return g ? `<button type="button" class="btn sm ghost guide-btn" data-act="guide-play" data-id="${g.id}"><span class="gi" aria-hidden="true">▶</span><span>${g.cta}</span></button>` : ""; };
@@ -723,7 +726,7 @@ function guidesView() {
     <p class="muted">Short videos that walk you through the competition desk, step by step.</p>
     <div class="guide-grid">${GUIDES.filter(g => g.id !== "stream" || S.streamingOn()).map(g => `<div class="panel stack guide-card" id="guide-${g.id}">
       <button type="button" class="guide-thumb" data-act="guide-play" data-id="${g.id}" aria-label="Play: ${g.title}"><img src="${g.file}.jpg" alt="" loading="lazy" width="960" height="600"><span class="gp" aria-hidden="true">▶</span></button>
-      <div class="guide-body"><b>${g.title}</b><span class="small muted">${g.len}</span><p class="small muted" style="margin:4px 0 0">${g.desc}</p></div></div>`).join("")}</div>
+      <div class="guide-body"><b>${g.title}</b><span class="small muted">${g.len}</span>${g.desc ? `<p class="small muted" style="margin:4px 0 0">${g.desc}</p>` : ""}</div></div>`).join("")}</div>
     ${I18N.lang !== "en" ? `<p class="small muted">The videos are in English.</p>` : ""}
   </div>`;
 }
@@ -1384,7 +1387,10 @@ async function handleHash() {
   // event's Pick the Winner tab as that player, and the address goes back to the event's own
   if (S.event) {
     // a tab's own address (#leaderboard, #triples…) opens that tab and stays (event-page-leaderboard-tab)
-    const tab = evFromHash(location.hash.slice(1)); if (tab) { if (tab.key !== S.evTab) evGo(tab.key); else render(); return; }
+    // #guide: the Picks tab with the guide video playing; the address becomes #pick, where closing it leaves the visitor
+    const guide = location.hash === "#guide";
+    const tab = evFromHash(location.hash.slice(1));
+    if (tab) { if (tab.key !== S.evTab || guide) evGo(tab.key); else render(); if (guide) openGuide("pick"); return; }
     const { tid, code } = readHash(), pk = /^pk-([A-Z0-9]+)-([A-Z0-9]+)$/.exec(String(code || ""));
     if (location.hash) history.replaceState(null, "", location.pathname);
     const x = S.event.tabs.find(y => y.tid === tid && y.view === "pick");
