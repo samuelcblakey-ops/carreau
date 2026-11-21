@@ -117,6 +117,7 @@ function fbStore() {
       try { await updateDoc(doc(db, "hallOfFame", tid), { gone: true }); } catch {} // a Hall of Fame entry stays, without its link
       try { await updateDoc(doc(db, "calendar", tid), { gone: true }); } catch {} // and a Season Calendar listing
       await deleteDoc(doc(db, "tournaments", tid)); // last, so a failure part-way never leaves games without their competition
+      await dropCompNote(tid); // the admin's private note on it (admin-notes)
     },
     // payments (payments-registration): tournaments/{tid}/private/payments, { paid: { <team or player id>: { at, by } } }, for the
     // competition's organisers only (firestore.rules). A merge of the one field, so two organisers ticking different teams both keep theirs.
@@ -827,9 +828,11 @@ function orgAdminPanel() {
       <div class="row" style="flex-wrap:wrap;gap:6px"><input id="org-label" placeholder="Who it's for, e.g. Bristol PC · Spring Triples" value="${esc(ORGCODES.label)}" style="max-width:320px"><button class="btn primary" data-act="org-make">Create a code</button></div>
       ${ORGCODES.made ? `<div class="notice stack" style="gap:6px"><b>New code: <span data-notr style="letter-spacing:.12em">${esc(ORGCODES.made)}</span></b>${copyRow("org-link", "Login link", `${base()}#login.${ORGCODES.made}`, "Opens the organiser login with the code filled in.")}</div>` : ""}
       ${ORGCODES.list === null ? `<p class="small muted">Loading codes…</p>` : !list.length ? `<p class="small muted">No codes yet.</p>` : list.map(c => { const [st, cls] = state(c); return `<div class="erow">
-        <div class="who"><b data-notr style="letter-spacing:.08em">${esc(c.code)}</b><span class="small muted"><span data-notr>${esc(c.label || "No label")}</span> · created ${when(c.createdAt)} · ${c.expiresAt > now ? "expires" : "expired"} ${when(c.expiresAt)} · ${Object.values(S.tournaments).filter(t => t.orgCode === c.code).length} competitions</span></div>
+        <div class="who"><b data-notr style="letter-spacing:.08em">${esc(c.code)}</b><span class="small muted"><span data-notr>${esc(c.label || "No label")}</span> · created ${when(c.createdAt)} · ${c.expiresAt > now ? "expires" : "expired"} ${when(c.expiresAt)} · ${Object.values(S.tournaments).filter(t => t.orgCode === c.code).length} competitions</span>${noteText("codes", c.code)}</div>
         <span class="pill ${cls}">${st}</span>
-        ${c.revoked ? `<button class="btn sm" data-act="org-restore" data-code="${esc(c.code)}">Restore</button>` : `<button class="btn sm" data-act="org-extend" data-code="${esc(c.code)}" data-exp="${c.expiresAt}">+${ORG_DAYS} days</button><button class="btn sm danger" data-act="org-revoke" data-code="${esc(c.code)}">Revoke</button>`}</div>`; }).join("")}
+        ${noteBtn("codes", c.code)}
+        ${c.revoked ? `<button class="btn sm" data-act="org-restore" data-code="${esc(c.code)}">Restore</button>` : `<button class="btn sm" data-act="org-extend" data-code="${esc(c.code)}" data-exp="${c.expiresAt}">+${ORG_DAYS} days</button><button class="btn sm danger" data-act="org-revoke" data-code="${esc(c.code)}">Revoke</button>`}
+        ${noteEdit("codes", c.code)}</div>`; }).join("")}
     </div>`;
 }
 
@@ -851,7 +854,8 @@ function watchCodes(tid) {
 }
 function restart() { if (!FB) return; startWatching(); watchRole(); renderFooter(); }
 function renderFooter() { /* admin lives at #admin (the back end); nothing shown to guests */ }
-const ADM = { filter: "all", q: "", creator: null, sel: new Set(), confirm: null, busy: "", names: {}, naming: null };
+const ADM = { filter: "all", q: "", creator: null, sel: new Set(), confirm: null, busy: "", names: {}, naming: null,
+  notes: { codes: {}, comps: {} }, noting: null, noteDraft: "" }; // admin-notes: private notes on organiser codes and competitions
 let unsubNames = null;
 function watchNames() {
   if (unsubNames || !isAdmin()) return;
@@ -1062,13 +1066,13 @@ function usagePanel() {
 // search ignores accents and capitals, folded as the picker does (hofNorm in the page): "melee" finds "Mêlée du jeudi"
 const fold = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 function adminView() {
-  if (isAdmin()) watchNames();
+  if (isAdmin()) { watchNames(); watchNotes(); }
   const all = Object.values(S.tournaments);
   const cs = creators(all); const cOf = Object.fromEntries(cs.map(c => [c.uid, c]));
   const counts = { all: all.length, examples: all.filter(t => t.listed).length, visitors: all.filter(t => !t.listed).length, empty: all.filter(t => !t.listed && !entriesOf(t)).length, archived: all.filter(t => t.archived).length };
   const q = fold(ADM.q.trim());
   const shown = all.filter(t => (ADM.filter === "all" || (ADM.filter === "examples" && t.listed) || (ADM.filter === "visitors" && !t.listed) || (ADM.filter === "empty" && !t.listed && !entriesOf(t)) || (ADM.filter === "archived" && t.archived))
-    && (!ADM.creator || (t.ownerUid || "unknown") === ADM.creator) && (!q || fold(t.name).includes(q)))
+    && (!ADM.creator || (t.ownerUid || "unknown") === ADM.creator) && (!q || compSearch(t).includes(q)))
     .sort((x, y) => (!!y.listed - !!x.listed) || (y.created || 0) - (x.created || 0));
   [...ADM.sel].forEach(id => { if (!S.tournaments[id]) ADM.sel.delete(id); });
   const nSel = ADM.sel.size; const allShownSel = shown.length && shown.every(t => ADM.sel.has(t.id));
@@ -1113,7 +1117,7 @@ function adminView() {
       <p class="small muted">Visitors only see the competitions they created on their own device, plus the examples (view-only). Your own competition menu shows just yours and the examples; everything else is managed here.</p>
       <div class="row" style="flex-wrap:wrap;gap:6px">${chip("all", "All")}${chip("visitors", "Visitors'")}${chip("empty", "Empty")}${chip("examples", "Examples")}${chip("archived", "Archived")}</div>
       <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center">
-        <input id="adm-q" type="search" placeholder="Search by name" value="${esc(ADM.q)}" style="max-width:220px">
+        <input id="adm-q" type="search" placeholder="Search by name or note" value="${esc(ADM.q)}" style="max-width:220px">
         ${ADM.creator ? `<span class="pill">Creator: ${esc(cOf[ADM.creator]?.label || "?")} <button class="btn sm ghost" data-act="adm-creator" data-uid="${esc(ADM.creator)}" aria-label="Clear creator filter">✕</button></span>` : ""}
         <span class="muted small" id="adm-count">${shown.length} shown</span>
       </div>
@@ -1124,15 +1128,17 @@ function adminView() {
             : `<button class="btn sm danger" data-act="adm-bulk-del">Delete selected</button><button class="btn sm" data-act="adm-bulk-arch">Archive selected</button><button class="btn sm ghost" data-act="adm-sel-none">Clear</button>`}` : ""}
         ${ADM.busy ? `<span class="small muted">${esc(ADM.busy)}</span>` : ""}
       </div>
-      <div>${shown.map(t => { const c = cOf[t.ownerUid || "unknown"]; return `<div class="erow" data-name="${esc(fold(t.name))}">
+      <div>${shown.map(t => { const c = cOf[t.ownerUid || "unknown"]; return `<div class="erow" data-name="${esc(compSearch(t))}">
         <input type="checkbox" data-act="adm-sel" data-id="${t.id}" ${ADM.sel.has(t.id) ? "checked" : ""} aria-label="Select ${esc(t.name)}">
-        <div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(c?.label || "Unknown")} · created ${when(t.created)}${t.updated ? ` · changed ${when(t.updated)}` : ""} · ${entriesOf(t)} ${t.entry === "melee" || t.entry === "shooting" ? "players" : "teams"}</span></div>
+        <div class="who"><b>${esc(t.name)}</b><span class="small muted">${esc(c?.label || "Unknown")} · created ${when(t.created)}${t.updated ? ` · changed ${when(t.updated)}` : ""} · ${entriesOf(t)} ${t.entry === "melee" || t.entry === "shooting" ? "players" : "teams"}</span>${noteText("comps", t.id)}</div>
         <span class="pill ${statusOf(t) === "Empty" ? "" : "playing"}">${statusOf(t)}</span>
         ${t.listed ? `<span class="pill">Example</span>` : ""}
         ${t.archived ? `<button class="btn sm" data-act="admin-restore" data-id="${t.id}">Restore</button>` : ""}
         <button class="btn sm ${t.listed ? "primary" : ""}" data-act="admin-example" data-id="${t.id}" title="Examples are shown to every visitor, view only">${t.listed ? "Example ✓" : "Make example"}</button>
+        ${noteBtn("comps", t.id)}
         <a class="btn sm" href="#${t.id}" data-act="admin-exit">Open</a>
-        ${S.adminConfirm === t.id ? `<button class="btn sm danger" data-act="admin-del-yes" data-id="${t.id}">Confirm delete</button>` : `<button class="btn sm danger" data-act="admin-del" data-id="${t.id}">Delete</button>`}</div>`; }).join("") || `<p class="muted">Nothing matches.</p>`}</div>
+        ${S.adminConfirm === t.id ? `<button class="btn sm danger" data-act="admin-del-yes" data-id="${t.id}">Confirm delete</button>` : `<button class="btn sm danger" data-act="admin-del" data-id="${t.id}">Delete</button>`}
+        ${noteEdit("comps", t.id)}</div>`; }).join("") || `<p class="muted">Nothing matches.</p>`}</div>
     </div>`}
   </div>`;
 }
@@ -1230,7 +1236,54 @@ function cleanupPanel() {
     ${L ? `<p class="small muted" id="adm-clean-last">Last clean-up ${esc(when(L.at))}: ${L.deleted} deleted${L.auto ? " (automatic)" : ""}.${L.cal ? ` ${L.cal} old Season Calendar listing${L.cal === 1 ? "" : "s"} deleted.` : ""}</p>` : ""}
   </div>`;
 }
+/* ---------------- admin: private notes on organiser codes and competitions (admin-notes) ----------------
+   The admin hands out organiser codes and organiser links, and writes down who has each one. The notes live in config/notes,
+   { codes: { <code>: text }, comps: { <competition id>: text } }, which only the admin can read or write (firestore.rules:
+   everything in config but config/site is the admin's). They're kept out of orgcodes/{code}, which the code's holder can read. */
+const NOTE_MAX = 300, NOTE_KINDS = ["codes", "comps"];
+let unsubNotes = null;
+function watchNotes() {
+  if (unsubNotes || !isAdmin() || !FB) return;
+  unsubNotes = onSnapshot(doc(FB.db, "config", "notes"), d => { const n = d.exists() ? d.data() : {}; ADM.notes = { codes: n.codes || {}, comps: n.comps || {} }; if (S.overlayView) render(); }, () => {});
+}
+const noteOf = (k, id) => (ADM.notes[k] || {})[id] || "";
+// the competitions search looks at the name and the note, accents and capitals folded
+const compSearch = t => fold(`${t.name || ""}\n${noteOf("comps", t.id)}`);
+// the note under the row's details (inside .who, where every <b> is a block, so none here)
+const noteText = (k, id) => { const v = noteOf(k, id); return v ? `<span class="small adm-note" style="display:block;margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere"><span class="muted">Note:</span> <span data-notr>${esc(v)}</span></span>` : ""; };
+const noteBtn = (k, id) => ADM.noting === `${k}:${id}` ? "" : `<button class="btn sm ghost" data-act="adm-note" data-k="${k}" data-id="${esc(id)}">${noteOf(k, id) ? "Edit note" : "Add note"}</button>`;
+// the box, on its own line at the foot of the row; what's typed (ADM.noteDraft) survives a redraw while it's open
+function noteEdit(k, id) {
+  if (ADM.noting !== `${k}:${id}`) return "";
+  const ph = k === "codes" ? "Who has this code, e.g. club secretary, Bristol PC · sent on WhatsApp" : "Who has the organiser link, e.g. club secretary, Bristol PC · sent on WhatsApp";
+  return `<div class="stack adm-note-edit" style="flex:1 1 100%;gap:6px">
+      <textarea id="adm-note" rows="2" maxlength="${NOTE_MAX}" aria-label="Note" placeholder="${ph}" style="min-height:64px">${esc(ADM.noteDraft)}</textarea>
+      <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center"><button class="btn sm primary" data-act="adm-note-save" data-k="${k}" data-id="${esc(id)}">Save note</button><button class="btn sm" data-act="adm-note-cancel">Cancel</button><span class="small muted">Only you see notes.</span></div></div>`;
+}
+async function noteAction(act, a) {
+  if (act === "adm-note") { const k = a.dataset.k, id = a.dataset.id; if (!NOTE_KINDS.includes(k)) return;
+    ADM.noting = `${k}:${id}`; ADM.noteDraft = noteOf(k, id); render();
+    setTimeout(() => { const el = document.getElementById("adm-note"); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }, 0); return; }
+  if (act === "adm-note-cancel") { ADM.noting = null; ADM.noteDraft = ""; render(); return; }
+  if (act === "adm-note-save") {
+    const k = a.dataset.k, id = a.dataset.id; if (!NOTE_KINDS.includes(k) || !id) return;
+    const v = (document.getElementById("adm-note")?.value ?? ADM.noteDraft).trim().slice(0, NOTE_MAX), was = noteOf(k, id);
+    ADM.noting = null; ADM.noteDraft = "";
+    const put = x => { ADM.notes = { ...ADM.notes, [k]: { ...ADM.notes[k] } }; if (x) ADM.notes[k][id] = x; else delete ADM.notes[k][id]; };
+    put(v); render();
+    try { await setDoc(doc(FB.db, "config", "notes"), { [k]: { [id]: v || deleteField() }, updated: Date.now() }, { merge: true }); if (v !== was) toast(v ? "Note saved." : "Note removed."); }
+    catch (e) { console.error(e); put(was); render(); toast("That change didn't save. Check your connection and try again."); }
+  }
+}
+// a deleted competition's note goes with it (deleteTournament); only when there is one, so bulk deletes don't queue empty writes
+async function dropCompNote(tid) {
+  if (!noteOf("comps", tid)) return;
+  try { await setDoc(doc(FB.db, "config", "notes"), { comps: { [tid]: deleteField() }, updated: Date.now() }, { merge: true });
+    const c = { ...ADM.notes.comps }; delete c[tid]; ADM.notes = { ...ADM.notes, comps: c }; }
+  catch (e) { console.warn("note", e?.code || e); }
+}
 async function adminAction(act, a) {
+  if (act.startsWith("adm-note")) { await noteAction(act, a); return true; }
   if (act.startsWith("adm-clean")) { await cleanupAction(act, a); return true; }
   if (act === "adm-usage-connect") { await usageConnect(); return true; }
   if (act === "adm-usage-refresh") { USAGE.err = USAGE.err === "expired" ? USAGE.err : null; await usageRefresh(true); return true; }
@@ -1263,13 +1316,14 @@ async function adminAction(act, a) {
   return false;
 }
 S.overlayInput = el => {
+  if (el.id === "adm-note") { ADM.noteDraft = el.value; return true; }
   if (el.id !== "adm-q") return false;
   ADM.q = el.value; const q = fold(ADM.q.trim()); let n = 0;
   document.querySelectorAll("#adm-comps [data-name]").forEach(r => { r.hidden = !!q && !r.dataset.name.includes(q); if (!r.hidden) n++; });
   const c = document.getElementById("adm-count"); if (c) c.textContent = `${n} shown`;
   return true;
 };
-S.overlayChange = async el => el.id === "adm-name" || el.id === "adm-q";
+S.overlayChange = async el => el.id === "adm-name" || el.id === "adm-q" || el.id === "adm-note";
 let unsubSite = null;
 async function backfillArchived() {
   if (!isAdmin() || S.backfilled) return; S.backfilled = true;
