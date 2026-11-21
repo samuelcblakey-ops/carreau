@@ -46,7 +46,21 @@ const { chromium } = require('playwright');
   await p.click('main .cal-guide [data-act="guide-play"]'); await w(500);
   log('calendar page opens:', await p.evaluate(() => document.querySelector('#guide-modal video')?.getAttribute('src') + ' | ' + document.querySelector('#guide-modal h3')?.textContent));
   await p.click('#guide-modal [data-act="guide-close"]'); await w(300);
+  // the Pick the Winner guide (pick-game-guide-video): listed with its length, poster and video served, and the player opens it
   await p.evaluate(() => { location.hash = 'guides'; }); await w(600);
+  const pg = await p.evaluate(async () => { const card = document.querySelector('#guide-pick'), img = card?.querySelector('img');
+    if (img && !img.complete) await new Promise(r => { img.onload = img.onerror = r; });
+    const r = await fetch('videos/pick-the-winner.mp4'), n = (await r.arrayBuffer()).byteLength, rj = await fetch('videos/pick-the-winner.jpg');
+    const v = document.createElement('video'); v.muted = true; v.preload = 'metadata'; let size = 'n/a', len = 'n/a';
+    if (v.canPlayType('video/mp4; codecs="avc1.4d401f"')) { v.src = 'videos/pick-the-winner.mp4'; await new Promise(x => { v.onloadedmetadata = x; v.onerror = x; setTimeout(x, 8000); }); size = v.videoWidth + 'x' + v.videoHeight; len = Math.round(v.duration) >= 85 && Math.round(v.duration) <= 100; }
+    return { listed: card ? card.querySelector('b').textContent + ' · ' + card.querySelector('.small').textContent : 'not listed', poster: !!img && img.naturalWidth > 0 && rj.status === 200,
+      file: `${r.status} ${r.headers.get('content-type')} ${n > 1e6}`, size, len }; });
+  log(`pick guide: ${pg.listed} | poster ${pg.poster} | file ${pg.file} | video ${pg.size} | about 1½ min ${pg.len}`);
+  await p.click('.guide-card [data-act="guide-play"][data-id="pick"]'); await w(800);
+  log('pick guide plays: ' + await p.evaluate(async () => { const v = document.querySelector('#guide-modal video'); if (!v) return 'no player';
+    if (v.canPlayType('video/mp4; codecs="avc1.4d401f"')) { v.muted = true; try { await v.play(); } catch {} await new Promise(r => setTimeout(r, 1200)); }
+    return v.getAttribute('src') + ' | ' + document.querySelector('#guide-modal h3').textContent + ' | playing ' + (v.canPlayType('video/mp4; codecs="avc1.4d401f"') ? v.currentTime > 0 : 'n/a'); }));
+  await p.click('#guide-modal [data-act="guide-close"]'); await w(300);
   await p.click('.guide-card [data-act="guide-play"][data-id="shooting"]'); await w(800);
   const modal = await p.evaluate(async () => { const v = document.querySelector('#guide-modal video'); if (!v) return null;
     const can = !!v.canPlayType('video/mp4; codecs="avc1.4d401f"'); let dur = 'n/a';
