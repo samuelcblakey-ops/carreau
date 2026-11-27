@@ -142,8 +142,8 @@ function fbStore() {
     },
     // the Hall of Fame page: shown entries only (the rules refuse anything else), for one country or all. Equality filters only,
     // so no composite index is needed; the page sorts them. Past a few hundred entries, add an index and order by date instead.
-    listHof({ country } = {}) {
-      const c = [where("hidden", "==", false)]; if (country) c.push(where("country", "==", country));
+    listHof({ country, level } = {}) {
+      const c = [where("hidden", "==", false)]; if (country) c.push(where("country", "==", country)); if (level) c.push(where("level", "==", level));
       return getDocs(query(collection(db, "hallOfFame"), ...c, limit(300))).then(s => s.docs.map(d => d.data()));
     },
     // Season Calendar: one listing per competition (calendar/{competition id}), kept apart from the competition, like the Hall of Fame
@@ -295,6 +295,8 @@ S.hofCanPublish = t => !!(AUTH.user && t) && (isAdmin() || (!t.archived && !t.li
 S.calCanPublish = t => S.hofCanPublish(t);
 // the Season Calendar page: the admin can hide a listing, or show it again (firestore.rules lets only the admin change hidden)
 S.calAdmin = () => isAdmin();
+// Hall of Fame: only the admin gives an entry the International level (hof-international-level, enforced in firestore.rules)
+S.hofAdmin = () => isAdmin();
 // an event run elsewhere: its organisers are the device that added it (organiser login off) or the organiser code it was added
 // with (login on), devices that joined with its organiser link, and the admin (enforced in firestore.rules, evOrg)
 S.calJoined = calJoined;

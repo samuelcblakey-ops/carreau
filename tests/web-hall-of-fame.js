@@ -53,6 +53,22 @@ const { chromium } = require('playwright');
   log('hidden: visitor read', await raw(B, 'get', 'hallOfFame/' + tid), '| visitor list has it', (await raw(B, 'hofShown')).split(',').includes(tid), '| owner read', await raw(A, 'get', 'hallOfFame/' + tid), '| admin list', (await raw(AD, 'hofAll')).split(',').includes(tid));
   log('reason: owner', await raw(A, 'get', 'hallOfFame/' + tid + '/private/admin'), '| visitor', await raw(B, 'get', 'hallOfFame/' + tid + '/private/admin'), '| owner write', await raw(A, 'set', 'hallOfFame/' + tid + '/private/admin', { reason: '' }));
   log('owner unhide:', await raw(A, 'update', 'hallOfFame/' + tid, { hidden: false }), '| relevel:', await raw(A, 'update', 'hallOfFame/' + tid, { level: 'national' }), '| keep level:', await raw(A, 'update', 'hallOfFame/' + tid, { note: 'Still mine', level: 'open' }));
+  // International (hof-international-level): only the admin gives it; an organiser keeps it on update but can't set or leave it
+  const said = r => r === 'ok' ? 'allowed' : /^denied permission-denied/.test(r) ? 'denied' : r;
+  const entryB = Object.assign({}, entry, { tid: tidB, byUid: await B.evaluate(() => window.__testUid()) });
+  await B.click('[data-act="new-t"]'); await w(2500); const tidC = await B.evaluate(() => location.hash.slice(1));
+  log('organiser creates international: ' + said(await raw(B, 'set', 'hallOfFame/' + tidC, Object.assign({}, entryB, { tid: tidC, level: 'international' }))));
+  log('organiser sets international on its own entry: ' + said(await raw(B, 'update', 'hallOfFame/' + tidB, { level: 'international' })));
+  const adminSet = said(await raw(AD, 'update', 'hallOfFame/' + tidB, { level: 'international', levelSetBy: 'admin' }));
+  log('admin sets international: ' + adminSet + ' | levelSetBy ' + await AD.evaluate(async t => (await window.__testRaw.get('hallOfFame/' + t))?.levelSetBy, tidB));
+  log('organiser updates an admin-international entry, level kept: ' + said(await raw(B, 'update', 'hallOfFame/' + tidB, { note: 'World final', level: 'international' })));
+  log('organiser changes international to open: ' + said(await raw(B, 'update', 'hallOfFame/' + tidB, { level: 'open' })));
+  // even without the admin's lock, an organiser can't move an entry off International
+  log('admin international without the lock: ' + said(await raw(AD, 'set', 'hallOfFame/' + tidB, Object.assign({}, entryB, { level: 'international', country: 'TH' }))) + ' | organiser changes it to national: ' + said(await raw(B, 'update', 'hallOfFame/' + tidB, { level: 'national' })));
+  // the page on England lists it too (its query by level is one the rules allow)
+  const V = await mk('visitor page'); await V.goto(process.env.WEB_URL + '#halloffame'); await w(4000);
+  await V.evaluate(async () => { const c = document.querySelector('#hof-country'); c.value = 'GB-ENG'; c.dispatchEvent(new Event('change', { bubbles: true })); await new Promise(r => setTimeout(r, 2500)); });
+  log('visitor on England sees the Thai international entry: ' + await V.evaluate(t => !!document.getElementById('hof-' + t), tidB) + ' | badge ' + await V.evaluate(t => document.querySelector('#hof-' + t + ' .hof-level, #hof-' + t + ' .hof-tile-level')?.textContent.trim(), tidB));
   // #admin: bulk "Archive selected" marks the entry gone (no link to the competition); the list's Restore links it again
   const gone = () => AD.evaluate(async t => (await window.__testRaw.get('hallOfFame/' + t))?.gone, tid);
   await AD.click(`#adm-comps [data-act="adm-sel"][data-id="${tid}"]`); await w(300); await AD.click('#adm-comps [data-act="adm-bulk-arch"]'); await w(2500);

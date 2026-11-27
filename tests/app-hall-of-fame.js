@@ -62,6 +62,22 @@ const { chromium } = require('playwright');
     L.push(`locked level: disabled ${q('#modal .hof-pick').disabled} | note ${txt(q('#modal .hof-levels').parentElement).includes('The site admin set the level.')}`);
     q('#modal [data-act="hof-save"]').click(); await w(250);
     L.push(`after lock update: ${S.hof[C.T().id].level} ${S.hof[C.T().id].levelSetBy}`);
+    // International (hof-international-level): only the admin can give it, and it's then locked for the organiser
+    S.hofAdmin = () => true; q('[data-hof-panel] [data-act="hof-open"]').click(); await w(150);
+    L.push(`admin sheet levels: ${qa('#modal .hof-pick').map(x => txt(x)).join(' ')} | enabled ${!q('#modal .hof-pick').disabled}`);
+    q('#modal [data-act="hof-level"][data-k="international"]').click(); await w(60);
+    L.push(`international picked colour: ${getComputedStyle(q('#modal .hof-pick.hof-international')).backgroundColor}`);
+    q('#modal [data-act="hof-save"]').click(); await w(250);
+    L.push(`admin saves international: ${S.hof[C.T().id].level} | levelSetBy ${S.hof[C.T().id].levelSetBy}`);
+    delete S.hofAdmin; q('[data-hof-panel] [data-act="hof-open"]').click(); await w(150);
+    L.push(`organiser sheet on an international entry: ${qa('#modal .hof-pick').map(x => txt(x) + (x.classList.contains('on') ? '*' : '')).join(' ')} | locked ${q('#modal .hof-pick').disabled} | note ${txt(q('#modal .hof-levels').parentElement).includes('The site admin set the level.')}`);
+    q('#modal [data-act="close"]').click(); await w(80);
+    { const e = Object.assign({}, S.hof[C.T().id], { level: 'national' }); delete e.levelSetBy; await S.store.setHof(C.T().id, e); await w(150); }
+    q('[data-hof-panel] [data-act="hof-open"]').click(); await w(150);
+    L.push(`organiser sheet levels: ${qa('#modal .hof-pick').map(x => txt(x)).join(' ')}`);
+    q('#modal [data-act="hof-level"][data-k="international"]')?.click(); await w(60);
+    L.push(`organiser can't pick international: ${!q('#modal .hof-pick.hof-international')} | still ${q('#modal .hof-pick.on') ? txt(q('#modal .hof-pick.on')) : '-'}`);
+    q('#modal [data-act="close"]').click(); await w(80);
     // remove, with a confirm step
     q('[data-hof-panel] [data-act="hof-remove"]').click(); await w(80);
     L.push(`confirm: ${txt(q('[data-hof-panel] .err'))}`);

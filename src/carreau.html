@@ -480,12 +480,12 @@ body:has(#modal .modal) .roundalert{z-index:45}
 span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6px;vertical-align:-1px}
 /* Hall of Fame: level labels and the publish sheet (solid colours, white text) */
 .hof-level{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:#2e7d32;vertical-align:1px}
-.hof-level.hof-national{background:#b3261e}.hof-level.hof-regional{background:#1f5fa8}.hof-level.hof-open{background:#2e7d32}
+.hof-level.hof-international{background:#6b3fa0}.hof-level.hof-national{background:#b3261e}.hof-level.hof-regional{background:#1f5fa8}.hof-level.hof-open{background:#2e7d32}
 .hof-levels{display:flex;flex-wrap:wrap;gap:8px}
 .hof-pick{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:var(--card, transparent);color:inherit;font:inherit;font-weight:600;cursor:pointer}
-.hof-pick .dot{width:12px;height:12px;border-radius:50%;background:#2e7d32}.hof-pick.hof-national .dot{background:#b3261e}.hof-pick.hof-regional .dot{background:#1f5fa8}
+.hof-pick .dot{width:12px;height:12px;border-radius:50%;background:#2e7d32}.hof-pick.hof-international .dot{background:#6b3fa0}.hof-pick.hof-national .dot{background:#b3261e}.hof-pick.hof-regional .dot{background:#1f5fa8}
 .hof-pick.on{color:#fff;border-color:transparent}.hof-pick.on .dot{background:#fff}
-.hof-pick.hof-national.on{background:#b3261e}.hof-pick.hof-regional.on{background:#1f5fa8}.hof-pick.hof-open.on{background:#2e7d32}
+.hof-pick.hof-international.on{background:#6b3fa0}.hof-pick.hof-national.on{background:#b3261e}.hof-pick.hof-regional.on{background:#1f5fa8}.hof-pick.hof-open.on{background:#2e7d32}
 .hof-pick:disabled{opacity:.6;cursor:default}
 .hof-where{align-items:flex-end}.hof-where .f{flex:1 1 200px}
 .hof-part{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px}.hof-part input{width:22px;height:22px;margin-top:1px;flex:none}.hof-part.off{opacity:.65}
@@ -565,9 +565,9 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .hof-tools input[type=search]{width:100%;box-sizing:border-box}
 .hof-chips{display:flex;flex-wrap:wrap;gap:8px}
 .hof-chip{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
-.hof-chip .dot{width:10px;height:10px;border-radius:50%;background:#2e7d32}.hof-chip.hof-national .dot{background:#b3261e}.hof-chip.hof-regional .dot{background:#1f5fa8}
+.hof-chip .dot{width:10px;height:10px;border-radius:50%;background:#2e7d32}.hof-chip.hof-international .dot{background:#6b3fa0}.hof-chip.hof-national .dot{background:#b3261e}.hof-chip.hof-regional .dot{background:#1f5fa8}
 .hof-chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}.hof-chip[aria-pressed="true"] .dot{box-shadow:0 0 0 2px #fff}
-.hof-chip.hof-national[aria-pressed="true"]{background:#b3261e;border-color:#b3261e;color:#fff}.hof-chip.hof-regional[aria-pressed="true"]{background:#1f5fa8;border-color:#1f5fa8;color:#fff}.hof-chip.hof-open[aria-pressed="true"]{background:#2e7d32;border-color:#2e7d32;color:#fff}
+.hof-chip.hof-international[aria-pressed="true"]{background:#6b3fa0;border-color:#6b3fa0;color:#fff}.hof-chip.hof-national[aria-pressed="true"]{background:#b3261e;border-color:#b3261e;color:#fff}.hof-chip.hof-regional[aria-pressed="true"]{background:#1f5fa8;border-color:#1f5fa8;color:#fff}.hof-chip.hof-open[aria-pressed="true"]{background:#2e7d32;border-color:#2e7d32;color:#fff}
 @media (pointer:coarse){.hof-chip{min-height:44px}}
 .hof-year{gap:10px}.hof-year-h{margin:10px 0 0;font-size:24px}
 .hof-card{display:flex;flex-direction:column;gap:8px}.hof-card h3{margin:0;overflow-wrap:anywhere}
@@ -581,9 +581,9 @@ span.medal:empty{min-width:12px;width:12px;height:12px;padding:0;margin-right:6p
 .hof-count{display:inline-block;margin-left:10px;padding:1px 9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--muted);vertical-align:4px}
 .hof-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.hof-grid > .hof-card,.hof-list > .hof-card{grid-column:1/-1}
 .hof-tile{display:flex;flex-direction:column;align-items:stretch;gap:3px;min-width:0;padding:10px 10px 10px 11px;border:1px solid var(--line);border-left:4px solid #2e7d32;border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
-.hof-tile.hof-national{border-left-color:#b3261e}.hof-tile.hof-regional{border-left-color:#1f5fa8}.hof-tile:hover{box-shadow:0 0 0 1px var(--accent)}
+.hof-tile.hof-international{border-left-color:#6b3fa0}.hof-tile.hof-national{border-left-color:#b3261e}.hof-tile.hof-regional{border-left-color:#1f5fa8}.hof-tile:hover{box-shadow:0 0 0 1px var(--accent)}
 .hof-tile-level{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.hof-tile .dot,.hof-line .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#2e7d32;flex:none}.hof-national .dot{background:#b3261e}.hof-regional .dot{background:#1f5fa8}
+.hof-tile .dot,.hof-line .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#2e7d32;flex:none}.hof-international .dot{background:#6b3fa0}.hof-national .dot{background:#b3261e}.hof-regional .dot{background:#1f5fa8}
 .hof-tile-name{font-size:15px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .hof-tile-meta,.hof-tile-more,.hof-line-date,.hof-line-sub{font-size:12px;color:var(--muted)}
 .hof-tile-w,.hof-tile-r,.hof-line-w,.hof-line-r{display:flex;align-items:center;gap:6px;min-width:0;font-size:13px}.hof-tile-w,.hof-line-w{font-weight:700}
@@ -1860,7 +1860,7 @@ function localStore() {
     async deleteHof(tid) { return this.setHof(tid, null); },
     async updateHof(tid, patch) { if (!data.hof[tid]) throw { code: "not-found" }; return this.setHof(tid, Object.assign(clone(data.hof[tid]), clone(patch))); },
     async getHof(tid) { return data.hof[tid] ? clone(data.hof[tid]) : null; },
-    async listHof({ country } = {}) { return Object.values(data.hof).filter(e => !e.hidden && (!country || e.country === country)).map(clone); },
+    async listHof({ country, level } = {}) { return Object.values(data.hof).filter(e => !e.hidden && (!country || e.country === country) && (!level || e.level === level)).map(clone); },
     // Season Calendar listings (the web build keeps them in calendar/{cid})
     watchCal(cid, cb) { setTimeout(() => cb(data.cal[cid] ? clone(data.cal[cid]) : null)); const k = "c:" + cid; if (!subsL.has(k)) subsL.set(k, new Set()); subsL.get(k).add(cb); return () => subsL.get(k).delete(cb); },
     async setCal(cid, L) { if (L) data.cal[cid] = clone(L); else delete data.cal[cid]; persist(); setTimeout(() => (subsL.get("c:" + cid) || new Set()).forEach(cb => cb(L ? clone(L) : null))); },
@@ -1930,7 +1930,7 @@ function dbStore(db) {
     setHof(tid, e) { return db.doc(`hallOfFame/${tid}`).set(clone(e)); },
     deleteHof(tid) { return db.doc(`hallOfFame/${tid}`).delete(); },
     updateHof(tid, patch) { return db.doc(`hallOfFame/${tid}`).update(clone(patch)); },
-    listHof({ country } = {}) { return new Promise((res, rej) => { let u = null; u = db.collection("hallOfFame").limit(300).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => clone(d.data())).filter(e => !e.hidden && (!country || e.country === country))); }, rej); }); },
+    listHof({ country, level } = {}) { return new Promise((res, rej) => { let u = null; u = db.collection("hallOfFame").limit(300).onSnapshot(s => { setTimeout(() => u && u()); res(s.docs.map(d => clone(d.data())).filter(e => !e.hidden && (!country || e.country === country) && (!level || e.level === level))); }, rej); }); },
     watchCal(cid, cb, onErr) { return db.doc(`calendar/${cid}`).onSnapshot(d => cb(d.exists ? clone(d.data()) : null), onErr); },
     setCal(cid, L) { return db.doc(`calendar/${cid}`).set(clone(L)); },
     deleteCal(cid) { return db.doc(`calendar/${cid}`).delete(); },
@@ -3683,17 +3683,20 @@ async function archiveCompetition(on) {
 // Who counts: each knockout's final (Main, Silver, Consolante, A/B/C…, shooting knockouts); with no knockout,
 // the top two of the standings (Swiss, snake, round robin, mêlée players), of each league, of the clubs (inter-club),
 // or of a shooting final. Entries are a snapshot, so they outlive the competition being archived or deleted.
-const HOF_LEVELS = ["national", "regional", "open"];
-const HOF_COLOUR = { national: "#b3261e", regional: "#1f5fa8", open: "#2e7d32" };
+const HOF_LEVELS = ["national", "regional", "open"]; // the Season Calendar's levels too
+// the Hall of Fame adds International (hof-international-level), which only the site admin gives
+const HOF_ALL_LEVELS = ["international", ...HOF_LEVELS];
+const HOF_COLOUR = { international: "#6b3fa0", national: "#b3261e", regional: "#1f5fa8", open: "#2e7d32" };
+const hofIsAdmin = () => !!S.hofAdmin?.();
 const HOF_I18N = {
-  en: { national: "National", regional: "Regional", open: "Open", "GB-ENG": "England", "GB-SCT": "Scotland", "GB-WLS": "Wales", "GB-NIR": "Northern Ireland" },
-  fr: { national: "National", regional: "Régional", open: "Open", "GB-ENG": "Angleterre", "GB-SCT": "Écosse", "GB-WLS": "Pays de Galles", "GB-NIR": "Irlande du Nord" },
-  es: { national: "Nacional", regional: "Regional", open: "Abierto", "GB-ENG": "Inglaterra", "GB-SCT": "Escocia", "GB-WLS": "Gales", "GB-NIR": "Irlanda del Norte" },
-  it: { national: "Nazionale", regional: "Regionale", open: "Open", "GB-ENG": "Inghilterra", "GB-SCT": "Scozia", "GB-WLS": "Galles", "GB-NIR": "Irlanda del Nord" },
-  de: { national: "National", regional: "Regional", open: "Offen", "GB-ENG": "England", "GB-SCT": "Schottland", "GB-WLS": "Wales", "GB-NIR": "Nordirland" },
-  nl: { national: "Nationaal", regional: "Regionaal", open: "Open", "GB-ENG": "Engeland", "GB-SCT": "Schotland", "GB-WLS": "Wales", "GB-NIR": "Noord-Ierland" },
-  pt: { national: "Nacional", regional: "Regional", open: "Aberto", "GB-ENG": "Inglaterra", "GB-SCT": "Escócia", "GB-WLS": "País de Gales", "GB-NIR": "Irlanda do Norte" },
-  th: { national: "ระดับชาติ", regional: "ระดับภูมิภาค", open: "โอเพ่น", "GB-ENG": "อังกฤษ", "GB-SCT": "สกอตแลนด์", "GB-WLS": "เวลส์", "GB-NIR": "ไอร์แลนด์เหนือ" },
+  en: { international: "International", national: "National", regional: "Regional", open: "Open", "GB-ENG": "England", "GB-SCT": "Scotland", "GB-WLS": "Wales", "GB-NIR": "Northern Ireland" },
+  fr: { international: "International", national: "National", regional: "Régional", open: "Open", "GB-ENG": "Angleterre", "GB-SCT": "Écosse", "GB-WLS": "Pays de Galles", "GB-NIR": "Irlande du Nord" },
+  es: { international: "Internacional", national: "Nacional", regional: "Regional", open: "Abierto", "GB-ENG": "Inglaterra", "GB-SCT": "Escocia", "GB-WLS": "Gales", "GB-NIR": "Irlanda del Norte" },
+  it: { international: "Internazionale", national: "Nazionale", regional: "Regionale", open: "Open", "GB-ENG": "Inghilterra", "GB-SCT": "Scozia", "GB-WLS": "Galles", "GB-NIR": "Irlanda del Nord" },
+  de: { international: "International", national: "National", regional: "Regional", open: "Offen", "GB-ENG": "England", "GB-SCT": "Schottland", "GB-WLS": "Wales", "GB-NIR": "Nordirland" },
+  nl: { international: "Internationaal", national: "Nationaal", regional: "Regionaal", open: "Open", "GB-ENG": "Engeland", "GB-SCT": "Schotland", "GB-WLS": "Wales", "GB-NIR": "Noord-Ierland" },
+  pt: { international: "Internacional", national: "Nacional", regional: "Regional", open: "Aberto", "GB-ENG": "Inglaterra", "GB-SCT": "Escócia", "GB-WLS": "País de Gales", "GB-NIR": "Irlanda do Norte" },
+  th: { international: "ระดับนานาชาติ", national: "ระดับชาติ", regional: "ระดับภูมิภาค", open: "โอเพ่น", "GB-ENG": "อังกฤษ", "GB-SCT": "สกอตแลนด์", "GB-WLS": "เวลส์", "GB-NIR": "ไอร์แลนด์เหนือ" },
 };
 // the UK's home nations are separate, as their federations are; the rest are ISO country codes
 const HOF_COUNTRIES = ["GB-ENG", "GB-SCT", "GB-WLS", "GB-NIR", "IE", "FR", "BE", "NL", "LU", "DE", "CH", "AT", "ES", "PT", "IT", "MC", "AD", "DK", "SE", "NO", "FI", "IS",
@@ -3714,7 +3717,7 @@ function hofDefaultCountry() {
   const byLang = { fr: "FR", es: "ES", it: "IT", de: "DE", nl: "NL", pt: "PT", th: "TH" }[(langs[0] || "").slice(0, 2).toLowerCase()];
   return byLang || "GB-ENG";
 }
-const hofLabel = level => `<span class="hof-level hof-${HOF_LEVELS.includes(level) ? level : "open"}" data-notr>${esc(hofWord(HOF_LEVELS.includes(level) ? level : "open"))}</span>`;
+const hofLabel = level => `<span class="hof-level hof-${HOF_ALL_LEVELS.includes(level) ? level : "open"}" data-notr>${esc(hofWord(HOF_ALL_LEVELS.includes(level) ? level : "open"))}</span>`;
 // a side of a game (or a ranked entry) as it's kept in the Hall of Fame: its name and its players
 function hofSide(t, ids) {
   ids = (ids || []).filter(Boolean); if (!ids.length) return null;
@@ -3805,7 +3808,8 @@ function hofOpen(t) {
   renderModal();
 }
 function renderHofModal(t, el) {
-  const md = S.modal, e = S.hof?.[t.id] || null, r = hofResult(t); const lockL = e?.levelSetBy === "admin", lockC = e?.countrySetBy === "admin";
+  const md = S.modal, e = S.hof?.[t.id] || null, r = hofResult(t); const lockL = e?.levelSetBy === "admin" && !hofIsAdmin(), lockC = e?.countrySetBy === "admin";
+  const levels = hofIsAdmin() || md.level === "international" ? HOF_ALL_LEVELS : HOF_LEVELS; // International: the admin's only
   const d = t.date ? new Date(t.date + "T12:00").toLocaleDateString(LOCALES[I18N.lang], { day: "numeric", month: "short", year: "numeric" }) : "";
   const countries = HOF_COUNTRIES.map(c => [c, hofCountryName(c)]).sort((a, b) => (a[0].startsWith("GB-") ? 0 : 1) - (b[0].startsWith("GB-") ? 0 : 1) || a[1].localeCompare(b[1], LOCALES[I18N.lang] || "en"));
   if (!countries.some(c => c[0] === md.country)) countries.unshift([md.country, hofCountryName(md.country)]);
@@ -3814,7 +3818,7 @@ function renderHofModal(t, el) {
     <div class="spread"><div><div class="eyebrow">Hall of Fame</div><h3>${e ? "Update the Hall of Fame entry" : "Publish to the Hall of Fame"}</h3></div><button class="btn ghost" data-act="close" aria-label="Close">✕</button></div>
     <div class="small"><b data-notr>${esc(t.name)}</b><div class="muted" data-notr>${esc([d, t.venue].filter(Boolean).join(" · "))}</div></div>
     <div class="stack" style="gap:6px"><div class="eyebrow">Competition level</div>
-      <div class="hof-levels" role="group" aria-label="Competition level">${HOF_LEVELS.map(l => `<button type="button" class="hof-pick hof-${l} ${md.level === l ? "on" : ""}" data-act="hof-level" data-k="${l}" aria-pressed="${md.level === l}" ${lockL ? "disabled" : ""}><span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(l))}</span></button>`).join("")}</div>
+      <div class="hof-levels" role="group" aria-label="Competition level">${levels.map(l => `<button type="button" class="hof-pick hof-${l} ${md.level === l ? "on" : ""}" data-act="hof-level" data-k="${l}" aria-pressed="${md.level === l}" ${lockL ? "disabled" : ""}><span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(l))}</span></button>`).join("")}</div>
       ${lockL ? `<span class="small muted">The site admin set the level.</span>` : ""}</div>
     <div class="row hof-where"><label class="f"><span>Country</span><select data-hof="country" ${lockC ? "disabled" : ""}>${countries.map(([c, n]) => `<option value="${esc(c)}" ${c === md.country ? "selected" : ""} data-notr>${esc(n)}</option>`).join("")}</select></label>
       <label class="f"><span>Region (optional)</span><input type="text" maxlength="60" data-hof="region" value="${esc(md.region)}" placeholder="e.g. Chiltern"></label></div>
@@ -3838,16 +3842,17 @@ function hofEntry(t, md, prev) {
   const r = hofResult(t); const parts = r.parts.filter(p => p.done && md.parts[p.id]).map(p => ({ id: p.id, name: p.name, winner: p.winner, runnerUp: p.runnerUp || null }));
   const now = Date.now(); const who = S.hofWho ? S.hofWho() : { byUid: "", byCode: "" };
   const e = { tid: t.id, name: String(t.name || "").slice(0, 120), date: t.date || "", venue: String(t.venue || "").slice(0, 120), entry: t.entry || "teams", fmt: t.format || "", system: sysOf(t),
-    level: prev?.levelSetBy === "admin" ? prev.level : md.level, country: prev?.countrySetBy === "admin" ? prev.country : md.country,
+    level: prev?.levelSetBy === "admin" && !hofIsAdmin() ? prev.level : md.level, country: prev?.countrySetBy === "admin" ? prev.country : md.country,
     region: String(md.region || "").trim().slice(0, 60), note: String(md.note || "").trim().slice(0, 280), parts, sig: hofSig(parts), lang: I18N.lang,
     publishedAt: prev?.publishedAt || now, updatedAt: now, byUid: prev ? prev.byUid || "" : who.byUid || "", byCode: prev ? prev.byCode || "" : who.byCode || "", hidden: prev ? !!prev.hidden : false };
   // what only the site admin sets is carried over unchanged
   ["hiddenAt", "levelSetBy", "countrySetBy"].forEach(k => { if (prev && prev[k] !== undefined) e[k] = prev[k]; });
+  if (e.level === "international" && hofIsAdmin()) e.levelSetBy = "admin"; // locked for the organiser, as the admin's other level settings are
   return e;
 }
 async function hofAction(act, k) {
   const md = S.modal, t = T(); if (!t || t.id !== md.tid) { S.modal = null; renderModal(); return; }
-  if (act === "hof-level") { if (HOF_LEVELS.includes(k)) md.level = k; renderModal(); return; }
+  if (act === "hof-level") { if (HOF_LEVELS.includes(k) || (k === "international" && hofIsAdmin())) md.level = k; renderModal(); return; }
   if (act === "hof-save") {
     const prev = S.hof?.[t.id] || null; const e = hofEntry(t, md, prev);
     if (!e.parts.length) { md.err = "Tick at least one part to publish."; renderModal(); return; }
@@ -3886,7 +3891,9 @@ async function hofLoad(force) {
   if (P.store !== S.store) { P.store = S.store; P.cache = {}; } // the website swaps the stand-in store for Firebase once signed in
   const c = P.cache[key]; if (!force && c && (c.loading || Date.now() - c.at < 5 * 60e3)) return;
   const mine = P.cache[key] = { loading: true, at: Date.now(), list: null };
-  try { const list = S.store.listHof ? await S.store.listHof(key === "all" ? {} : { country: key }) : []; mine.list = list.filter(e => e && !e.hidden); }
+  // a country also shows every International entry (hof-international-level): a world championship isn't one country's event
+  try { let list = !S.store.listHof ? [] : key === "all" ? await S.store.listHof({}) : (await Promise.all([S.store.listHof({ country: key }), S.store.listHof({ level: "international" })])).flat();
+    mine.list = [...new Map(list.filter(e => e && !e.hidden).map(e => [e.tid, e])).values()]; }
   catch (err) { console.error(err); mine.err = true; mine.at = 0; }
   mine.loading = false; if (P.cache[key] === mine && hofOnPage()) hofPaint();
 }
@@ -3997,7 +4004,7 @@ function renderHofPage() {
         <label class="f"><span>Country</span><select id="hof-country">${[["all", "All countries"], ...countries].map(([c, n]) => `<option value="${esc(c)}"${c === P.country ? " selected" : ""}${c === "all" ? "" : " data-notr"}>${esc(n)}</option>`).join("")}</select></label>
         <label class="f"><span>Format</span><select id="hof-fmt">${[["all", "All formats"], ...HOF_FORMATS].map(([k, n]) => `<option value="${k}"${k === P.fmt ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>
       </div>
-      <div class="hof-chips" role="group" aria-label="Competition level">${["all", ...HOF_LEVELS].map(k => `<button type="button" class="hof-chip${k === "all" ? "" : " hof-" + k}" data-act="hof-filter-level" data-k="${k}" aria-pressed="${P.level === k}">${k === "all" ? "All levels" : `<span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(k))}</span>`}</button>`).join("")}</div>
+      <div class="hof-chips" role="group" aria-label="Competition level">${["all", ...HOF_ALL_LEVELS].map(k => `<button type="button" class="hof-chip${k === "all" ? "" : " hof-" + k}" data-act="hof-filter-level" data-k="${k}" aria-pressed="${P.level === k}">${k === "all" ? "All levels" : `<span class="dot" aria-hidden="true"></span><span data-notr>${esc(hofWord(k))}</span>`}</button>`).join("")}</div>
       <div class="hof-viewbar"><span class="eyebrow">Layout</span><div class="seg" role="group" aria-label="Layout">${HOF_VIEWS.map(([k, l]) => `<button type="button" data-act="hof-view" data-k="${k}" aria-pressed="${hofView() === k}">${HOF_VIEW_ICON[k]}<span>${l}</span></button>`).join("")}</div></div>
     </div>
     <div id="hof-results" class="stack" aria-live="polite">${hofResultsHtml()}</div>
@@ -8107,7 +8114,7 @@ document.addEventListener("click", async e => {
   if (act.startsWith("pk-")) { await pickAction(act, a, t); return; }
   switch (act) {
     case "hof-open": if (t && hofCan(t)) hofOpen(t); break;
-    case "hof-filter-level": hofPage().level = HOF_LEVELS.includes(a.dataset.k) ? a.dataset.k : "all"; hofRedraw(); break;
+    case "hof-filter-level": hofPage().level = HOF_ALL_LEVELS.includes(a.dataset.k) ? a.dataset.k : "all"; hofRedraw(); break;
     case "hof-all-countries": hofPage().country = "all"; hofRedraw(); break;
     case "hof-clear": Object.assign(hofPage(), { q: "", level: "all", fmt: "all" }); hofRedraw(); break;
     case "hof-retry": hofLoad(true); hofRedraw(); break;

@@ -120,6 +120,30 @@ const SEED = () => {
     q('[data-act="lang-menu"]').click(); await w(30); q('[data-lang="en"]').click(); await w(150);
   } catch (e) { L.push('ERR ' + e.message + ' ' + (e.stack || '').split('\n')[1]); } return L; });
   console.log(out.join('\n'));
+  // International (hof-international-level): its chip and purple badge, and it shows under every country
+  console.log(await p.evaluate(async () => { const C = window.__carreau, S = C.S, w = ms => new Promise(r => setTimeout(r, ms)), q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)];
+    const txt = el => (el?.textContent || '').replace(/\s+/g, ' ').trim(), hex = c => '#' + c.match(/\d+/g).slice(0, 3).map(n => (+n).toString(16).padStart(2, '0')).join('');
+    const E = (tid, o) => Object.assign({ tid, name: '', date: '2026-11-24', venue: 'Khon Kaen', entry: 'teams', fmt: 'triples', system: 'knockout', level: 'open', country: 'TH', region: '', note: '',
+      parts: [{ id: 'ko-A', name: 'Main knockout', winner: { name: 'Madagascar (MAD)', players: [] }, runnerUp: { name: 'France (FRA)', players: [] } }], sig: '', lang: 'en', publishedAt: Date.now(), updatedAt: Date.now(), byUid: '', byCode: '', hidden: false }, o);
+    await S.store.setHof('t7', E('t7', { name: "World Championships 2026 · Men's Triples", level: 'international', levelSetBy: 'admin' }));
+    await S.store.setHof('t8', E('t8', { name: 'Thai National Triples', level: 'national', date: '2026-05-01' })); await w(100);
+    location.hash = 'halloffame'; await w(250); C.hofPage().cache = {};
+    const ch = q('#hof-country'); ch.value = 'GB-ENG'; ch.dispatchEvent(new Event('change', { bubbles: true })); await w(300);
+    q('[data-act="hof-view"][data-k="cards"]').click(); await w(150);
+    const L = [];
+    L.push(`level chips: ${qa('.hof-chip').map(txt).join(' | ')}`);
+    L.push(`international badge colour: ${q('#hof-t7 .hof-level') ? hex(getComputedStyle(q('#hof-t7 .hof-level')).backgroundColor) : 'no badge'} | chip dot ${hex(getComputedStyle(q('.hof-chip.hof-international .dot')).backgroundColor)}`);
+    L.push(`country England: international entries shown ${!!q('#hof-t7')} | Thailand-only national entry hidden ${!q('#hof-t8')}`);
+    q('[data-act="hof-filter-level"][data-k="international"]').click(); await w(150);
+    L.push(`international chip with England: ${qa('#hof-results .hof-card h3').map(txt).join(' / ')} | pressed colour ${hex(getComputedStyle(q('.hof-chip.hof-international')).backgroundColor)}`);
+    q('[data-act="hof-filter-level"][data-k="all"]').click(); await w(150);
+    { const c2 = q('#hof-country'); c2.value = 'TH'; c2.dispatchEvent(new Event('change', { bubbles: true })); } await w(300);
+    L.push(`country Thailand: ${qa('#hof-results .hof-card h3').map(txt).join(' / ')}`);
+    // the Season Calendar keeps its three levels
+    location.hash = 'calendar'; await w(300);
+    L.push(`calendar levels unchanged: ${qa('.hof-chip[data-act="cal-filter-level"]').map(txt).filter(x => x !== 'All levels').join(' ')}`);
+    location.hash = 'halloffame'; await w(250);
+    return L.join('\n'); }));
   // 12. on a phone: the header with the trophy and the page fit the width
   await p.setViewportSize({ width: 375, height: 760 }); await p.evaluate(() => { location.hash = 'halloffame'; }); await p.waitForTimeout(300);
   await p.evaluate(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); document.querySelector('#hof-country').value = 'all'; document.querySelector('#hof-country').dispatchEvent(new Event('change', { bubbles: true })); await w(200);
@@ -129,5 +153,8 @@ const SEED = () => {
   console.log('phone list: ' + JSON.stringify(await p.evaluate(() => { const l = document.querySelector('.hof-line'); return { overflow: document.documentElement.scrollWidth > innerWidth + 1, venue: getComputedStyle(l.querySelector('.hof-line-sub')).display, height: Math.round(l.getBoundingClientRect().height) < 70 }; })));
   console.log('phone: ' + JSON.stringify(await p.evaluate(() => ({ overflow: document.documentElement.scrollWidth > innerWidth + 1, trophy: !!document.querySelector('header .hof-btn'),
     label: getComputedStyle(document.querySelector('header .hof-btn span')).display, picker: Math.round(document.querySelector('.picker-btn')?.getBoundingClientRect().width || 0) }))));
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(200);
+  console.log('390 px: ' + (await p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1 || [...document.querySelectorAll('.hof-chip')].some(c => c.getBoundingClientRect().right > innerWidth + 0.5)) ? 'sideways scroll' : 'no sideways scroll') + ' | chips ' + await p.evaluate(() => document.querySelectorAll('.hof-chip').length));
+  await p.screenshot({ path: process.env.OUT + '/app-hall-of-fame-page-390-international.png' });
   console.log('errs', errs); await b.close();
 })();
