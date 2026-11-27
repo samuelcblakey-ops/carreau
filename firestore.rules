@@ -261,7 +261,7 @@ service cloud.firestore {
     function hofShape(d, tid) {
       return d.keys().hasOnly(['tid', 'name', 'date', 'venue', 'entry', 'fmt', 'system', 'level', 'country', 'region', 'note', 'parts', 'sig', 'lang',
                                'publishedAt', 'updatedAt', 'byUid', 'byCode', 'hidden', 'hiddenAt', 'levelSetBy', 'countrySetBy', 'gone'])
-        && d.tid == tid && d.name is string && d.name.size() <= 120 && d.level in ['national', 'regional', 'open']
+        && d.tid == tid && d.name is string && d.name.size() <= 120 && d.level in ['international', 'national', 'regional', 'open']
         && d.country is string && d.country.size() >= 2 && d.country.size() <= 8
         && d.get('region', '') is string && d.get('region', '').size() <= 60 && d.get('note', '') is string && d.get('note', '').size() <= 300
         && d.get('venue', '') is string && d.get('venue', '').size() <= 120
@@ -273,10 +273,13 @@ service cloud.firestore {
       allow list: if isAdmin() || resource.data.hidden == false;
       allow create: if hofShape(request.resource.data, tid)
                     && (isAdmin() || (hofOrganiser(tid) && request.resource.data.byUid == request.auth.uid && request.resource.data.hidden == false
-                                      && !request.resource.data.keys().hasAny(['hiddenAt', 'levelSetBy', 'countrySetBy'])));
+                                      && !request.resource.data.keys().hasAny(['hiddenAt', 'levelSetBy', 'countrySetBy'])
+                                      && request.resource.data.level != 'international'));
+      // 'international' (hof-international-level) is the admin's to give: an organiser's update keeps it only if it was already set
       allow update: if hofShape(request.resource.data, tid)
                     && (isAdmin() || (hofOrganiser(tid) && same('hidden') && same('hiddenAt') && same('levelSetBy') && same('countrySetBy')
                                       && same('byUid') && same('byCode') && same('publishedAt')
+                                      && ((request.resource.data.level != 'international' && resource.data.level != 'international') || same('level'))
                                       && (resource.data.get('levelSetBy', '') != 'admin' || same('level'))
                                       && (resource.data.get('countrySetBy', '') != 'admin' || same('country'))));
       allow delete: if isAdmin() || hofOrganiser(tid);
